@@ -1,0 +1,27 @@
+main: camp.pvp.Practice
+name: Camp
+version: ${plugin.desc}
+author: pvp.camp
+depend:
+  - NetworkHelper
+  - ProtocolLib
+
+commands:
+  arena:
+    description: Arena configuration utility.
+  duel:
+    description: Duel another player or team.
+  event:
+    description: Host an event.
+  leaderboards:
+    aliases: [leaderboard, lb, elo]
+    description: View player leaderboards.
+  practiceutil:
+    aliases: [putil, putils, pu]
+    description: General staff utility command.
+  settings:
+    aliases: [options]
+    description: General server settings.
+  statistics:
+    aliases: [stats]
+    description: View the statistics of yourself or another player.
