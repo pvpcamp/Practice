@@ -1,6 +1,7 @@
 package camp.pvp;
 
 import camp.pvp.arenas.ArenaManager;
+import camp.pvp.commands.PlayerTimeCommand;
 import camp.pvp.listeners.bukkit.PlayerJoinLeaveListeners;
 import camp.pvp.profiles.GameProfileManager;
 import camp.pvp.sidebar.SidebarAdapter;
@@ -36,11 +37,12 @@ public class Practice extends JavaPlugin {
         this.gameProfileManager = new GameProfileManager(this);
 
         this.assemble = new Assemble(this, new SidebarAdapter(this));
-        assemble.setTicks(5);
+        assemble.setTicks(10);
         assemble.setAssembleStyle(AssembleStyle.MODERN);
         assemble.setup();
 
-        new PlayerJoinLeaveListeners(this);
+        registerCommands();
+        registerListeners();
     }
 
     @Override
@@ -51,5 +53,13 @@ public class Practice extends JavaPlugin {
         assemble.cleanup();
 
         instance = null;
+    }
+
+    public void registerCommands() {
+        new PlayerTimeCommand(this);
+    }
+
+    public void registerListeners() {
+        new PlayerJoinLeaveListeners(this);
     }
 }

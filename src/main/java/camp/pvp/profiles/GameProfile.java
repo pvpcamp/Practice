@@ -15,12 +15,34 @@ public class GameProfile {
         LOBBY, LOBBY_QUEUE, LOBBY_PARTY, KIT_EDITOR, IN_GAME, IN_GAME_WAITING, SPECTATING
     }
 
+    public enum Time {
+        SUNRISE, DAY, SUNSET, NIGHT;
+
+        public long getTime() {
+            switch(this) {
+                case SUNRISE: return 0;
+                case DAY: return 6000;
+                case SUNSET: return 12000;
+                case NIGHT: return 18000;
+                default: return 1337;
+            }
+
+        }
+    }
+
+    // Stored DB values.
     private @Getter final UUID uuid;
     private @Getter @Setter String name;
+    private @Getter @Setter Time time;
+    private @Getter @Setter State state;
+
     private @Getter @Setter Game game;
 
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
+
+        this.state = State.LOBBY;
+        this.time = Time.DAY;
     }
 
     public void documentImport(Document document) {
@@ -30,6 +52,7 @@ public class GameProfile {
     public Map<String, Object> export() {
         Map<String, Object> values = new HashMap<>();
         values.put("name", name);
+        values.put("time", time.toString());
 
         return values;
     }

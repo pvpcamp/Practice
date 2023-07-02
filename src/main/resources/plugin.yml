@@ -3,6 +3,7 @@ name: Camp
 version: ${plugin.desc}
 author: pvp.camp
 depend:
+  - Gooey2
   - NetworkHelper
   - ProtocolLib
 
@@ -16,6 +17,9 @@ commands:
   leaderboards:
     aliases: [leaderboard, lb, elo]
     description: View player leaderboards.
+  playertime:
+    aliases: [ptime, day, night, sunrise, sunset]
+    description: Changes the time of day for yourself.
   practiceutil:
     aliases: [putil, putils, pu]
     description: General staff utility command.
