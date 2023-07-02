@@ -1,5 +1,8 @@
 package camp.pvp;
 
+import camp.pvp.arenas.ArenaManager;
+import camp.pvp.listeners.bukkit.PlayerJoinLeaveListeners;
+import camp.pvp.profiles.GameProfileManager;
 import camp.pvp.sidebar.SidebarAdapter;
 import camp.pvp.utils.EntityHider;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -13,11 +16,13 @@ public class Practice extends JavaPlugin {
 
     public @Getter static Practice instance;
 
-    public ProtocolManager protocolManager;
-    public EntityHider entityHider;
+    private @Getter ProtocolManager protocolManager;
+    private @Getter EntityHider entityHider;
 
-    public Assemble assemble;
+    private Assemble assemble;
 
+    private @Getter ArenaManager arenaManager;
+    private @Getter GameProfileManager gameProfileManager;
 
 
     @Override
@@ -27,14 +32,24 @@ public class Practice extends JavaPlugin {
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.entityHider = new EntityHider(this, EntityHider.Policy.BLACKLIST);
 
+        this.arenaManager = new ArenaManager(this);
+        this.gameProfileManager = new GameProfileManager(this);
+
         this.assemble = new Assemble(this, new SidebarAdapter(this));
         assemble.setTicks(5);
         assemble.setAssembleStyle(AssembleStyle.MODERN);
         assemble.setup();
+
+        new PlayerJoinLeaveListeners(this);
     }
 
     @Override
     public void onDisable() {
+        arenaManager.shutdown();
+        gameProfileManager.shutdown();
+
+        assemble.cleanup();
+
         instance = null;
     }
 }

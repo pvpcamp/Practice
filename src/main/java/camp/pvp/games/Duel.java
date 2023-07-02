@@ -1,4 +1,10 @@
 package camp.pvp.games;
 
-public class Duel {
+import java.util.UUID;
+
+public class Duel extends Game{
+
+    public Duel(UUID uuid) {
+        super(uuid);
+    }
 }

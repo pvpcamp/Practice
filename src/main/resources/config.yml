@@ -1,1 +1,4 @@
 messages:
+mongo:
+  collections:
+    profile_collection: "practice_profiles"
