@@ -27,19 +27,16 @@ public class GameProfileManager {
 
         this.mongoManager = NetworkHelper.getInstance().getMongoManager();
 
-        this.logger.info("Starting GameProfileManager...");
+        this.logger.info("Started GameProfileManager.");
     }
 
     public GameProfile find(UUID uuid, boolean store) {
         GameProfile profile = loadedProfiles.get(uuid);
         if(profile == null) {
-            logger.info("Did not find profile for " + uuid.toString());
             profile = importFromDatabase(uuid, store);
             if(store) {
                 loadedProfiles.put(uuid, profile);
             }
-        } else {
-            logger.info("Found profile " + profile.getUuid().toString());
         }
 
         return profile;
@@ -53,11 +50,16 @@ public class GameProfileManager {
         return GameProfile.State.LOBBY;
     }
 
+    public void updateGlobalPlayerVisibility() {
+        for(GameProfile profile : loadedProfiles.values()) {
+            profile.updatePlayerVisibility();
+        }
+    }
+
     public GameProfile create(Player player) {
         GameProfile profile = new GameProfile(player.getUniqueId());
 
         profile.setName(player.getName());
-        logger.info("Player name: " + profile.getName());
 
         MongoUpdate mu = new MongoUpdate("practice_profiles", profile.getUuid());
         mu.setUpdate(profile.export());
