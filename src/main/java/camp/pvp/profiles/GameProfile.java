@@ -2,6 +2,7 @@ package camp.pvp.profiles;
 
 import camp.pvp.Practice;
 import camp.pvp.games.Game;
+import camp.pvp.games.PostGameInventory;
 import camp.pvp.interactables.InteractableItem;
 import camp.pvp.interactables.InteractableItems;
 import camp.pvp.utils.PlayerUtils;

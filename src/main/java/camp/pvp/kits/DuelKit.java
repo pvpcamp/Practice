@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public enum DuelKit {
-    NO_DEBUFF, DEBUFF, BOXING, SOUP;
+    NO_DEBUFF, DEBUFF, BOXING, SOUP, BUILD_UHC;
 
     public String getDisplayName() {
         switch(this) {
@@ -47,6 +47,15 @@ public enum DuelKit {
             case NO_DEBUFF:
             case DEBUFF:
             case SOUP:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public boolean isBuild() {
+        switch(this) {
+            case BUILD_UHC:
                 return true;
             default:
                 return false;

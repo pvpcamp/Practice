@@ -66,6 +66,7 @@ public class Practice extends JavaPlugin {
     @Override
     public void onDisable() {
         arenaManager.shutdown();
+        gameManager.shutdown();
         gameProfileManager.shutdown();
 
 

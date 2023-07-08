@@ -12,17 +12,18 @@ import java.util.UUID;
 @Getter @Setter
 public class GameParticipant {
 
-    public final UUID uuid;
-    public final String name;
-    public boolean alive;
+    private final UUID uuid;
+    private final String name;
+    private boolean alive;
 
     private Map<PlayerCooldown.Type, PlayerCooldown> cooldowns;
 
-    public UUID attacker;
-    public EntityDamageEvent.DamageCause lastDamageCause;
+    private UUID attacker;
+    private EntityDamageEvent.DamageCause lastDamageCause;
 
     public int hits, currentCombo, longestCombo;
 
+    private PostGameInventory postGameInventory;
 
     public GameParticipant(UUID uuid, String name) {
         this.uuid = uuid;

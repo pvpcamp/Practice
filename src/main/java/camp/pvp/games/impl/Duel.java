@@ -3,6 +3,7 @@ package camp.pvp.games.impl;
 import camp.pvp.Practice;
 import camp.pvp.arenas.Arena;
 import camp.pvp.arenas.ArenaPosition;
+import camp.pvp.cooldowns.PlayerCooldown;
 import camp.pvp.games.Game;
 import camp.pvp.games.GameInventory;
 import camp.pvp.games.GameParticipant;
@@ -21,6 +22,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -45,7 +47,15 @@ public class Duel extends Game {
         if(getArena() == null) {
             for(Arena a : getPlugin().getArenaManager().getArenas()) {
                 if(a.isEnabled()) {
-                    list.add(a);
+                    if (kit.isBuild()) {
+                        if (a.getType().equals(Arena.Type.DUEL_BUILD)) {
+                            list.add(a);
+                        }
+                    } else {
+                        if(a.getType().equals(Arena.Type.DUEL)) {
+                            list.add(a);
+                        }
+                    }
                 }
             }
 
@@ -62,103 +72,115 @@ public class Duel extends Game {
                 this.setArena(list.get(0));
             }
         }
-
-        this.setState(State.STARTING);
-
-        StringBuilder stringBuilder = new StringBuilder();
-        List<Player> players = new ArrayList<>(this.getAlivePlayers());
-        int s = 0;
-        while(s != this.getAlive().size()) {
-            Player p = players.get(0);
-            stringBuilder.append(ChatColor.WHITE + p.getName());
-
-            players.remove(p);
-            s++;
-            if(s == this.getAlivePlayers().size()) {
-                stringBuilder.append(ChatColor.GRAY + ".");
-            } else {
-                stringBuilder.append(ChatColor.GRAY + ", ");
-            }
-        }
-
-        for(Player p : this.getAllPlayers()) {
-            p.sendMessage(" ");
-            p.sendMessage(Colors.get("&6&lDuel starting in 5 seconds."));
-            p.sendMessage(Colors.get(" &7● &6Mode: &f" + this.queueType.toString()));
-            p.sendMessage(Colors.get(" &7● &6Map: &f" + Colors.get(getArena().getDisplayName())));
-            p.sendMessage(Colors.get(" &7● &6Participants: &f" + stringBuilder));
-            p.sendMessage(" ");
-        }
-
         Map<Player, Location> locations = new HashMap<>();
 
         Set<ArenaPosition> positions = getArena().getPositions();
         ArenaPosition pos1 = null, pos2 = null;
+        int x = 0;
         for(ArenaPosition ap : positions) {
             switch(ap.getPosition()) {
                 case "spawn1":
                     pos1 = ap;
+                    x++;
                     break;
                 case "spawn2":
                     pos2 = ap;
+                    x++;
                     break;
             }
         }
 
-        int position = 1;
-        for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
-            GameParticipant participant = entry.getValue();
-            Player p = Bukkit.getPlayer(entry.getKey());
-            Location location = null;
-            Set<ArenaPosition> positions = getArena().getPositions();
-            if(position == 1) {
-                location = pos1.getLocation();
-            }
+        // X checks for 2 available spawn positions. If 2 are not available, the game is cancelled.
+        if(x == 2) {
 
-            if(position == 2) {
-                location = pos2.getLocation();
-            }
+            this.setState(State.STARTING);
 
-            if(p != null) {
-                locations.put(p, location);
-                p.teleport(locations.get(p));
+            StringBuilder stringBuilder = new StringBuilder();
+            List<Player> players = new ArrayList<>(this.getAlivePlayers());
+            int s = 0;
+            while(s != this.getAlive().size()) {
+                Player p = players.get(0);
+                stringBuilder.append(ChatColor.WHITE + p.getName());
 
-                // TODO: Custom Kits
-                this.getKit().apply(p);
-            }
-            position++;
-        }
-
-        getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();;
-
-        this.startingTimer = new BukkitRunnable() {
-            int i = 5;
-            public void run() {
-                if (i == 0) {
-                    for(Player p : Duel.this.getAlivePlayers()) {
-                        if(p != null) {
-                            p.playSound(p.getLocation(), Sound.NOTE_PIANO, 1, 1);
-                            p.sendMessage(ChatColor.GREEN + "The game has started, good luck!");
-                        }
-                    }
-
-                    Duel duel = Duel.this;
-                    duel.setStarted(new Date());
-                    duel.setState(State.ACTIVE);
-
-                    this.cancel();
+                players.remove(p);
+                s++;
+                if(s == this.getAlivePlayers().size()) {
+                    stringBuilder.append(ChatColor.GRAY + ".");
                 } else {
-                    if (i > 0) {
-                        for (Player p : Duel.this.getAllPlayers()) {
-                            p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
-                            p.sendMessage(ChatColor.GREEN.toString() + i + "...");
-                        }
-                    }
-
-                    i -= 1;
+                    stringBuilder.append(ChatColor.GRAY + ", ");
                 }
             }
-        }.runTaskTimer(this.getPlugin(), 20, 20);
+
+            for(Player p : this.getAllPlayers()) {
+                p.sendMessage(" ");
+                p.sendMessage(Colors.get("&6&lDuel starting in 5 seconds."));
+                p.sendMessage(Colors.get(" &7● &6Mode: &f" + this.queueType.toString()));
+                p.sendMessage(Colors.get(" &7● &6Map: &f" + Colors.get(getArena().getDisplayName())));
+                p.sendMessage(Colors.get(" &7● &6Participants: &f" + stringBuilder));
+                p.sendMessage(" ");
+            }
+
+            int position = 1;
+            for (Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
+                GameParticipant participant = entry.getValue();
+                Player p = Bukkit.getPlayer(entry.getKey());
+                Location location = null;
+                if (position == 1) {
+                    location = pos1.getLocation();
+                }
+
+                if (position == 2) {
+                    location = pos2.getLocation();
+                }
+
+                if (p != null) {
+                    locations.put(p, location);
+                    p.teleport(locations.get(p));
+
+                    // TODO: Custom Kits
+                    this.getKit().apply(p);
+                }
+                position++;
+            }
+
+            getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
+
+            this.startingTimer = new BukkitRunnable() {
+                int i = 5;
+                public void run() {
+                    if (i == 0) {
+                        for(Player p : Duel.this.getAlivePlayers()) {
+                            if(p != null) {
+                                p.playSound(p.getLocation(), Sound.NOTE_PIANO, 1, 1);
+                                p.sendMessage(ChatColor.GREEN + "The game has started, good luck!");
+                            }
+                        }
+
+                        Duel duel = Duel.this;
+                        duel.setStarted(new Date());
+                        duel.setState(State.ACTIVE);
+
+                        this.cancel();
+                    } else {
+                        if (i > 0) {
+                            for (Player p : Duel.this.getAllPlayers()) {
+                                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
+                                p.sendMessage(ChatColor.GREEN.toString() + i + "...");
+                            }
+                        }
+
+                        i -= 1;
+                    }
+                }
+            }.runTaskTimer(this.getPlugin(), 20, 20);
+        } else {
+            for(Player p : getAlivePlayers()) {
+                GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
+                p.sendMessage(ChatColor.RED + "The arena " + arena.getName() + " does not have valid spawn points, please notify a staff member.");
+                profile.setGame(null);
+                profile.playerUpdate();
+            }
+        }
     }
 
     @Override
@@ -167,46 +189,48 @@ public class Duel extends Game {
         this.setEnded(new Date());
         this.setState(State.ENDED);
 
-        String winner = null;
-        String loser = null;
-        GameProfile winnerProfile = null;
-        GameProfile loserProfile = null;
+        GameParticipant winnerParticipant = null, loserParticipant = null;
+        GameProfile winnerProfile = null, loserProfile = null;
 
-        for(Map.Entry<UUID, Participant> entry : this.getParticipants().entrySet()) {
-            Participant participant = entry.getValue();
-            if(participant.isAlive()) {
-                winner = participant.getName();
-                winnerProfile = pm.get(entry.getKey());
-                participant.setGameInventory(new PostGameInventory(participant));
+        for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
+            GameParticipant participant = entry.getValue();
+            Player player = Bukkit.getPlayer(entry.getKey());
+            PlayerInventory inventory = player.getInventory();
+
+            PostGameInventory pgi;
+            UUID uuid = UUID.randomUUID();
+
+            boolean alive = participant.isAlive();
+            if(alive) {
+                winnerParticipant = participant;
+                winnerProfile = gpm.getLoadedProfiles().get(entry.getKey());
+
+                pgi = new PostGameInventory(uuid, participant, inventory.getContents(), inventory.getArmorContents());
+                winnerParticipant.setPostGameInventory(pgi);
             } else {
-                loser = participant.getName();
-                loserProfile = pm.get(entry.getKey());
+                loserParticipant = participant;
+                loserProfile = gpm.getLoadedProfiles().get(entry.getKey());
+
+                pgi = new PostGameInventory(uuid, participant, inventory.getContents(), inventory.getArmorContents());
+                loserParticipant.setPostGameInventory(pgi);
             }
+
+            getPlugin().getGameManager().addInventory(pgi);
         }
 
         List<TextComponent> components = new ArrayList<>();
-        for(Participant p : this.getParticipants().values()) {
+        for(GameParticipant p : this.getParticipants().values()) {
             TextComponent text = new TextComponent(ChatColor.WHITE + p.getName());
-            text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inventory " + p.getGameInventory().getUuid()));
+            text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/postgameinventory " + p.getPostGameInventory().getUuid().toString()));
             text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GREEN + "Click to view " + ChatColor.WHITE + p.getName() + "'s " + ChatColor.GREEN + "inventory.").create()));
             components.add(text);
-
-            for(Participant p2 : this.getParticipants().values()) {
-                Profile profile = pm.get(p2.getUuid());
-                PreviousMatch previousMatch = new PreviousMatch(profile, p.getUuid(), p.getName(), getKit(), getArena());
-                profile.setPreviousMatch(previousMatch);
-                if(p2 != p) {
-                    p.getGameInventory().setOpponentInventory(p2.getGameInventory());
-                    break;
-                }
-            }
         }
 
         // Match Summary Message
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(" ");
         stringBuilder.append(Colors.get("&6&lMatch ended."));
-        stringBuilder.append(Colors.get("\n &7● &6Winner: &f" + winner));
+        stringBuilder.append(Colors.get("\n &7● &6Winner: &f" + winnerParticipant.getName()));
 
         TextComponent text = new TextComponent(ChatColor.GRAY + " ● " + ChatColor.AQUA + "Inventories: ");
         final int size = components.size();
@@ -264,55 +288,87 @@ public class Duel extends Game {
             player.sendMessage(" ");
         }
 
-        Bukkit.getScheduler().runTaskLater(PracticeModule.INSTANCE.getPlugin(), () -> {
-            for(Map.Entry<UUID, Participant> entry : this.getParticipants().entrySet()) {
+        this.endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
+            for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
                 Player player = Bukkit.getPlayer(entry.getKey());
-                Profile profile = pm.get(entry.getKey());
+                GameParticipant participant = entry.getValue();
+                GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
+
                 if(player != null) {
                     if(entry.getValue().isAlive()) {
-                        for(Cooldown cooldown : pm.get(player.getUniqueId()).getCooldowns().values()) {
+
+                        for(PlayerCooldown cooldown : participant.getCooldowns().values()) {
                             cooldown.remove();
                         }
 
-                        profile.setOccupation(null);
+                        profile.setGame(null);
                         profile.playerUpdate();
                     }
                 }
             }
-
-            Set<UUID> spectators = new HashSet<>(this.getSpectators().keySet());
-            for(UUID uuid : spectators) {
+            for(UUID uuid : this.getSpectators().keySet()) {
                 Player player = Bukkit.getPlayer(uuid);
                 this.spectateEnd(player);
             }
-
-            this.getSpectators().clear();
 
             for(Entity entity: getEntities()) {
                 entity.remove();
             }
 
-            for(Block block : this.getPlacedBlocks()) {
-                block.setType(Material.AIR);
-            }
+            // TODO: Replace built blocks from build duel.
 
-            for(BrokenBlock block : this.getBrokenBlocks()) {
-                Block b = block.getBlock();
-                b.setType(block.getMaterial());
-                b.setData(block.getData());
-            }
+//            for(Block block : this.getPlacedBlocks()) {
+//                block.setType(Material.AIR);
+//            }
+//
+//            for(BrokenBlock block : this.getBrokenBlocks()) {
+//                Block b = block.getBlock();
+//                b.setType(block.getMaterial());
+//                b.setData(block.getData());
+//            }
 
 //            if(this.getKit().getType().equals(Kit.Type.BUILD)) {
 //                this.getArena().setInUse(false);
 //            }
 
-            this.setState(State.STOPPED);
+            this.setState(State.ENDED);
         }, 60);
     }
 
     @Override
     public void forceEnd() {
+        this.announce("&c&lThis match has been forcefully ended by the server.");
 
+        getStartingTimer().cancel();
+        getEndingTimer().cancel();
+
+        for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
+            Player player = Bukkit.getPlayer(entry.getKey());
+            GameParticipant participant = entry.getValue();
+            GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
+
+            if(player != null) {
+                if(entry.getValue().isAlive()) {
+
+                    for(PlayerCooldown cooldown : participant.getCooldowns().values()) {
+                        cooldown.remove();
+                    }
+
+                    profile.setGame(null);
+                    profile.playerUpdate();
+                }
+            }
+        }
+        for(UUID uuid : this.getSpectators().keySet()) {
+            Player player = Bukkit.getPlayer(uuid);
+            this.spectateEnd(player);
+        }
+
+        for(Entity entity: getEntities()) {
+            entity.remove();
+        }
+
+        this.setState(State.ENDED);
     }
 
     @Override
