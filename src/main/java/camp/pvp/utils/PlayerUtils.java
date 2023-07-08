@@ -1,9 +1,5 @@
 package camp.pvp.utils;
 
-import camp.pvp.Practice;
-import camp.pvp.profiles.GameProfile;
-import camp.pvp.profiles.GameProfileManager;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;

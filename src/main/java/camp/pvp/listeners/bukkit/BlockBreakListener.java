@@ -1,6 +1,7 @@
 package camp.pvp.listeners.bukkit;
 
 import camp.pvp.Practice;
+import camp.pvp.profiles.GameProfile;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,6 +19,11 @@ public class BlockBreakListener implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
+        GameProfile gameProfile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         Block block = event.getBlock();
+
+        if(!gameProfile.isBuildMode()) {
+            event.setCancelled(true);
+        }
     }
 }

@@ -35,4 +35,8 @@ public class GameManager {
 
         return g;
     }
+
+    public void addGame(Game game) {
+        this.games.put(game.getUuid(), game);
+    }
 }

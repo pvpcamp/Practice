@@ -10,6 +10,9 @@ depend:
 commands:
   arena:
     description: Arena configuration utility.
+  build:
+    description: Toggles build mode for staff.
+    permission: camp.staff.build_mode
   duel:
     description: Duel another player or team.
   event:

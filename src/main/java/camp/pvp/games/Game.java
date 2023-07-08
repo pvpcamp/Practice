@@ -54,6 +54,8 @@ public abstract class Game {
         this.spectators = new HashMap<>();
         this.state = State.INACTIVE;
         this.round = 0;
+
+        this.plugin.getGameManager().addGame(this);
     }
 
     public abstract List<String> getScoreboard(GameProfile profile);
@@ -69,7 +71,6 @@ public abstract class Game {
     public abstract void forceEnd();
 
     public void eliminate(Player player) {
-        Bukkit.getServer().getPluginManager().callEvent(new GameEliminationEvent(this, player));
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         if(participant != null) {
             participant.setAlive(false);
@@ -158,7 +159,6 @@ public abstract class Game {
 
     public void spectateStart(Player player, Player target) {
         spectateStart(player, target.getLocation());
-        this.getSpectators().get(player.getUniqueId()).setTarget(target);
     }
 
     public void spectateStart(Player player, Location location) {
@@ -177,7 +177,7 @@ public abstract class Game {
         }
 
         profile.setGame(this);
-        profile.playerItems();
+        profile.givePlayerItems();
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
         updateEntities();

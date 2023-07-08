@@ -2,22 +2,25 @@ package camp.pvp.profiles;
 
 import camp.pvp.Practice;
 import camp.pvp.games.Game;
+import camp.pvp.interactables.InteractableItem;
+import camp.pvp.interactables.InteractableItems;
+import camp.pvp.utils.PlayerUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
+import org.bukkit.inventory.PlayerInventory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+@Getter @Setter
 public class GameProfile {
 
     public enum State {
-        LOBBY, KIT_EDITOR, IN_GAME, IN_GAME_WAITING, SPECTATING
+        LOBBY, LOBBY_QUEUE, LOBBY_PARTY, KIT_EDITOR, IN_GAME, SPECTATING
     }
 
     public enum Time {
@@ -36,26 +39,57 @@ public class GameProfile {
     }
 
     // Stored DB values.
-    private @Getter final UUID uuid;
-    private @Getter @Setter String name;
-    private @Getter @Setter Time time;
+    private final UUID uuid;
+    private String name;
+    private Time time;
+    private boolean buildMode;
 
-    private @Getter @Setter Game game;
+    private Game game;
 
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
 
         this.time = Time.DAY;
+        this.buildMode = false;
     }
 
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
     }
 
-    public void playerItems() {
+    public State getState() {
+        if(game != null) {
+            if(game.getAlive().get(this.uuid) != null) {
+                return State.IN_GAME;
+            } else {
+                return State.SPECTATING;
+            }
+        } else {
+            return State.LOBBY;
+        }
+    }
+
+    public List<InteractableItem> getPlayerItems() {
+        State state = this.getState();
+        List<InteractableItem> items = new ArrayList<>();
+        for(InteractableItems i : InteractableItems.values()) {
+            if(state.equals(i.getState())) {
+                items.add(i.getItem());
+            }
+        }
+
+        return items;
+    }
+
+    public void givePlayerItems() {
         Player player = getPlayer();
         if(player != null) {
-            playerReset();
+            PlayerUtils.reset(player);
+
+            PlayerInventory pi = player.getInventory();
+            for(InteractableItem i : getPlayerItems()) {
+                pi.setItem(i.getSlot(), i.getItem().clone());
+            }
         }
     }
 
@@ -63,22 +97,31 @@ public class GameProfile {
         Player player = getPlayer();
         if(player != null) {
             updatePlayerVisibility();
-            playerItems();
+            givePlayerItems();
 //            setEditing(null);
 //            setRenaming(null);
-//
-//            switch(getState()) {
-//                case LOBBY:
-//                case PARTY:
-//                case TOURNAMENT:
-//                case QUEUE:
-//                    Location location = PracticeModule.INSTANCE.getLobby();
-//                    if (location != null) {
-//                        player.teleport(PracticeModule.INSTANCE.getLobby());
-//                    } else {
-//                        player.sendMessage(ChatColor.RED + "You could not be teleported to the lobby. Please notify staff!");
-//                    }
-//            }
+
+            Location location = null;
+            State state = getState();
+            boolean check = false;
+            switch(state) {
+                case LOBBY:
+                    location = Practice.instance.getLobbyLocation();
+                    check = true;
+                    break;
+                case KIT_EDITOR:
+                    location = Practice.instance.getKitEditorLocation();
+                    check = true;
+                    break;
+            }
+
+            if(check) {
+                if(location == null) {
+                    player.sendMessage(ChatColor.RED + "Location for " + getState().toString().toLowerCase() + " could not be found.");
+                } else {
+                    player.teleport(location);
+                }
+            }
         }
     }
 
