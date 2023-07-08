@@ -1,4 +1,3 @@
-messages:
-mongo:
-  collections:
-    profile_collection: "practice_profiles"
+locations:
+  lobby:
+  kit_editor:

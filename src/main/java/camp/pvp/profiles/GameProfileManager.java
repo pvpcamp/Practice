@@ -5,6 +5,7 @@ import camp.pvp.Practice;
 import camp.pvp.mongo.MongoManager;
 import camp.pvp.mongo.MongoResult;
 import camp.pvp.mongo.MongoUpdate;
+import lombok.Getter;
 import org.bson.Document;
 import org.bukkit.entity.Player;
 
@@ -17,7 +18,7 @@ public class GameProfileManager {
 
     private Practice plugin;
     private Logger logger;
-    private Map<UUID, GameProfile> loadedProfiles;
+    private @Getter Map<UUID, GameProfile> loadedProfiles;
 
     private MongoManager mongoManager;
     public GameProfileManager(Practice plugin) {

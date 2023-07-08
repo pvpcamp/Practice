@@ -1,4 +1,4 @@
-package camp.pvp.games;
+package camp.pvp.games.impl;
 
 public class FreeForAll {
 }

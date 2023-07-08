@@ -1,16 +1,13 @@
 package camp.pvp.profiles;
 
+import camp.pvp.Practice;
 import camp.pvp.games.Game;
-import camp.pvp.interactables.InteractableItems;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.HashMap;
@@ -42,42 +39,17 @@ public class GameProfile {
     private @Getter final UUID uuid;
     private @Getter @Setter String name;
     private @Getter @Setter Time time;
-    private @Getter @Setter State state;
 
     private @Getter @Setter Game game;
 
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
 
-        this.state = State.LOBBY;
         this.time = Time.DAY;
     }
 
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
-    }
-
-    public void playerReset() {
-        Player player = getPlayer();
-        if(player != null) {
-            player.setFoodLevel(20);
-            player.setMaxHealth(20);
-            player.setHealth(20);
-            player.setGameMode(GameMode.SURVIVAL);
-            player.setLevel(0);
-            player.setExp(0);
-            player.getInventory().clear();
-            player.getInventory().setArmorContents(null);
-            player.setAllowFlight(false);
-            player.setFlying(false);
-            player.setWalkSpeed(0.2F);
-            player.setFlySpeed(0.1F);
-            player.setFireTicks(0);
-            player.setSaturation(20);
-            for(PotionEffect effect : player.getActivePotionEffects()){
-                player.removePotionEffect(effect.getType());
-            }
-        }
     }
 
     public void playerItems() {
@@ -112,44 +84,40 @@ public class GameProfile {
 
     public void updatePlayerVisibility() {
         Player player = getPlayer();
-//        if(player != null) {
-//            if(game != null) {
-//                if(game.getCurrentPlaying().contains(player)) {
-//                    for (Player p : Bukkit.getOnlinePlayers()) {
-//                        if(!game.seeEveryone() && !game.getCurrentPlaying().contains(p)) {
-//                            player.hidePlayer(p);
-//                        } else {
-//                            player.showPlayer(p);
-//                        }
-//                    }
-//                } else {
-//                    for (Player p : Bukkit.getOnlinePlayers()) {
+        GameProfileManager gpm = Practice.instance.getGameProfileManager();
+        if(player != null) {
+            if(game != null) {
+                if(game.getCurrentPlaying().contains(player)) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+//                        !game.seeEveryone() &&
+                        if(!game.getCurrentPlaying().contains(p)) {
+                            player.hidePlayer(p);
+                        } else {
+                            player.showPlayer(p);
+                        }
+                    }
+                } else {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
 //                        boolean b = getSettings().isSpectatorVisibility() ? occupation.getAllPlayers().contains(p) : occupation.getCurrentPlaying().contains(p);
-//                        if (b) {
-//                            player.showPlayer(p);
-//                        } else {
-//                            player.hidePlayer(p);
-//                        }
-//                    }
-//                }
-//            } else {
-//                if(getSettings().isPlayerVisibility()) {
-//                    ProfileManager pm = PracticeModule.INSTANCE.getProfileManager();
-//                    for(Player p : Bukkit.getOnlinePlayers()) {
-//                        Profile profile = pm.get(p.getUniqueId());
-//                        if(profile.getOccupation() != null && profile.getOccupation().getSpectators().get(p.getUniqueId()) != null) {
-//                            player.hidePlayer(p);
-//                        } else {
-//                            player.showPlayer(p);
-//                        }
-//                    }
-//                } else {
-//                    for(Player p : Bukkit.getOnlinePlayers()) {
-//                        player.hidePlayer(p);
-//                    }
-//                }
-//            }
-//        }
+                        boolean b = game.getCurrentPlaying().contains(p);
+                        if (b) {
+                            player.showPlayer(p);
+                        } else {
+                            player.hidePlayer(p);
+                        }
+                    }
+                }
+            } else {
+                for(Player p : Bukkit.getOnlinePlayers()) {
+                    GameProfile profile = gpm.find(p.getUniqueId(), true);
+                    if(profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) {
+                        player.hidePlayer(p);
+                    } else {
+                        player.showPlayer(p);
+                    }
+                }
+            }
+        }
     }
 
     public void documentImport(Document document) {

@@ -1,10 +1,13 @@
 package camp.pvp.kits;
 
 import camp.pvp.games.GameInventory;
+import camp.pvp.utils.PlayerUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public enum DuelKit {
     NO_DEBUFF, DEBUFF, BOXING, SOUP;
@@ -69,5 +72,15 @@ public enum DuelKit {
         }
 
         return inv;
+    }
+
+    public void apply(Player player) {
+        PlayerInventory pi = player.getInventory();
+        GameInventory gi = this.getGameInventory();
+
+        PlayerUtils.reset(player);
+
+        pi.setArmorContents(gi.getArmor());
+        pi.setContents(gi.getInventory());
     }
 }

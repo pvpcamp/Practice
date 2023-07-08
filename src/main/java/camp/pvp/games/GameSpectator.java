@@ -12,8 +12,6 @@ public class GameSpectator {
     public final UUID uuid;
     public final String name;
 
-    public Player target;
-
     public GameSpectator(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;

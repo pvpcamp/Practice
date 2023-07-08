@@ -17,6 +17,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -24,10 +25,10 @@ import java.util.*;
 public abstract class Game {
 
     public enum State {
-        INACTIVE, STARTING, ACTIVE, ENDED, STOPPED;
+        INACTIVE, STARTING, ACTIVE, ENDED;
     }
 
-    private Practice plugin;
+    private final Practice plugin;
     private EntityHider entityHider;
 
     public final UUID uuid;
@@ -41,6 +42,8 @@ public abstract class Game {
     public int round;
     public Date created, started, ended;
 
+    public BukkitTask startingTimer, endingTimer;
+
     public List<Entity> entities;
 
     protected Game(Practice plugin, UUID uuid) {
@@ -53,17 +56,20 @@ public abstract class Game {
         this.round = 0;
     }
 
+    public abstract List<String> getScoreboard(GameProfile profile);
+
+    public abstract List<String> getSpectatorScoreboard(GameProfile profile);
+
+    public abstract void init();
+
     public abstract void start();
 
     public abstract void end();
 
     public abstract void forceEnd();
 
-    public abstract List<String> getScoreboard(GameProfile profile);
-
-    public abstract List<String> getSpectatorScoreboard(GameProfile profile);
-
     public void eliminate(Player player) {
+        Bukkit.getServer().getPluginManager().callEvent(new GameEliminationEvent(this, player));
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         if(participant != null) {
             participant.setAlive(false);

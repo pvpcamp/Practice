@@ -1,9 +1,14 @@
 package camp.pvp.interactables;
 
+import camp.pvp.Practice;
+import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public enum InteractableItems {
     QUEUE, PIT, CREATE_PARTY, KIT_EDITOR, SETTINGS,
@@ -42,5 +47,25 @@ public enum InteractableItems {
             default:
                 return null;
         }
+    }
+
+    public List<InteractableItem> getItems(GameProfile gameProfile) {
+        List<InteractableItem> items = new ArrayList<>();
+
+        GameProfile.State state = Practice.instance.getGameProfileManager().getState(gameProfile);
+        switch (state) {
+            case LOBBY:
+                items.add(QUEUE.getItem());
+                items.add(PIT.getItem());
+                items.add(CREATE_PARTY.getItem());
+                items.add(KIT_EDITOR.getItem());
+                items.add(SETTINGS.getItem());
+            default:
+                break;
+
+        }
+
+
+        return items;
     }
 }
