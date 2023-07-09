@@ -5,17 +5,22 @@ import camp.pvp.games.impl.events.SumoEvent;
 import camp.pvp.games.impl.events.TournamentEvent;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class GameManager {
 
     private Practice plugin;
+    private Logger logger;
     public Map<UUID, Game> games;
     public Map<UUID, PostGameInventory> postGameInventories;
 
     public GameManager(Practice plugin) {
         this.plugin = plugin;
+        this.logger = plugin.getLogger();
         this.games = new HashMap<>();
         this.postGameInventories = new HashMap<>();
+
+        this.logger.info("Started GameManager.");
     }
 
     public SumoEvent getActiveSumoEvent() {

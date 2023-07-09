@@ -1,15 +1,17 @@
 package camp.pvp.interactables;
 
+import camp.pvp.interactables.impl.lobby.KitEditorInteract;
+import camp.pvp.interactables.impl.lobby.PartyCreateInteract;
+import camp.pvp.interactables.impl.lobby.PitInteract;
+import camp.pvp.interactables.impl.lobby.SettingsInteract;
+import camp.pvp.interactables.impl.queue.LeaveQueueInteract;
+import camp.pvp.interactables.impl.queue.QueueInteract;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.ItemBuilder;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public enum InteractableItems {
-    QUEUE, PIT, CREATE_PARTY, KIT_EDITOR, SETTINGS,
+    QUEUE, PIT, PARTY_CREATE, KIT_EDITOR, SETTINGS,
     STOP_SPECTATING, SHOW_PLAYERS,
     LEAVE_QUEUE;
 
@@ -18,47 +20,23 @@ public enum InteractableItems {
             // LOBBY
             case QUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.DIAMOND_SWORD, "&6Join a Queue &7(Right Click)").create(),
-                        0,
-                        (player, gameProfile) -> {
-
-                        });
+                        new ItemBuilder(Material.DIAMOND_SWORD, "&6Join a Queue &7(Right Click)").create(), 0, new QueueInteract());
             case PIT:
                 return new InteractableItem(
-                        new ItemBuilder(Material.GOLD_AXE, "&6Join The Pit &7(Right Click)").create(),
-                        1,
-                        (player, gameProfile) -> {
-
-                        });
-            case CREATE_PARTY:
+                        new ItemBuilder(Material.GOLD_AXE, "&6Join The Pit &7(Right Click)").create(), 1, new PitInteract());
+            case PARTY_CREATE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.BEACON, "&6Create a Party &7(Right Click)").create(),
-                        4,
-                        (player, gameProfile) -> {
-
-                        });
+                        new ItemBuilder(Material.BEACON, "&6Create a Party &7(Right Click)").create(), 4, new PartyCreateInteract());
             case KIT_EDITOR:
                 return new InteractableItem(
-                        new ItemBuilder(Material.BOOK, "&6Edit Your Kits &7(Right Click)").create(),
-                        7,
-                        (player, gameProfile) -> {
-
-                        });
+                        new ItemBuilder(Material.BOOK, "&6Edit Your Kits &7(Right Click)").create(), 7, new KitEditorInteract());
             case SETTINGS:
                 return new InteractableItem(
-                        new ItemBuilder(Material.ANVIL, "&6Settings &7(Right Click)").create(),
-                        8,
-                        (player, gameProfile) -> {
-
-                        });
+                        new ItemBuilder(Material.ANVIL, "&6Settings &7(Right Click)").create(), 8, new SettingsInteract());
             // LOBBY_QUEUE
             case LEAVE_QUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.REDSTONE, "&cLeave Queue &7(Right Click)").create(),
-                        0,
-                        (player, gameProfile) -> {
-
-                        });
+                        new ItemBuilder(Material.FIRE, "&cLeave Queue &7(Right Click)").create(), 0, new LeaveQueueInteract());
             default:
                 return null;
         }
@@ -66,10 +44,16 @@ public enum InteractableItems {
 
     public GameProfile.State getState() {
         switch (this) {
+            case QUEUE:
+            case PIT:
+            case PARTY_CREATE:
+            case KIT_EDITOR:
+            case SETTINGS:
+                return GameProfile.State.LOBBY;
             case LEAVE_QUEUE:
                 return GameProfile.State.LOBBY_QUEUE;
             default:
-                return GameProfile.State.LOBBY;
+                return GameProfile.State.IN_GAME;
 
         }
     }

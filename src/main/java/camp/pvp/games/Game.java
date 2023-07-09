@@ -133,12 +133,14 @@ public abstract class Game {
         GameParticipant victimParticipant = this.getParticipants().get(victim.getUniqueId());
         GameParticipant participant = this.getParticipants().get(attacker.getUniqueId());
         if(victimParticipant != null && participant != null) {
-            victimParticipant.setAttacker(attacker.getUniqueId());
-            participant.hits++;
-            participant.currentCombo++;
+            if(victimParticipant.isAlive() && participant.isAlive()) {
+                victimParticipant.setAttacker(attacker.getUniqueId());
+                participant.hits++;
+                participant.currentCombo++;
 
-            if(participant.currentCombo > participant.longestCombo) {
-                participant.longestCombo = participant.currentCombo;
+                if (participant.currentCombo > participant.longestCombo) {
+                    participant.longestCombo = participant.currentCombo;
+                }
             }
         } else {
             event.setCancelled(true);
@@ -154,11 +156,7 @@ public abstract class Game {
     }
 
     public void spectateStart(Player player) {
-        spectateStart(player, (Location) null);
-    }
-
-    public void spectateStart(Player player, Player target) {
-        spectateStart(player, target.getLocation());
+        spectateStart(player, null);
     }
 
     public void spectateStart(Player player, Location location) {
@@ -219,6 +217,10 @@ public abstract class Game {
         } else {
             spectateEnd(player);
         }
+    }
+
+    public boolean isBuild() {
+        return false;
     }
 
     public List<Player> getAllPlayers() {
@@ -290,6 +292,12 @@ public abstract class Game {
                     entityHider.hideEntity(player, entity);
                 }
             }
+        }
+    }
+
+    public void clearEntities() {
+        for(Entity entity : getEntities()) {
+            entity.remove();
         }
     }
 

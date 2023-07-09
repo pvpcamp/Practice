@@ -21,29 +21,29 @@ public class SidebarAdapter implements AssembleAdapter {
 
     @Override
     public String getTitle(Player player) {
-        return "&6&lPvP Camp &fDev";
+        return "&6&lPvP Camp";
     }
 
     @Override
     public List<String> getLines(Player player) {
         List<String> lines = new ArrayList<>();
 
-//        GameProfile profile = gameProfileManager.find(player.getUniqueId(), true);
-//        if(profile != null) {
-//            GameProfile.State state = gameProfileManager.getState(profile);
-//
-//            lines.add("&7&m------------------");
-//            switch(state) {
-//                case LOBBY:
-//                    lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
-//                    return lines;
-//                default:
-//                    lines.add("&f&oIn Development.");
-//            }
-//            lines.add(" ");
-//            lines.add("&6pvp.camp");
-//            lines.add("&7&m------------------");
-//        }
+        GameProfile profile = gameProfileManager.find(player.getUniqueId(), true);
+        if(profile != null) {
+            GameProfile.State state = gameProfileManager.getState(profile);
+
+            lines.add("&7&m------------------");
+            switch(state) {
+                case LOBBY:
+                    lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
+                    return lines;
+                default:
+                    lines.add("&f&oIn Development.");
+            }
+            lines.add(" ");
+            lines.add("&6pvp.camp");
+            lines.add("&7&m------------------");
+        }
 
         return lines;
     }

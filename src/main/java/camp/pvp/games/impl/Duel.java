@@ -13,6 +13,7 @@ import camp.pvp.profiles.GameProfileManager;
 import camp.pvp.queue.GameQueue;
 import camp.pvp.utils.Colors;
 import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -29,7 +30,7 @@ import java.util.*;
 
 public class Duel extends Game {
 
-    public @Getter GameQueue.Type queueType;
+    public @Setter @Getter GameQueue.Type queueType;
 
     public Duel(Practice plugin, UUID uuid) {
         super(plugin, uuid);
@@ -311,9 +312,7 @@ public class Duel extends Game {
                 this.spectateEnd(player);
             }
 
-            for(Entity entity: getEntities()) {
-                entity.remove();
-            }
+            this.clearEntities();
 
             // TODO: Replace built blocks from build duel.
 
@@ -364,10 +363,7 @@ public class Duel extends Game {
             this.spectateEnd(player);
         }
 
-        for(Entity entity: getEntities()) {
-            entity.remove();
-        }
-
+        this.clearEntities();
         this.setState(State.ENDED);
     }
 

@@ -20,7 +20,7 @@ public class PlayerUtils {
         player.setWalkSpeed(0.2F);
         player.setFlySpeed(0.1F);
         player.setFireTicks(0);
-        player.setSaturation(14);
+        player.setSaturation(13);
         for(PotionEffect effect : player.getActivePotionEffects()){
             player.removePotionEffect(effect.getType());
         }

@@ -1,4 +1,4 @@
-package camp.pvp.listeners.bukkit;
+package camp.pvp.listeners.bukkit.player;
 
 import camp.pvp.Practice;
 import camp.pvp.profiles.GameProfile;
@@ -33,6 +33,8 @@ public class PlayerJoinLeaveListeners implements Listener {
         }
 
         profile.setName(player.getName());
+
+        profile.playerUpdate();
     }
 
     @EventHandler
