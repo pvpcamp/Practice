@@ -265,6 +265,13 @@ public abstract class Game {
         return players;
     }
 
+    public int countAll() {
+        int i = 0;
+        i += getAlive().size();
+        i += getSpectators().size();
+        return i;
+    }
+
     public <T> void playEffect(Location location, Effect effect, T t) {
         for(Player player : getAllPlayers()) {
             player.playEffect(location, effect, t);

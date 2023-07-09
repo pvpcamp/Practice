@@ -57,6 +57,15 @@ public class GameManager {
         return g;
     }
 
+    public int getTotalInGame() {
+        int i = 0;
+        for(Game game : getActiveGames()) {
+            i += game.countAll();
+        }
+
+        return i;
+    }
+
     public void addGame(Game game) {
         this.games.put(game.getUuid(), game);
     }

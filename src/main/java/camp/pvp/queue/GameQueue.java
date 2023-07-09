@@ -4,12 +4,15 @@ import camp.pvp.Practice;
 import camp.pvp.games.impl.Duel;
 import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.GameProfile;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.UUID;
 
+@Getter @Setter
 public class GameQueue {
 
     public enum Type {

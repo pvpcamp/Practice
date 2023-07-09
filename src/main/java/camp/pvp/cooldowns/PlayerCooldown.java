@@ -38,7 +38,7 @@ public class PlayerCooldown {
         public String expireMessage() {
             switch(this) {
                 case ENDER_PEARL:
-                    return Colors.get("&aYour ender pearl cooldown has expired!");
+                    return Colors.get("&aYou can now use ender pearls again.");
                 default:
                     return null;
             }
@@ -87,7 +87,7 @@ public class PlayerCooldown {
             } else {
                 if(getType().equals(Type.ENDER_PEARL)) {
                     long seconds = TimeUnit.MILLISECONDS.toSeconds(getRemaining()) % 60;
-                    player.setLevel((int) seconds);
+                    player.setLevel((int) seconds + 1);
                     player.setExp((getTicksRemaining().floatValue() / (float) (getType().getDuration() * 20)));
                 }
             }

@@ -369,6 +369,11 @@ public class Duel extends Game {
 
     @Override
     public List<String> getScoreboard(GameProfile profile) {
+        List<String> lines = new ArrayList<>();
+        switch(getState()) {
+            case INACTIVE:
+
+        }
         return null;
     }
 

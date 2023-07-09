@@ -12,6 +12,7 @@ public class GameQueueMember {
 
     private final UUID uuid;
     private final String name;
+    private GameQueue queue;
 
     public GameQueueMember(UUID uuid, String name) {
         this.uuid = uuid;
