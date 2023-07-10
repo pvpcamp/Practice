@@ -4,6 +4,8 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class PlayerUtils {
 
     public static void reset(Player player) {
@@ -24,5 +26,16 @@ public class PlayerUtils {
         for(PotionEffect effect : player.getActivePotionEffects()){
             player.removePotionEffect(effect.getType());
         }
+    }
+
+    public static int getPing(Player player) {
+        try {
+            Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);
+            return (int) entityPlayer.getClass().getField("ping").get(entityPlayer);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 }

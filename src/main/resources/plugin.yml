@@ -8,6 +8,8 @@ depend:
   - ProtocolLib
 
 commands:
+  accept:
+    description: Accepts a duel from a player or team.
   arena:
     description: Arena configuration utility.
   build:

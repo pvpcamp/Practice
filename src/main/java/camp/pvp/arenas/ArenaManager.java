@@ -23,6 +23,20 @@ public class ArenaManager {
         this.arenaConfig = new ArenaConfig(plugin, this);
     }
 
+    public Arena getArenaFromName(String name) {
+        for(Arena arena : arenas) {
+            if(arena.getName().equalsIgnoreCase(name)) {
+                return arena;
+            }
+        }
+
+        return null;
+    }
+
+    public void deleteArena(Arena arena) {
+        this.arenas.remove(arena);
+    }
+
     public void shutdown() {
         arenaConfig.shutdown();
     }

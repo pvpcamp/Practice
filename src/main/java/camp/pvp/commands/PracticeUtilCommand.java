@@ -2,6 +2,7 @@ package camp.pvp.commands;
 
 import camp.pvp.Practice;
 import camp.pvp.profiles.GameProfile;
+import camp.pvp.utils.Colors;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -47,6 +48,8 @@ public class PracticeUtilCommand implements CommandExecutor {
             sb.append("\n&6/practiceutil setlobby &7- &fSets the lobby location.");
             sb.append("\n&6/practiceutil setkiteditor &7- &fSets the kit editor location.");
             sb.append("\n&6/practiceutil reset &7- &fResets your player.");
+
+            player.sendMessage(Colors.get(sb.toString()));
         }
 
         return true;

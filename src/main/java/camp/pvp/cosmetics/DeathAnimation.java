@@ -42,7 +42,7 @@ public enum DeathAnimation {
 
                 game.playSound(location, Sound.LAVA_POP, 1F, 1F);
 
-                Bukkit.getScheduler().runTaskLater(Practice.getInstance(), ()-> {
+                Bukkit.getScheduler().runTaskLater(Practice.instance, ()-> {
                     for(Item i : items) {
                         i.remove();
                     }

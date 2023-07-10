@@ -1,11 +1,21 @@
 package camp.pvp;
 
 import camp.pvp.arenas.ArenaManager;
-import camp.pvp.commands.BuildCommand;
-import camp.pvp.commands.PlayerTimeCommand;
+import camp.pvp.commands.*;
 import camp.pvp.cooldowns.CooldownRunnable;
 import camp.pvp.games.GameManager;
-import camp.pvp.listeners.bukkit.player.PlayerJoinLeaveListeners;
+import camp.pvp.listeners.bukkit.block.BlockBreakListener;
+import camp.pvp.listeners.bukkit.block.BlockPlaceListener;
+import camp.pvp.listeners.bukkit.entity.EntityDamageByEntityListener;
+import camp.pvp.listeners.bukkit.entity.EntityDamageListener;
+import camp.pvp.listeners.bukkit.entity.EntityRegainHealthListener;
+import camp.pvp.listeners.bukkit.entity.EntitySpawnListener;
+import camp.pvp.listeners.bukkit.inventory.InventoryClickListener;
+import camp.pvp.listeners.bukkit.inventory.InventoryMoveItemListener;
+import camp.pvp.listeners.bukkit.player.*;
+import camp.pvp.listeners.bukkit.potion.PotionSplashListener;
+import camp.pvp.listeners.bukkit.projectile.ProjectileHitListener;
+import camp.pvp.listeners.bukkit.projectile.ProjectileLaunchListener;
 import camp.pvp.listeners.packets.EnderpearlSound;
 import camp.pvp.nametags.NameColorRunnable;
 import camp.pvp.profiles.GameProfileManager;
@@ -51,15 +61,15 @@ public class Practice extends JavaPlugin {
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.entityHider = new EntityHider(this, EntityHider.Policy.BLACKLIST);
 
-        this.assemble = new Assemble(this, new SidebarAdapter(this));
-        assemble.setTicks(10);
-        assemble.setAssembleStyle(AssembleStyle.MODERN);
-        assemble.setup();
-
         this.arenaManager = new ArenaManager(this);
         this.gameManager = new GameManager(this);
         this.gameQueueManager = new GameQueueManager(this);
         this.gameProfileManager = new GameProfileManager(this);
+
+        this.assemble = new Assemble(this, new SidebarAdapter(this));
+        assemble.setTicks(10);
+        assemble.setAssembleStyle(AssembleStyle.MODERN);
+        assemble.setup();
 
         cooldownTask = this.getServer().getScheduler().runTaskTimer(this, new CooldownRunnable(this), 2, 2);
         nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 10, 10);
@@ -99,13 +109,42 @@ public class Practice extends JavaPlugin {
     }
 
     public void registerCommands() {
+        new AcceptCommand(this);
+        new ArenaCommand(this);
         new BuildCommand(this);
+        new DuelCommand(this);
         new PlayerTimeCommand(this);
+        new PracticeUtilCommand(this);
     }
 
     public void registerListeners() {
         // Bukkit
+        new BlockBreakListener(this);
+        new BlockPlaceListener(this);
+
+        new EntityDamageByEntityListener(this);
+        new EntityDamageListener(this);
+        new EntityRegainHealthListener(this);
+        new EntitySpawnListener(this);
+
+        new InventoryClickListener(this);
+        new InventoryMoveItemListener(this);
+
+        new FoodLevelChangeListener(this);
+//        new PlayerBucketEmptyListener(this);
+        new PlayerDeathListener(this);
+        new PlayerDropItemListener(this);
+        new PlayerInteractEntityListener(this);
+        new PlayerInteractListener(this);
         new PlayerJoinLeaveListeners(this);
+        new PlayerMoveListener(this);
+        new PlayerPickupItemListener(this);
+        new PlayerTeleportListener(this);
+
+        new PotionSplashListener(this);
+
+        new ProjectileHitListener(this);
+        new ProjectileLaunchListener(this);
 
         // Packets
         new EnderpearlSound(this);

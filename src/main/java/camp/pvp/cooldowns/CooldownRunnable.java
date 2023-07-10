@@ -11,6 +11,7 @@ public class CooldownRunnable implements Runnable{
     private GameManager gameManager;
     public CooldownRunnable(Practice plugin) {
         this.plugin = plugin;
+        this.gameManager = plugin.getGameManager();
     }
 
     @Override

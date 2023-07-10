@@ -75,24 +75,11 @@ public class Duel extends Game {
         }
         Map<Player, Location> locations = new HashMap<>();
 
-        Set<ArenaPosition> positions = getArena().getPositions();
-        ArenaPosition pos1 = null, pos2 = null;
-        int x = 0;
-        for(ArenaPosition ap : positions) {
-            switch(ap.getPosition()) {
-                case "spawn1":
-                    pos1 = ap;
-                    x++;
-                    break;
-                case "spawn2":
-                    pos2 = ap;
-                    x++;
-                    break;
-            }
-        }
 
-        // X checks for 2 available spawn positions. If 2 are not available, the game is cancelled.
-        if(x == 2) {
+        Map<String, ArenaPosition> positions = arena.getPositions();
+        ArenaPosition pos1 = positions.get("spawn1"), pos2 = positions.get("spawn2");
+
+        if(pos1 != null && pos2 != null) {
 
             this.setState(State.STARTING);
 

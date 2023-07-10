@@ -36,7 +36,7 @@ public class SidebarAdapter implements AssembleAdapter {
     public List<String> getLines(Player player) {
         List<String> lines = new ArrayList<>();
 
-        GameProfile profile = gameProfileManager.find(player.getUniqueId(), true);
+        GameProfile profile = gameProfileManager.getLoadedProfiles().get(player.getUniqueId());
         if(profile != null) {
             GameProfile.State state = gameProfileManager.getState(profile);
 

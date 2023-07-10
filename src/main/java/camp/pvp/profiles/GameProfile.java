@@ -46,9 +46,12 @@ public class GameProfile {
     private boolean buildMode;
 
     private Game game;
+    private Map<UUID, DuelRequest> duelRequests;
 
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
+
+        this.duelRequests = new HashMap<>();
 
         this.time = Time.DAY;
         this.buildMode = false;

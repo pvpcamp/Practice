@@ -37,10 +37,10 @@ public class ArenaConfig {
         if(arenaSection != null) {
             Set<String> arenaKeys = arenaSection.getKeys(false);
 
-            logger.info("Found " + arenaKeys.size() + " arenas in config file.");
-
             for (String s : arenaKeys) {
-                load(s);
+                if(config.isSet("arenas." + s)) {
+                    load(s);
+                }
             }
         } else {
             logger.warning("No arenas have been found in arenas.yml!");
@@ -49,26 +49,18 @@ public class ArenaConfig {
 
     public void load(String name) {
         String path = "arenas." + name + ".";
-        Arena arena = new Arena();
+        Arena arena = new Arena(name);
 
-        arena.setName(name);
         arena.setType(Arena.Type.valueOf(config.getString(path + "type")));
         arena.setDisplayName(config.getString(path + "display_name"));
         arena.setEnabled(config.getBoolean(path + "enabled"));
 
         for(String s : config.getConfigurationSection(path + "positions").getKeys(false)) {
-            String p = path + "positions." + s + ".";
+            String p = path + "positions." + s;
 
-            ArenaPosition pos = new ArenaPosition(p, new Location(
-                    Bukkit.getWorld(config.getString(p + "world")),
-                    config.getDouble(p + "x"),
-                    config.getDouble(p + "y"),
-                    config.getDouble(p + "z"),
-                    (float) config.getDouble(p + "yaw"),
-                    (float) config.getDouble(p + "pitch")
-            ));
+            ArenaPosition pos = new ArenaPosition(s, (Location) config.get(p, Location.class));
 
-            arena.getPositions().add(pos);
+            arena.getPositions().put(pos.getPosition(), pos);
         }
 
         this.logger.info("Loaded arena '" + arena.getName() + "'.");
@@ -83,21 +75,17 @@ public class ArenaConfig {
         config.set(path + ".display_name", arena.getDisplayName());
         config.set(path + ".enabled", arena.isEnabled());
 
-        for(ArenaPosition position : arena.getPositions()) {
+        for(ArenaPosition position : arena.getPositions().values()) {
             Location location = position.getLocation();
-            String p = path + ".positions." + position.getPosition() + ".";
-            config.set(p + "world", location.getWorld().getName());
-            config.set(p + "x", (double) location.getX());
-            config.set(p + "y", (double) location.getY());
-            config.set(p + "z", (double) location.getZ());
-            config.set(p + "yaw", (float) location.getYaw());
-            config.set(p + "pitch", (float) location.getPitch());
+            String p = path + ".positions." + position.getPosition();
+            config.set(p, location);
         }
 
         this.logger.info("Exported arena '" + arena.getName() + "'.");
     }
 
     public void shutdown() {
+        config = new YamlConfiguration();
         for(Arena arena : manager.getArenas()) {
             export(arena);
         }

@@ -21,7 +21,7 @@ public class GameParticipant {
     private UUID attacker;
     private EntityDamageEvent.DamageCause lastDamageCause;
 
-    public int hits, currentCombo, longestCombo;
+    public int hits, currentCombo, longestCombo, thrownPotions, missedPotions;
 
     private PostGameInventory postGameInventory;
 

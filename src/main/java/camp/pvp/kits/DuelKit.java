@@ -73,8 +73,29 @@ public enum DuelKit {
         }
     }
 
+    public boolean isHunger() {
+        switch(this) {
+            case SOUP:
+            case BOXING:
+                return false;
+            default:
+                return true;
+        }
+    }
+
     public boolean isRanked() {
         return false;
+    }
+
+    public ItemStack getIcon() {
+        ItemStack item = null;
+        switch(this) {
+            case NO_DEBUFF:
+                Potion potion = new Potion(PotionType.INSTANT_HEAL);
+                item = potion.toItemStack(1);
+        }
+
+        return item;
     }
 
     public GameInventory getGameInventory() {
