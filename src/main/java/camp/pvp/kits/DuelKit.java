@@ -137,8 +137,8 @@ public enum DuelKit {
                 health.setSplash(true);
 
                 inv[7] = speed.toItemStack(1);
-                inv[27] = speed.toItemStack(1);
-                inv[36] = speed.toItemStack(1);
+                inv[26] = speed.toItemStack(1);
+                inv[35] = speed.toItemStack(1);
 
                 inv[8] = fireResistance.toItemStack(1);
 

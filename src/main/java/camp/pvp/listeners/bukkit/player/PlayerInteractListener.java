@@ -41,7 +41,7 @@ public class PlayerInteractListener implements Listener {
         if(action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
             for(InteractableItems i : InteractableItems.values()) {
                 InteractableItem ii = i.getItem();
-                if(i.getState().equals(state) && ii.getItem().isSimilar(item)) {
+                if(i.getState().equals(state) && ii != null && ii.getItem().isSimilar(item)) {
                     ii.getInteract().onInteract(player, profile);
                     event.setCancelled(true);
                     return;

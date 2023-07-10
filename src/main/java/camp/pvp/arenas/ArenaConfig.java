@@ -63,6 +63,8 @@ public class ArenaConfig {
             arena.getPositions().put(pos.getPosition(), pos);
         }
 
+        manager.getArenas().add(arena);
+
         this.logger.info("Loaded arena '" + arena.getName() + "'.");
     }
 

@@ -51,6 +51,9 @@ public class DuelCommand implements CommandExecutor {
                                     ItemStack item = duelKit.getIcon();
                                     GuiButton button = new GuiButton(item.getType(), duelKit.getDisplayName());
                                     button.setItemMeta(item.getItemMeta());
+                                    button.setData(item.getData());
+                                    button.setName(duelKit.getDisplayName());
+
                                     button.setAction((player1, gui1) -> {
                                         GameProfile gp = gpm.getLoadedProfiles().get(target.getUniqueId());
                                         if(gp != null) {
@@ -58,9 +61,10 @@ public class DuelCommand implements CommandExecutor {
                                             duelRequest.send();
                                             gp.getDuelRequests().put(player1.getUniqueId(), duelRequest);
                                         } else {
-                                            player1.closeInventory();
                                             player1.sendMessage(ChatColor.RED + "The player you specified is not on this server.");
                                         }
+
+                                        player1.closeInventory();
                                     });
 
                                     button.setSlot(x);

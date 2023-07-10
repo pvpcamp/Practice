@@ -1,5 +1,6 @@
 package camp.pvp.interactables;
 
+import camp.pvp.interactables.impl.game.StopSpectatingInteract;
 import camp.pvp.interactables.impl.lobby.KitEditorInteract;
 import camp.pvp.interactables.impl.lobby.PartyCreateInteract;
 import camp.pvp.interactables.impl.lobby.PitInteract;
@@ -12,7 +13,7 @@ import org.bukkit.Material;
 
 public enum InteractableItems {
     QUEUE, PIT, PARTY_CREATE, KIT_EDITOR, SETTINGS,
-    STOP_SPECTATING, SHOW_PLAYERS,
+    STOP_SPECTATING,
     LEAVE_QUEUE;
 
     public InteractableItem getItem() {
@@ -36,7 +37,11 @@ public enum InteractableItems {
             // LOBBY_QUEUE
             case LEAVE_QUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.FIRE, "&cLeave Queue &7(Right Click)").create(), 0, new LeaveQueueInteract());
+                        new ItemBuilder(Material.REDSTONE, "&cLeave Queue &7(Right Click)").create(), 0, new LeaveQueueInteract());
+            // SPECTATING
+            case STOP_SPECTATING:
+                return new InteractableItem(
+                        new ItemBuilder(Material.REDSTONE, "&cStop Spectating &7(Right Click)").create(), 4, new StopSpectatingInteract());
             default:
                 return null;
         }
@@ -52,6 +57,8 @@ public enum InteractableItems {
                 return GameProfile.State.LOBBY;
             case LEAVE_QUEUE:
                 return GameProfile.State.LOBBY_QUEUE;
+            case STOP_SPECTATING:
+                return GameProfile.State.SPECTATING;
             default:
                 return GameProfile.State.IN_GAME;
 

@@ -52,6 +52,7 @@ public abstract class Game {
         this.uuid = uuid;
         this.participants = new HashMap<>();
         this.spectators = new HashMap<>();
+        this.entities = new ArrayList<>();
         this.state = State.INACTIVE;
         this.round = 0;
 
@@ -99,8 +100,8 @@ public abstract class Game {
 //            }
 //
 //            participant.setGameInventory(new GameInventory(participant));
-            this.spectateStart(player);
-            this.announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
+            Game.this.spectateStart(player);
+            Game.this.announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
         }
     }
 

@@ -45,7 +45,7 @@ public class TimeUtil {
     }
 
     public static String get(Date date1, Date date2) {
-        long duration = date1.getTime() - date2.getTime();;
+        long duration = date1.getTime() - date2.getTime();
         long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) % 60;
         long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) % 60;
 

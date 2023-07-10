@@ -3,6 +3,8 @@ package camp.pvp.games;
 import camp.pvp.cooldowns.PlayerCooldown;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.HashMap;
@@ -28,7 +30,12 @@ public class GameParticipant {
     public GameParticipant(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
+        this.alive = true;
         this.cooldowns = new HashMap<>();
+    }
+
+    public Player getPlayer() {
+        return Bukkit.getPlayer(uuid);
     }
 
     public void clearCooldowns() {

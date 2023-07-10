@@ -19,7 +19,7 @@ public class PlayerTeleportListener implements Listener {
         if (event.getCause().equals(PlayerTeleportEvent.TeleportCause.ENDER_PEARL)) {
             Location location = event.getTo();
             location.setX(location.getBlockX() + 0.5);
-            location.setY(location.getBlockY());
+            location.setY(location.getBlockY() + 0.2);
             location.setZ(location.getBlockZ() + 0.5);
             event.setTo(location);
         }

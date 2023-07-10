@@ -12,6 +12,8 @@ import camp.pvp.profiles.GameProfile;
 import camp.pvp.profiles.GameProfileManager;
 import camp.pvp.queue.GameQueue;
 import camp.pvp.utils.Colors;
+import camp.pvp.utils.PlayerUtils;
+import camp.pvp.utils.TimeUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -60,21 +62,21 @@ public class Duel extends Game {
                 }
             }
 
-            if(list.isEmpty()) {
-                for(Player p : getAlivePlayers()) {
-                    GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
-                    p.sendMessage(ChatColor.RED + "There are no arenas currently available for the ladder selected. Please notify a staff member.");
-                    profile.setGame(null);
-                    profile.playerUpdate();
-                }
-                return;
-            } else {
-                Collections.shuffle(list);
-                this.setArena(list.get(0));
-            }
+            Collections.shuffle(list);
+            this.setArena(list.get(0));
         }
-        Map<Player, Location> locations = new HashMap<>();
 
+        if(arena == null) {
+            for(Player p : getAlivePlayers()) {
+                GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
+                p.sendMessage(ChatColor.RED + "There are no arenas currently available for the ladder selected. Please notify a staff member.");
+                profile.setGame(null);
+                profile.playerUpdate();
+            }
+            return;
+        }
+
+        Map<Player, Location> locations = new HashMap<>();
 
         Map<String, ArenaPosition> positions = arena.getPositions();
         ArenaPosition pos1 = positions.get("spawn1"), pos2 = positions.get("spawn2");
@@ -322,11 +324,24 @@ public class Duel extends Game {
     }
 
     @Override
+    public void eliminate(Player player) {
+        super.eliminate(player);
+        if(this.getAlive().size() < 2) {
+            this.end();
+        }
+    }
+
+    @Override
     public void forceEnd() {
         this.announce("&c&lThis match has been forcefully ended by the server.");
 
-        getStartingTimer().cancel();
-        getEndingTimer().cancel();
+        if(getStartingTimer() != null) {
+            getStartingTimer().cancel();
+        }
+
+        if(getEndingTimer() != null) {
+            getEndingTimer().cancel();
+        }
 
         for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
             Player player = Bukkit.getPlayer(entry.getKey());
@@ -351,17 +366,40 @@ public class Duel extends Game {
         }
 
         this.clearEntities();
+        this.setEnded(new Date());
         this.setState(State.ENDED);
     }
 
     @Override
     public List<String> getScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
-        switch(getState()) {
-            case INACTIVE:
-
+        GameParticipant self = getAlive().get(profile.getUuid());
+        GameParticipant opponent = null;
+        for(GameParticipant p : getAlive().values()) {
+            if(p.getUuid() != self.getUuid()) {
+                opponent = p;
+                break;
+            }
         }
-        return null;
+
+        if(opponent == null) {
+            lines.add("&cError!");
+            return lines;
+        }
+
+        switch(getState()) {
+            case STARTING:
+                lines.add("&6Kit: &f" + kit.getDisplayName());
+                lines.add("&6Arena: &f" + arena.getDisplayName());
+                lines.add("&6Opponent: &f" + opponent.getName());
+                break;
+            case ACTIVE:
+                lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
+                lines.add("&6Ping: &e" + PlayerUtils.getPing(self.getPlayer()) + " ms&7/&c" + PlayerUtils.getPing(opponent.getPlayer()) + " ms");
+            case ENDED:
+                lines.add("&6Duration: " + TimeUtil.get(getStarted(), getEnded()));
+        }
+        return lines;
     }
 
     @Override

@@ -105,6 +105,8 @@ public class Practice extends JavaPlugin {
             getConfig().set("locations.kit_editor", kitEditorLocation);
         }
 
+        this.saveConfig();
+
         instance = null;
     }
 

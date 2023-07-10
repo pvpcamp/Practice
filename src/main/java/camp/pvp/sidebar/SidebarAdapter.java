@@ -38,7 +38,7 @@ public class SidebarAdapter implements AssembleAdapter {
 
         GameProfile profile = gameProfileManager.getLoadedProfiles().get(player.getUniqueId());
         if(profile != null) {
-            GameProfile.State state = gameProfileManager.getState(profile);
+            GameProfile.State state = profile.getState();
 
             lines.add("&7&m------------------");
             switch(state) {
