@@ -49,22 +49,23 @@ public class DuelCommand implements CommandExecutor {
                             for(DuelKit duelKit : DuelKit.values()) {
                                 if(duelKit.isQueueable()) {
                                     ItemStack item = duelKit.getIcon();
-                                    GuiButton button = new GuiButton(item.getType(), duelKit.getDisplayName());
-                                    button.setItemMeta(item.getItemMeta());
-                                    button.setData(item.getData());
-                                    button.setName(duelKit.getDisplayName());
+                                    GuiButton button = new GuiButton(item, duelKit.getColor() + duelKit.getDisplayName());
 
-                                    button.setAction((player1, gui1) -> {
+                                    button.setLore(
+                                            "&7Click to duel " + targetProfile.getName() + "!"
+                                    );
+
+                                    button.setAction((pl, igui) -> {
                                         GameProfile gp = gpm.getLoadedProfiles().get(target.getUniqueId());
                                         if(gp != null) {
-                                            DuelRequest duelRequest = new DuelRequest(player1.getUniqueId(), target.getUniqueId(), duelKit, null, 30);
+                                            DuelRequest duelRequest = new DuelRequest(pl.getUniqueId(), target.getUniqueId(), duelKit, null, 30);
                                             duelRequest.send();
-                                            gp.getDuelRequests().put(player1.getUniqueId(), duelRequest);
+                                            gp.getDuelRequests().put(pl.getUniqueId(), duelRequest);
                                         } else {
-                                            player1.sendMessage(ChatColor.RED + "The player you specified is not on this server.");
+                                            pl.sendMessage(ChatColor.RED + "The player you specified is not on this server.");
                                         }
 
-                                        player1.closeInventory();
+                                        pl.closeInventory();
                                     });
 
                                     button.setSlot(x);

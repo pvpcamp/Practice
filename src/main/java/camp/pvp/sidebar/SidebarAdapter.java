@@ -52,8 +52,8 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
-                    lines.add("&6&nIn Queue:");
-                    lines.add(" &7● " + queue.getDuelKit().getDisplayName() + (ranked ? " &f(U)" : "&f(R)"));
+                    lines.add("&6In Queue:");
+                    lines.add(" &7● " + queue.getDuelKit().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(U)" : "&f&l(R)"));
 //                    if(ranked) {
 //                        lines.add(" &7● &f(900-1100)");
 //                    }

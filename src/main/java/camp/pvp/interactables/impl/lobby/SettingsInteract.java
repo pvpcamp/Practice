@@ -12,6 +12,8 @@ public class SettingsInteract implements ItemInteract {
     @Override
     public void onInteract(Player player, GameProfile gameProfile) {
         StandardGui gui = new StandardGui("Settings", 9);
+
+
         GuiButton comingSoon = new GuiButton(Material.WOOL, "&6Coming soon!");
         comingSoon.setSlot(4);
         gui.addButton(comingSoon, false);

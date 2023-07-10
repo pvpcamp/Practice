@@ -2,8 +2,10 @@ package camp.pvp.queue;
 
 import camp.pvp.Practice;
 import camp.pvp.kits.DuelKit;
+import camp.pvp.profiles.GameProfile;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashSet;
@@ -32,6 +34,11 @@ public class GameQueueManager {
             gqm.setQueue(gameQueue);
             gameQueue.getQueueMembers().add(gqm);
 
+            DuelKit kit = gameQueue.getDuelKit();
+            GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+            profile.givePlayerItems();
+            player.sendMessage(ChatColor.GREEN + "You have joined the queue for " + gameQueue.getType().name() + " " + kit.getColor() + kit.getDisplayName() + ChatColor.GREEN + ".");
+
             return gqm;
         }
 
@@ -45,7 +52,13 @@ public class GameQueueManager {
     public boolean removeFromQueue(UUID uuid) {
         GameQueue queue = getQueue(uuid);
         if(queue != null) {
-            return findQueueMember(queue, uuid) != null;
+            GameQueueMember gqm = findQueueMember(queue, uuid);
+            queue.getQueueMembers().remove(gqm);
+
+            Player player = gqm.getPlayer();
+            GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+            player.sendMessage(ChatColor.RED + "You have left the queue.");
+            profile.givePlayerItems();
         }
         return false;
     }

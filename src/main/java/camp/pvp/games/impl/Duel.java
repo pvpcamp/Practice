@@ -4,10 +4,7 @@ import camp.pvp.Practice;
 import camp.pvp.arenas.Arena;
 import camp.pvp.arenas.ArenaPosition;
 import camp.pvp.cooldowns.PlayerCooldown;
-import camp.pvp.games.Game;
-import camp.pvp.games.GameInventory;
-import camp.pvp.games.GameParticipant;
-import camp.pvp.games.PostGameInventory;
+import camp.pvp.games.*;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.profiles.GameProfileManager;
 import camp.pvp.queue.GameQueue;
@@ -141,7 +138,7 @@ public class Duel extends Game {
                     if (i == 0) {
                         for(Player p : Duel.this.getAlivePlayers()) {
                             if(p != null) {
-                                p.playSound(p.getLocation(), Sound.NOTE_PIANO, 1, 1);
+                                p.playSound(p.getLocation(), Sound.NOTE_PIANO, 1, 12);
                                 p.sendMessage(ChatColor.GREEN + "The game has started, good luck!");
                             }
                         }
@@ -178,6 +175,11 @@ public class Duel extends Game {
         GameProfileManager gpm = getPlugin().getGameProfileManager();
         this.setEnded(new Date());
         this.setState(State.ENDED);
+
+        if(getStarted() == null) {
+            setStarted(new Date());
+            getStartingTimer().cancel();
+        }
 
         GameParticipant winnerParticipant = null, loserParticipant = null;
         GameProfile winnerProfile = null, loserProfile = null;
@@ -222,7 +224,7 @@ public class Duel extends Game {
         stringBuilder.append(Colors.get("&6&lMatch ended."));
         stringBuilder.append(Colors.get("\n &7● &6Winner: &f" + winnerParticipant.getName()));
 
-        TextComponent text = new TextComponent(ChatColor.GRAY + " ● " + ChatColor.AQUA + "Inventories: ");
+        TextComponent text = new TextComponent(ChatColor.GRAY + " ● " + ChatColor.GOLD + "Inventories: ");
         final int size = components.size();
         int x = 0;
         while(x != size) {
@@ -296,8 +298,9 @@ public class Duel extends Game {
                     }
                 }
             }
-            for(UUID uuid : this.getSpectators().keySet()) {
-                Player player = Bukkit.getPlayer(uuid);
+
+            for(GameSpectator spectator : new ArrayList<>(this.getSpectators().values())) {
+                Player player = Bukkit.getPlayer(spectator.getUuid());
                 this.spectateEnd(player);
             }
 
@@ -318,14 +321,12 @@ public class Duel extends Game {
 //            if(this.getKit().getType().equals(Kit.Type.BUILD)) {
 //                this.getArena().setInUse(false);
 //            }
-
-            this.setState(State.ENDED);
         }, 60);
     }
 
     @Override
-    public void eliminate(Player player) {
-        super.eliminate(player);
+    public void eliminate(Player player, boolean leftGame) {
+        super.eliminate(player, leftGame);
         if(this.getAlive().size() < 2) {
             this.end();
         }
@@ -360,8 +361,8 @@ public class Duel extends Game {
                 }
             }
         }
-        for(UUID uuid : this.getSpectators().keySet()) {
-            Player player = Bukkit.getPlayer(uuid);
+        for(GameSpectator spectator : new ArrayList<>(this.getSpectators().values())) {
+            Player player = Bukkit.getPlayer(spectator.getUuid());
             this.spectateEnd(player);
         }
 
@@ -382,11 +383,6 @@ public class Duel extends Game {
             }
         }
 
-        if(opponent == null) {
-            lines.add("&cError!");
-            return lines;
-        }
-
         switch(getState()) {
             case STARTING:
                 lines.add("&6Kit: &f" + kit.getDisplayName());
@@ -394,16 +390,48 @@ public class Duel extends Game {
                 lines.add("&6Opponent: &f" + opponent.getName());
                 break;
             case ACTIVE:
+                int ping = 0, enemyPing = 0;
+                ping = PlayerUtils.getPing(self.getPlayer());
                 lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
-                lines.add("&6Ping: &e" + PlayerUtils.getPing(self.getPlayer()) + " ms&7/&c" + PlayerUtils.getPing(opponent.getPlayer()) + " ms");
+                lines.add(" ");
+                lines.add("&6Your Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms");
+                if(opponent != null) {
+                    enemyPing = PlayerUtils.getPing(opponent.getPlayer());
+                    int difference = enemyPing - ping;
+                    lines.add("&6Enemy Ping: &f" + PlayerUtils.getPing(opponent.getPlayer()) + " ms");
+//                    lines.add("&7&o" +(difference > 0 ? "+" : "") + difference + " ms" );
+                }
+                break;
             case ENDED:
-                lines.add("&6Duration: " + TimeUtil.get(getStarted(), getEnded()));
+                lines.add("&6&lYou win!");
+                lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
+                break;
         }
         return lines;
     }
 
     @Override
     public List<String> getSpectatorScoreboard(GameProfile profile) {
-        return null;
+        List<String> lines = new ArrayList<>();
+
+        switch(getState()) {
+            case STARTING:
+                lines.add("&6Kit: &f" + kit.getDisplayName());
+                lines.add("&6Arena: &f" + arena.getDisplayName());
+                break;
+            case ACTIVE:
+                lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
+                break;
+            case ENDED:
+                lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
+                break;
+        }
+
+        lines.add(" ");
+        for(GameParticipant participant : getParticipants().values()) {
+            lines.add((participant.isAlive() ? " &a❤ ":" &4X &c&m") + participant.getName());
+        }
+
+        return lines;
     }
 }

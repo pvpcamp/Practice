@@ -1,7 +1,9 @@
 package camp.pvp.listeners.bukkit.player;
 
 import camp.pvp.Practice;
+import camp.pvp.games.Game;
 import camp.pvp.profiles.GameProfile;
+import camp.pvp.utils.Colors;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,11 +37,36 @@ public class PlayerJoinLeaveListeners implements Listener {
         profile.setName(player.getName());
 
         profile.playerUpdate();
+
+        event.setJoinMessage(null);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ");
+        sb.append("\n&6Welcome to &6&lPvP Camp&r&6!");
+        sb.append("\n&7&oWe are currently in development, please report any bugs to the developers.");
+        sb.append("\n ");
+        player.sendMessage(Colors.get(sb.toString()));
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+        Game game = profile.getGame();
+
+        if(game != null) {
+            switch(profile.getState()) {
+                case SPECTATING:
+                    game.spectateEnd(player);
+                    break;
+                case IN_GAME:
+                    game.eliminate(player, true);
+                    break;
+            }
+        }
+
         plugin.getGameProfileManager().exportToDatabase(player.getUniqueId(), true, false);
+
+        event.setQuitMessage(null);
     }
 }

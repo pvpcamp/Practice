@@ -92,6 +92,7 @@ public enum DuelKit {
         switch(this) {
             case NO_DEBUFF:
                 Potion potion = new Potion(PotionType.INSTANT_HEAL);
+                potion.setSplash(true);
                 item = potion.toItemStack(1);
         }
 
@@ -103,22 +104,22 @@ public enum DuelKit {
         ItemStack[] armor = inventory.getArmor(), inv = inventory.getInventory();
         switch(this) {
             case NO_DEBUFF:
-                armor[0] = new ItemStack(Material.DIAMOND_HELMET);
-                armor[0].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[0].addEnchantment(Enchantment.DURABILITY, 3);
+                armor[3] = new ItemStack(Material.DIAMOND_HELMET);
+                armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+                armor[3].addEnchantment(Enchantment.DURABILITY, 3);
 
-                armor[1] = new ItemStack(Material.DIAMOND_CHESTPLATE);
-                armor[1].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[1].addEnchantment(Enchantment.DURABILITY, 3);
-
-                armor[2] = new ItemStack(Material.DIAMOND_LEGGINGS);
+                armor[2] = new ItemStack(Material.DIAMOND_CHESTPLATE);
                 armor[2].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
                 armor[2].addEnchantment(Enchantment.DURABILITY, 3);
 
-                armor[3] = new ItemStack(Material.DIAMOND_BOOTS);
-                armor[3].addEnchantment(Enchantment.PROTECTION_FALL, 4);
-                armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[3].addEnchantment(Enchantment.DURABILITY, 3);
+                armor[1] = new ItemStack(Material.DIAMOND_LEGGINGS);
+                armor[1].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+                armor[1].addEnchantment(Enchantment.DURABILITY, 3);
+
+                armor[0] = new ItemStack(Material.DIAMOND_BOOTS);
+                armor[0].addEnchantment(Enchantment.PROTECTION_FALL, 4);
+                armor[0].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+                armor[0].addEnchantment(Enchantment.DURABILITY, 3);
 
                 inv[0] = new ItemStack(Material.DIAMOND_SWORD);
                 inv[0].addEnchantment(Enchantment.DAMAGE_ALL, 3);

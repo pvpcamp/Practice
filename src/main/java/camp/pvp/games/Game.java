@@ -2,6 +2,7 @@ package camp.pvp.games;
 
 import camp.pvp.Practice;
 import camp.pvp.arenas.Arena;
+import camp.pvp.cosmetics.DeathAnimation;
 import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
@@ -71,7 +72,7 @@ public abstract class Game {
 
     public abstract void forceEnd();
 
-    public void eliminate(Player player) {
+    public void eliminate(Player player, boolean leftGame) {
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         if(participant != null) {
             participant.setAlive(false);
@@ -100,8 +101,15 @@ public abstract class Game {
 //            }
 //
 //            participant.setGameInventory(new GameInventory(participant));
-            Game.this.spectateStart(player);
-            Game.this.announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
+
+            DeathAnimation.BLOOD.playAnimation(this, location);
+
+            if(leftGame) {
+                Game.this.announce("&f" + player.getName() + "&a disconnected.");
+            } else {
+                Game.this.spectateStart(player);
+                Game.this.announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
+            }
         }
     }
 
@@ -122,7 +130,7 @@ public abstract class Game {
 
             if(victim.getHealth() - damage < 0) {
                 victim.setHealth(victim.getMaxHealth());
-                this.eliminate(victim);
+                this.eliminate(victim, false);
                 Bukkit.getScheduler().runTaskLater(plugin, ()-> victim.setHealth(20), 1);
             }
         } else {
@@ -161,7 +169,7 @@ public abstract class Game {
     }
 
     public void spectateStart(Player player, Location location) {
-        GameProfile profile = plugin.getGameProfileManager().find(player.getUniqueId(), true);
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
         this.getSpectators().put(player.getUniqueId(), new GameSpectator(player.getUniqueId(), player.getName()));
 
@@ -190,7 +198,7 @@ public abstract class Game {
     }
 
     public void spectateEnd(Player player) {
-        GameProfile profile = plugin.getGameProfileManager().find(player.getUniqueId(), true);
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
         if(!this.getState().equals(State.ENDED)) {
             if (!this.getParticipants().containsKey(player.getUniqueId())) {
@@ -214,7 +222,7 @@ public abstract class Game {
 
     public void leave(Player player) {
         if(getAlive().containsKey(player.getUniqueId())) {
-            eliminate(player);
+            eliminate(player, true);
         } else {
             spectateEnd(player);
         }

@@ -1,6 +1,7 @@
 package camp.pvp.queue;
 
 import camp.pvp.Practice;
+import camp.pvp.games.Game;
 import camp.pvp.games.impl.Duel;
 import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.GameProfile;
@@ -46,10 +47,20 @@ public class GameQueue {
         this.queueMembers = new LinkedList<>();
     }
 
+    public int getPlaying() {
+        for(Game game : getPlugin().getGameManager().getActiveGames()) {
+            if(game instanceof Duel && game.getKit().equals(duelKit) && ((Duel) game).getQueueType().equals(getType())) {
+                return game.getAlive().size();
+            }
+        }
+
+        return 0;
+    }
+
     public void startQueue() {
         switch(type) {
             case UNRANKED:
-                queueTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+                queueTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
                     if (queueMembers.size() > 1) {
                         final GameQueueMember member1, member2;
                         member1 = queueMembers.poll();

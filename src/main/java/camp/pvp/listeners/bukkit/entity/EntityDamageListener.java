@@ -28,7 +28,7 @@ public class EntityDamageListener implements Listener {
 
                 if(player.getHealth() - event.getFinalDamage() < 0) {
                     player.setHealth(player.getMaxHealth());
-                    game.eliminate(player);
+                    game.eliminate(player, false);
                     Bukkit.getScheduler().runTaskLater(plugin, ()-> player.setHealth(20), 1);
                     return;
                 }

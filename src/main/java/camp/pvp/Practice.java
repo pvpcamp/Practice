@@ -115,8 +115,10 @@ public class Practice extends JavaPlugin {
         new ArenaCommand(this);
         new BuildCommand(this);
         new DuelCommand(this);
+        new PingCommand(this);
         new PlayerTimeCommand(this);
         new PracticeUtilCommand(this);
+        new SpectateCommand(this);
     }
 
     public void registerListeners() {

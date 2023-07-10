@@ -1,7 +1,7 @@
 main: camp.pvp.Practice
-name: Camp
+name: Practice
 version: ${plugin.desc}
-author: pvp.camp
+author: leuo
 depend:
   - Gooey2
   - NetworkHelper
@@ -22,6 +22,8 @@ commands:
   leaderboards:
     aliases: [leaderboard, lb, elo]
     description: View player leaderboards.
+  ping:
+    description: Check a player's ping.
   playertime:
     aliases: [ptime, day, night, sunrise, sunset]
     description: Changes the time of day for yourself.
@@ -31,6 +33,9 @@ commands:
   settings:
     aliases: [options]
     description: General server settings.
+  spectate:
+    aliases: [spec]
+    description: Spectate a game.
   statistics:
     aliases: [stats]
     description: View the statistics of yourself or another player.

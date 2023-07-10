@@ -68,6 +68,8 @@ public class GameProfile {
             } else {
                 return State.SPECTATING;
             }
+        } else if(Practice.instance.getGameQueueManager().getQueue(uuid) != null) {
+            return State.LOBBY_QUEUE;
         } else {
             return State.LOBBY;
         }
