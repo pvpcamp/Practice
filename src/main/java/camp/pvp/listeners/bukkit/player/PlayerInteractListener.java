@@ -6,7 +6,10 @@ import camp.pvp.games.Game;
 import camp.pvp.games.GameParticipant;
 import camp.pvp.interactables.InteractableItem;
 import camp.pvp.interactables.InteractableItems;
+import camp.pvp.kits.CustomDuelKit;
+import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.GameProfile;
+import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -39,6 +42,10 @@ public class PlayerInteractListener implements Listener {
         ItemStack item = event.getItem();
 
         if(action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
+            if(profile.isBuildMode()) {
+                return;
+            }
+
             for(InteractableItems i : InteractableItems.values()) {
                 InteractableItem ii = i.getItem();
                 if(i.getState().equals(state) && ii != null && ii.getItem().isSimilar(item)) {
@@ -51,6 +58,24 @@ public class PlayerInteractListener implements Listener {
             Game game = profile.getGame();
             if (game != null) {
                 GameParticipant participant = game.getAlive().get(player.getUniqueId());
+                if(!participant.isKitApplied()) {
+                    DuelKit kit = game.getKit();
+                    switch(player.getItemInHand().getType()) {
+                        case ENCHANTED_BOOK:
+                            int slot = player.getInventory().getHeldItemSlot() + 1;
+                            CustomDuelKit cdk = profile.getCustomDuelKits().get(kit).get(slot);
+                            if(cdk != null) {
+                                cdk.apply(player);
+                                participant.setKitApplied(true);
+                            }
+                            break;
+                        case BOOK:
+                            kit.apply(player);
+                            participant.setKitApplied(true);
+                            break;
+                    }
+                }
+
                 switch(player.getItemInHand().getType()) {
                     case ENDER_PEARL:
                         PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
@@ -97,8 +122,19 @@ public class PlayerInteractListener implements Listener {
                 } else {
                     event.setCancelled(true);
                 }
-            } else if(!profile.isBuildMode()) {
-                event.setCancelled(true);
+            } else if(profile.getState().equals(GameProfile.State.KIT_EDITOR) && block != null) {
+                DuelKit editingKit = profile.getEditingKit();
+                switch(block.getType()) {
+                    case CHEST:
+                        break;
+                    case ANVIL:
+                        StandardGui gui = new StandardGui("Editing " + editingKit.getDisplayName(), 27);
+                        break;
+                    case SIGN:
+                        profile.setEditingKit(null);
+                        profile.playerUpdate();
+                        break;
+                }
             }
         }
     }

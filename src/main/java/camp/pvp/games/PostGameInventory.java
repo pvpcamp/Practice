@@ -38,6 +38,9 @@ public class PostGameInventory extends GameInventory {
         boolean pots = false, soups = false;
         int potCount = 0, soupsCount = 0;
 
+        Potion healPotion = new Potion(PotionType.INSTANT_HEAL, 2);
+        healPotion.setSplash(true);
+
         for(int x = 0; x < 36; x++) {
             ItemStack item = items[x];
             if(item != null && !item.getType().equals(Material.AIR)) {
@@ -50,14 +53,9 @@ public class PostGameInventory extends GameInventory {
 
                 gui.addButton(button, false);
 
-                if (item.getItemMeta() instanceof PotionMeta) {
-                    PotionMeta pm = (PotionMeta) item.getItemMeta();
-                    for (PotionEffect pe : pm.getCustomEffects()) {
-                        if (pe.getType().equals(PotionEffectType.HEAL)) {
-                            pots = true;
-                            potCount++;
-                        }
-                    }
+                if (item.isSimilar(healPotion.toItemStack(1))) {
+                    pots = true;
+                    potCount++;
                 } else {
                     switch(item.getType()) {
                         case MUSHROOM_SOUP:
@@ -101,10 +99,7 @@ public class PostGameInventory extends GameInventory {
         gui.addButton(playerButton, false);
 
         if(pots) {
-            Potion potion = new Potion(PotionType.INSTANT_HEAL, 2);
-            potion.setSplash(true);
-
-            GuiButton button = new GuiButton(potion.toItemStack(Math.max(potCount, 1)), "&c" + potCount + " pots left.");
+            GuiButton button = new GuiButton(healPotion.toItemStack(Math.max(potCount, 1)), "&c" + potCount + " pots left.");
             button.setLore(
                     "&6Thrown Potions: &f" + gameParticipant.getThrownPotions(),
                     "&6Missed Potions: &f" + gameParticipant.getMissedPotions()

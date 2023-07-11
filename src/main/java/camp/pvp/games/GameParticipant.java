@@ -16,7 +16,7 @@ public class GameParticipant {
     private final UUID uuid;
     private final String name;
     private GameTeam team;
-    private boolean alive;
+    private boolean alive, kitApplied;
 
     private Map<PlayerCooldown.Type, PlayerCooldown> cooldowns;
 

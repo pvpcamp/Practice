@@ -43,7 +43,7 @@ public class PotionSplashListener implements Listener {
                 if(game.getParticipants().containsKey(player.getUniqueId())) {
                     GameParticipant participant = game.getParticipants().get(player.getUniqueId());
                     participant.thrownPotions++;
-                    if(event.getIntensity(player) < 0.4) {
+                    if(event.getIntensity(player) < 0.5) {
                         participant.missedPotions++;
                     }
                 }

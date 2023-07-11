@@ -5,6 +5,9 @@ import camp.pvp.games.Game;
 import camp.pvp.games.PostGameInventory;
 import camp.pvp.interactables.InteractableItem;
 import camp.pvp.interactables.InteractableItems;
+import camp.pvp.kits.CustomDuelKit;
+import camp.pvp.kits.DuelKit;
+import camp.pvp.utils.ItemBuilder;
 import camp.pvp.utils.PlayerUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +15,9 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.*;
@@ -48,14 +53,25 @@ public class GameProfile {
     private Game game;
     private Map<UUID, DuelRequest> duelRequests;
 
+    private DuelKit editingKit;
+    private CustomDuelKit editingCustomKit;
+    private Map<DuelKit, Map<Integer, CustomDuelKit>> customDuelKits;
+
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
 
         this.duelRequests = new HashMap<>();
+        this.customDuelKits = new HashMap<>();
 
         this.time = Time.DAY;
         this.buildMode = false;
         this.spectatorVisibility = true;
+
+        for(DuelKit kit : DuelKit.values()) {
+            if(kit.isEditable()) {
+                customDuelKits.put(kit, new HashMap<>());
+            }
+        }
     }
 
     public Player getPlayer() {
@@ -71,6 +87,8 @@ public class GameProfile {
             }
         } else if(Practice.instance.getGameQueueManager().getQueue(uuid) != null) {
             return State.LOBBY_QUEUE;
+        } else if(editingKit != null){
+            return State.KIT_EDITOR;
         } else {
             return State.LOBBY;
         }
@@ -96,6 +114,21 @@ public class GameProfile {
             PlayerInventory pi = player.getInventory();
             for(InteractableItem i : getPlayerItems()) {
                 pi.setItem(i.getSlot(), i.getItem().clone());
+            }
+
+            if(game != null && game.getAlive().get(this.getUuid()) != null) {
+                DuelKit kit = game.getKit();
+                Map<Integer, CustomDuelKit> customKits = getCustomDuelKits().get(kit);
+                if(customKits.isEmpty()) {
+                    kit.apply(player);
+                    return;
+                }
+
+                for(Map.Entry<Integer, CustomDuelKit> entry : customKits.entrySet()) {
+                    String name = entry.getValue().getName();
+                    ItemStack i = new ItemBuilder(Material.ENCHANTED_BOOK, name);
+                    pi.setItem(entry.getKey() - 1, i);
+                }
             }
         }
     }

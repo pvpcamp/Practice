@@ -24,6 +24,7 @@ public class SettingsInteract implements ItemInteract {
                 gui.updateGui();
             }
         });
+
         spectatorVisibility.setButtonUpdater(new AbstractButtonUpdater() {
             @Override
             public void update(GuiButton guiButton, Gui gui) {

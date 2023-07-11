@@ -155,6 +155,7 @@ public abstract class Game {
             participant.setMaxHealth(Math.round(victim.getMaxHealth()));
             participant.setHunger(victim.getFoodLevel());
             participant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
+            participant.setCurrentCombo(0);
 
             if(victim.getHealth() - damage < 0) {
                 this.eliminate(victim, false);
@@ -172,10 +173,10 @@ public abstract class Game {
             if(victimParticipant.isAlive() && participant.isAlive()) {
                 victimParticipant.setAttacker(attacker.getUniqueId());
 
-                participant.setHealth(Math.round(victim.getHealth()));
-                participant.setMaxHealth(Math.round(victim.getMaxHealth()));
-                participant.setHunger(victim.getFoodLevel());
-                participant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
+                victimParticipant.setHealth(Math.round(victim.getHealth()));
+                victimParticipant.setMaxHealth(Math.round(victim.getMaxHealth()));
+                victimParticipant.setHunger(victim.getFoodLevel());
+                victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
                 participant.hits++;
                 participant.currentCombo++;
 
@@ -206,10 +207,10 @@ public abstract class Game {
         this.getSpectators().put(player.getUniqueId(), new GameSpectator(player.getUniqueId(), player.getName()));
 
         if(!this.getParticipants().containsKey(player.getUniqueId())) {
-            String message = "&b" + player.getName() + "&f has started spectating.";
+            String message = "&f" + player.getName() + "&6 has started spectating.";
             player.sendMessage(ChatColor.GREEN + "You have started spectating.");
             if(player.hasPermission("practice.staff")) {
-                this.staffAnnounce("&7[SILENT] " + message);
+                this.staffAnnounce("&7[Staff] " + message);
             } else {
                 this.announce(message);
             }

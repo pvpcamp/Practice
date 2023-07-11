@@ -29,6 +29,7 @@ import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -80,6 +81,10 @@ public class Practice extends JavaPlugin {
 
         if(getConfig().get("locations.kit_editor") != null) {
             this.kitEditorLocation = (Location) getConfig().get("locations.kit_editor", Location.class);
+        }
+
+        for(Entity entity : getServer().getWorlds().get(0).getEntities()) {
+            entity.remove();
         }
 
         registerCommands();

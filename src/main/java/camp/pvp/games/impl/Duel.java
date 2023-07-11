@@ -373,9 +373,9 @@ public class Duel extends Game {
             if(participant.isAlive()) {
                 if(!queueType.equals(GameQueue.Type.RANKED)) {
                     Player player = participant.getPlayer();
-                    lines.add(" &6" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
+                    lines.add(" &f" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
                 } else {
-                    lines.add(" &6" + participant.getName() + "&c ❤");
+                    lines.add(" &f" + participant.getName() + "&c ❤");
                 }
             } else {
                 lines.add(" &4X &c&m" + participant.getName());
