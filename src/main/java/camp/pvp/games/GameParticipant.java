@@ -6,16 +6,16 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.potion.PotionEffect;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Getter @Setter
 public class GameParticipant {
 
     private final UUID uuid;
     private final String name;
+    private GameTeam team;
     private boolean alive;
 
     private Map<PlayerCooldown.Type, PlayerCooldown> cooldowns;
@@ -23,8 +23,11 @@ public class GameParticipant {
     private UUID attacker;
     private EntityDamageEvent.DamageCause lastDamageCause;
 
-    public int hits, currentCombo, longestCombo, thrownPotions, missedPotions;
+    public long health, maxHealth, hunger,
+            hits, currentCombo, longestCombo,
+            thrownPotions, missedPotions;
 
+    private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
 
     public GameParticipant(UUID uuid, String name) {

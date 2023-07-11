@@ -23,22 +23,12 @@ public class Event extends Game {
     }
 
     @Override
-    public void init() {
-
-    }
-
-    @Override
     public void start() {
 
     }
 
     @Override
     public void end() {
-
-    }
-
-    @Override
-    public void forceEnd() {
 
     }
 }

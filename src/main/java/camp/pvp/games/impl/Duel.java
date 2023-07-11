@@ -36,11 +36,6 @@ public class Duel extends Game {
     }
 
     @Override
-    public void init() {
-
-    }
-
-    @Override
     public void start() {
 
         List<Arena> list = new ArrayList<>();
@@ -331,45 +326,6 @@ public class Duel extends Game {
     }
 
     @Override
-    public void forceEnd() {
-        this.announce("&c&lThis match has been forcefully ended by the server.");
-
-        if(getStartingTimer() != null) {
-            getStartingTimer().cancel();
-        }
-
-        if(getEndingTimer() != null) {
-            getEndingTimer().cancel();
-        }
-
-        for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
-            Player player = Bukkit.getPlayer(entry.getKey());
-            GameParticipant participant = entry.getValue();
-            GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
-
-            if(player != null) {
-                if(entry.getValue().isAlive()) {
-
-                    for(PlayerCooldown cooldown : participant.getCooldowns().values()) {
-                        cooldown.remove();
-                    }
-
-                    profile.setGame(null);
-                    profile.playerUpdate();
-                }
-            }
-        }
-        for(GameSpectator spectator : new ArrayList<>(this.getSpectators().values())) {
-            Player player = Bukkit.getPlayer(spectator.getUuid());
-            this.spectateEnd(player);
-        }
-
-        this.clearEntities();
-        this.setEnded(new Date());
-        this.setState(State.ENDED);
-    }
-
-    @Override
     public List<String> getScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
         GameParticipant self = getAlive().get(profile.getUuid());
@@ -395,7 +351,6 @@ public class Duel extends Game {
                 lines.add("&6Your Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms");
                 if(opponent != null) {
                     enemyPing = PlayerUtils.getPing(opponent.getPlayer());
-                    int difference = enemyPing - ping;
                     lines.add("&6Enemy Ping: &f" + PlayerUtils.getPing(opponent.getPlayer()) + " ms");
 //                    lines.add("&7&o" +(difference > 0 ? "+" : "") + difference + " ms" );
                 }
@@ -412,6 +367,23 @@ public class Duel extends Game {
     public List<String> getSpectatorScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
 
+        lines.add("&6Players:");
+
+        for(GameParticipant participant : getParticipants().values()) {
+            if(participant.isAlive()) {
+                if(!queueType.equals(GameQueue.Type.RANKED)) {
+                    Player player = participant.getPlayer();
+                    lines.add(" &6" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
+                } else {
+                    lines.add(" &6" + participant.getName() + "&c ❤");
+                }
+            } else {
+                lines.add(" &4X &c&m" + participant.getName());
+            }
+        }
+
+        lines.add(" ");
+
         switch(getState()) {
             case STARTING:
                 lines.add("&6Kit: &f" + kit.getDisplayName());
@@ -423,11 +395,6 @@ public class Duel extends Game {
             case ENDED:
                 lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
                 break;
-        }
-
-        lines.add(" ");
-        for(GameParticipant participant : getParticipants().values()) {
-            lines.add((participant.isAlive() ? " &a❤ ":" &4X &c&m") + participant.getName());
         }
 
         return lines;

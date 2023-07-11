@@ -65,18 +65,51 @@ public abstract class Game {
 
     public abstract List<String> getSpectatorScoreboard(GameProfile profile);
 
-    public abstract void init();
-
     public abstract void start();
 
     public abstract void end();
 
-    public abstract void forceEnd();
+    public void forceEnd() {
+        this.announce("&c&lThis match has been forcefully ended by the server.");
+
+        if(getStartingTimer() != null) {
+            getStartingTimer().cancel();
+        }
+
+        if(getEndingTimer() != null) {
+            getEndingTimer().cancel();
+        }
+
+        for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
+            Player player = Bukkit.getPlayer(entry.getKey());
+            GameParticipant participant = entry.getValue();
+            GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
+
+            if(player != null) {
+                if(entry.getValue().isAlive()) {
+                    participant.clearCooldowns();
+
+                    profile.setGame(null);
+                    profile.playerUpdate();
+                }
+            }
+        }
+
+        for(GameSpectator spectator : new ArrayList<>(this.getSpectators().values())) {
+            Player player = Bukkit.getPlayer(spectator.getUuid());
+            this.spectateEnd(player);
+        }
+
+        this.clearEntities();
+        this.setEnded(new Date());
+        this.setState(State.ENDED);
+    }
 
     public void eliminate(Player player, boolean leftGame) {
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         if(participant != null) {
             participant.setAlive(false);
+            participant.clearCooldowns();
 
             PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
             participant.setPostGameInventory(pgi);
@@ -92,21 +125,6 @@ public abstract class Game {
             }
 
             Location location = player.getLocation();
-//            GameProfile profile = plugin.getGameProfileManager().
-//            profile.getCosmetics().getEliminateAnimation().runAnimation(location, this);
-//
-//            for(Cooldown cooldown : profile.getCooldowns().values()) {
-//                cooldown.expire();
-//            }
-//
-//            for(Spectator spectator : getSpectators().values()) {
-//                if(spectator.getTarget().equals(player)) {
-//                    spectator.setTarget(null);
-//                }
-//            }
-//
-//            participant.setGameInventory(new GameInventory(participant));
-
             DeathAnimation.BLOOD.playAnimation(this, location);
 
             if(leftGame) {
@@ -133,8 +151,12 @@ public abstract class Game {
                 damage += 1;
             }
 
+            participant.setHealth(Math.round(victim.getHealth()));
+            participant.setMaxHealth(Math.round(victim.getMaxHealth()));
+            participant.setHunger(victim.getFoodLevel());
+            participant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
+
             if(victim.getHealth() - damage < 0) {
-                victim.setHealth(victim.getMaxHealth());
                 this.eliminate(victim, false);
                 Bukkit.getScheduler().runTaskLater(plugin, ()-> victim.setHealth(20), 1);
             }
@@ -149,6 +171,11 @@ public abstract class Game {
         if(victimParticipant != null && participant != null) {
             if(victimParticipant.isAlive() && participant.isAlive()) {
                 victimParticipant.setAttacker(attacker.getUniqueId());
+
+                participant.setHealth(Math.round(victim.getHealth()));
+                participant.setMaxHealth(Math.round(victim.getMaxHealth()));
+                participant.setHunger(victim.getFoodLevel());
+                participant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
                 participant.hits++;
                 participant.currentCombo++;
 

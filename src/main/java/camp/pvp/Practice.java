@@ -72,7 +72,7 @@ public class Practice extends JavaPlugin {
         assemble.setup();
 
         cooldownTask = this.getServer().getScheduler().runTaskTimer(this, new CooldownRunnable(this), 2, 2);
-        nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 10, 10);
+        nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 20, 20);
 
         if(getConfig().get("locations.lobby") != null) {
             this.lobbyLocation = (Location) getConfig().get("locations.lobby", Location.class);
