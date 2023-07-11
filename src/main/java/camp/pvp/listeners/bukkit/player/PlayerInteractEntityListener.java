@@ -29,7 +29,7 @@ public class PlayerInteractEntityListener implements Listener {
             GameProfile profile = gpm.getLoadedProfiles().get(player.getUniqueId());
             GameProfile targetProfile = gpm.getLoadedProfiles().get(target.getUniqueId());
             if(player.getItemInHand() == null || (player.getItemInHand() != null && player.getItemInHand().getType().equals(Material.AIR))) {
-                if(!profile.getState().equals(GameProfile.State.LOBBY) && !targetProfile.getState().equals(GameProfile.State.LOBBY)) {
+                if(profile.getState().equals(GameProfile.State.LOBBY) && targetProfile.getState().equals(GameProfile.State.LOBBY)) {
                     player.performCommand("duel " + target.getName());
                 }
             }

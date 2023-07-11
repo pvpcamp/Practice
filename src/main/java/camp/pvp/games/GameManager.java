@@ -3,6 +3,7 @@ package camp.pvp.games;
 import camp.pvp.Practice;
 import camp.pvp.games.impl.events.SumoEvent;
 import camp.pvp.games.impl.events.TournamentEvent;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -12,7 +13,7 @@ public class GameManager {
     private Practice plugin;
     private Logger logger;
     public Map<UUID, Game> games;
-    public Map<UUID, PostGameInventory> postGameInventories;
+    public @Getter Map<UUID, PostGameInventory> postGameInventories;
 
     public GameManager(Practice plugin) {
         this.plugin = plugin;

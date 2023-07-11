@@ -117,6 +117,7 @@ public class Practice extends JavaPlugin {
         new DuelCommand(this);
         new PingCommand(this);
         new PlayerTimeCommand(this);
+        new PostGameInventoryCommand(this);
         new PracticeUtilCommand(this);
         new SpectateCommand(this);
     }
@@ -151,6 +152,6 @@ public class Practice extends JavaPlugin {
         new ProjectileLaunchListener(this);
 
         // Packets
-        new EnderpearlSound(this);
+        protocolManager.addPacketListener(new EnderpearlSound(this));
     }
 }

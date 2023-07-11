@@ -47,14 +47,8 @@ public class Duel extends Game {
         if(getArena() == null) {
             for(Arena a : getPlugin().getArenaManager().getArenas()) {
                 if(a.isEnabled()) {
-                    if (kit.isBuild()) {
-                        if (a.getType().equals(Arena.Type.DUEL_BUILD)) {
-                            list.add(a);
-                        }
-                    } else {
-                        if(a.getType().equals(Arena.Type.DUEL)) {
-                            list.add(a);
-                        }
+                    if(kit.getArenaType().equals(a.getType())) {
+                        list.add(a);
                     }
                 }
             }
@@ -180,14 +174,21 @@ public class Duel extends Game {
             setStarted(new Date());
             getStartingTimer().cancel();
         }
+        
+        for(GameParticipant participant : getAlive().values()) {
+            Player player = participant.getPlayer();
+            PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
+            participant.setPostGameInventory(pgi);
+            getPlugin().getGameManager().getPostGameInventories().put(pgi.getUuid(), pgi);
+        }
 
         GameParticipant winnerParticipant = null, loserParticipant = null;
         GameProfile winnerProfile = null, loserProfile = null;
+        PostGameInventory winnerInventory = null, loserInventory = null;
 
         for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
             GameParticipant participant = entry.getValue();
             Player player = Bukkit.getPlayer(entry.getKey());
-            PlayerInventory inventory = player.getInventory();
 
             PostGameInventory pgi;
             UUID uuid = UUID.randomUUID();
@@ -196,19 +197,16 @@ public class Duel extends Game {
             if(alive) {
                 winnerParticipant = participant;
                 winnerProfile = gpm.getLoadedProfiles().get(entry.getKey());
-
-                pgi = new PostGameInventory(uuid, participant, inventory.getContents(), inventory.getArmorContents());
-                winnerParticipant.setPostGameInventory(pgi);
+                winnerInventory = participant.getPostGameInventory();
             } else {
                 loserParticipant = participant;
                 loserProfile = gpm.getLoadedProfiles().get(entry.getKey());
-
-                pgi = new PostGameInventory(uuid, participant, inventory.getContents(), inventory.getArmorContents());
-                loserParticipant.setPostGameInventory(pgi);
+                loserInventory = participant.getPostGameInventory();
             }
-
-            getPlugin().getGameManager().addInventory(pgi);
         }
+        
+        winnerInventory.setOpponentInventory(loserParticipant, loserInventory);
+        loserInventory.setOpponentInventory(winnerParticipant, winnerInventory);
 
         List<TextComponent> components = new ArrayList<>();
         for(GameParticipant p : this.getParticipants().values()) {

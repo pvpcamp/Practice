@@ -7,11 +7,14 @@ import camp.pvp.profiles.GameProfile;
 import camp.pvp.profiles.GameProfileManager;
 import camp.pvp.queue.GameQueue;
 import camp.pvp.queue.GameQueueManager;
+import camp.pvp.queue.GameQueueMember;
+import camp.pvp.utils.TimeUtil;
 import io.github.thatkawaiisam.assemble.AssembleAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class SidebarAdapter implements AssembleAdapter {
@@ -48,12 +51,14 @@ public class SidebarAdapter implements AssembleAdapter {
                     break;
                 case LOBBY_QUEUE:
                     GameQueue queue = gameQueueManager.getQueue(player);
+                    GameQueueMember queueMember = gameQueueManager.findQueueMember(queue, player.getUniqueId());
                     boolean ranked = queue.getType().equals(GameQueue.Type.UNRANKED);
                     lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
                     lines.add("&6In Queue:");
-                    lines.add(" &7● " + queue.getDuelKit().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(U)" : "&f&l(R)"));
+                    lines.add(" &f● " + queue.getDuelKit().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f(U)" : "&f&l(R)"));
+                    lines.add(" &f● " + TimeUtil.get(new Date(), queueMember.getJoined()));
 //                    if(ranked) {
 //                        lines.add(" &7● &f(900-1100)");
 //                    }

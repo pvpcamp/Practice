@@ -29,7 +29,6 @@ public class QueueInteract implements ItemInteract {
             DuelKit kit = queue.getDuelKit();
             GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
             button.setButtonUpdater((guiButton, g) -> guiButton.setLore(
-                    " ",
                     "&6Playing: &f" + queue.getPlaying(),
                     "&6In Queue: &f" + queue.getQueueMembers().size(),
                     "&7Click to join queue!"));

@@ -8,7 +8,7 @@ import java.util.*;
 public class Arena {
 
     public enum Type {
-        DUEL, DUEL_BUILD, FFA, EVENT_SUMO, EVENT_SPLEEF, EVENT_OITC;
+        DUEL, DUEL_BUILD, DUEL_HCF, FFA, EVENT_SUMO, EVENT_SPLEEF, EVENT_OITC;
 
         public List<String> getValidPositions() {
             switch(this) {

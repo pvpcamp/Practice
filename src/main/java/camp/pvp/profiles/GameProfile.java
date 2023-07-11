@@ -43,7 +43,7 @@ public class GameProfile {
     private final UUID uuid;
     private String name;
     private Time time;
-    private boolean buildMode;
+    private boolean buildMode, spectatorVisibility;
 
     private Game game;
     private Map<UUID, DuelRequest> duelRequests;
@@ -55,6 +55,7 @@ public class GameProfile {
 
         this.time = Time.DAY;
         this.buildMode = false;
+        this.spectatorVisibility = true;
     }
 
     public Player getPlayer() {
@@ -147,8 +148,7 @@ public class GameProfile {
                     }
                 } else {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-//                        boolean b = getSettings().isSpectatorVisibility() ? occupation.getAllPlayers().contains(p) : occupation.getCurrentPlaying().contains(p);
-                        boolean b = game.getCurrentPlaying().contains(p);
+                        boolean b = this.isSpectatorVisibility() ? game.getAllPlayers().contains(p) : game.getCurrentPlaying().contains(p);
                         if (b) {
                             player.showPlayer(p);
                         } else {

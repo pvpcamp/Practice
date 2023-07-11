@@ -27,6 +27,8 @@ commands:
   playertime:
     aliases: [ptime, day, night, sunrise, sunset]
     description: Changes the time of day for yourself.
+  postgameinventory:
+    description: Opens the post game inventory GUI.
   practiceutil:
     aliases: [putil, putils, pu]
     description: General staff utility command.

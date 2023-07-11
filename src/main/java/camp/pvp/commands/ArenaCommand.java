@@ -111,6 +111,7 @@ public class ArenaCommand implements CommandExecutor {
                             default:
                                 break;
                         }
+                        break;
                     case 3:
                         if(exists) {
                             switch (args[0].toLowerCase()) {

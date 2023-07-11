@@ -24,8 +24,8 @@ public class PlayerDeathListener implements Listener {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         Game game = profile.getGame();
         if(game != null && game.getAlivePlayers().contains(player)) {
-            game.eliminate(player, false);
             event.getDrops().clear();
+            game.eliminate(player, false);
             player.spigot().respawn();
             player.teleport(player.getLocation());
         }

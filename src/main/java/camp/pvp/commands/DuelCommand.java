@@ -5,12 +5,14 @@ import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.DuelRequest;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.profiles.GameProfileManager;
+import camp.pvp.utils.Colors;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -43,7 +45,7 @@ public class DuelCommand implements CommandExecutor {
                         GameProfile targetProfile = gpm.getLoadedProfiles().get(target.getUniqueId());
 
                         if(targetProfile.getGame() == null) {
-                            StandardGui gui = new StandardGui("Duel " + target.getName(), 9);
+                            StandardGui requestGui = new StandardGui("Duel " + target.getName(), 9);
 
                             int x = 0;
                             for(DuelKit duelKit : DuelKit.values()) {
@@ -69,12 +71,50 @@ public class DuelCommand implements CommandExecutor {
                                     });
 
                                     button.setSlot(x);
-                                    gui.addButton(button, false);
+                                    requestGui.addButton(button, false);
                                     x++;
                                 }
                             }
 
-                            gui.open(player);
+                            DuelRequest duelRequest = profile.getDuelRequests().get(target.getUniqueId());
+
+                            if(duelRequest != null && !duelRequest.isExpired()) {
+                                StandardGui acceptGui = new StandardGui("Accept Duel from " + target.getName() + "?", 27);
+
+                                DuelKit kit = duelRequest.getKit();
+                                GuiButton acceptButton = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName() + " Duel Request");
+                                acceptButton.setLore(
+                                        "&7Would you like to accept this duel?",
+                                        "&6Arena: &f" + (duelRequest.getArena() == null ? "Random" : Colors.get(duelRequest.getArena().getDisplayName())));
+                                acceptButton.setAction(new GuiAction() {
+                                    @Override
+                                    public void run(Player player, Gui gui) {
+                                        if(!duelRequest.isExpired() && profile.getState().equals(GameProfile.State.LOBBY) && targetProfile.getState().equals(GameProfile.State.LOBBY)) {
+                                            duelRequest.startGame();
+                                        } else {
+                                            player.closeInventory();
+                                            player.sendMessage(ChatColor.RED + "This duel has expired.");
+                                        }
+                                    }
+                                });
+
+                                acceptButton.setSlot(11);
+                                acceptGui.addButton(acceptButton, false);
+
+                                GuiButton duelGuiButton = new GuiButton(Material.GOLD_SWORD, "&6Send New Duel Request");
+                                duelGuiButton.setAction(new GuiAction() {
+                                    @Override
+                                    public void run(Player player, Gui gui) {
+                                        requestGui.open(player);
+                                    }
+                                });
+
+                                duelGuiButton.setSlot(15);
+                                acceptGui.addButton(duelGuiButton, false);
+                                acceptGui.open(player);
+                            } else {
+                                requestGui.open(player);
+                            }
                         } else {
                             player.sendMessage(ChatColor.RED + "The player you specified is in a game.");
                         }

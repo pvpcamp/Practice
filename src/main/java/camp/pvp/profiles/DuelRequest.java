@@ -6,6 +6,7 @@ import camp.pvp.games.impl.Duel;
 import camp.pvp.kits.DuelKit;
 import camp.pvp.queue.GameQueue;
 import camp.pvp.utils.Colors;
+import lombok.Getter;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -18,12 +19,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
+@Getter
 public class DuelRequest {
 
     private final UUID sender, opponent;
     private final DuelKit kit;
     private final Arena arena;
-    private final Date expires;
+    private Date expires;
 
     public DuelRequest(UUID sender, UUID opponent, DuelKit kit, Arena arena, int secondsUntilExpired) {
         this.sender = sender;
@@ -65,6 +67,8 @@ public class DuelRequest {
             duel.join(opponentPlayer);
 
             Practice.instance.getGameManager().addGame(duel);
+
+            this.expires = new Date();
 
             duel.start();
         }

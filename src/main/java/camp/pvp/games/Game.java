@@ -77,6 +77,10 @@ public abstract class Game {
         if(participant != null) {
             participant.setAlive(false);
 
+            PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
+            participant.setPostGameInventory(pgi);
+            getPlugin().getGameManager().getPostGameInventories().put(pgi.getUuid(), pgi);
+
             if(getAlive().size() > 1) {
                 for (ItemStack item : player.getInventory()) {
                     if (item != null && !item.getType().equals(Material.AIR)) {
