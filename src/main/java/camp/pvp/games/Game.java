@@ -7,6 +7,7 @@ import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
 import camp.pvp.utils.EntityHider;
+import camp.pvp.utils.PlayerUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -188,7 +189,6 @@ public abstract class Game {
         }
 
         profile.setGame(this);
-        profile.givePlayerItems();
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
         updateEntities();
@@ -199,6 +199,9 @@ public abstract class Game {
         if(location != null) {
             player.teleport(location);
         }
+
+        PlayerUtils.reset(player);
+        Bukkit.getScheduler().runTaskLater(plugin, profile::givePlayerItems, 1);
     }
 
     public void spectateEnd(Player player) {
