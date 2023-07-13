@@ -16,14 +16,17 @@ import camp.pvp.listeners.bukkit.player.*;
 import camp.pvp.listeners.bukkit.potion.PotionSplashListener;
 import camp.pvp.listeners.bukkit.projectile.ProjectileHitListener;
 import camp.pvp.listeners.bukkit.projectile.ProjectileLaunchListener;
+import camp.pvp.listeners.bukkit.world.WeatherChangeListener;
 import camp.pvp.listeners.packets.EnderpearlSound;
 import camp.pvp.nametags.NameColorRunnable;
+import camp.pvp.parties.PartyManager;
 import camp.pvp.profiles.GameProfileManager;
 import camp.pvp.queue.GameQueueManager;
 import camp.pvp.sidebar.SidebarAdapter;
 import camp.pvp.utils.EntityHider;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.lunarclient.bukkitapi.LunarClientAPI;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
@@ -41,15 +44,18 @@ public class Practice extends JavaPlugin {
     private ProtocolManager protocolManager;
     private EntityHider entityHider;
 
+    private Assemble assemble;
+
+    private LunarClientAPI lunarClientAPI;
+
     private Location lobbyLocation;
     private Location kitEditorLocation;
-
-    private Assemble assemble;
 
     private ArenaManager arenaManager;
     private GameManager gameManager;
     private GameQueueManager gameQueueManager;
     private GameProfileManager gameProfileManager;
+    private PartyManager partyManager;
 
     private BukkitTask cooldownTask, nameColorTask;
 
@@ -66,11 +72,14 @@ public class Practice extends JavaPlugin {
         this.gameManager = new GameManager(this);
         this.gameQueueManager = new GameQueueManager(this);
         this.gameProfileManager = new GameProfileManager(this);
+        this.partyManager = new PartyManager(this);
 
         this.assemble = new Assemble(this, new SidebarAdapter(this));
-        assemble.setTicks(10);
+        assemble.setTicks(5);
         assemble.setAssembleStyle(AssembleStyle.MODERN);
         assemble.setup();
+
+        this.lunarClientAPI = LunarClientAPI.getInstance();
 
         cooldownTask = this.getServer().getScheduler().runTaskTimer(this, new CooldownRunnable(this), 2, 2);
         nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 20, 20);
@@ -93,10 +102,6 @@ public class Practice extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        arenaManager.shutdown();
-        gameManager.shutdown();
-        gameProfileManager.shutdown();
-
         cooldownTask.cancel();
         nameColorTask.cancel();
 
@@ -120,6 +125,8 @@ public class Practice extends JavaPlugin {
         new ArenaCommand(this);
         new BuildCommand(this);
         new DuelCommand(this);
+        new GamesCommand(this);
+        new PartyCommand(this);
         new PingCommand(this);
         new PlayerTimeCommand(this);
         new PostGameInventoryCommand(this);
@@ -156,7 +163,15 @@ public class Practice extends JavaPlugin {
         new ProjectileHitListener(this);
         new ProjectileLaunchListener(this);
 
+        new WeatherChangeListener(this);
+
         // Packets
         protocolManager.addPacketListener(new EnderpearlSound(this));
+    }
+
+    public void shutdown() {
+        arenaManager.shutdown();
+        gameManager.shutdown();
+        gameProfileManager.shutdown();
     }
 }

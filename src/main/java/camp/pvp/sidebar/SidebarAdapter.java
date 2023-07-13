@@ -1,8 +1,10 @@
 package camp.pvp.sidebar;
 
 import camp.pvp.Practice;
+import camp.pvp.arenas.Arena;
 import camp.pvp.games.Game;
 import camp.pvp.games.GameManager;
+import camp.pvp.parties.Party;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.profiles.GameProfileManager;
 import camp.pvp.queue.GameQueue;
@@ -32,7 +34,7 @@ public class SidebarAdapter implements AssembleAdapter {
 
     @Override
     public String getTitle(Player player) {
-        return "&6&lPvP Camp";
+        return "&6&lPvP Camp &7[Beta]";
     }
 
     @Override
@@ -46,8 +48,15 @@ public class SidebarAdapter implements AssembleAdapter {
             lines.add("&7&m------------------");
             switch(state) {
                 case LOBBY:
-                    lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
+                    int online = Bukkit.getOnlinePlayers().size();
+                    lines.add("&6Online: &f" + online);
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
+                    if(profile.isDebugMode()) {
+                        lines.add(" ");
+                        lines.add("&6Debug:");
+                        lines.add(" &6&oBuild mode: &f" + profile.isBuildMode());
+                        lines.add(" &6&oLC Players: &f" + plugin.getLunarClientAPI().getPlayersRunningLunarClient().size() + "/" + online);
+                    }
                     break;
                 case LOBBY_QUEUE:
                     GameQueue queue = gameQueueManager.getQueue(player);
@@ -67,7 +76,9 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
-                    lines.add("&6&nParty:");
+                    Party party = profile.getParty();
+                    lines.add("&6Party &7(" + party.getMembers().size() + ")");
+                    lines.add("&6Leader: &f" + party.getLeader().getName());
                     break;
                 case IN_GAME:
                     Game game = profile.getGame();
@@ -81,8 +92,10 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
-                    lines.add("&6&nKit Editor:");
-                    lines.add("&6Door: &fLeave");
+                    lines.add("&6Editing Kit:");
+                    lines.add(" &f" + profile.getEditingKit().getDisplayName());
+                    lines.add(" ");
+                    lines.add("&6Sign: &fLeave");
                     lines.add("&6Chest: &fMore Items");
                     lines.add("&6Anvil: &fSave");
                     break;

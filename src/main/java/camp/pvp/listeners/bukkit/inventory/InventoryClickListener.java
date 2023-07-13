@@ -2,6 +2,7 @@ package camp.pvp.listeners.bukkit.inventory;
 
 import camp.pvp.Practice;
 import camp.pvp.games.Game;
+import camp.pvp.games.GameParticipant;
 import camp.pvp.profiles.GameProfile;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,12 +26,12 @@ public class InventoryClickListener implements Listener {
             case KIT_EDITOR:
                 break;
             case IN_GAME:
-                Game occupation = profile.getGame();
-                if(occupation == null) {
-//                    Participant participant = occupation.getAlive().get(player.getUniqueId());
-//                    if(participant != null && !participant.isKitApplied()) {
-//                        event.setCancelled(true);
-//                    }
+                Game game = profile.getGame();
+                if(game != null) {
+                    GameParticipant participant = game.getAlive().get(player.getUniqueId());
+                    if(participant != null && !participant.isKitApplied()) {
+                        event.setCancelled(true);
+                    }
                 }
                 break;
             default:

@@ -5,6 +5,7 @@ import camp.pvp.arenas.Arena;
 import camp.pvp.arenas.ArenaPosition;
 import camp.pvp.cooldowns.PlayerCooldown;
 import camp.pvp.games.*;
+import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.profiles.GameProfileManager;
 import camp.pvp.queue.GameQueue;
@@ -91,6 +92,7 @@ public class Duel extends Game {
                 p.sendMessage(" ");
                 p.sendMessage(Colors.get("&6&lDuel starting in 5 seconds."));
                 p.sendMessage(Colors.get(" &7● &6Mode: &f" + this.queueType.toString()));
+                p.sendMessage(Colors.get(" &7● &6Kit: &f" + kit.getColor() + kit.getDisplayName()));
                 p.sendMessage(Colors.get(" &7● &6Map: &f" + Colors.get(getArena().getDisplayName())));
                 p.sendMessage(Colors.get(" &7● &6Participants: &f" + stringBuilder));
                 p.sendMessage(" ");
@@ -113,8 +115,7 @@ public class Duel extends Game {
                     locations.put(p, location);
                     p.teleport(locations.get(p));
 
-                    // TODO: Custom Kits
-                    this.getKit().apply(p);
+                    getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey()).givePlayerItems();
                 }
                 position++;
             }
@@ -348,6 +349,21 @@ public class Duel extends Game {
                 ping = PlayerUtils.getPing(self.getPlayer());
                 lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
                 lines.add(" ");
+                if(kit.equals(DuelKit.BOXING)) {
+                    long difference = self.getHits() - opponent.getHits();
+                    lines.add("&6Hits: &a" + self.getHits() + "&7/&c" + opponent.getHits());
+
+                    if(difference == 0) {
+                        lines.add("&7First to 100.");
+                    } else if(difference > 0){
+                        lines.add(" &e● +" + difference + " Hits");
+                    } else {
+                        lines.add(" &c● " + difference + " Hits");
+                    }
+
+                    lines.add(" ");
+                }
+
                 lines.add("&6Your Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms");
                 if(opponent != null) {
                     enemyPing = PlayerUtils.getPing(opponent.getPlayer());
@@ -371,11 +387,15 @@ public class Duel extends Game {
 
         for(GameParticipant participant : getParticipants().values()) {
             if(participant.isAlive()) {
-                if(!queueType.equals(GameQueue.Type.RANKED)) {
-                    Player player = participant.getPlayer();
-                    lines.add(" &f" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
+                Player player = participant.getPlayer();
+                if(kit.equals(DuelKit.BOXING)) {
+                    lines.add(" &f" + participant.getName() + " &7(" + participant.getHits() + ")");
                 } else {
-                    lines.add(" &f" + participant.getName() + "&c ❤");
+                    if (!queueType.equals(GameQueue.Type.RANKED)) {
+                        lines.add(" &f" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
+                    } else {
+                        lines.add(" &f" + participant.getName() + "&c ❤");
+                    }
                 }
             } else {
                 lines.add(" &4X &c&m" + participant.getName());

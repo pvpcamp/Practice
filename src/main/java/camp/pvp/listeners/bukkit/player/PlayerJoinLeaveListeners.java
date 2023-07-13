@@ -35,8 +35,9 @@ public class PlayerJoinLeaveListeners implements Listener {
         }
 
         profile.setName(player.getName());
-
         profile.playerUpdate();
+
+        plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
         event.setJoinMessage(null);
 
@@ -63,6 +64,10 @@ public class PlayerJoinLeaveListeners implements Listener {
                     game.eliminate(player, true);
                     break;
             }
+        }
+
+        if(profile.getParty() != null) {
+            profile.getParty().leave(player);
         }
 
         plugin.getGameProfileManager().exportToDatabase(player.getUniqueId(), true, false);

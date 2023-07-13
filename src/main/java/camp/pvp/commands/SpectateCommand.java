@@ -10,6 +10,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Predicate;
+
 public class SpectateCommand implements CommandExecutor {
 
     private Practice plugin;
@@ -30,6 +36,12 @@ public class SpectateCommand implements CommandExecutor {
                     return true;
                 }
 
+                UUID uuid = null;
+                try {
+                    uuid = UUID.fromString(args[0]);
+                } catch (Exception ignored) {
+                }
+
                 Player target = Bukkit.getPlayer(args[0]);
                 if(target != null) {
                     GameProfile targetProfile = plugin.getGameProfileManager().getLoadedProfiles().get(target.getUniqueId());
@@ -40,11 +52,26 @@ public class SpectateCommand implements CommandExecutor {
                     }
 
                     game.spectateStart(player, target.getLocation());
+                } else if (uuid != null) {
+                    Game game = plugin.getGameManager().games.get(uuid);
+                    if(game != null && game.getState().equals(Game.State.ACTIVE)) {
+                        game.spectateStart(player, game.getAlivePlayers().get(0).getLocation());
+                    } else {
+                        player.sendMessage(ChatColor.RED + "The game ID you specified is invalid.");
+                    }
                 } else {
                     player.sendMessage(ChatColor.RED + "The player you specified was not found.");
                 }
-            } else {
-                player.sendMessage(ChatColor.RED + "Usage: /" + label + " <player>");
+            } else if(profile.getState().equals(GameProfile.State.LOBBY) || profile.getState().equals(GameProfile.State.LOBBY_PARTY)) {
+                List<Game> games = new ArrayList<>(plugin.getGameManager().getActiveGames());
+                if(!games.isEmpty()) {
+                    Game game = games.get(0);
+                    game.spectateStart(player, game.getAlivePlayers().get(0).getLocation());
+
+                    player.sendMessage(ChatColor.GREEN + "You did not specify what game you wanted to spectate, so we sent you here!");
+                } else {
+                    player.sendMessage(ChatColor.RED + "No active games found.");
+                }
             }
         }
 

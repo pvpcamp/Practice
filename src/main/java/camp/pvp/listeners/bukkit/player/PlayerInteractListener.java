@@ -9,7 +9,11 @@ import camp.pvp.interactables.InteractableItems;
 import camp.pvp.kits.CustomDuelKit;
 import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.GameProfile;
+import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.Gui;
+import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -19,8 +23,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.*;
+
+import java.util.Map;
 
 public class PlayerInteractListener implements Listener {
 
@@ -58,7 +65,7 @@ public class PlayerInteractListener implements Listener {
             Game game = profile.getGame();
             if (game != null) {
                 GameParticipant participant = game.getAlive().get(player.getUniqueId());
-                if(!participant.isKitApplied()) {
+                if(participant != null && !participant.isKitApplied()) {
                     DuelKit kit = game.getKit();
                     switch(player.getItemInHand().getType()) {
                         case ENCHANTED_BOOK:
@@ -67,11 +74,13 @@ public class PlayerInteractListener implements Listener {
                             if(cdk != null) {
                                 cdk.apply(player);
                                 participant.setKitApplied(true);
+                                player.updateInventory();
                             }
                             break;
                         case BOOK:
                             kit.apply(player);
                             participant.setKitApplied(true);
+                            player.updateInventory();
                             break;
                     }
                 }
@@ -122,19 +131,94 @@ public class PlayerInteractListener implements Listener {
                 } else {
                     event.setCancelled(true);
                 }
-            } else if(profile.getState().equals(GameProfile.State.KIT_EDITOR) && block != null) {
-                DuelKit editingKit = profile.getEditingKit();
-                switch(block.getType()) {
-                    case CHEST:
-                        break;
-                    case ANVIL:
-                        StandardGui gui = new StandardGui("Editing " + editingKit.getDisplayName(), 27);
-                        break;
-                    case SIGN:
-                        profile.setEditingKit(null);
-                        profile.playerUpdate();
-                        break;
+            } else if(profile.getState().equals(GameProfile.State.KIT_EDITOR)) {
+                if(block != null) {
+                    DuelKit editingKit = profile.getEditingKit();
+                    switch (block.getType()) {
+                        case CHEST:
+                            if(editingKit.isMoreItems()) {
+                                Inventory inventory = Bukkit.createInventory(player, 36, "More Items");
+                                for(ItemStack i : editingKit.getGameInventory().getInventory()) {
+                                    if(i != null && !i.getType().equals(Material.AIR)) {
+                                        inventory.addItem(i);
+                                    }
+                                }
+
+                                player.openInventory(inventory);
+                            }
+                            break;
+                        case ANVIL:
+                            StandardGui gui = new StandardGui("Editing " + editingKit.getDisplayName(), 27);
+                            Map<Integer, CustomDuelKit> customKits = profile.getCustomDuelKits().get(editingKit);
+                            int x = 1;
+                            while (x < 6) {
+                                CustomDuelKit cdk = customKits.get(x);
+                                if (cdk == null) {
+                                    GuiButton createButton = new GuiButton(Material.CHEST, editingKit.getColor() + "Create new " + editingKit.getDisplayName() + " kit.");
+                                    createButton.setSlot(1 + x);
+                                    createButton.setCloseOnClick(true);
+
+                                    int finalX = x;
+                                    createButton.setAction(new GuiAction() {
+                                        @Override
+                                        public void run(Player player, Gui gui) {
+                                            CustomDuelKit cdk = new CustomDuelKit(editingKit, 1);
+                                            cdk.setItems(player.getInventory().getContents());
+                                            customKits.put(finalX, cdk);
+                                        }
+                                    });
+
+                                    gui.addButton(createButton, false);
+                                } else {
+                                    GuiButton loadButton = new GuiButton(Material.BOOK, "&aLoad Kit " + editingKit.getDisplayName());
+                                    loadButton.setSlot(1 + x);
+                                    loadButton.setAction(new GuiAction() {
+                                        @Override
+                                        public void run(Player player, Gui gui) {
+                                            cdk.apply(player);
+                                            player.getInventory().setArmorContents(null);
+                                        }
+                                    });
+                                    gui.addButton(loadButton, false);
+
+                                    GuiButton saveButton = new GuiButton(Material.NETHER_STAR, "&6Save Kit " + editingKit.getDisplayName());
+                                    saveButton.setSlot(10 + x);
+                                    saveButton.setCloseOnClick(true);
+                                    saveButton.setAction(new GuiAction() {
+                                        @Override
+                                        public void run(Player player, Gui gui) {
+                                            cdk.setItems(player.getInventory().getContents());
+                                        }
+                                    });
+
+                                    gui.addButton(saveButton, false);
+
+                                    GuiButton deleteButton = new GuiButton(Material.TNT, "&cDelete Kit " + editingKit.getDisplayName());
+                                    deleteButton.setSlot(19 + x);
+                                    deleteButton.setCloseOnClick(true);
+                                    int finalX = x;
+                                    deleteButton.setAction(new GuiAction() {
+                                        @Override
+                                        public void run(Player player, Gui gui) {
+                                            customKits.remove(finalX);
+                                        }
+                                    });
+                                    gui.addButton(deleteButton, false);
+                                }
+                                x++;
+                            }
+
+                            gui.open(player);
+                            break;
+                        case SIGN:
+                        case WALL_SIGN:
+                            profile.setEditingKit(null);
+                            profile.playerUpdate();
+                            break;
+                    }
                 }
+
+                event.setCancelled(true);
             }
         }
     }

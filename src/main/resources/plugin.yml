@@ -6,6 +6,7 @@ depend:
   - Gooey2
   - NetworkHelper
   - ProtocolLib
+  - LunarClient-API
 
 commands:
   accept:
@@ -19,9 +20,14 @@ commands:
     description: Duel another player or team.
   event:
     description: Host an event.
+  games:
+    description: Gets all active games.
   leaderboards:
     aliases: [leaderboard, lb, elo]
     description: View player leaderboards.
+  party:
+    aliases: [p]
+    description: Manage your party.
   ping:
     description: Check a player's ping.
   playertime:

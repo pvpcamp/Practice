@@ -3,8 +3,14 @@ package camp.pvp.commands;
 import camp.pvp.Practice;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
+import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.Gui;
+import camp.pvp.utils.guis.GuiAction;
+import camp.pvp.utils.guis.StandardGui;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -40,6 +46,30 @@ public class PracticeUtilCommand implements CommandExecutor {
                     case "reset":
                         profile.playerUpdate();
                         return true;
+                    case "shutdown":
+                    case "stopserver":
+                        StandardGui gui = new StandardGui("Are you sure?", 27);
+                        gui.setDefaultBackground();
+
+                        GuiButton yes = new GuiButton(Material.GOLD_BLOCK, "&aYes");
+                        yes.setSlot(12);
+                        yes.setLore(
+                                "&4&lCAUTION: &fYou could be disrupting games!",
+                                "&f&lAre you sure you want to stop the server?"
+                        );
+                        yes.setAction((player1, gui1) -> {
+                            plugin.shutdown();
+                            Bukkit.getScheduler().runTaskLater(plugin, ()-> plugin.getServer().shutdown(), 20);
+                        });
+                        gui.addButton(yes, false);
+
+                        GuiButton no = new GuiButton(Material.REDSTONE_BLOCK, "&cNo");
+                        no.setSlot(14);
+                        no.setCloseOnClick(true);
+                        gui.addButton(no, false);
+
+                        gui.open(player);
+                        return true;
                 }
             }
 
@@ -48,6 +78,7 @@ public class PracticeUtilCommand implements CommandExecutor {
             sb.append("\n&6/practiceutil setlobby &7- &fSets the lobby location.");
             sb.append("\n&6/practiceutil setkiteditor &7- &fSets the kit editor location.");
             sb.append("\n&6/practiceutil reset &7- &fResets your player.");
+            sb.append("\n&6/practiceutil shutdown &7- &fShutdown the server.");
 
             player.sendMessage(Colors.get(sb.toString()));
         }

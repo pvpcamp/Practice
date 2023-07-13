@@ -3,8 +3,13 @@ package camp.pvp.cooldowns;
 import camp.pvp.games.GameParticipant;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
+import com.lunarclient.bukkitapi.LunarClientAPI;
+import com.lunarclient.bukkitapi.cooldown.LCCooldown;
+import com.lunarclient.bukkitapi.nethandler.LCPacket;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketCooldown;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 import java.util.Calendar;
@@ -49,7 +54,7 @@ public class PlayerCooldown {
     private final Date issued;
     private final GameParticipant participant;
     private final Player player;
-    private boolean expired = false;
+    private boolean expired = false, lunar;
 
     public PlayerCooldown(Type type, GameParticipant participant, Player player) {
         this.type = type;
@@ -60,6 +65,13 @@ public class PlayerCooldown {
         calendar.setTime(new Date());
         calendar.add(Calendar.SECOND, type.getDuration());
         this.issued = calendar.getTime();
+
+        LunarClientAPI lcApi = LunarClientAPI.getInstance();
+        this.lunar = lcApi.isRunningLunarClient(player);
+
+        if(lunar) {
+            LunarClientAPI.getInstance().sendPacket(player, new LCCooldown("Pearl Cooldown", 16, Material.ENDER_PEARL).getPacket());
+        }
     }
 
     public long getRemaining() {
@@ -85,7 +97,7 @@ public class PlayerCooldown {
                 expired = true;
                 expire();
             } else {
-                if(getType().equals(Type.ENDER_PEARL)) {
+                if(getType().equals(Type.ENDER_PEARL) && !lunar) {
                     long seconds = TimeUnit.MILLISECONDS.toSeconds(getRemaining()) % 60;
                     player.setLevel((int) seconds + 1);
                     player.setExp((getTicksRemaining().floatValue() / (float) (getType().getDuration() * 20)));
@@ -101,7 +113,10 @@ public class PlayerCooldown {
 
     public void remove() {
         expired = true;
-        player.setExp(0);
-        player.setLevel(0);
+
+        if(!lunar) {
+            player.setExp(0);
+            player.setLevel(0);
+        }
     }
 }

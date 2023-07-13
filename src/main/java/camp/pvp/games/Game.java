@@ -107,7 +107,7 @@ public abstract class Game {
 
     public void eliminate(Player player, boolean leftGame) {
         GameParticipant participant = getParticipants().get(player.getUniqueId());
-        if(participant != null) {
+        if(participant != null && !this.getState().equals(State.ENDED)) {
             participant.setAlive(false);
             participant.clearCooldowns();
 
@@ -141,14 +141,20 @@ public abstract class Game {
         participant.setLastDamageCause(event.getCause());
         if(this.getState().equals(State.ACTIVE)) {
             double damage = event.getFinalDamage();
-//            participant.setCurrentCombo(0);
-//            if(kit != null && kit.getType().equals(Kit.Type.SUMO)) {
-//                event.setDamage(0);
-//                victim.setHealth(20);
-//            }
+            boolean canDie = true;
 
             if(event.getCause().equals(EntityDamageEvent.DamageCause.FIRE) || event.getCause().equals(EntityDamageEvent.DamageCause.LAVA) || event.getCause().equals(EntityDamageEvent.DamageCause.FIRE_TICK)) {
                 damage += 1;
+            }
+
+            if(kit != null && !kit.isTakeDamage()) {
+                if(event.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
+                    event.setCancelled(true);
+                    canDie = false;
+                }
+
+                event.setDamage(0);
+                victim.setHealth(victim.getMaxHealth());
             }
 
             participant.setHealth(Math.round(victim.getHealth()));
@@ -158,8 +164,14 @@ public abstract class Game {
             participant.setCurrentCombo(0);
 
             if(victim.getHealth() - damage < 0) {
-                this.eliminate(victim, false);
-                Bukkit.getScheduler().runTaskLater(plugin, ()-> victim.setHealth(20), 1);
+                if (event.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
+                    event.setCancelled(true);
+                }
+
+                if(canDie) {
+                    this.eliminate(victim, false);
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> victim.setHealth(20), 1);
+                }
             }
         } else {
             event.setCancelled(true);
@@ -177,12 +189,26 @@ public abstract class Game {
                 victimParticipant.setMaxHealth(Math.round(victim.getMaxHealth()));
                 victimParticipant.setHunger(victim.getFoodLevel());
                 victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
-                participant.hits++;
-                participant.currentCombo++;
+
+                if(victimParticipant.isHittable()) {
+                    participant.hits++;
+                    participant.currentCombo++;
+                    victimParticipant.handleHit();
+                }
+
+                if(!kit.isTakeDamage()) {
+                    event.setDamage(0);
+                    victim.setHealth(victim.getMaxHealth());
+                    if(kit.equals(DuelKit.BOXING) && participant.getHits() > 99) {
+                        this.eliminate(victim, false);
+                    }
+                }
 
                 if (participant.currentCombo > participant.longestCombo) {
                     participant.longestCombo = participant.currentCombo;
                 }
+            } else {
+                event.setCancelled(true);
             }
         } else {
             event.setCancelled(true);
@@ -221,15 +247,16 @@ public abstract class Game {
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
         updateEntities();
 
-        player.setAllowFlight(true);
-        player.setFlying(true);
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 1, true, false));
         if(location != null) {
             player.teleport(location);
         }
 
-        PlayerUtils.reset(player);
-        Bukkit.getScheduler().runTaskLater(plugin, profile::givePlayerItems, 1);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            profile.givePlayerItems();
+            player.setAllowFlight(true);
+            player.setFlying(true);
+        }, 1);
     }
 
     public void spectateEnd(Player player) {

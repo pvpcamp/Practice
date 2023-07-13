@@ -1,12 +1,15 @@
 package camp.pvp.interactables;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.inventory.ItemStack;
 
+@Getter @Setter
 public class InteractableItem {
-    @Getter private final ItemStack item;
-    @Getter private final int slot;
-    @Getter private final ItemInteract interact;
+    private final ItemStack item;
+    private final int slot;
+    private final ItemInteract interact;
+    private String permission;
 
     public InteractableItem(ItemStack item, int slot, ItemInteract interact) {
         this.item = item;

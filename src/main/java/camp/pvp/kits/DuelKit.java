@@ -11,10 +11,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum DuelKit {
-    NO_DEBUFF, DEBUFF, CLASSIC, HCF, BOXING, SOUP, BUILD_UHC;
+    NO_DEBUFF, CLASSIC, HCF, BOXING;
 
     public String getDisplayName() {
         switch(this) {
@@ -24,12 +29,8 @@ public enum DuelKit {
                 return "HCF";
             case CLASSIC:
                 return "Classic";
-            case DEBUFF:
-                return "Debuff";
             case BOXING:
                 return "Boxing";
-            case SOUP:
-                return "Soup";
             default:
                 return null;
         }
@@ -43,12 +44,8 @@ public enum DuelKit {
                 return ChatColor.DARK_RED;
             case CLASSIC:
                 return ChatColor.LIGHT_PURPLE;
-            case DEBUFF:
-                return ChatColor.DARK_GREEN;
             case BOXING:
-                return ChatColor.GOLD;
-            case SOUP:
-                return ChatColor.GREEN;
+                return ChatColor.DARK_PURPLE;
             default:
                 return null;
         }
@@ -56,13 +53,8 @@ public enum DuelKit {
 
     public boolean isEditable() {
         switch(this) {
-            case NO_DEBUFF:
-            case DEBUFF:
-            case HCF:
-            case SOUP:
-                return true;
             default:
-                return false;
+                return true;
         }
     }
 
@@ -77,8 +69,6 @@ public enum DuelKit {
 
     public boolean isBuild() {
         switch(this) {
-            case BUILD_UHC:
-                return true;
             default:
                 return false;
         }
@@ -89,15 +79,55 @@ public enum DuelKit {
             case NO_DEBUFF:
             case HCF:
             case CLASSIC:
+            case BOXING:
                 return true;
             default:
                 return false;
         }
     }
 
+    public boolean isMoreItems() {
+        switch(this) {
+            case NO_DEBUFF:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public boolean isTakeDamage() {
+        switch(this) {
+            case BOXING:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    public List<ItemStack> getMoreItems() {
+        List<ItemStack> items = new ArrayList<>();
+        for(ItemStack i : this.getGameInventory().getInventory()) {
+            if(i != null && !i.getType().equals(Material.AIR)) {
+                if(!items.contains(i)) {
+                    items.add(i);
+                }
+            }
+        }
+
+        return items;
+    }
+
     public boolean isHunger() {
         switch(this) {
-            case SOUP:
+            case BOXING:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    public boolean takeDamage() {
+        switch(this) {
             case BOXING:
                 return false;
             default:
@@ -122,6 +152,9 @@ public enum DuelKit {
                 break;
             case CLASSIC:
                 item = new ItemStack(Material.DIAMOND_SWORD);
+                break;
+            case BOXING:
+                item = new ItemStack(Material.DIAMOND_CHESTPLATE);
                 break;
         }
 
@@ -166,11 +199,12 @@ public enum DuelKit {
                 Potion health = new Potion(PotionType.INSTANT_HEAL, 2);
                 health.setSplash(true);
 
-                inv[7] = speed.toItemStack(1);
+                inv[8] = speed.toItemStack(1);
+                inv[17] = speed.toItemStack(1);
                 inv[26] = speed.toItemStack(1);
                 inv[35] = speed.toItemStack(1);
 
-                inv[8] = fireResistance.toItemStack(1);
+                inv[7] = fireResistance.toItemStack(1);
 
                 for(int x = 0; x < 36; x++) {
                     ItemStack i = inv[x];
@@ -215,12 +249,12 @@ public enum DuelKit {
                 health = new Potion(PotionType.INSTANT_HEAL, 2);
                 health.setSplash(true);
 
-                inv[7] = speed.toItemStack(1);
+                inv[8] = speed.toItemStack(1);
                 inv[17] = speed.toItemStack(1);
                 inv[26] = speed.toItemStack(1);
                 inv[35] = speed.toItemStack(1);
 
-                inv[8] = fireResistance.toItemStack(1);
+                inv[7] = fireResistance.toItemStack(1);
 
                 for(int x = 0; x < 36; x++) {
                     ItemStack i = inv[x];
@@ -243,6 +277,13 @@ public enum DuelKit {
 
                 inv[9] = new ItemStack(Material.ARROW, 12);
                 break;
+            case BOXING:
+                inv[0] = new ItemStack(Material.DIAMOND_SWORD);
+                inv[0].addEnchantment(Enchantment.DAMAGE_ALL, 1);
+                inv[0].addEnchantment(Enchantment.DURABILITY, 1);
+
+                inventory.getPotionEffects().add(new PotionEffect(PotionEffectType.SPEED, 99999, 1));
+                break;
             default:
                 break;
 
@@ -256,6 +297,10 @@ public enum DuelKit {
         GameInventory gi = this.getGameInventory();
 
         PlayerUtils.reset(player);
+
+        for(PotionEffect effect : gi.getPotionEffects()) {
+            player.addPotionEffect(effect);
+        }
 
         pi.setArmorContents(gi.getArmor());
         pi.setContents(gi.getInventory());

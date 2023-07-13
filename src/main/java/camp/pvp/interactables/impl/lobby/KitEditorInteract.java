@@ -4,6 +4,8 @@ import camp.pvp.interactables.ItemInteract;
 import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.Gui;
+import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.entity.Player;
 
@@ -18,6 +20,17 @@ public class KitEditorInteract implements ItemInteract {
                 GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
                 button.setLore("&7Click to edit " + kit.getColor() + kit.getDisplayName() + "&7.");
                 button.setSlot(x);
+
+                button.setAction(new GuiAction() {
+                    @Override
+                    public void run(Player player, Gui gui) {
+                        gameProfile.setEditingKit(kit);
+                        gameProfile.playerUpdate();
+                        kit.apply(player);
+                        player.getInventory().setArmorContents(null);
+                    }
+                });
+
                 gui.addButton(button, false);
                 x++;
             }

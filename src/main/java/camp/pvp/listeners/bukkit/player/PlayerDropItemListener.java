@@ -42,7 +42,10 @@ public class PlayerDropItemListener implements Listener {
                     item.remove();
                 }
             }.runTaskLater(plugin, 400L);
-        } else if(!profile.isBuildMode()) {
+        } else if (profile.getState().equals(GameProfile.State.KIT_EDITOR)) {
+            Item item = event.getItemDrop();
+            item.remove();
+        } else if (!profile.isBuildMode()) {
             event.setCancelled(true);
         }
     }

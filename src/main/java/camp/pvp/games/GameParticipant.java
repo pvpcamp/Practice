@@ -1,5 +1,6 @@
 package camp.pvp.games;
 
+import camp.pvp.Practice;
 import camp.pvp.cooldowns.PlayerCooldown;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ public class GameParticipant {
     private final UUID uuid;
     private final String name;
     private GameTeam team;
-    private boolean alive, kitApplied;
+    private boolean alive, kitApplied, hittable;
 
     private Map<PlayerCooldown.Type, PlayerCooldown> cooldowns;
 
@@ -35,10 +36,16 @@ public class GameParticipant {
         this.name = name;
         this.alive = true;
         this.cooldowns = new HashMap<>();
+        this.hittable = true;
     }
 
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
+    }
+
+    public void handleHit() {
+        hittable = false;
+        Bukkit.getScheduler().runTaskLater(Practice.instance, () -> GameParticipant.this.setHittable(true), 9);
     }
 
     public void clearCooldowns() {

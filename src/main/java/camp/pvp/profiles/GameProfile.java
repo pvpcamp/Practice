@@ -7,6 +7,7 @@ import camp.pvp.interactables.InteractableItem;
 import camp.pvp.interactables.InteractableItems;
 import camp.pvp.kits.CustomDuelKit;
 import camp.pvp.kits.DuelKit;
+import camp.pvp.parties.Party;
 import camp.pvp.utils.ItemBuilder;
 import camp.pvp.utils.PlayerUtils;
 import lombok.Getter;
@@ -48,10 +49,12 @@ public class GameProfile {
     private final UUID uuid;
     private String name;
     private Time time;
-    private boolean buildMode, spectatorVisibility;
+    private boolean buildMode, debugMode, spectatorVisibility, lobbyVisibility;
 
     private Game game;
     private Map<UUID, DuelRequest> duelRequests;
+
+    private Party party;
 
     private DuelKit editingKit;
     private CustomDuelKit editingCustomKit;
@@ -65,6 +68,7 @@ public class GameProfile {
 
         this.time = Time.DAY;
         this.buildMode = false;
+        this.lobbyVisibility = true;
         this.spectatorVisibility = true;
 
         for(DuelKit kit : DuelKit.values()) {
@@ -89,6 +93,8 @@ public class GameProfile {
             return State.LOBBY_QUEUE;
         } else if(editingKit != null){
             return State.KIT_EDITOR;
+        } else if(party != null){
+            return State.LOBBY_PARTY;
         } else {
             return State.LOBBY;
         }
@@ -120,15 +126,19 @@ public class GameProfile {
                 DuelKit kit = game.getKit();
                 Map<Integer, CustomDuelKit> customKits = getCustomDuelKits().get(kit);
                 if(customKits.isEmpty()) {
+                    game.getParticipants().get(uuid).setKitApplied(true);
                     kit.apply(player);
                     return;
                 }
 
                 for(Map.Entry<Integer, CustomDuelKit> entry : customKits.entrySet()) {
                     String name = entry.getValue().getName();
-                    ItemStack i = new ItemBuilder(Material.ENCHANTED_BOOK, name);
+                    ItemStack i = new ItemBuilder(Material.ENCHANTED_BOOK, name).create();
                     pi.setItem(entry.getKey() - 1, i);
                 }
+
+                ItemStack defaultKit = new ItemBuilder(Material.BOOK, "&aDefault Kit").create();
+                pi.setItem(8, defaultKit);
             }
         }
     }
@@ -145,7 +155,12 @@ public class GameProfile {
             State state = getState();
             boolean check = false;
             switch(state) {
+                case LOBBY_QUEUE:
+                case LOBBY_PARTY:
                 case LOBBY:
+                    if(player.hasPermission("practice.lobby.fly")) {
+                        player.setAllowFlight(true);
+                    }
                     location = Practice.instance.getLobbyLocation();
                     check = true;
                     break;
@@ -174,28 +189,40 @@ public class GameProfile {
                     for (Player p : Bukkit.getOnlinePlayers()) {
 //                        !game.seeEveryone() &&
                         if(!game.getCurrentPlaying().contains(p)) {
-                            player.hidePlayer(p);
+                            if(player.canSee(p)) {
+                                player.hidePlayer(p);
+                            }
                         } else {
-                            player.showPlayer(p);
+                            if(!player.canSee(p)) {
+                                player.showPlayer(p);
+                            }
                         }
                     }
                 } else {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         boolean b = this.isSpectatorVisibility() ? game.getAllPlayers().contains(p) : game.getCurrentPlaying().contains(p);
                         if (b) {
-                            player.showPlayer(p);
+                            if(!player.canSee(p)) {
+                                player.showPlayer(p);
+                            }
                         } else {
-                            player.hidePlayer(p);
+                            if(player.canSee(p)) {
+                                player.hidePlayer(p);
+                            }
                         }
                     }
                 }
             } else {
                 for(Player p : Bukkit.getOnlinePlayers()) {
-                    GameProfile profile = gpm.find(p.getUniqueId(), true);
-                    if(profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) {
-                        player.hidePlayer(p);
+                    GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
+                    if((profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) || !this.isLobbyVisibility()) {
+                        if(player.canSee(p)) {
+                            player.hidePlayer(p);
+                        }
                     } else {
-                        player.showPlayer(p);
+                        if(!player.canSee(p)) {
+                            player.showPlayer(p);
+                        }
                     }
                 }
             }

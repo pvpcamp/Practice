@@ -31,6 +31,8 @@ public class PlayerInteractEntityListener implements Listener {
             if(player.getItemInHand() == null || (player.getItemInHand() != null && player.getItemInHand().getType().equals(Material.AIR))) {
                 if(profile.getState().equals(GameProfile.State.LOBBY) && targetProfile.getState().equals(GameProfile.State.LOBBY)) {
                     player.performCommand("duel " + target.getName());
+                } else if(profile.getState().equals(GameProfile.State.SPECTATING) && targetProfile.getState().equals(GameProfile.State.IN_GAME) && player.hasPermission("practice.staff")) {
+                    player.openInventory(target.getInventory());
                 }
             }
         }

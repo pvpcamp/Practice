@@ -26,7 +26,6 @@ public class PlayerDeathListener implements Listener {
         if(game != null && game.getAlivePlayers().contains(player)) {
             event.getDrops().clear();
             game.eliminate(player, false);
-            player.spigot().respawn();
             player.teleport(player.getLocation());
         }
     }

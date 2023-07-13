@@ -21,10 +21,10 @@ public class FoodLevelChangeListener implements Listener {
         if(event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-            Game occupation = profile.getGame();
-            if(occupation != null) {
-                if(occupation.getCurrentPlaying().contains(player)) {
-                    if (occupation.getKit() != null && !occupation.getKit().isHunger()) {
+            Game game = profile.getGame();
+            if(game != null) {
+                if(game.getCurrentPlaying().contains(player)) {
+                    if (game.getKit() != null && !game.getKit().isHunger()) {
                         event.setCancelled(true);
                     }
                 }
