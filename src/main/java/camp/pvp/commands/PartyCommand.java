@@ -5,8 +5,13 @@ import camp.pvp.parties.Party;
 import camp.pvp.parties.PartyMember;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
+import camp.pvp.utils.buttons.AbstractButtonUpdater;
+import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.Gui;
+import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -41,28 +46,58 @@ public class PartyCommand implements CommandExecutor {
 
                         switch(args[0].toLowerCase()) {
                             case "info":
-                                StringBuilder sb = new StringBuilder();
-                                sb.append("&6&lParty &7(" + party.getMembers().size() + ")");
-                                sb.append("\n&6Leader: &f" + party.getLeader().getName());
-                                sb.append("\n&6Members: &f");
-
-                                List<PartyMember> members = new ArrayList<>(party.getMembers().values());
-                                for(int x = 0; x < members.size(); x++) {
-                                    sb.append(members.get(x).getName());
-
-                                    if(x + 1 == party.getMembers().size()) {
-                                        sb.append("&7.");
-                                    } else {
-                                        sb.append("&7, &f");
-                                    }
-                                }
-
-                                player.sendMessage(Colors.get(sb.toString()));
+                                player.sendMessage(Colors.get(info(party).toString()));
                                 return true;
                             case "settings":
                                 if(player.getUniqueId().equals(party.getLeader().getUuid())) {
                                     StandardGui gui = new StandardGui("Party Settings", 27);
                                     gui.setDefaultBackground();
+
+                                    GuiButton openPartyButton = new GuiButton(Material.NETHER_STAR, "&6Open/Closed Party");
+                                    openPartyButton.setButtonUpdater(new AbstractButtonUpdater() {
+                                        @Override
+                                        public void update(GuiButton guiButton, Gui gui) {
+                                            guiButton.setLore(
+                                                    "&7Should the party be open to",
+                                                    "&7the public or invite only?",
+                                                    "&6Current Setting: &f" + (party.isOpen() ? "Public" : "Invite Only")
+                                            );
+                                        }
+                                    });
+
+                                    openPartyButton.setAction(new GuiAction() {
+                                        @Override
+                                        public void run(Player player, Gui gui) {
+                                            party.setOpen(!party.isOpen());
+                                            gui.updateGui();
+                                        }
+                                    });
+
+                                    openPartyButton.setSlot(11);
+                                    gui.addButton(openPartyButton, false);
+
+                                    GuiButton playerKitsButton = new GuiButton(Material.DIAMOND_SWORD, "&6Member Customizable HCF Kits");
+                                    playerKitsButton.setButtonUpdater(new AbstractButtonUpdater() {
+                                        @Override
+                                        public void update(GuiButton guiButton, Gui gui) {
+                                            guiButton.setLore(
+                                                    "&7Should party members have the",
+                                                    "&7ability to customize their HCF kit?",
+                                                    "&6Current Setting: &f" + (party.isChooseKits() ? "Enabled" : "Disabled")
+                                            );
+                                        }
+                                    });
+
+                                    playerKitsButton.setAction(new GuiAction() {
+                                        @Override
+                                        public void run(Player player, Gui gui) {
+                                            party.setChooseKits(!party.isChooseKits());
+                                            gui.updateGui();
+                                        }
+                                    });
+
+                                    playerKitsButton.setSlot(15);
+                                    gui.addButton(playerKitsButton, false);
 
                                     gui.open(player);
                                 } else {
@@ -90,5 +125,25 @@ public class PartyCommand implements CommandExecutor {
         }
 
         return true;
+    }
+
+    public StringBuilder info(Party party) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("&6&lParty &7(" + party.getMembers().size() + ")");
+        sb.append("\n&6Leader: &f" + party.getLeader().getName());
+        sb.append("\n&6Members: &f");
+
+        List<PartyMember> members = new ArrayList<>(party.getMembers().values());
+        for(int x = 0; x < members.size(); x++) {
+            sb.append(members.get(x).getName());
+
+            if(x + 1 == party.getMembers().size()) {
+                sb.append("&7.");
+            } else {
+                sb.append("&7, &f");
+            }
+        }
+
+        return sb;
     }
 }

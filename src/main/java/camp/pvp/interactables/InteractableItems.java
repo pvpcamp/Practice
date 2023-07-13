@@ -18,7 +18,7 @@ import org.bukkit.Material;
 public enum InteractableItems {
     QUEUE, PARTY_CREATE, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
-    PARTY_EVENT, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS,
+    PARTY_EVENT, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS, PARTY_PLAYER_SETTINGS,
     STOP_SPECTATING;
 
     public InteractableItem getItem() {
@@ -33,6 +33,7 @@ public enum InteractableItems {
             case KIT_EDITOR:
                 return new InteractableItem(
                         new ItemBuilder(Material.BOOK, "&6Edit Your Kits &7(Right Click)").create(), 7, new KitEditorInteract());
+            case PARTY_PLAYER_SETTINGS:
             case SETTINGS:
                 return new InteractableItem(
                         new ItemBuilder(Material.ANVIL, "&6Settings &7(Right Click)").create(), 8, new SettingsInteract());
@@ -52,7 +53,7 @@ public enum InteractableItems {
                         new ItemBuilder(Material.REDSTONE, "&6Leave Party &7(Right Click)").create(), 4, new PartyLeaveInteract());
             case PARTY_SETTINGS:
                 return new InteractableItem(
-                        new ItemBuilder(Material.PAPER, "&6Party Settings &7(Right Click)").create(), 8, new PartySettingsInteract());
+                        new ItemBuilder(Material.PAPER, "&6Party Settings &7(Right Click)").create(), 7, new PartySettingsInteract());
             // SPECTATING
             case STOP_SPECTATING:
                 return new InteractableItem(
@@ -76,6 +77,7 @@ public enum InteractableItems {
             case PARTY_EVENT:
             case PARTY_KIT:
             case PARTY_LEAVE:
+            case PARTY_PLAYER_SETTINGS:
             case PARTY_SETTINGS:
                 return GameProfile.State.LOBBY_PARTY;
             default:

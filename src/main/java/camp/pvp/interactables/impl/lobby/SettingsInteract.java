@@ -65,7 +65,7 @@ public class SettingsInteract implements ItemInteract {
             @Override
             public void run(Player player, Gui gui) {
                 if(gameProfile.getTime().ordinal() == GameProfile.Time.NIGHT.ordinal()) {
-                    gameProfile.setTime(GameProfile.Time.SUNRISE);
+                    gameProfile.setTime(GameProfile.Time.DAY);
                 } else {
                     gameProfile.setTime(GameProfile.Time.values()[gameProfile.getTime().ordinal() + 1]);
                 }
@@ -83,7 +83,6 @@ public class SettingsInteract implements ItemInteract {
                         "&7What time of day would",
                         "&7you like to have set?",
                         " ",
-                        (time.equals(GameProfile.Time.SUNRISE) ? "&6&l" : "&8") +" ● Sunrise",
                         (time.equals(GameProfile.Time.DAY) ? "&6&l" : "&8") +" ● Day",
                         (time.equals(GameProfile.Time.SUNSET) ? "&6&l" : "&8") +" ● Sunset",
                         (time.equals(GameProfile.Time.NIGHT) ? "&6&l" : "&8") +" ● Night");

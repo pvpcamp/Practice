@@ -29,7 +29,7 @@ public class AcceptCommand implements CommandExecutor {
             Player player = (Player) sender;
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
-            if(profile.getGame() == null) {
+            if(profile.getState().equals(GameProfile.State.LOBBY)) {
 
                 Player target = Bukkit.getPlayer(args[0]);
 
@@ -52,7 +52,7 @@ public class AcceptCommand implements CommandExecutor {
                     player.sendMessage(ChatColor.RED + "The player you specified is not on this server.");
                 }
             } else {
-                player.sendMessage(ChatColor.RED + "You cannot duel someone when you are in a game.");
+                player.sendMessage(ChatColor.RED + "You cannot duel someone right now.");
             }
         }
 

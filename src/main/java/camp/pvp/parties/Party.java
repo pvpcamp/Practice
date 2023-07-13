@@ -14,9 +14,12 @@ public class Party {
 
     private Practice plugin;
     private Map<UUID, PartyMember> members;
+    private boolean chooseKits, open;
     public Party(Practice plugin) {
         this.plugin = plugin;
         this.members = new HashMap<>();
+        this.chooseKits = true;
+        this.open = false;
     }
 
     public PartyMember join(Player player) {

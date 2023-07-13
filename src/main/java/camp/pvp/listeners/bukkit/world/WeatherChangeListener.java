@@ -3,7 +3,9 @@ package camp.pvp.listeners.bukkit.world;
 import camp.pvp.Practice;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.weather.ThunderChangeEvent;
 import org.bukkit.event.weather.WeatherChangeEvent;
 
 public class WeatherChangeListener implements Listener {
@@ -14,8 +16,17 @@ public class WeatherChangeListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    @EventHandler
+    @EventHandler(priority= EventPriority.HIGHEST)
     public void onWeatherChange(WeatherChangeEvent event) {
-        Bukkit.getScheduler().runTaskLater(plugin, () -> event.getWorld().setWeatherDuration(0), 1);
+        event.getWorld().setStorm(false);
+        event.getWorld().setWeatherDuration(0);
+    }
+
+    @EventHandler(priority= EventPriority.HIGHEST)
+    public void onThunderChange(ThunderChangeEvent event) {
+
+        boolean storm = event.toThunderState();
+        if(storm)
+            event.setCancelled(true);
     }
 }

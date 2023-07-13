@@ -24,11 +24,6 @@ public class PlayerTimeCommand implements CommandExecutor {
             GameProfile profile = plugin.getGameProfileManager().find(player.getUniqueId(), true);
 
             switch(label.toLowerCase()) {
-                case "sunrise":
-                    profile.setTime(GameProfile.Time.SUNRISE);
-                    player.setPlayerTime(GameProfile.Time.SUNRISE.getTime(), false);
-                    player.sendMessage(ChatColor.GREEN + "Your time has been set to sunrise.");
-                    break;
                 case "day":
                     profile.setTime(GameProfile.Time.DAY);
                     player.setPlayerTime(GameProfile.Time.DAY.getTime(), false);

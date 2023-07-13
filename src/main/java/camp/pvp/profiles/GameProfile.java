@@ -31,13 +31,12 @@ public class GameProfile {
     }
 
     public enum Time {
-        SUNRISE, DAY, SUNSET, NIGHT;
+        DAY, SUNSET, NIGHT;
 
         public long getTime() {
             switch(this) {
-                case SUNRISE: return 0;
                 case DAY: return 6000;
-                case SUNSET: return 12000;
+                case SUNSET: return 13000;
                 case NIGHT: return 18000;
                 default: return 1337;
             }

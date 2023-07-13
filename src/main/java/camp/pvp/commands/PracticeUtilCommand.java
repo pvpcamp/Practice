@@ -46,6 +46,8 @@ public class PracticeUtilCommand implements CommandExecutor {
                     case "reset":
                         profile.playerUpdate();
                         return true;
+                    case "restart":
+                    case "stop":
                     case "shutdown":
                     case "stopserver":
                         StandardGui gui = new StandardGui("Are you sure?", 27);

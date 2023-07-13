@@ -28,10 +28,19 @@ public class QueueInteract implements ItemInteract {
         for(GameQueue queue : gqm.getGameQueues()) {
             DuelKit kit = queue.getDuelKit();
             GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
-            button.setButtonUpdater((guiButton, g) -> guiButton.setLore(
-                    "&6Playing: &f" + queue.getPlaying(),
-                    "&6In Queue: &f" + queue.getQueueMembers().size(),
-                    "&7Click to join queue!"));
+            button.setButtonUpdater(new AbstractButtonUpdater() {
+                @Override
+                public void update(GuiButton guiButton, Gui gui) {
+                    int playing = queue.getPlaying();
+                    guiButton.setLore(
+                            "&6Playing: &f" + playing,
+                            "&6In Queue: &f" + queue.getQueueMembers().size(),
+                            "&7Click to join queue!");
+
+                    int stack = playing > 1 ? (Math.min(playing, 64)) : 1;
+                    guiButton.setAmount(stack);
+                }
+            });
 
             button.setAction((p, g) -> {
                 gqm.addToQueue(p, queue);

@@ -4,7 +4,9 @@ import camp.pvp.Practice;
 import camp.pvp.arenas.Arena;
 import camp.pvp.games.Game;
 import camp.pvp.games.GameManager;
+import camp.pvp.kits.HCFKit;
 import camp.pvp.parties.Party;
+import camp.pvp.parties.PartyMember;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.profiles.GameProfileManager;
 import camp.pvp.queue.GameQueue;
@@ -66,8 +68,8 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
                     lines.add("&6In Queue:");
-                    lines.add(" &f● " + queue.getDuelKit().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f(U)" : "&f&l(R)"));
-                    lines.add(" &f● " + TimeUtil.get(new Date(), queueMember.getJoined()));
+                    lines.add(" &7● " + queue.getDuelKit().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f(U)" : "&f&l(R)"));
+                    lines.add(" &7● &f" + TimeUtil.get(new Date(), queueMember.getJoined()));
 //                    if(ranked) {
 //                        lines.add(" &7● &f(900-1100)");
 //                    }
@@ -77,8 +79,11 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
                     Party party = profile.getParty();
+                    PartyMember member = party.getMembers().get(player.getUniqueId());
+                    HCFKit kit = member.getHcfKit();
                     lines.add("&6Party &7(" + party.getMembers().size() + ")");
                     lines.add("&6Leader: &f" + party.getLeader().getName());
+                    lines.add("&6HCF Kit: " + kit.getColor() + kit.toString());
                     break;
                 case IN_GAME:
                     Game game = profile.getGame();

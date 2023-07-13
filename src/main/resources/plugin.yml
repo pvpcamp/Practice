@@ -31,7 +31,7 @@ commands:
   ping:
     description: Check a player's ping.
   playertime:
-    aliases: [ptime, day, night, sunrise, sunset]
+    aliases: [ptime, day, night, sunset]
     description: Changes the time of day for yourself.
   postgameinventory:
     description: Opens the post game inventory GUI.
