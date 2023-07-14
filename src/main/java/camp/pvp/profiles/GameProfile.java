@@ -3,15 +3,18 @@ package camp.pvp.profiles;
 import camp.pvp.Practice;
 import camp.pvp.cosmetics.DeathAnimation;
 import camp.pvp.games.Game;
-import camp.pvp.games.PostGameInventory;
 import camp.pvp.interactables.InteractableItem;
 import camp.pvp.interactables.InteractableItems;
 import camp.pvp.kits.CustomDuelKit;
 import camp.pvp.kits.DuelKit;
 import camp.pvp.parties.Party;
 import camp.pvp.parties.PartyInvite;
+import camp.pvp.profiles.stats.DuelKitQueueStatistics;
+import camp.pvp.queue.GameQueue;
 import camp.pvp.utils.ItemBuilder;
 import camp.pvp.utils.PlayerUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
@@ -63,6 +66,8 @@ public class GameProfile {
     private CustomDuelKit editingCustomKit;
     private Map<DuelKit, Map<Integer, CustomDuelKit>> customDuelKits;
 
+    private Map<GameQueue.Type, Map<DuelKit, DuelKitQueueStatistics>> duelKitQueueStatistics;
+
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
 
@@ -73,14 +78,26 @@ public class GameProfile {
         this.duelRequests = new HashMap<>();
         this.customDuelKits = new HashMap<>();
 
+        this.duelKitQueueStatistics = new HashMap<>();
+
         this.time = Time.DAY;
         this.buildMode = false;
         this.lobbyVisibility = true;
         this.spectatorVisibility = true;
 
+        duelKitQueueStatistics.put(GameQueue.Type.UNRANKED, new HashMap<>());
+        duelKitQueueStatistics.put(GameQueue.Type.RANKED, new HashMap<>());
+
         for(DuelKit kit : DuelKit.values()) {
             if(kit.isEditable()) {
                 customDuelKits.put(kit, new HashMap<>());
+            }
+
+            if(kit.isQueueable()) {
+                duelKitQueueStatistics.get(GameQueue.Type.UNRANKED).put(kit, new DuelKitQueueStatistics(kit, GameQueue.Type.UNRANKED));
+                if(kit.isRanked()) {
+                    duelKitQueueStatistics.get(GameQueue.Type.RANKED).put(kit, new DuelKitQueueStatistics(kit, GameQueue.Type.RANKED));
+                }
             }
         }
     }
@@ -121,7 +138,7 @@ public class GameProfile {
             if(game != null && game.getAlive().get(this.getUuid()) != null) {
                 DuelKit kit = game.getKit();
                 Map<Integer, CustomDuelKit> customKits = getCustomDuelKits().get(kit);
-                if(customKits.isEmpty()) {
+                if(customKits == null || customKits.isEmpty()) {
                     game.getParticipants().get(uuid).setKitApplied(true);
                     kit.apply(player);
                     return;
@@ -165,6 +182,8 @@ public class GameProfile {
                     check = true;
                     break;
             }
+
+            player.setPlayerTime(time.getTime(), false);
 
             if(check) {
                 if(location == null) {
@@ -227,12 +246,92 @@ public class GameProfile {
 
     public void documentImport(Document document) {
         this.name = document.getString("name");
+        this.time = Time.valueOf(document.getString("player_time"));
+        this.buildMode = document.getBoolean("build_mode");
+        this.debugMode = document.getBoolean("debug_mode");
+        this.spectatorVisibility = document.getBoolean("spectator_visibility");
+        this.lobbyVisibility = document.getBoolean("lobby_visibility");
+        this.deathAnimation = DeathAnimation.valueOf(document.getString("death_animation"));
+
+        // Get serialized kits from document, and turn them back into CustomDuelKits.
+        Object serializedKits = document.get("custom_duel_kits");
+
+        Map<String, Map<String, Map<String, Object>>> ck = (Map<String, Map<String, Map<String, Object>>>) serializedKits;
+
+        for(Map.Entry<String, Map<String, Map<String, Object>>> kitEntry : ck.entrySet()) {
+
+            DuelKit kit = DuelKit.valueOf(kitEntry.getKey());
+
+            for(Map.Entry<String, Map<String, Object>> customKitEntry : kitEntry.getValue().entrySet()) {
+
+                int i = Integer.parseInt(customKitEntry.getKey());
+
+                Map<String, Object> map = customKitEntry.getValue();
+
+                CustomDuelKit customDuelKit = new CustomDuelKit(kit, i, true);
+                getCustomDuelKits().get(kit).put(i, customDuelKit);
+
+                customDuelKit.importFromMap(map);
+            }
+        }
+
+        // Get serialized kits from document, and turn them back into CustomDuelKits.
+        Object serializedDkqs = document.get("duelkit_queue_stats");
+
+        Map<String, Map<String, Map<String, Object>>> dkqsSerialized = (Map<String, Map<String, Map<String, Object>>>) serializedDkqs;
+
+        for(Map.Entry<String, Map<String, Map<String, Object>>> queueEntry : dkqsSerialized.entrySet()) {
+
+            GameQueue.Type type = GameQueue.Type.valueOf(queueEntry.getKey());
+
+            for(Map.Entry<String, Map<String, Object>> statsEntry : queueEntry.getValue().entrySet()) {
+
+                DuelKit kit = DuelKit.valueOf(statsEntry.getKey());
+
+                Map<String, Object> map = statsEntry.getValue();
+
+                DuelKitQueueStatistics dkqs = new DuelKitQueueStatistics(kit, type);
+
+                dkqs.importFromMap(map);
+            }
+        }
     }
 
     public Map<String, Object> export() {
         Map<String, Object> values = new HashMap<>();
         values.put("name", name);
-        values.put("time", time.toString());
+        values.put("player_time", time.toString());
+        values.put("build_mode", buildMode);
+        values.put("debug_mode", debugMode);
+        values.put("spectator_visibility", spectatorVisibility);
+        values.put("lobby_visibility", lobbyVisibility);
+        values.put("death_animation", deathAnimation);
+
+        // Convert CustomDuelKits to serialized form for DB storage.
+        Map<String, Map<String, Map<String, Object>>> ck = new HashMap<>();
+        for(Map.Entry<DuelKit, Map<Integer, CustomDuelKit>> kitEntry : getCustomDuelKits().entrySet()) {
+            DuelKit kit = kitEntry.getKey();
+            for(Map.Entry<Integer, CustomDuelKit> customKitEntry : kitEntry.getValue().entrySet()) {
+                CustomDuelKit cdk = customKitEntry.getValue();
+                ck.computeIfAbsent(kit.toString(), v -> new HashMap<>());
+                ck.get(kit.toString()).put(String.valueOf(cdk.getSlot()), cdk.exportItems());
+            }
+        }
+
+        values.put("custom_duel_kits", ck);
+
+        // Convert DuelKitQueueStatistics to serialized form for DB storage.
+        Map<String, Map<String, Map<String, Object>>> dkqs = new HashMap<>();
+        for(Map.Entry<GameQueue.Type, Map<DuelKit, DuelKitQueueStatistics>> queueTypeEntry : getDuelKitQueueStatistics().entrySet()) {
+            GameQueue.Type type = queueTypeEntry.getKey();
+            for(Map.Entry<DuelKit, DuelKitQueueStatistics> queueStatsEntry : queueTypeEntry.getValue().entrySet()) {
+                DuelKit kit = queueStatsEntry.getKey();
+                dkqs.computeIfAbsent(type.name(), v -> new HashMap<>());
+                dkqs.get(type.name()).put(String.valueOf(kit.toString()), queueStatsEntry.getValue().exportItems());
+            }
+        }
+
+        values.put("duelkit_queue_stats", dkqs);
 
         return values;
     }

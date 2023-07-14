@@ -120,7 +120,9 @@ public class TeamDuel extends TeamGame {
         if(getArena() == null) {
             for(Arena a : getPlugin().getArenaManager().getArenas()) {
                 if(a.isEnabled()) {
-                    if(a.getType().equals(Arena.Type.DUEL)) {
+                    if(a.getType().equals(Arena.Type.HCF_TEAMFIGHT) && kit.getArenaTypes().contains(Arena.Type.DUEL_HCF)) {
+                        list.add(a);
+                    } else if(kit.getArenaTypes().contains(a.getType())) {
                         list.add(a);
                     }
                 }

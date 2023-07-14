@@ -167,6 +167,7 @@ public class ArenaCommand implements CommandExecutor {
                                     arena.setType(type);
                                     player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN
                                             + " type has been set to " + ChatColor.WHITE + type.name() + ChatColor.GREEN + ".");
+                                    return true;
                                 case "position":
                                     ArenaPosition position = null;
                                     Location location = player.getLocation();

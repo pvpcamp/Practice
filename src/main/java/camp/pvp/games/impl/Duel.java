@@ -24,6 +24,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -43,7 +45,7 @@ public class Duel extends Game {
         if(getArena() == null) {
             for(Arena a : getPlugin().getArenaManager().getArenas()) {
                 if(a.isEnabled()) {
-                    if(kit.getArenaType().equals(a.getType())) {
+                    if(kit.getArenaTypes().contains(a.getType())) {
                         list.add(a);
                     }
                 }
@@ -126,9 +128,14 @@ public class Duel extends Game {
                 int i = 5;
                 public void run() {
                     if (i == 0) {
+                        boolean b = getKit().isMoveOnStart();
                         for(Player p : Duel.this.getAlivePlayers()) {
                             if(p != null) {
-                                p.playSound(p.getLocation(), Sound.NOTE_PIANO, 1, 12);
+                                if(!b) {
+                                    p.removePotionEffect(PotionEffectType.JUMP);
+                                }
+
+                                p.playSound(p.getLocation(), Sound.GLASS, 1, 1);
                                 p.sendMessage(ChatColor.GREEN + "The game has started, good luck!");
                             }
                         }

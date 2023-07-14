@@ -4,6 +4,7 @@ import camp.pvp.Practice;
 import camp.pvp.arenas.Arena;
 import camp.pvp.games.Game;
 import camp.pvp.games.GameManager;
+import camp.pvp.games.GameTeam;
 import camp.pvp.kits.HCFKit;
 import camp.pvp.parties.Party;
 import camp.pvp.parties.PartyMember;
@@ -81,9 +82,11 @@ public class SidebarAdapter implements AssembleAdapter {
                     Party party = profile.getParty();
                     PartyMember member = party.getMembers().get(player.getUniqueId());
                     HCFKit kit = member.getHcfKit();
+                    GameTeam.Color color = member.getTeamColor();
                     lines.add("&6Party &7(" + party.getMembers().size() + ")");
                     lines.add("&6Leader: &f" + party.getLeader().getName());
                     lines.add("&6HCF Kit: " + kit.getColor() + kit.toString());
+                    lines.add("&6Assigned Team: " + color.getChatColor() + color.getName());
 
                     if(party.getGame() != null) {
                         lines.add("&7&oParty In Game");

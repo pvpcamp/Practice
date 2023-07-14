@@ -16,10 +16,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public enum DuelKit {
-    NO_DEBUFF, CLASSIC, HCF, BOXING;
+    NO_DEBUFF, CLASSIC, HCF, BOXING, SUMO;
 
     public String getDisplayName() {
         switch(this) {
@@ -31,6 +33,8 @@ public enum DuelKit {
                 return "Classic";
             case BOXING:
                 return "Boxing";
+            case SUMO:
+                return "Sumo";
             default:
                 return null;
         }
@@ -46,6 +50,8 @@ public enum DuelKit {
                 return ChatColor.LIGHT_PURPLE;
             case BOXING:
                 return ChatColor.DARK_PURPLE;
+            case SUMO:
+                return ChatColor.GREEN;
             default:
                 return null;
         }
@@ -53,17 +59,30 @@ public enum DuelKit {
 
     public boolean isEditable() {
         switch(this) {
+            case SUMO:
+                return false;
             default:
                 return true;
         }
     }
 
-    public Arena.Type getArenaType() {
+//    public Arena.Type getArenaType() {
+//        switch(this) {
+//            case HCF:
+//                return Arena.Type.DUEL_HCF;
+//            default:
+//                return Arena.Type.DUEL;
+//        }
+//    }
+
+    public List<Arena.Type> getArenaTypes() {
         switch(this) {
             case HCF:
-                return Arena.Type.DUEL_HCF;
+                return Arrays.asList(Arena.Type.DUEL_HCF, Arena.Type.HCF_TEAMFIGHT);
+            case SUMO:
+                return Collections.singletonList(Arena.Type.DUEL_SUMO);
             default:
-                return Arena.Type.DUEL;
+                return Collections.singletonList(Arena.Type.DUEL);
         }
     }
 
@@ -72,10 +91,12 @@ public enum DuelKit {
             case NO_DEBUFF:
                 return 10;
             case HCF:
+                return 11;
+            case CLASSIC:
                 return 12;
             case BOXING:
-                return 14;
-            case CLASSIC:
+                return 15;
+            case SUMO:
                 return 16;
         }
 
@@ -95,6 +116,7 @@ public enum DuelKit {
             case HCF:
             case CLASSIC:
             case BOXING:
+            case SUMO:
                 return true;
             default:
                 return false;
@@ -110,43 +132,55 @@ public enum DuelKit {
         }
     }
 
-    public boolean isTakeDamage() {
+    public ItemStack[] getMoreItems() {
         switch(this) {
-            case BOXING:
-                return false;
+            case NO_DEBUFF:
+                ItemStack[] items = this.getGameInventory().getInventory();
+
+                items[3] = new ItemStack(Material.GOLDEN_CARROT, 64);
+                return items;
             default:
-                return true;
-        }
-    }
-
-    public List<ItemStack> getMoreItems() {
-        List<ItemStack> items = new ArrayList<>();
-        for(ItemStack i : this.getGameInventory().getInventory()) {
-            if(i != null && !i.getType().equals(Material.AIR)) {
-                if(!items.contains(i)) {
-                    items.add(i);
-                }
-            }
+                break;
         }
 
-        return items;
+        return null;
     }
 
     public boolean isHunger() {
         switch(this) {
             case BOXING:
+            case SUMO:
                 return false;
             default:
                 return true;
         }
     }
 
-    public boolean takeDamage() {
+    public boolean isTakeDamage() {
         switch(this) {
             case BOXING:
+            case SUMO:
                 return false;
             default:
                 return true;
+        }
+    }
+
+    public boolean isMoveOnStart() {
+        switch(this) {
+            case SUMO:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    public boolean isDieInWater() {
+        switch(this) {
+            case SUMO:
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -158,6 +192,7 @@ public enum DuelKit {
         switch(this) {
             default:
                 return true;
+            case HCF:
             case BOXING:
                 return false;
         }
@@ -179,6 +214,9 @@ public enum DuelKit {
                 break;
             case BOXING:
                 item = new ItemStack(Material.DIAMOND_CHESTPLATE);
+                break;
+            case SUMO:
+                item = new ItemStack(Material.LEASH);
                 break;
         }
 
@@ -300,6 +338,9 @@ public enum DuelKit {
                 inv[3] = new ItemStack(Material.GOLDEN_APPLE, 8);
 
                 inv[9] = new ItemStack(Material.ARROW, 12);
+                break;
+            case SUMO:
+                inventory.getPotionEffects().add(new PotionEffect(PotionEffectType.JUMP, 99999, 245));
                 break;
             case BOXING:
                 inv[0] = new ItemStack(Material.DIAMOND_SWORD);

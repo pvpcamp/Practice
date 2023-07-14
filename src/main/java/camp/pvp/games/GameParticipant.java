@@ -2,6 +2,7 @@ package camp.pvp.games;
 
 import camp.pvp.Practice;
 import camp.pvp.cooldowns.PlayerCooldown;
+import camp.pvp.kits.HCFKit;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -18,6 +19,10 @@ public class GameParticipant {
     private final String name;
     private GameTeam team;
     private boolean alive, kitApplied, hittable;
+
+    // HCFTEAMS ONLY
+    private HCFKit appliedHcfKit;
+    private int energy;
 
     private Map<PlayerCooldown.Type, PlayerCooldown> cooldowns;
 
@@ -37,6 +42,9 @@ public class GameParticipant {
         this.alive = true;
         this.cooldowns = new HashMap<>();
         this.hittable = true;
+
+        this.appliedHcfKit = null;
+        this.energy = 0;
     }
 
     public Player getPlayer() {

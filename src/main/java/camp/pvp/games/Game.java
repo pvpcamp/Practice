@@ -135,7 +135,15 @@ public abstract class Game {
             }
 
             Location location = player.getLocation();
-            profile.getDeathAnimation().playAnimation(this, player, !participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.FALL));
+
+            if(participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+                GameProfile attackerProfile = plugin.getGameProfileManager().getLoadedProfiles().get(participant.getAttacker());
+                if(attackerProfile != null) {
+                    attackerProfile.getDeathAnimation().playAnimation(this, player, true);
+                }
+            } else {
+                profile.getDeathAnimation().playAnimation(this, player, false);
+            }
         }
     }
 
@@ -183,6 +191,11 @@ public abstract class Game {
         GameParticipant participant = this.getParticipants().get(attacker.getUniqueId());
         if(victimParticipant != null && participant != null) {
             if(victimParticipant.isAlive() && participant.isAlive()) {
+
+                participant.setHealth(Math.round(attacker.getHealth()));
+                participant.setMaxHealth(Math.round(attacker.getMaxHealth()));
+                participant.setHunger(attacker.getFoodLevel());
+
                 victimParticipant.setAttacker(attacker.getUniqueId());
 
                 victimParticipant.setHealth(Math.round(victim.getHealth()));
@@ -230,6 +243,15 @@ public abstract class Game {
         spectateStart(player, null);
     }
 
+    public void spectateStartRandom(Player player) {
+        Location location = null;
+        if(this.getAlive().size() > 0) {
+            location = this.getAlivePlayers().get(0).getLocation();
+        }
+
+        spectateStart(player, location);
+    }
+
     public void spectateStart(Player player, Location location) {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
@@ -253,15 +275,11 @@ public abstract class Game {
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 1, true, false));
         if(location != null) {
             player.teleport(location);
-        } else {
-            player.teleport(this.getAlivePlayers().get(0).getLocation());
         }
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            profile.givePlayerItems();
-            player.setAllowFlight(true);
-            player.setFlying(true);
-        }, 1);
+        profile.givePlayerItems();
+        player.setAllowFlight(true);
+        player.setFlying(true);
     }
 
     public void spectateEnd(Player player) {

@@ -10,7 +10,7 @@ public class PartySpectateInteract implements ItemInteract {
     public void onInteract(Player player, GameProfile gameProfile) {
         Party party = gameProfile.getParty();
         if(party.getGame() != null) {
-            party.getGame().spectateStart(player, null);
+            party.getGame().spectateStartRandom(player);
         }
     }
 }

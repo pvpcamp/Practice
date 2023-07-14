@@ -7,6 +7,7 @@ import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
+import com.lunarclient.bukkitapi.LunarClientAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -46,6 +47,15 @@ public class PracticeUtilCommand implements CommandExecutor {
                     case "reset":
                         profile.playerUpdate();
                         return true;
+                    case "staffmodules":
+                        LunarClientAPI lcApi = plugin.getLunarClientAPI();
+                        if(lcApi.isRunningLunarClient(player)) {
+                            lcApi.giveAllStaffModules(player);
+                            player.sendMessage(ChatColor.GREEN + "You have been given the Lunar Client staff modules.");
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You are not running Lunar Client.");
+                        }
+                        return true;
                     case "restart":
                     case "stop":
                     case "shutdown":
@@ -80,6 +90,7 @@ public class PracticeUtilCommand implements CommandExecutor {
             sb.append("\n&6/practiceutil setlobby &7- &fSets the lobby location.");
             sb.append("\n&6/practiceutil setkiteditor &7- &fSets the kit editor location.");
             sb.append("\n&6/practiceutil reset &7- &fResets your player.");
+            sb.append("\n&6/practiceutil staffmodules &7- &fGives you the Lunar Client staff modules.");
             sb.append("\n&6/practiceutil shutdown &7- &fShutdown the server.");
 
             player.sendMessage(Colors.get(sb.toString()));

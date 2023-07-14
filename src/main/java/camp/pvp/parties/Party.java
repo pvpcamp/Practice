@@ -2,6 +2,7 @@ package camp.pvp.parties;
 
 import camp.pvp.Practice;
 import camp.pvp.games.Game;
+import camp.pvp.games.GameTeam;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
 import camp.pvp.utils.PlayerUtils;

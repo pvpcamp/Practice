@@ -76,7 +76,7 @@ public enum DeathAnimation {
                 l = new Location(world, location.getX(), location.getY() + 0.5, location.getZ());
 
                 if(velocity) {
-                    victim.setVelocity(new Vector(0, 1, 0));
+                    victim.setVelocity(new Vector(0, 1.2, 0));
                 }
 
                 game.playEffect(l, Effect.EXPLOSION_LARGE, null);
@@ -85,7 +85,7 @@ public enum DeathAnimation {
                 break;
             default:
                 if(velocity) {
-                    victim.setVelocity(new Vector(0, 0.4, 0));
+                    victim.setVelocity(new Vector(0, 0.6, 0));
                 }
                 game.playSound(location, Sound.FIREWORK_BLAST, 1F, 1F);
                 break;

@@ -2,7 +2,9 @@ package camp.pvp.listeners.bukkit.player;
 
 import camp.pvp.Practice;
 import camp.pvp.games.Game;
+import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.GameProfile;
+import camp.pvp.queue.GameQueue;
 import camp.pvp.utils.Colors;
 import com.lunarclient.bukkitapi.LunarClientAPI;
 import com.lunarclient.bukkitapi.nethandler.client.LCPacketTeammates;
@@ -25,7 +27,6 @@ public class PlayerJoinLeaveListeners implements Listener {
 
     @EventHandler
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
-        plugin.getGameProfileManager().find(event.getUniqueId(), true);
     }
 
     @EventHandler
@@ -51,11 +52,6 @@ public class PlayerJoinLeaveListeners implements Listener {
         sb.append("\n&7&oWe are currently in development, please report any bugs to the developers.");
         sb.append("\n ");
         player.sendMessage(Colors.get(sb.toString()));
-
-        LunarClientAPI lcApi = plugin.getLunarClientAPI();
-        if(lcApi.isRunningLunarClient(player) && player.hasPermission("practice.staff")) {
-            lcApi.giveAllStaffModules(player);
-        }
     }
 
     @EventHandler
@@ -78,6 +74,8 @@ public class PlayerJoinLeaveListeners implements Listener {
         if(profile.getParty() != null) {
             profile.getParty().leave(player);
         }
+
+        profile.getDuelKitQueueStatistics().get(GameQueue.Type.UNRANKED).get(DuelKit.NO_DEBUFF).setWins(1);
 
         event.setQuitMessage(null);
 

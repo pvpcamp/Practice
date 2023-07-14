@@ -5,6 +5,7 @@ import camp.pvp.commands.*;
 import camp.pvp.cooldowns.CooldownRunnable;
 import camp.pvp.games.GameManager;
 import camp.pvp.interactables.InteractableItems;
+import camp.pvp.kits.EnergyRunnable;
 import camp.pvp.listeners.bukkit.block.BlockBreakListener;
 import camp.pvp.listeners.bukkit.block.BlockPlaceListener;
 import camp.pvp.listeners.bukkit.entity.EntityDamageByEntityListener;
@@ -58,7 +59,7 @@ public class Practice extends JavaPlugin {
     private GameProfileManager gameProfileManager;
     private PartyManager partyManager;
 
-    private BukkitTask cooldownTask, nameColorTask;
+    private BukkitTask cooldownTask, energyTask, nameColorTask;
 
     @Override
     public void onEnable() {
@@ -83,6 +84,7 @@ public class Practice extends JavaPlugin {
         this.lunarClientAPI = LunarClientAPI.getInstance();
 
         cooldownTask = this.getServer().getScheduler().runTaskTimer(this, new CooldownRunnable(this), 2, 2);
+        energyTask = this.getServer().getScheduler().runTaskTimer(this, new EnergyRunnable(this), 10, 10);
         nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 20, 20);
 
         if(getConfig().get("locations.lobby") != null) {

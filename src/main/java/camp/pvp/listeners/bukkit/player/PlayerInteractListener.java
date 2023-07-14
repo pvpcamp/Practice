@@ -138,7 +138,7 @@ public class PlayerInteractListener implements Listener {
                         case CHEST:
                             if(editingKit.isMoreItems()) {
                                 Inventory inventory = Bukkit.createInventory(player, 36, "More Items");
-                                for(ItemStack i : editingKit.getGameInventory().getInventory()) {
+                                for(ItemStack i : editingKit.getMoreItems()) {
                                     if(i != null && !i.getType().equals(Material.AIR)) {
                                         inventory.addItem(i);
                                     }
@@ -162,7 +162,7 @@ public class PlayerInteractListener implements Listener {
                                     createButton.setAction(new GuiAction() {
                                         @Override
                                         public void run(Player player, Gui gui) {
-                                            CustomDuelKit cdk = new CustomDuelKit(editingKit, 1);
+                                            CustomDuelKit cdk = new CustomDuelKit(editingKit, 1, false);
                                             cdk.setItems(player.getInventory().getContents());
                                             customKits.put(finalX, cdk);
                                         }
@@ -175,6 +175,7 @@ public class PlayerInteractListener implements Listener {
                                     loadButton.setAction(new GuiAction() {
                                         @Override
                                         public void run(Player player, Gui gui) {
+                                            player.getInventory().clear();
                                             cdk.apply(player);
                                             player.getInventory().setArmorContents(null);
                                         }

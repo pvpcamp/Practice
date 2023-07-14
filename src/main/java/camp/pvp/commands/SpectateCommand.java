@@ -66,7 +66,7 @@ public class SpectateCommand implements CommandExecutor {
                 List<Game> games = new ArrayList<>(plugin.getGameManager().getActiveGames());
                 if(!games.isEmpty()) {
                     Game game = games.get(0);
-                    game.spectateStart(player, game.getAlivePlayers().get(0).getLocation());
+                    game.spectateStartRandom(player);
 
                     player.sendMessage(ChatColor.GREEN + "You did not specify what game you wanted to spectate, so we sent you here!");
                 } else {

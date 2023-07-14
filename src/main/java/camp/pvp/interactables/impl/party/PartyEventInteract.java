@@ -101,7 +101,7 @@ public class PartyEventInteract implements ItemInteract {
 
                     int x = 0;
                     for(DuelKit kit : DuelKit.values()) {
-                        if(kit.isFfa()) {
+                        if(kit.isQueueable()) {
                             GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
                             button.setCloseOnClick(true);
                             button.setLore(
@@ -145,6 +145,7 @@ public class PartyEventInteract implements ItemInteract {
                                         }
 
                                         teamDuel.setKit(kit);
+                                        teamDuel.setParty(party);
 
                                         teamDuel.start();
                                         plugin.getGameManager().addGame(teamDuel);

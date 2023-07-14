@@ -27,21 +27,20 @@ public class PlayerMoveListener implements Listener {
         Location from = event.getFrom();
         Location to = event.getTo();
 
-        // TODO: Sumo esc gamemodes.
-//        if(game != null) {
-//            if(event.getTo().getBlock().isLiquid() && game.getCurrentPlaying().contains(player)) {
-//                if (game.getKit() != null && game.getKit().getType().equals(Kit.Type.SUMO) && game.getState().equals(Occupation.State.ACTIVE)) {
-//                    game.eliminate(player);
-//                }
-//            }
-//
-//            if(!game.isMoveOnStart()) {
-//                if(game.getState().equals(Occupation.State.STARTING) && game.getCurrentPlaying().contains(player)) {
-//                    if (from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ()) {
-//                        player.teleport(from);
-//                    }
-//                }
-//            }
-//        }
+        if(game != null) {
+            if(event.getTo().getBlock().isLiquid() && game.getCurrentPlaying().contains(player)) {
+                if(game.getKit().isDieInWater() && game.getState().equals(Game.State.ACTIVE)) {
+                    game.eliminate(player, false);
+                }
+            }
+
+            if(!game.getKit().isMoveOnStart()) {
+                if(game.getState().equals(Game.State.STARTING) && game.getCurrentPlaying().contains(player)) {
+                    if (from.getX() != to.getX() || from.getZ() != to.getZ()) {
+                        player.teleport(from);
+                    }
+                }
+            }
+        }
     }
 }
