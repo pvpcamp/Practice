@@ -37,7 +37,7 @@ public class GameQueueManager {
             DuelKit kit = gameQueue.getDuelKit();
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
             profile.givePlayerItems();
-            player.sendMessage(ChatColor.GREEN + "You have joined the queue for " + gameQueue.getType().name() + " " + kit.getColor() + kit.getDisplayName() + ChatColor.GREEN + ".");
+            player.sendMessage(ChatColor.GREEN + "You have joined the queue for " + gameQueue.getType().name().toLowerCase() + " " + kit.getColor() + kit.getDisplayName() + ChatColor.GREEN + ".");
 
             return gqm;
         }

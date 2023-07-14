@@ -10,16 +10,29 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 public enum DeathAnimation {
-    DEFAULT, BLOOD, CLOUD;
+    DEFAULT, BLOOD, EXPLOSION;
 
-    public void playAnimation(Game game, Location location) {
-        World world = location.getWorld();
+    public String toString() {
+        switch(this) {
+            case BLOOD:
+                return "Blood";
+            case EXPLOSION:
+                return "Explosion";
+            default:
+                return "Default";
+        }
+    }
+
+    public void playAnimation(Game game, Player victim, boolean velocity) {
+        World world = victim.getWorld();
+        Location location = victim.getLocation();
         switch(this) {
             case BLOOD:
                 Location l = new Location(world, location.getX(), location.getY() + 0.5, location.getZ());
@@ -46,7 +59,11 @@ public enum DeathAnimation {
                     items.add(bloodItem);
                 }
 
-                game.playSound(location, Sound.SUCCESSFUL_HIT, 1F, 1F);
+                if(velocity) {
+                    victim.setVelocity(new Vector(0, 0.5, 0));
+                }
+
+                game.playSound(location, Sound.AMBIENCE_THUNDER, 1F, 1F);
 
                 Bukkit.getScheduler().runTaskLater(Practice.instance, ()-> {
                     for(Item i : items) {
@@ -55,7 +72,22 @@ public enum DeathAnimation {
                 }, 40);
 
                 break;
+            case EXPLOSION:
+                l = new Location(world, location.getX(), location.getY() + 0.5, location.getZ());
+
+                if(velocity) {
+                    victim.setVelocity(new Vector(0, 1, 0));
+                }
+
+                game.playEffect(l, Effect.EXPLOSION_LARGE, null);
+                game.playSound(location, Sound.EXPLODE, 1F, 1F);
+
+                break;
             default:
+                if(velocity) {
+                    victim.setVelocity(new Vector(0, 0.4, 0));
+                }
+                game.playSound(location, Sound.FIREWORK_BLAST, 1F, 1F);
                 break;
         }
     }

@@ -9,9 +9,18 @@ import camp.pvp.games.GameSpectator;
 import camp.pvp.games.GameTeam;
 import camp.pvp.games.PostGameInventory;
 import camp.pvp.games.impl.teams.TeamGame;
+import camp.pvp.kits.DuelKit;
+import camp.pvp.parties.Party;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.profiles.GameProfileManager;
+import camp.pvp.queue.GameQueue;
 import camp.pvp.utils.Colors;
+import camp.pvp.utils.PlayerUtils;
+import camp.pvp.utils.TimeUtil;
+import com.lunarclient.bukkitapi.LunarClientAPI;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketTeammates;
+import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -22,38 +31,87 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
 public class TeamDuel extends TeamGame {
 
-    protected TeamDuel(Practice plugin, UUID uuid) {
+    private @Getter @Setter Party party;
+    public TeamDuel(Practice plugin, UUID uuid) {
         super(plugin, uuid);
     }
 
     @Override
     public List<String> getScoreboard(GameProfile profile) {
-        return null;
+        List<String> lines = new ArrayList<>();
+
+        GameParticipant self = getAlive().get(profile.getUuid());
+
+        GameTeam friendlyTeam = self.getTeam();
+        GameTeam enemyTeam = friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? getBlue() : getRed();
+
+        switch(getState()) {
+            case STARTING:
+                lines.add("&6Kit: &f" + kit.getDisplayName());
+                lines.add("&6Arena: &f" + arena.getDisplayName());
+                lines.add("");
+                lines.add("&9Blue Team " + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? "(You)" : "") + ": &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
+                lines.add("&cRed Team " + (friendlyTeam.getColor().equals(GameTeam.Color.RED) ? "(You)" : "") + ": &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+                break;
+            case ACTIVE:
+                int ping = 0;
+                ping = PlayerUtils.getPing(self.getPlayer());
+                lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
+                lines.add(" ");
+
+                lines.add("&6Your Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms");
+                lines.add("");
+                lines.add("&9Blue Team " + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? "(You)" : "") + ": &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
+                lines.add("&cRed Team " + (friendlyTeam.getColor().equals(GameTeam.Color.RED) ? "(You)" : "") + ": &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+                break;
+            case ENDED:
+                ping = PlayerUtils.getPing(self.getPlayer());
+                lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
+                lines.add(" ");
+                lines.add("&6Your Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms");
+                lines.add("");
+                lines.add("&9Blue Team " + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? "(You)" : "") + ": &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
+                lines.add("&cRed Team " + (friendlyTeam.getColor().equals(GameTeam.Color.RED) ? "(You)" : "") + ": &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+                break;
+        }
+        return lines;
     }
 
     @Override
     public List<String> getSpectatorScoreboard(GameProfile profile) {
-        return null;
-    }
+        List<String> lines = new ArrayList<>();
 
-    @Override
-    public void eliminate(Player player, boolean leftGame) {
-        super.eliminate(player, leftGame);
-        int teamsWithPlayersLeft = 0;
-        for(GameTeam team : getTeams()) {
-            if(team.getAliveParticipants().size() > 0) {
-                teamsWithPlayersLeft++;
-            }
+        switch(getState()) {
+            case STARTING:
+                lines.add("&6Kit: &f" + kit.getDisplayName());
+                lines.add("&6Arena: &f" + arena.getDisplayName());
+                lines.add(" ");
+                lines.add("&9Blue Team: &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
+                lines.add("&cRed Team: &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+                break;
+            case ACTIVE:
+                lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
+                lines.add(" ");
+                lines.add("&9Blue Team: &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
+                lines.add("&cRed Team: &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+
+                break;
+            case ENDED:
+                lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
+                lines.add(" ");
+                lines.add("&9Blue Team: &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
+                lines.add("&cRed Team: &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+
+                break;
         }
 
-        if(teamsWithPlayersLeft < 2) {
-            this.end();
-        }
+        return lines;
     }
 
     @Override
@@ -62,7 +120,7 @@ public class TeamDuel extends TeamGame {
         if(getArena() == null) {
             for(Arena a : getPlugin().getArenaManager().getArenas()) {
                 if(a.isEnabled()) {
-                    if(kit.getArenaType().equals(Arena.Type.DUEL_TEAMS)) {
+                    if(a.getType().equals(Arena.Type.DUEL)) {
                         list.add(a);
                     }
                 }
@@ -82,43 +140,60 @@ public class TeamDuel extends TeamGame {
             return;
         }
 
-        Map<Player, Location> locations = new HashMap<>();
-
-        Map<String, ArenaPosition> positions = arena.getPositions();
-        ArenaPosition blueSpawn = positions.get("blue"),
-                redSpawn = positions.get("red"),
-                yellowSpawn = positions.get("yellow"),
-                whiteSpawn = positions.get("white");
-
+        if(party != null) {
+            party.setGame(this);
+        }
 
         this.setState(State.STARTING);
 
         StringBuilder sb = new StringBuilder();
         sb.append(" ");
         sb.append("\n&6&lTeam duel starting in 5 seconds.");
+        sb.append("\n &7● &6Kit: " + getKit().getColor() + getKit().getDisplayName());
         sb.append("\n &7● &6Map: &f" + arena.getDisplayName());
 
-        for(GameTeam team : this.getTeams()) {
-            ArenaPosition spawnPosition = arena.getPositions().get(team.getColor().toString().toLowerCase());
-            List<GameParticipant> p = new ArrayList<>(team.getParticipants().values());
-            sb.append("\n &7● " + team.getColor().getChatColor() + team.getColor().toString() + ": &f");
-            int x = 0;
-            while (x != team.getParticipants().size()) {
-                GameParticipant participant = p.get(0);
-                Player player = participant.getPlayer();
-                sb.append(ChatColor.WHITE + participant.getName());
+        ArenaPosition blueSpawn = arena.getPositions().get("spawn1");
+        List<GameParticipant> blueParticipants = new ArrayList<>(getBlue().getParticipants().values());
+        sb.append("\n &7● &9Blue Team: &f");
+        int blueCount = 0;
+        while (blueCount != getBlue().getParticipants().size()) {
+            GameParticipant participant = blueParticipants.get(0);
+            GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(participant.getUuid());
+            Player player = participant.getPlayer();
+            sb.append(ChatColor.WHITE + participant.getName());
 
-                p.remove(participant);
-                x++;
-                if (x == team.getParticipants().size()) {
-                    sb.append("&7.");
-                } else {
-                    sb.append("&7, ");
-                }
-
-                player.teleport(spawnPosition.getLocation());
-                this.getKit().apply(player);
+            blueParticipants.remove(participant);
+            blueCount++;
+            if (blueCount == getBlue().getParticipants().size()) {
+                sb.append("&7.");
+            } else {
+                sb.append("&7, ");
             }
+
+            player.teleport(blueSpawn.getLocation());
+            profile.givePlayerItems();
+        }
+
+        ArenaPosition redSpawn = arena.getPositions().get("spawn2");
+        List<GameParticipant> redParticipants = new ArrayList<>(getRed().getParticipants().values());
+        sb.append("\n &7● &cRed Team: &f");
+        int redCount = 0;
+        while (redCount != getRed().getParticipants().size()) {
+            GameParticipant participant = redParticipants.get(0);
+            GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(participant.getUuid());
+            Player player = participant.getPlayer();
+            sb.append(ChatColor.WHITE + participant.getName());
+
+            redParticipants.remove(participant);
+            redCount++;
+            if (redCount == getRed().getParticipants().size()) {
+                sb.append("&7.");
+            } else {
+                sb.append("&7, ");
+            }
+
+            player.teleport(redSpawn.getLocation());
+            profile.givePlayerItems();
         }
 
         sb.append("\n ");
@@ -168,12 +243,15 @@ public class TeamDuel extends TeamGame {
             getStartingTimer().cancel();
         }
 
-        GameTeam winningTeam = null;
-        for(GameTeam team : getTeams()) {
-            if(team.getAliveParticipants().size() > 0) {
-                winningTeam = team;
-                break;
-            }
+        if(party != null) {
+            party.setGame(null);
+        }
+
+        GameTeam winningTeam;
+        if(getBlue().isEliminated()) {
+            winningTeam = getRed();
+        } else {
+            winningTeam = getBlue();
         }
 
         for(GameParticipant participant : getAlive().values()) {
@@ -196,7 +274,7 @@ public class TeamDuel extends TeamGame {
         stringBuilder.append(" ");
         stringBuilder.append(Colors.get("&6&lMatch ended."));
         if(winningTeam != null) {
-            stringBuilder.append(Colors.get("&6Winning Team: " + winningTeam.getColor().getChatColor() + winningTeam.toString()));
+            stringBuilder.append(Colors.get("\n&6Winning Team: " + winningTeam.getColor().getChatColor() + winningTeam.getColor().getName()));
         }
 
         TextComponent text = new TextComponent(ChatColor.GRAY + " ● " + ChatColor.GOLD + "Inventories: ");

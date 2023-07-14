@@ -8,6 +8,7 @@ import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
 import camp.pvp.utils.EntityHider;
 import camp.pvp.utils.PlayerUtils;
+import com.comphenix.protocol.events.PacketContainer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -21,6 +22,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 @Getter @Setter
@@ -107,6 +109,7 @@ public abstract class Game {
 
     public void eliminate(Player player, boolean leftGame) {
         GameParticipant participant = getParticipants().get(player.getUniqueId());
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         if(participant != null && !this.getState().equals(State.ENDED)) {
             participant.setAlive(false);
             participant.clearCooldowns();
@@ -124,15 +127,15 @@ public abstract class Game {
                 }
             }
 
-            Location location = player.getLocation();
-            DeathAnimation.BLOOD.playAnimation(this, location);
-
             if(leftGame) {
                 Game.this.announce("&f" + player.getName() + "&a disconnected.");
             } else {
                 Game.this.spectateStart(player);
                 Game.this.announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
             }
+
+            Location location = player.getLocation();
+            profile.getDeathAnimation().playAnimation(this, player, !participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.FALL));
         }
     }
 
@@ -164,12 +167,9 @@ public abstract class Game {
             participant.setCurrentCombo(0);
 
             if(victim.getHealth() - damage < 0) {
-                if (event.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
-                    event.setCancelled(true);
-                }
-
                 if(canDie) {
                     this.eliminate(victim, false);
+                    event.setCancelled(true);
                     Bukkit.getScheduler().runTaskLater(plugin, () -> victim.setHealth(20), 1);
                 }
             }
@@ -215,7 +215,7 @@ public abstract class Game {
         }
     }
 
-    public void join(Player player) {
+    public GameParticipant join(Player player) {
         GameProfile profile = plugin.getGameProfileManager().find(player.getUniqueId(), true);
         profile.setGame(this);
         profile.getDuelRequests().clear();
@@ -223,6 +223,7 @@ public abstract class Game {
 
         GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
         this.participants.put(player.getUniqueId(), participant);
+        return participant;
     }
 
     public void spectateStart(Player player) {
@@ -252,6 +253,8 @@ public abstract class Game {
         player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 1, true, false));
         if(location != null) {
             player.teleport(location);
+        } else {
+            player.teleport(this.getAlivePlayers().get(0).getLocation());
         }
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -354,6 +357,16 @@ public abstract class Game {
     public void playSound(Location location, Sound sound, float v1, float v2) {
         for(Player player : getAllPlayers()) {
             player.playSound(location, sound, v1, v2);
+        }
+    }
+
+    public void sendPacketToAllPlayers(PacketContainer pc) {
+        for(Player player : getAllPlayers()) {
+            try {
+                plugin.getProtocolManager().sendServerPacket(player, pc);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

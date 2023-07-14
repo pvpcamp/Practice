@@ -53,9 +53,9 @@ public class PlayerInteractListener implements Listener {
                 return;
             }
 
-            for(InteractableItems i : InteractableItems.values()) {
+            for(InteractableItems i : InteractableItems.getInteractableItems(profile)) {
                 InteractableItem ii = i.getItem();
-                if(i.getState().equals(state) && ii != null && ii.getItem().isSimilar(item)) {
+                if(ii != null && ii.getItem().isSimilar(item)) {
                     ii.getInteract().onInteract(player, profile);
                     event.setCancelled(true);
                     return;

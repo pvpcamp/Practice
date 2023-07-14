@@ -1,7 +1,11 @@
 package camp.pvp.utils;
 
+import camp.pvp.Practice;
+import camp.pvp.interactables.InteractableItem;
+import camp.pvp.interactables.InteractableItems;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
 import java.lang.reflect.InvocationTargetException;
@@ -26,6 +30,18 @@ public class PlayerUtils {
         for(PotionEffect effect : player.getActivePotionEffects()){
             player.removePotionEffect(effect.getType());
         }
+    }
+
+    public static void giveInteractableItems(Player player) {
+        PlayerInventory pi = player.getInventory();
+
+        pi.clear();
+        for(InteractableItems i : InteractableItems.getInteractableItems(Practice.instance.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId()))) {
+            InteractableItem ii = i.getItem();
+            pi.setItem(ii.getSlot(), ii.getItem().clone());
+        }
+
+        player.updateInventory();
     }
 
     public static int getPing(Player player) {

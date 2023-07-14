@@ -98,7 +98,7 @@ public class PostGameInventory extends GameInventory {
         playerButton.setSlot(49);
         gui.addButton(playerButton, false);
 
-        if(pots) {
+        if(pots || getGameParticipant().getThrownPotions() > 0) {
             GuiButton button = new GuiButton(healPotion.toItemStack(Math.max(potCount, 1)), "&c" + potCount + " pots left.");
             button.setLore(
                     "&6Thrown Potions: &f" + gameParticipant.getThrownPotions(),

@@ -1,6 +1,7 @@
 package camp.pvp.profiles;
 
 import camp.pvp.Practice;
+import camp.pvp.cosmetics.DeathAnimation;
 import camp.pvp.games.Game;
 import camp.pvp.games.PostGameInventory;
 import camp.pvp.interactables.InteractableItem;
@@ -8,6 +9,7 @@ import camp.pvp.interactables.InteractableItems;
 import camp.pvp.kits.CustomDuelKit;
 import camp.pvp.kits.DuelKit;
 import camp.pvp.parties.Party;
+import camp.pvp.parties.PartyInvite;
 import camp.pvp.utils.ItemBuilder;
 import camp.pvp.utils.PlayerUtils;
 import lombok.Getter;
@@ -49,11 +51,13 @@ public class GameProfile {
     private String name;
     private Time time;
     private boolean buildMode, debugMode, spectatorVisibility, lobbyVisibility;
+    private DeathAnimation deathAnimation;
 
     private Game game;
     private Map<UUID, DuelRequest> duelRequests;
 
     private Party party;
+    private Map<UUID, PartyInvite> partyInvites;
 
     private DuelKit editingKit;
     private CustomDuelKit editingCustomKit;
@@ -61,6 +65,10 @@ public class GameProfile {
 
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
+
+        this.deathAnimation = DeathAnimation.DEFAULT;
+
+        this.partyInvites = new HashMap<>();
 
         this.duelRequests = new HashMap<>();
         this.customDuelKits = new HashMap<>();
@@ -99,26 +107,15 @@ public class GameProfile {
         }
     }
 
-    public List<InteractableItem> getPlayerItems() {
-        State state = this.getState();
-        List<InteractableItem> items = new ArrayList<>();
-        for(InteractableItems i : InteractableItems.values()) {
-            if(state.equals(i.getState())) {
-                items.add(i.getItem());
-            }
-        }
-
-        return items;
-    }
-
     public void givePlayerItems() {
         Player player = getPlayer();
         if(player != null) {
             PlayerUtils.reset(player);
 
             PlayerInventory pi = player.getInventory();
-            for(InteractableItem i : getPlayerItems()) {
-                pi.setItem(i.getSlot(), i.getItem().clone());
+            for(InteractableItems i : InteractableItems.getInteractableItems(this)) {
+                InteractableItem ii = i.getItem();
+                pi.setItem(ii.getSlot(), ii.getItem().clone());
             }
 
             if(game != null && game.getAlive().get(this.getUuid()) != null) {

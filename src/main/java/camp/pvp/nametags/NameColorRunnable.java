@@ -1,6 +1,8 @@
 package camp.pvp.nametags;
 
 import camp.pvp.Practice;
+import camp.pvp.games.GameParticipant;
+import camp.pvp.games.impl.teams.TeamGame;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
 import org.bukkit.Bukkit;
@@ -19,7 +21,7 @@ public class NameColorRunnable implements Runnable{
     private List<String> teams;
     public NameColorRunnable(Practice plugin) {
         this.plugin = plugin;
-        this.teams = Arrays.asList("playing", "enemies", "friendly", "spectators", "lobby", "party", "tournament");
+        this.teams = Arrays.asList("playing", "enemies", "blue", "red", "spectators", "lobby", "party", "tournament");
     }
 
     @Override
@@ -39,7 +41,8 @@ public class NameColorRunnable implements Runnable{
 
                 Team playingTeam = scoreboard.getTeam("playing");
                 Team enemyTeam = scoreboard.getTeam("enemies");
-                Team friendlyTeam = scoreboard.getTeam("friendly");
+                Team blueTeam = scoreboard.getTeam("blue");
+                Team redTeam = scoreboard.getTeam("red");
                 Team spectatorTeam = scoreboard.getTeam("spectators");
                 Team lobbyTeam = scoreboard.getTeam("lobby");
                 Team partyTeam = scoreboard.getTeam("party");
@@ -55,12 +58,20 @@ public class NameColorRunnable implements Runnable{
                     enemyTeam.setPrefix(Colors.get("&c"));
                 }
 
-                if(friendlyTeam == null) {
-                    friendlyTeam = scoreboard.registerNewTeam("friendly");
-                    friendlyTeam.setPrefix(Colors.get("&a"));
-                    friendlyTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
-                    friendlyTeam.setAllowFriendlyFire(false);
-                    friendlyTeam.setCanSeeFriendlyInvisibles(true);
+                if(blueTeam == null) {
+                    blueTeam = scoreboard.registerNewTeam("blue");
+                    blueTeam.setPrefix(Colors.get("&9[Blue] "));
+                    blueTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
+                    blueTeam.setAllowFriendlyFire(false);
+                    blueTeam.setCanSeeFriendlyInvisibles(true);
+                }
+
+                if(redTeam == null) {
+                    redTeam = scoreboard.registerNewTeam("red");
+                    redTeam.setPrefix(Colors.get("&c[Red] "));
+                    redTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
+                    redTeam.setAllowFriendlyFire(false);
+                    redTeam.setCanSeeFriendlyInvisibles(true);
                 }
 
                 if(spectatorTeam == null) {
@@ -86,14 +97,25 @@ public class NameColorRunnable implements Runnable{
                 }
 
                 if (profile.getGame() != null) {
-                    if(plugin.getGameProfileManager().getState(profile).equals(GameProfile.State.SPECTATING)) {
-                        for (Player p : profile.getGame().getAlivePlayers()) {
-                            playingTeam.addEntry(p.getName());
+                    if(profile.getGame() instanceof TeamGame) {
+                        TeamGame teamGame = (TeamGame) profile.getGame();
+                        for(GameParticipant p : teamGame.getBlue().getAliveParticipants().values()) {
+                            blueTeam.addEntry(p.getName());
+                        }
+
+                        for(GameParticipant p : teamGame.getRed().getAliveParticipants().values()) {
+                            redTeam.addEntry(p.getName());
                         }
                     } else {
-                        for (Player p : profile.getGame().getAlivePlayers()) {
-                            if(!p.equals(player)) {
-                                enemyTeam.addEntry(p.getName());
+                        if (plugin.getGameProfileManager().getState(profile).equals(GameProfile.State.SPECTATING)) {
+                            for (Player p : profile.getGame().getAlivePlayers()) {
+                                playingTeam.addEntry(p.getName());
+                            }
+                        } else {
+                            for (Player p : profile.getGame().getAlivePlayers()) {
+                                if (!p.equals(player)) {
+                                    enemyTeam.addEntry(p.getName());
+                                }
                             }
                         }
                     }

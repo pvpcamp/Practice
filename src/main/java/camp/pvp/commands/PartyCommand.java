@@ -2,6 +2,7 @@ package camp.pvp.commands;
 
 import camp.pvp.Practice;
 import camp.pvp.parties.Party;
+import camp.pvp.parties.PartyInvite;
 import camp.pvp.parties.PartyMember;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
@@ -11,6 +12,7 @@ import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -53,6 +55,7 @@ public class PartyCommand implements CommandExecutor {
                                     StandardGui gui = new StandardGui("Party Settings", 27);
                                     gui.setDefaultBackground();
 
+                                    final Party fParty = party;
                                     GuiButton openPartyButton = new GuiButton(Material.NETHER_STAR, "&6Open/Closed Party");
                                     openPartyButton.setButtonUpdater(new AbstractButtonUpdater() {
                                         @Override
@@ -60,7 +63,7 @@ public class PartyCommand implements CommandExecutor {
                                             guiButton.setLore(
                                                     "&7Should the party be open to",
                                                     "&7the public or invite only?",
-                                                    "&6Current Setting: &f" + (party.isOpen() ? "Public" : "Invite Only")
+                                                    "&6Current Setting: &f" + (fParty.isOpen() ? "Public" : "Invite Only")
                                             );
                                         }
                                     });
@@ -68,7 +71,7 @@ public class PartyCommand implements CommandExecutor {
                                     openPartyButton.setAction(new GuiAction() {
                                         @Override
                                         public void run(Player player, Gui gui) {
-                                            party.setOpen(!party.isOpen());
+                                            fParty.setOpen(!fParty.isOpen());
                                             gui.updateGui();
                                         }
                                     });
@@ -83,7 +86,7 @@ public class PartyCommand implements CommandExecutor {
                                             guiButton.setLore(
                                                     "&7Should party members have the",
                                                     "&7ability to customize their HCF kit?",
-                                                    "&6Current Setting: &f" + (party.isChooseKits() ? "Enabled" : "Disabled")
+                                                    "&6Current Setting: &f" + (fParty.isChooseKits() ? "Enabled" : "Disabled")
                                             );
                                         }
                                     });
@@ -91,7 +94,7 @@ public class PartyCommand implements CommandExecutor {
                                     playerKitsButton.setAction(new GuiAction() {
                                         @Override
                                         public void run(Player player, Gui gui) {
-                                            party.setChooseKits(!party.isChooseKits());
+                                            fParty.setChooseKits(!fParty.isChooseKits());
                                             gui.updateGui();
                                         }
                                     });
@@ -109,17 +112,67 @@ public class PartyCommand implements CommandExecutor {
                                 return true;
                         }
                     case 2:
+                        Player target = Bukkit.getPlayer(args[1]);
+                        if(target != null) {
+                            GameProfile targetProfile = plugin.getGameProfileManager().getLoadedProfiles().get(target.getUniqueId());
+                            party = targetProfile.getParty();
+                            switch (args[0].toLowerCase()) {
+                                case "join":
+                                    if (profile.getParty() == null) {
+                                        if (party != null && party.isOpen()) {
+                                            party.join(player);
+                                        } else {
+                                            PartyInvite invite = profile.getPartyInvites().get(target.getUniqueId());
+                                            if (invite != null && !invite.isExpired() && invite.getParty().getMembers().size() > 0 && invite.getParty().getMembers().containsKey(target.getUniqueId())) {
+                                                invite.getParty().join(player);
+                                            } else {
+                                                player.sendMessage(ChatColor.RED + "You do not have a party invitation from this player right now.");
+                                            }
+                                        }
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "You cannot join a party right now as you are already in one.");
+                                    }
+                                    return true;
+                                case "invite":
+                                    if (profile.getParty() != null && profile.getParty().getLeader().getUuid().equals(profile.getUuid())) {
+                                        if (party == null) {
+                                            PartyInvite invite = new PartyInvite(profile.getParty(), target, player);
+                                            targetProfile.getPartyInvites().put(player.getUniqueId(), invite);
+                                            invite.send();
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "This player is already in a party.");
+                                        }
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "You cannot send a party invite if you're not in a party.");
+                                    }
+                                    return true;
+                                case "leader":
+                                    if(profile.getParty() != null && profile.getParty().getLeader().getUuid().equals(profile.getUuid())) {
+                                        party = profile.getParty();
+                                        if(targetProfile.getParty() != null && targetProfile.getParty().equals(party)) {
+                                            party.setLeader(party.getMembers().get(target.getUniqueId()));
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "The player you specified is not in the same party as you.");
+                                        }
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "You cannot assign a party leader if you're not in a party or if you're not the leader.");
+                                    }
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "The player you specified was not found.");
+                        }
                 }
             }
 
             StringBuilder help = new StringBuilder();
             help.append("&6&l/party &r&6Help");
             help.append("\n&6/party info &7- &fGeneral party information.");
-            help.append("\n&6/party leave &7- &fLeaves the party.");
             help.append("\n&6/party settings &7- &fOpens party settings.");
+            help.append("\n&6/party leave &7- &fLeave the party.");
+            help.append("\n&6/party join <name> &7- &fJoin a party.");
             help.append("\n&6/party leader <name> &7- &fAssigns a new party leader.");
             help.append("\n&6/party invite <name> &7- &fInvites a new player to your party.");
-            help.append("\n&6/party join <name> &7- &fJoin a player's party.");
+            help.append("\n&6/party kick <name> &7- &fKicks a player from your party.");
 
             player.sendMessage(Colors.get(help.toString()));
         }

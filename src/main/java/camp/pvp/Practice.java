@@ -4,6 +4,7 @@ import camp.pvp.arenas.ArenaManager;
 import camp.pvp.commands.*;
 import camp.pvp.cooldowns.CooldownRunnable;
 import camp.pvp.games.GameManager;
+import camp.pvp.interactables.InteractableItems;
 import camp.pvp.listeners.bukkit.block.BlockBreakListener;
 import camp.pvp.listeners.bukkit.block.BlockPlaceListener;
 import camp.pvp.listeners.bukkit.entity.EntityDamageByEntityListener;

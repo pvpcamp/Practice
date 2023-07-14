@@ -4,6 +4,10 @@ import camp.pvp.Practice;
 import camp.pvp.games.Game;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
+import com.lunarclient.bukkitapi.LunarClientAPI;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketTeammates;
+import com.lunarclient.bukkitapi.object.StaffModule;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -47,6 +51,11 @@ public class PlayerJoinLeaveListeners implements Listener {
         sb.append("\n&7&oWe are currently in development, please report any bugs to the developers.");
         sb.append("\n ");
         player.sendMessage(Colors.get(sb.toString()));
+
+        LunarClientAPI lcApi = plugin.getLunarClientAPI();
+        if(lcApi.isRunningLunarClient(player) && player.hasPermission("practice.staff")) {
+            lcApi.giveAllStaffModules(player);
+        }
     }
 
     @EventHandler
@@ -70,8 +79,8 @@ public class PlayerJoinLeaveListeners implements Listener {
             profile.getParty().leave(player);
         }
 
-        plugin.getGameProfileManager().exportToDatabase(player.getUniqueId(), true, false);
-
         event.setQuitMessage(null);
+
+        Bukkit.getScheduler().runTaskLater(plugin, ()-> plugin.getGameProfileManager().exportToDatabase(player.getUniqueId(), true, false), 2);
     }
 }

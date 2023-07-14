@@ -46,6 +46,7 @@ public class DuelRequest {
         if(senderPlayer != null && opponentPlayer != null) {
             senderPlayer.sendMessage(ChatColor.GREEN + "You sent a duel request to " + opponentPlayer.getName() + ".");
 
+
             TextComponent msg = new TextComponent(Colors.get("&aYou received a duel request from " + senderPlayer.getName() + ", click to accept."));
             msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/accept " + senderPlayer.getName()));
             msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Colors.get("&a/accept " + senderPlayer.getName())).create()));

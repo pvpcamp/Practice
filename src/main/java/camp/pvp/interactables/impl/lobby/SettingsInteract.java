@@ -1,5 +1,6 @@
 package camp.pvp.interactables.impl.lobby;
 
+import camp.pvp.cosmetics.DeathAnimation;
 import camp.pvp.interactables.ItemInteract;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.buttons.AbstractButtonUpdater;
@@ -7,6 +8,7 @@ import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
+import com.lunarclient.bukkitapi.LunarClientAPI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -90,6 +92,51 @@ public class SettingsInteract implements ItemInteract {
         });
         playerTime.setSlot(12);
         gui.addButton(playerTime, false);
+
+        GuiButton deathAnimation = new GuiButton(Material.BLAZE_ROD, "&4Death Animation");
+        deathAnimation.setAction(new GuiAction() {
+            @Override
+            public void run(Player player, Gui gui) {
+                if(gameProfile.getDeathAnimation().ordinal() == DeathAnimation.values().length - 1) {
+                    gameProfile.setDeathAnimation(DeathAnimation.DEFAULT);
+                } else {
+                    gameProfile.setDeathAnimation(DeathAnimation.values()[gameProfile.getDeathAnimation().ordinal() + 1]);
+                }
+
+                gui.updateGui();
+            }
+        });
+
+        deathAnimation.setButtonUpdater(new AbstractButtonUpdater() {
+            @Override
+            public void update(GuiButton guiButton, Gui gui) {
+                DeathAnimation da = gameProfile.getDeathAnimation();
+                guiButton.setLore(
+                        "&7What would you like your",
+                        "&7death animation to be?",
+                        " ",
+                        (da.equals(DeathAnimation.DEFAULT) ? "&6&l" : "&8") +" ● Default",
+                        (da.equals(DeathAnimation.BLOOD) ? "&6&l" : "&8") +" ● Blood",
+                        (da.equals(DeathAnimation.EXPLOSION) ? "&6&l" : "&8") +" ● Explosion");
+            }
+        });
+        deathAnimation.setSlot(13);
+        gui.addButton(deathAnimation, false);
+
+        if(!LunarClientAPI.getInstance().isRunningLunarClient(player)) {
+            GuiButton lunarNotice = new GuiButton(Material.BEACON, "&b&lNotice!");
+            lunarNotice.setLore(
+                    "&bMany of the features on our",
+                    "&bserver involve the use of",
+                    "&b&lLunarClientAPI&r&b, which provides",
+                    "&ba better playing experience.",
+                    " ",
+                    "&bPlease consider using &b&lLunar Client",
+                    "&bthe next time you connect our network."
+            );
+            lunarNotice.setSlot(4);
+            gui.addButton(lunarNotice, false);
+        }
 
         if(player.hasPermission("practice.staff.debug_mode")) {
             GuiButton debugMode = new GuiButton(Material.COMMAND, "&c&l&oDebug Mode");

@@ -67,6 +67,21 @@ public enum DuelKit {
         }
     }
 
+    public int getUnrankedSlot() {
+        switch(this) {
+            case NO_DEBUFF:
+                return 10;
+            case HCF:
+                return 12;
+            case BOXING:
+                return 14;
+            case CLASSIC:
+                return 16;
+        }
+
+        return 0;
+    }
+
     public boolean isBuild() {
         switch(this) {
             default:
@@ -137,6 +152,15 @@ public enum DuelKit {
 
     public boolean isRanked() {
         return false;
+    }
+
+    public boolean isFfa() {
+        switch(this) {
+            default:
+                return true;
+            case BOXING:
+                return false;
+        }
     }
 
     public ItemStack getIcon() {

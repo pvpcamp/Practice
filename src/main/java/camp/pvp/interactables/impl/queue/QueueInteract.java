@@ -19,12 +19,11 @@ public class QueueInteract implements ItemInteract {
     @Override
     public void onInteract(Player player, GameProfile gameProfile) {
         GameQueueManager gqm = Practice.instance.getGameQueueManager();
-        StandardGui gui = new StandardGui("Queue", 9);
+        StandardGui gui = new StandardGui("&6Unranked Queue", 27);
         gui.setAutoUpdate(true);
 
         gui.setDefaultBackground();
 
-        int x = 0;
         for(GameQueue queue : gqm.getGameQueues()) {
             DuelKit kit = queue.getDuelKit();
             GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
@@ -33,8 +32,8 @@ public class QueueInteract implements ItemInteract {
                 public void update(GuiButton guiButton, Gui gui) {
                     int playing = queue.getPlaying();
                     guiButton.setLore(
-                            "&6Playing: &f" + playing,
-                            "&6In Queue: &f" + queue.getQueueMembers().size(),
+                            kit.getColor() + "Playing: &f" + playing,
+                            kit.getColor() + "In Queue: &f" + queue.getQueueMembers().size(),
                             "&7Click to join queue!");
 
                     int stack = playing > 1 ? (Math.min(playing, 64)) : 1;
@@ -47,9 +46,8 @@ public class QueueInteract implements ItemInteract {
             });
             button.setCloseOnClick(true);
 
-            button.setSlot(x);
+            button.setSlot(kit.getUnrankedSlot());
             gui.addButton(button, false);
-            x++;
         }
 
         gui.open(player);

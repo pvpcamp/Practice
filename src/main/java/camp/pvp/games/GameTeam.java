@@ -13,18 +13,23 @@ import java.util.UUID;
 public class GameTeam {
 
     public enum Color {
-        BLUE, RED, YELLOW, WHITE;
+        BLUE, RED;
 
         public ChatColor getChatColor() {
             switch(this) {
                 case BLUE:
                     return ChatColor.BLUE;
-                case RED:
-                    return ChatColor.RED;
-                case YELLOW:
-                    return ChatColor.YELLOW;
                 default:
-                    return ChatColor.WHITE;
+                    return ChatColor.RED;
+            }
+        }
+
+        public String getName() {
+            switch(this) {
+                case BLUE:
+                    return "Blue";
+                default:
+                    return "Red";
             }
         }
     }
@@ -33,10 +38,9 @@ public class GameTeam {
     private final TeamGame game;
     private boolean eliminated;
 
-    public GameTeam(Color color, TeamGame game, boolean eliminated) {
+    public GameTeam(Color color, TeamGame game) {
         this.color = color;
         this.game = game;
-        this.eliminated = eliminated;
     }
 
     public Map<UUID, GameParticipant> getParticipants() {
@@ -59,5 +63,13 @@ public class GameTeam {
         }
 
         return participants;
+    }
+
+    public boolean isEliminated() {
+        if(eliminated) {
+            return true;
+        }
+
+        return getAliveParticipants().size() < 1;
     }
 }

@@ -16,6 +16,8 @@ public class Arena {
                     return Arrays.asList("blue", "red", "yellow", "white", "center");
                 case DUEL_BUILD:
                     return Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
+                case FFA:
+                    return Arrays.asList("spawn");
                 default:
                     return Arrays.asList("spawn1", "spawn2", "center");
             }

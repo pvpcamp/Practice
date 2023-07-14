@@ -18,15 +18,8 @@ public class WeatherChangeListener implements Listener {
 
     @EventHandler(priority= EventPriority.HIGHEST)
     public void onWeatherChange(WeatherChangeEvent event) {
-        event.getWorld().setStorm(false);
-        event.getWorld().setWeatherDuration(0);
-    }
-
-    @EventHandler(priority= EventPriority.HIGHEST)
-    public void onThunderChange(ThunderChangeEvent event) {
-
-        boolean storm = event.toThunderState();
-        if(storm)
+        if(event.toWeatherState()) {
             event.setCancelled(true);
+        }
     }
 }

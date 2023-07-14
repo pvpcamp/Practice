@@ -84,6 +84,10 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&6Party &7(" + party.getMembers().size() + ")");
                     lines.add("&6Leader: &f" + party.getLeader().getName());
                     lines.add("&6HCF Kit: " + kit.getColor() + kit.toString());
+
+                    if(party.getGame() != null) {
+                        lines.add("&7&oParty In Game");
+                    }
                     break;
                 case IN_GAME:
                     Game game = profile.getGame();
