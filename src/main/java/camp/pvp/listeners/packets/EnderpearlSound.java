@@ -43,10 +43,10 @@ public class EnderpearlSound extends PacketAdapter {
                 e.setCancelled(true);
             }
 
-            if (player.getItemInHand().getType().equals(Material.ENDER_PEARL)) {
+            if (closest.getItemInHand().getType().equals(Material.ENDER_PEARL)) {
                 Game game = profile.getGame();
                 if(game != null && game.getState().equals(Game.State.ACTIVE)) {
-                    PlayerCooldown cooldown = game.getParticipants().get(player.getUniqueId()).getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
+                    PlayerCooldown cooldown = game.getParticipants().get(closest.getUniqueId()).getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
                     if(cooldown != null) {
                         if(!cooldown.isExpired()) {
                             e.setCancelled(true);
