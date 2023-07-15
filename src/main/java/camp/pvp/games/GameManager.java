@@ -2,18 +2,22 @@ package camp.pvp.games;
 
 import camp.pvp.Practice;
 import camp.pvp.games.impl.events.SumoEvent;
-import camp.pvp.games.impl.events.TournamentEvent;
+import camp.pvp.games.tournaments.Tournament;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 import java.util.logging.Logger;
 
+@Getter @Setter
 public class GameManager {
 
     private Practice plugin;
     private Logger logger;
-    public Map<UUID, Game> games;
-    public @Getter Map<UUID, PostGameInventory> postGameInventories;
+    private Map<UUID, Game> games;
+    private Tournament tournament;
+
+    private Map<UUID, PostGameInventory> postGameInventories;
 
     public GameManager(Practice plugin) {
         this.plugin = plugin;
@@ -29,17 +33,6 @@ public class GameManager {
             Game.State state = game.getState();
             if(game instanceof SumoEvent && !state.equals(Game.State.INACTIVE) || !state.equals(Game.State.ENDED)) {
                 return (SumoEvent) game;
-            }
-        }
-
-        return null;
-    }
-
-    public TournamentEvent getActiveTournamentEvent() {
-        for(Game game : games.values()) {
-            Game.State state = game.getState();
-            if(game instanceof TournamentEvent && !state.equals(Game.State.INACTIVE) || !state.equals(Game.State.ENDED)) {
-                return (TournamentEvent) game;
             }
         }
 

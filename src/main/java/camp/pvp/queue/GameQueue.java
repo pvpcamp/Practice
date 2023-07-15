@@ -17,7 +17,7 @@ import java.util.UUID;
 public class GameQueue {
 
     public enum Type {
-        UNRANKED, RANKED, PRIVATE;
+        UNRANKED, RANKED, PRIVATE, TOURNAMENT;
 
         @Override
         public String toString() {
@@ -28,6 +28,8 @@ public class GameQueue {
                     return "Ranked";
                 case PRIVATE:
                     return "Private Game";
+                case TOURNAMENT:
+                    return "Tournament";
                 default:
                     return null;
             }

@@ -37,7 +37,6 @@ import java.util.*;
 
 public class TeamDuel extends TeamGame {
 
-    private @Getter @Setter Party party;
     public TeamDuel(Practice plugin, UUID uuid) {
         super(plugin, uuid);
     }
@@ -142,8 +141,8 @@ public class TeamDuel extends TeamGame {
             return;
         }
 
-        if(party != null) {
-            party.setGame(this);
+        if(this.getParty() != null) {
+            getParty().setGame(this);
         }
 
         this.setState(State.STARTING);
@@ -245,8 +244,8 @@ public class TeamDuel extends TeamGame {
             getStartingTimer().cancel();
         }
 
-        if(party != null) {
-            party.setGame(null);
+        if(getParty() != null) {
+            getParty().setGame(null);
         }
 
         GameTeam winningTeam;

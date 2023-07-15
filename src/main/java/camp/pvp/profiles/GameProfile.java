@@ -3,6 +3,7 @@ package camp.pvp.profiles;
 import camp.pvp.Practice;
 import camp.pvp.cosmetics.DeathAnimation;
 import camp.pvp.games.Game;
+import camp.pvp.games.tournaments.Tournament;
 import camp.pvp.interactables.InteractableItem;
 import camp.pvp.interactables.InteractableItems;
 import camp.pvp.kits.CustomDuelKit;
@@ -32,7 +33,7 @@ import java.util.*;
 public class GameProfile {
 
     public enum State {
-        LOBBY, LOBBY_QUEUE, LOBBY_PARTY, KIT_EDITOR, IN_GAME, SPECTATING
+        LOBBY, LOBBY_QUEUE, LOBBY_PARTY, LOBBY_TOURNAMENT, KIT_EDITOR, IN_GAME, SPECTATING
     }
 
     public enum Time {
@@ -53,10 +54,11 @@ public class GameProfile {
     private final UUID uuid;
     private String name;
     private Time time;
-    private boolean buildMode, debugMode, spectatorVisibility, lobbyVisibility;
+    private boolean buildMode, debugMode, spectatorVisibility, lobbyVisibility, tournamentNotifications;
     private DeathAnimation deathAnimation;
 
     private Game game;
+    private Tournament tournament;
     private Map<UUID, DuelRequest> duelRequests;
 
     private Party party;
@@ -84,6 +86,7 @@ public class GameProfile {
         this.buildMode = false;
         this.lobbyVisibility = true;
         this.spectatorVisibility = true;
+        this.tournamentNotifications = true;
 
         duelKitQueueStatistics.put(GameQueue.Type.UNRANKED, new HashMap<>());
         duelKitQueueStatistics.put(GameQueue.Type.RANKED, new HashMap<>());

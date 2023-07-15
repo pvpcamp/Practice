@@ -3,7 +3,9 @@ package camp.pvp.games;
 import camp.pvp.Practice;
 import camp.pvp.arenas.Arena;
 import camp.pvp.cosmetics.DeathAnimation;
+import camp.pvp.games.tournaments.Tournament;
 import camp.pvp.kits.DuelKit;
+import camp.pvp.parties.Party;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
 import camp.pvp.utils.EntityHider;
@@ -38,6 +40,9 @@ public abstract class Game {
     public final UUID uuid;
     public Map<UUID, GameParticipant> participants;
     public Map<UUID, GameSpectator> spectators;
+
+    private Party party;
+    private Tournament tournament;
 
     public State state;
     public Arena arena;

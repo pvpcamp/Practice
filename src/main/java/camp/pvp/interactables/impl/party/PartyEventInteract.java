@@ -59,7 +59,7 @@ public class PartyEventInteract implements ItemInteract {
                                     }
 
                                     if (members.size() > 1) {
-                                        FreeForAll ffa = new FreeForAll(plugin, UUID.randomUUID(), party);
+                                        FreeForAll ffa = new FreeForAll(plugin, UUID.randomUUID());
                                         for (PartyMember member : kickedMembers) {
                                             Player p = member.getPlayer();
                                             p.sendMessage(ChatColor.RED + "You have been kicked from the party since you were not able to play in the event.");
@@ -70,6 +70,7 @@ public class PartyEventInteract implements ItemInteract {
                                             ffa.join(member.getPlayer());
                                         }
 
+                                        ffa.setParty(party);
                                         ffa.setKit(kit);
 
                                         ffa.start();

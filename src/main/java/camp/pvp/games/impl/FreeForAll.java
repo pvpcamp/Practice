@@ -33,15 +33,8 @@ import java.util.*;
 
 public class FreeForAll extends Game {
 
-    private @Getter @Setter Party party;
-
-    public FreeForAll(Practice plugin, UUID uuid, Party party) {
+    public FreeForAll(Practice plugin, UUID uuid) {
         super(plugin, uuid);
-        this.party = party;
-
-        if(party != null) {
-            party.setGame(this);
-        }
     }
 
     @Override
@@ -139,6 +132,10 @@ public class FreeForAll extends Game {
                 profile.playerUpdate();
             }
             return;
+        }
+
+        if(getParty() != null) {
+            getParty().setGame(this);
         }
 
         Map<String, ArenaPosition> positions = arena.getPositions();
