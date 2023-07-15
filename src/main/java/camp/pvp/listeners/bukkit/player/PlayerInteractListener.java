@@ -14,6 +14,7 @@ import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -42,11 +43,17 @@ public class PlayerInteractListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-        GameProfile.State state = profile.getState();
         Action action = event.getAction();
         Block block = event.getClickedBlock();
 
         ItemStack item = event.getItem();
+
+        if(profile == null) {
+            player.sendMessage(ChatColor.RED + "Your profile has not been loaded yet, if this persists please reconnect.");
+            return;
+        }
+
+        GameProfile.State state = profile.getState();
 
         if(action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
             if(profile.isBuildMode()) {

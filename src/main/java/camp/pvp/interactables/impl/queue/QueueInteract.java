@@ -32,8 +32,8 @@ public class QueueInteract implements ItemInteract {
                 public void update(GuiButton guiButton, Gui gui) {
                     int playing = queue.getPlaying();
                     guiButton.setLore(
-                            kit.getColor() + "Playing: &f" + playing,
-                            kit.getColor() + "In Queue: &f" + queue.getQueueMembers().size(),
+                            "&6Playing: &f" + playing,
+                            "&6In Queue: &f" + queue.getQueueMembers().size(),
                             "&7Click to join queue!");
 
                     int stack = playing > 1 ? (Math.min(playing, 64)) : 1;

@@ -135,6 +135,7 @@ public class Practice extends JavaPlugin {
         new PostGameInventoryCommand(this);
         new PracticeUtilCommand(this);
         new SpectateCommand(this);
+        new StatisticsCommand(this);
     }
 
     public void registerListeners() {

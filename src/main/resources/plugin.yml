@@ -44,6 +44,5 @@ commands:
   spectate:
     aliases: [spec]
     description: Spectate a game.
-  statistics:
-    aliases: [stats]
+  stats:
     description: View the statistics of yourself or another player.

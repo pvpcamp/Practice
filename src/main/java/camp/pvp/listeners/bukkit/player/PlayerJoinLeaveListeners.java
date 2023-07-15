@@ -10,8 +10,10 @@ import com.lunarclient.bukkitapi.LunarClientAPI;
 import com.lunarclient.bukkitapi.nethandler.client.LCPacketTeammates;
 import com.lunarclient.bukkitapi.object.StaffModule;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -27,9 +29,10 @@ public class PlayerJoinLeaveListeners implements Listener {
 
     @EventHandler
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
+        GameProfile profile = plugin.getGameProfileManager().find(event.getUniqueId(), true);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
@@ -52,6 +55,16 @@ public class PlayerJoinLeaveListeners implements Listener {
         sb.append("\n&7&oWe are currently in development, please report any bugs to the developers.");
         sb.append("\n ");
         player.sendMessage(Colors.get(sb.toString()));
+
+        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+            @Override
+            public void run() {
+                GameProfile p = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+                if(player.isOnline() && p == null) {
+                    player.kickPlayer(ChatColor.RED + "There was an issue loading your profile, please reconnect.");
+                }
+            }
+        }, 40);
     }
 
     @EventHandler

@@ -36,7 +36,7 @@ public class DuelCommand implements CommandExecutor {
                 GameProfileManager gpm = plugin.getGameProfileManager();
                 GameProfile profile = gpm.getLoadedProfiles().get(player.getUniqueId());
 
-                if(profile.getGame() == null) {
+                if(profile.getState().equals(GameProfile.State.LOBBY)) {
 
                     Player target = Bukkit.getPlayer(args[0]);
 
@@ -44,7 +44,7 @@ public class DuelCommand implements CommandExecutor {
 
                         GameProfile targetProfile = gpm.getLoadedProfiles().get(target.getUniqueId());
 
-                        if(targetProfile.getGame() == null) {
+                        if(targetProfile.getState().equals(GameProfile.State.LOBBY)) {
                             StandardGui requestGui = new StandardGui("Duel " + target.getName(), 9);
 
                             int x = 0;
@@ -53,21 +53,30 @@ public class DuelCommand implements CommandExecutor {
                                     ItemStack item = duelKit.getIcon();
                                     GuiButton button = new GuiButton(item, duelKit.getColor() + duelKit.getDisplayName());
 
+                                    button.setCloseOnClick(true);
                                     button.setLore(
-                                            "&7Click to duel " + targetProfile.getName() + "!"
+                                            "&7Click to duel &6" + targetProfile.getName() + "&7!"
                                     );
 
                                     button.setAction((pl, igui) -> {
                                         GameProfile gp = gpm.getLoadedProfiles().get(target.getUniqueId());
                                         if(gp != null) {
-                                            DuelRequest duelRequest = new DuelRequest(pl.getUniqueId(), target.getUniqueId(), duelKit, null, 30);
-                                            duelRequest.send();
-                                            gp.getDuelRequests().put(pl.getUniqueId(), duelRequest);
+                                            DuelRequest oldRequest = gp.getDuelRequests().get(pl.getUniqueId());
+                                            if(gp.getState().equals(GameProfile.State.LOBBY)) {
+                                                if(oldRequest != null && oldRequest.getKit().equals(duelKit) && !oldRequest.isExpired()) {
+                                                    player.sendMessage(ChatColor.RED + "You already sent this player a duel request recently for this same kit.");
+                                                    return;
+                                                }
+
+                                                DuelRequest duelRequest = new DuelRequest(pl.getUniqueId(), target.getUniqueId(), duelKit, null, 30);
+                                                duelRequest.send();
+                                                gp.getDuelRequests().put(pl.getUniqueId(), duelRequest);
+                                            } else {
+                                                player.sendMessage(ChatColor.RED + "You cannot send a duel to this player right now as they are busy.");
+                                            }
                                         } else {
                                             pl.sendMessage(ChatColor.RED + "The player you specified is not on this server.");
                                         }
-
-                                        pl.closeInventory();
                                     });
 
                                     button.setSlot(x);
@@ -116,7 +125,7 @@ public class DuelCommand implements CommandExecutor {
                                 requestGui.open(player);
                             }
                         } else {
-                            player.sendMessage(ChatColor.RED + "The player you specified is in a game.");
+                            player.sendMessage(ChatColor.RED + "You cannot send a duel to this player right now as they are busy.");
                         }
                     } else {
                         player.sendMessage(ChatColor.RED + "The player you specified is not on this server.");

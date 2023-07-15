@@ -2,10 +2,15 @@ package camp.pvp.profiles;
 
 import camp.pvp.NetworkHelper;
 import camp.pvp.Practice;
+import camp.pvp.mongo.MongoCollectionResult;
 import camp.pvp.mongo.MongoManager;
 import camp.pvp.mongo.MongoResult;
 import camp.pvp.mongo.MongoUpdate;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import lombok.Getter;
+import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bukkit.entity.Player;
 
@@ -41,6 +46,21 @@ public class GameProfileManager {
         }
 
         return profile;
+    }
+
+    public GameProfile find(String name, boolean store) {
+        final GameProfile[] profile = {null};
+        mongoManager.getCollection(false, "practice_profiles", new MongoCollectionResult() {
+            @Override
+            public void call(MongoCollection<Document> mongoCollection) {
+                Document doc = mongoCollection.find(Filters.regex("name", "(?i)" + name)).first();
+                if(doc != null) {
+                    profile[0] = importFromDatabase(doc.get("_id", UUID.class), store);
+                }
+            }
+        });
+
+        return profile[0];
     }
 
     public GameProfile.State getState(UUID uuid) {
