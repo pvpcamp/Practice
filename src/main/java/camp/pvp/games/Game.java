@@ -177,7 +177,10 @@ public abstract class Game {
             participant.setMaxHealth(Math.round(victim.getMaxHealth()));
             participant.setHunger(victim.getFoodLevel());
             participant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
-            participant.setCurrentCombo(0);
+
+            if(event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+                participant.setCurrentCombo(0);
+            }
 
             if(victim.getHealth() - damage < 0) {
                 if(canDie) {
@@ -212,6 +215,23 @@ public abstract class Game {
                     participant.hits++;
                     participant.currentCombo++;
                     victimParticipant.handleHit();
+
+                    if(participant.isComboMessages()) {
+                        switch ((int) participant.getCurrentCombo()) {
+                            case 5:
+                                attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+                                attacker.sendMessage(Colors.get("&a5 Hit Combo!"));
+                                break;
+                            case 10:
+                                attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
+                                attacker.sendMessage(Colors.get("&6&o10 HIT COMBO!"));
+                                break;
+                            case 20:
+                                attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
+                                attacker.sendMessage(Colors.get("&4&l&o20 HIT COMBO!!!"));
+                                break;
+                        }
+                    }
                 }
 
                 if(!kit.isTakeDamage()) {
@@ -220,21 +240,6 @@ public abstract class Game {
                     if(kit.equals(DuelKit.BOXING) && participant.getHits() > 99) {
                         this.eliminate(victim, false);
                     }
-                }
-
-                switch((int) participant.getCurrentCombo()) {
-                    case 5:
-                        attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
-                        attacker.sendMessage(Colors.get("&a5 Hit Combo!"));
-                        break;
-                    case 10:
-                        attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
-                        attacker.sendMessage(Colors.get("&6&o10 HIT COMBO!"));
-                        break;
-                    case 20:
-                        attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
-                        attacker.sendMessage(Colors.get("&4&l&o20 HIT COMBO!!!"));
-                        break;
                 }
 
                 if (participant.currentCombo > participant.longestCombo) {
@@ -255,6 +260,7 @@ public abstract class Game {
         plugin.getGameQueueManager().removeFromQueue(player);
 
         GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
+        participant.setComboMessages(profile.isComboMessages());
         this.participants.put(player.getUniqueId(), participant);
         return participant;
     }

@@ -40,7 +40,7 @@ public class SettingsInteract implements ItemInteract {
         spectatorVisibility.setSlot(10);
         gui.addButton(spectatorVisibility, false);
 
-        GuiButton lobbyVisibility = new GuiButton(Material.TORCH, "&eLobby Visibility");
+        GuiButton lobbyVisibility = new GuiButton(Material.EYE_OF_ENDER, "&eLobby Visibility");
         lobbyVisibility.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -61,6 +61,27 @@ public class SettingsInteract implements ItemInteract {
         });
         lobbyVisibility.setSlot(11);
         gui.addButton(lobbyVisibility, false);
+
+        GuiButton comboMessages = new GuiButton(Material.EXP_BOTTLE, "&3Combo Messages and Sounds");
+        comboMessages.setAction(new GuiAction() {
+            @Override
+            public void run(Player player, Gui gui) {
+                gameProfile.setComboMessages(!gameProfile.isComboMessages());
+                gui.updateGui();
+            }
+        });
+
+        comboMessages.setButtonUpdater(new AbstractButtonUpdater() {
+            @Override
+            public void update(GuiButton guiButton, Gui gui) {
+                guiButton.setLore(
+                        "&7Would you like to receive combo",
+                        "&7messages and sounds?",
+                        "&aCurrent Setting: &f" + (gameProfile.isComboMessages() ? "Enabled" : "Disabled"));
+            }
+        });
+        comboMessages.setSlot(12);
+        gui.addButton(comboMessages, false);
 
         GuiButton playerTime = new GuiButton(Material.WATCH, "&5Player Time");
         playerTime.setAction(new GuiAction() {
@@ -90,7 +111,7 @@ public class SettingsInteract implements ItemInteract {
                         (time.equals(GameProfile.Time.NIGHT) ? "&6&l" : "&8") +" ● Night");
             }
         });
-        playerTime.setSlot(12);
+        playerTime.setSlot(13);
         gui.addButton(playerTime, false);
 
         GuiButton deathAnimation = new GuiButton(Material.BLAZE_ROD, "&4Death Animation");
@@ -120,7 +141,7 @@ public class SettingsInteract implements ItemInteract {
                         (da.equals(DeathAnimation.EXPLOSION) ? "&6&l" : "&8") +" ● Explosion");
             }
         });
-        deathAnimation.setSlot(13);
+        deathAnimation.setSlot(14);
         gui.addButton(deathAnimation, false);
 
         if(!LunarClientAPI.getInstance().isRunningLunarClient(player)) {

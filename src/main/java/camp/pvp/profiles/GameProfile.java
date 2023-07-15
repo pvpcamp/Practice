@@ -54,7 +54,7 @@ public class GameProfile {
     private final UUID uuid;
     private String name;
     private Time time;
-    private boolean buildMode, debugMode, spectatorVisibility, lobbyVisibility, tournamentNotifications;
+    private boolean buildMode, debugMode, spectatorVisibility, lobbyVisibility, comboMessages, tournamentNotifications;
     private DeathAnimation deathAnimation;
 
     private Game game;
@@ -86,6 +86,7 @@ public class GameProfile {
         this.buildMode = false;
         this.lobbyVisibility = true;
         this.spectatorVisibility = true;
+        this.comboMessages = true;
         this.tournamentNotifications = true;
 
         duelKitQueueStatistics.put(GameQueue.Type.UNRANKED, new HashMap<>());
@@ -255,6 +256,7 @@ public class GameProfile {
         this.spectatorVisibility = document.getBoolean("spectator_visibility");
         this.lobbyVisibility = document.getBoolean("lobby_visibility");
         this.deathAnimation = DeathAnimation.valueOf(document.getString("death_animation"));
+        this.comboMessages = document.getBoolean("combo_messages");
 
         // Get serialized kits from document, and turn them back into CustomDuelKits.
         Object serializedKits = document.get("custom_duel_kits");
@@ -309,6 +311,7 @@ public class GameProfile {
         values.put("spectator_visibility", spectatorVisibility);
         values.put("lobby_visibility", lobbyVisibility);
         values.put("death_animation", deathAnimation);
+        values.put("combo_messages", comboMessages);
 
         // Convert CustomDuelKits to serialized form for DB storage.
         Map<String, Map<String, Map<String, Object>>> ck = new HashMap<>();

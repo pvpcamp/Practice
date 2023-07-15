@@ -12,6 +12,7 @@ import com.mongodb.client.model.Filters;
 import lombok.Getter;
 import org.bson.BsonDocument;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -72,8 +73,11 @@ public class GameProfileManager {
     }
 
     public void updateGlobalPlayerVisibility() {
-        for(GameProfile profile : loadedProfiles.values()) {
-            profile.updatePlayerVisibility();
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            GameProfile profile = getLoadedProfiles().get(player.getUniqueId());
+            if(profile != null) {
+                profile.updatePlayerVisibility();
+            }
         }
     }
 
