@@ -63,6 +63,7 @@ public enum DeathAnimation {
                     victim.setVelocity(new Vector(0, 0.5, 0));
                 }
 
+                game.playSound(location, Sound.HURT_FLESH, 1F, 1F);
                 game.playSound(location, Sound.AMBIENCE_THUNDER, 1F, 1F);
 
                 Bukkit.getScheduler().runTaskLater(Practice.instance, ()-> {
@@ -80,13 +81,17 @@ public enum DeathAnimation {
                 }
 
                 game.playEffect(l, Effect.EXPLOSION_LARGE, null);
+
+                game.playSound(location, Sound.HURT_FLESH, 1F, 1F);
                 game.playSound(location, Sound.EXPLODE, 1F, 1F);
 
                 break;
             default:
                 if(velocity) {
-                    victim.setVelocity(new Vector(0, 0.6, 0));
+                    victim.setVelocity(new Vector(0, 0.5, 0));
                 }
+
+                game.playSound(location, Sound.HURT_FLESH, 1F, 1F);
                 game.playSound(location, Sound.FIREWORK_BLAST, 1F, 1F);
                 break;
         }

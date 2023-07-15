@@ -3,6 +3,7 @@ package camp.pvp.listeners.packets;
 import camp.pvp.Practice;
 import camp.pvp.cooldowns.PlayerCooldown;
 import camp.pvp.games.Game;
+import camp.pvp.games.GameParticipant;
 import camp.pvp.profiles.GameProfile;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
@@ -46,11 +47,16 @@ public class EnderpearlSound extends PacketAdapter {
             if (closest.getItemInHand().getType().equals(Material.ENDER_PEARL)) {
                 Game game = profile.getGame();
                 if(game != null && game.getState().equals(Game.State.ACTIVE)) {
-                    PlayerCooldown cooldown = game.getParticipants().get(closest.getUniqueId()).getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
-                    if(cooldown != null) {
-                        if(!cooldown.isExpired()) {
-                            e.setCancelled(true);
+                    GameParticipant participant = game.getParticipants().get(closest.getUniqueId());
+                    if(participant != null) {
+                        PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
+                        if(cooldown != null) {
+                            if(!cooldown.isExpired()) {
+                                e.setCancelled(true);
+                            }
                         }
+                    } else {
+                        e.setCancelled(true);
                     }
                 } else {
                     e.setCancelled(true);

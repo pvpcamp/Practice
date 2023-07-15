@@ -111,6 +111,7 @@ public class PartyCommand implements CommandExecutor {
                                 party.leave(player);
                                 return true;
                         }
+                        break;
                     case 2:
                         Player target = Bukkit.getPlayer(args[1]);
                         if(target != null) {

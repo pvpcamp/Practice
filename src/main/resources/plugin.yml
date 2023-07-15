@@ -12,6 +12,7 @@ commands:
   accept:
     description: Accepts a duel from a player or team.
   arena:
+    permission: practice.commands.arena
     description: Arena configuration utility.
   build:
     description: Toggles build mode for staff.
@@ -21,6 +22,7 @@ commands:
   event:
     description: Host an event.
   games:
+    permission: practice.commands.games
     description: Gets all active games.
   leaderboards:
     aliases: [leaderboard, lb, elo]
@@ -37,6 +39,7 @@ commands:
     description: Opens the post game inventory GUI.
   practiceutil:
     aliases: [putil, putils, pu]
+    permission: practice.commands.practiceutil
     description: General staff utility command.
   settings:
     aliases: [options]

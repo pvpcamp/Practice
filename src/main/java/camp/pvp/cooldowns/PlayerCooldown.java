@@ -88,7 +88,7 @@ public class PlayerCooldown {
 
     public String getBlockedMessage() {
         long seconds = TimeUnit.MILLISECONDS.toSeconds(getRemaining()) % 60;
-        return type.blockedMessage().replace("<time>", String.valueOf(seconds));
+        return type.blockedMessage().replace("<time>", String.valueOf(seconds + 1));
     }
 
     public void check() {

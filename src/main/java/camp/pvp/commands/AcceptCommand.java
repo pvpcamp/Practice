@@ -39,12 +39,16 @@ public class AcceptCommand implements CommandExecutor {
 
                     if (targetProfile.getGame() == null) {
                         DuelRequest duelRequest = profile.getDuelRequests().get(targetProfile.getUuid());
-                        if(duelRequest.isExpired()) {
-                            player.sendMessage(ChatColor.RED + "This duel request has expired.");
-                            return true;
-                        }
+                        if(duelRequest != null) {
+                            if (duelRequest.isExpired()) {
+                                player.sendMessage(ChatColor.RED + "This duel request has expired.");
+                                return true;
+                            }
 
-                        duelRequest.startGame();
+                            duelRequest.startGame();
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You do not have a duel request from this player.");
+                        }
                     } else {
                         player.sendMessage(ChatColor.RED + "The player you specified is in a game.");
                     }

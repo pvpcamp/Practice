@@ -53,7 +53,7 @@ public class SpectateCommand implements CommandExecutor {
 
                     game.spectateStart(player, target.getLocation());
                 } else if (uuid != null) {
-                    Game game = plugin.getGameManager().games.get(uuid);
+                    Game game = plugin.getGameManager().getGames().get(uuid);
                     if(game != null && game.getState().equals(Game.State.ACTIVE)) {
                         game.spectateStart(player, game.getAlivePlayers().get(0).getLocation());
                     } else {
@@ -65,6 +65,7 @@ public class SpectateCommand implements CommandExecutor {
             } else if(profile.getState().equals(GameProfile.State.LOBBY) || profile.getState().equals(GameProfile.State.LOBBY_PARTY)) {
                 List<Game> games = new ArrayList<>(plugin.getGameManager().getActiveGames());
                 if(!games.isEmpty()) {
+                    Collections.shuffle(games);
                     Game game = games.get(0);
                     game.spectateStartRandom(player);
 

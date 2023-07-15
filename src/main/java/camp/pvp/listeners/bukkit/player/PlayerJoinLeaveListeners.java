@@ -7,7 +7,11 @@ import camp.pvp.profiles.GameProfile;
 import camp.pvp.queue.GameQueue;
 import camp.pvp.utils.Colors;
 import com.lunarclient.bukkitapi.LunarClientAPI;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketModSettings;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketNotification;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketServerRule;
 import com.lunarclient.bukkitapi.nethandler.client.LCPacketTeammates;
+import com.lunarclient.bukkitapi.nethandler.client.obj.ServerRule;
 import com.lunarclient.bukkitapi.object.StaffModule;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -56,42 +60,57 @@ public class PlayerJoinLeaveListeners implements Listener {
         sb.append("\n ");
         player.sendMessage(Colors.get(sb.toString()));
 
+        LunarClientAPI lcApi = LunarClientAPI.getInstance();
+
         Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
             @Override
             public void run() {
                 GameProfile p = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-                if(player.isOnline() && p == null) {
-                    player.kickPlayer(ChatColor.RED + "There was an issue loading your profile, please reconnect.");
+                if (player.isOnline()) {
+                    if (p == null) {
+                        player.kickPlayer(ChatColor.RED + "There was an issue loading your profile, please reconnect.");
+                    }
+
+                    if (lcApi.isRunningLunarClient(player)) {
+                        player.sendMessage(Colors.get("&cReminder: &fWe have detected that you are using Lunar Client. To ensure your best experience on PvP Camp, please enable Lunar Client cooldowns."));
+                    }
                 }
             }
-        }, 40);
+        }, 20);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-        Game game = profile.getGame();
 
-        if(game != null) {
-            switch(profile.getState()) {
-                case SPECTATING:
-                    game.spectateEnd(player);
-                    break;
-                case IN_GAME:
-                    game.eliminate(player, true);
-                    break;
+        if(profile != null) {
+            Game game = profile.getGame();
+
+            if (game != null) {
+                switch (profile.getState()) {
+                    case SPECTATING:
+                        game.spectateEnd(player);
+                        break;
+                    case IN_GAME:
+                        game.eliminate(player, true);
+                        break;
+                }
             }
+
+            if (profile.getParty() != null) {
+                profile.getParty().leave(player);
+            }
+
+            if (profile.getTournament() != null) {
+                profile.getTournament().leave(player);
+            }
+
+            plugin.getGameQueueManager().removeFromQueue(player);
+
+            event.setQuitMessage(null);
+
+            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getGameProfileManager().exportToDatabase(player.getUniqueId(), true, false), 2);
         }
-
-        if(profile.getParty() != null) {
-            profile.getParty().leave(player);
-        }
-
-        profile.getDuelKitQueueStatistics().get(GameQueue.Type.UNRANKED).get(DuelKit.NO_DEBUFF).setWins(1);
-
-        event.setQuitMessage(null);
-
-        Bukkit.getScheduler().runTaskLater(plugin, ()-> plugin.getGameProfileManager().exportToDatabase(player.getUniqueId(), true, false), 2);
     }
 }

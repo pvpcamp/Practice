@@ -64,8 +64,8 @@ public abstract class Tournament {
             }
         } else {
             player.sendMessage(ChatColor.RED + "This tournament has already started.");
-            return null;
         }
+        return null;
     }
 
     public void leave(Player player) {

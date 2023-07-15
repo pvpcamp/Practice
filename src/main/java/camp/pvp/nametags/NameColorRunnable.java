@@ -26,12 +26,12 @@ public class NameColorRunnable implements Runnable{
 
     @Override
     public void run() {
-        for(GameProfile profile : plugin.getGameProfileManager().getLoadedProfiles().values()) {
-            Player player = profile.getPlayer();
-            if(player != null && player.isOnline()) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+            if (profile != null && player.isOnline()) {
                 Scoreboard scoreboard = player.getScoreboard();
-                for(Team team : scoreboard.getTeams()) {
-                    if(teams.contains(team.getName())) {
+                for (Team team : scoreboard.getTeams()) {
+                    if (teams.contains(team.getName())) {
                         List<String> entries = new ArrayList<>(team.getEntries());
                         for (String s : entries) {
                             team.removeEntry(s);
@@ -48,17 +48,17 @@ public class NameColorRunnable implements Runnable{
                 Team partyTeam = scoreboard.getTeam("party");
                 Team tournamentTeam = scoreboard.getTeam("tournament");
 
-                if(playingTeam == null) {
+                if (playingTeam == null) {
                     playingTeam = scoreboard.registerNewTeam("playing");
                     playingTeam.setPrefix(Colors.get("&e"));
                 }
 
-                if(enemyTeam == null) {
+                if (enemyTeam == null) {
                     enemyTeam = scoreboard.registerNewTeam("enemies");
                     enemyTeam.setPrefix(Colors.get("&c"));
                 }
 
-                if(blueTeam == null) {
+                if (blueTeam == null) {
                     blueTeam = scoreboard.registerNewTeam("blue");
                     blueTeam.setPrefix(Colors.get("&9[Blue] "));
                     blueTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
@@ -66,7 +66,7 @@ public class NameColorRunnable implements Runnable{
                     blueTeam.setCanSeeFriendlyInvisibles(true);
                 }
 
-                if(redTeam == null) {
+                if (redTeam == null) {
                     redTeam = scoreboard.registerNewTeam("red");
                     redTeam.setPrefix(Colors.get("&c[Red] "));
                     redTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
@@ -74,36 +74,36 @@ public class NameColorRunnable implements Runnable{
                     redTeam.setCanSeeFriendlyInvisibles(true);
                 }
 
-                if(spectatorTeam == null) {
+                if (spectatorTeam == null) {
                     spectatorTeam = scoreboard.registerNewTeam("spectators");
                     spectatorTeam.setPrefix(Colors.get("&7&o"));
                     spectatorTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
                     spectatorTeam.setCanSeeFriendlyInvisibles(true);
                 }
 
-                if(lobbyTeam == null) {
+                if (lobbyTeam == null) {
                     lobbyTeam = scoreboard.registerNewTeam("lobby");
                     lobbyTeam.setPrefix(Colors.get("&b"));
                 }
 
-                if(partyTeam == null) {
+                if (partyTeam == null) {
                     partyTeam = scoreboard.registerNewTeam("party");
                     partyTeam.setPrefix(Colors.get("&b[Party] &f"));
                 }
 
-                if(tournamentTeam == null) {
+                if (tournamentTeam == null) {
                     tournamentTeam = scoreboard.registerNewTeam("tournament");
                     tournamentTeam.setPrefix(Colors.get("&6&l* &r&6"));
                 }
 
                 if (profile.getGame() != null) {
-                    if(profile.getGame() instanceof TeamGame) {
+                    if (profile.getGame() instanceof TeamGame) {
                         TeamGame teamGame = (TeamGame) profile.getGame();
-                        for(GameParticipant p : teamGame.getBlue().getAliveParticipants().values()) {
+                        for (GameParticipant p : teamGame.getBlue().getAliveParticipants().values()) {
                             blueTeam.addEntry(p.getName());
                         }
 
-                        for(GameParticipant p : teamGame.getRed().getAliveParticipants().values()) {
+                        for (GameParticipant p : teamGame.getRed().getAliveParticipants().values()) {
                             redTeam.addEntry(p.getName());
                         }
                     } else {
@@ -122,10 +122,6 @@ public class NameColorRunnable implements Runnable{
 
                     for (Player p : profile.getGame().getSpectatorsPlayers()) {
                         spectatorTeam.addEntry(p.getName());
-                    }
-                } else {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        lobbyTeam.addEntry(p.getName());
                     }
                 }
             }
