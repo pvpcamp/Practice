@@ -8,6 +8,8 @@ import camp.pvp.interactables.impl.lobby.SettingsInteract;
 import camp.pvp.interactables.impl.party.*;
 import camp.pvp.interactables.impl.queue.LeaveQueueInteract;
 import camp.pvp.interactables.impl.queue.QueueInteract;
+import camp.pvp.interactables.impl.tournaments.TournamentLeaveInteract;
+import camp.pvp.interactables.impl.tournaments.TournamentStatusInteract;
 import camp.pvp.parties.Party;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.ItemBuilder;
@@ -20,6 +22,7 @@ public enum InteractableItems {
     QUEUE, PARTY_CREATE, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_TEAMS, PARTY_LEAVE, PARTY_SETTINGS,
+    TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
     STOP_SPECTATING;
 
     public InteractableItem getItem() {
@@ -60,6 +63,13 @@ public enum InteractableItems {
             case PARTY_SETTINGS:
                 return new InteractableItem(
                         new ItemBuilder(Material.PAPER, "&6Party Settings &7(Right Click)").create(), 7, new PartySettingsInteract());
+            // LOBBY_TOURNAMENT
+            case TOURNAMENT_STATUS:
+                return new InteractableItem(
+                        new ItemBuilder(Material.DIAMOND, "&6Tournament Status &7(Right Click)").create(), 0, new TournamentStatusInteract());
+            case TOURNAMENT_LEAVE:
+                return new InteractableItem(
+                        new ItemBuilder(Material.NETHER_STAR, "&6Leave Tournament &7(Right Click)").create(), 4, new TournamentLeaveInteract());
             // SPECTATING
             case STOP_SPECTATING:
                 return new InteractableItem(
@@ -96,6 +106,11 @@ public enum InteractableItems {
                 break;
             case LOBBY_QUEUE:
                 items.add(LEAVE_QUEUE);
+                break;
+            case LOBBY_TOURNAMENT:
+                items.add(TOURNAMENT_LEAVE);
+                items.add(TOURNAMENT_STATUS);
+                items.add(SETTINGS);
                 break;
             case SPECTATING:
                 items.add(STOP_SPECTATING);

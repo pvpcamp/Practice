@@ -32,16 +32,18 @@ public class GamesCommand implements CommandExecutor {
 
             player.sendMessage(Colors.get("&6&lActive Games &7(" + games.size() + ")"));
             for(Game game : games) {
-                TextComponent component = new TextComponent(Colors.get(
-                        "&6 ● Game ID: &f" + game.getUuid().toString()
-                        + "&7, &6Kit: " + game.getKit().getColor() + game.getKit().getDisplayName()
-                        + "&7, &6Arena: &f" + game.getArena().getDisplayName()
-                        + "&7, &6Alive: &f" + game.getAlive().size()
-                        + "&7, &6Spectating: &f" + game.getSpectators().size()
-                ));
-                component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/spectate " + game.getUuid().toString()));
-                component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + game.getUuid().toString()).create()));
-                player.spigot().sendMessage(component);
+                if(!game.getState().equals(Game.State.INACTIVE)) {
+                    TextComponent component = new TextComponent(Colors.get(
+                            "&6 ● Game ID: &f" + game.getUuid().toString()
+                                    + "&7, &6Kit: " + game.getKit().getColor() + game.getKit().getDisplayName()
+                                    + "&7, &6Arena: &f" + game.getArena().getDisplayName()
+                                    + "&7, &6Alive: &f" + game.getAlive().size()
+                                    + "&7, &6Spectating: &f" + game.getSpectators().size()
+                    ));
+                    component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/spectate " + game.getUuid().toString()));
+                    component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GRAY + game.getUuid().toString()).create()));
+                    player.spigot().sendMessage(component);
+                }
             }
         }
 

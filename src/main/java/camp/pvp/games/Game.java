@@ -255,6 +255,11 @@ public abstract class Game {
 
     public GameParticipant join(Player player) {
         GameProfile profile = plugin.getGameProfileManager().find(player.getUniqueId(), true);
+
+        if(profile.getGame() != null) {
+            profile.getGame().leave(player);
+        }
+
         profile.setGame(this);
         profile.getDuelRequests().clear();
         plugin.getGameQueueManager().removeFromQueue(player);

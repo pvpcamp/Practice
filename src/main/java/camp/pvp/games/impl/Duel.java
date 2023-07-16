@@ -328,6 +328,11 @@ public class Duel extends Game {
     @Override
     public void eliminate(Player player, boolean leftGame) {
         super.eliminate(player, leftGame);
+
+        if(getTournament() != null) {
+            getTournament().eliminate(player, leftGame);
+        }
+
         if(this.getAlive().size() < 2) {
             this.end();
         }

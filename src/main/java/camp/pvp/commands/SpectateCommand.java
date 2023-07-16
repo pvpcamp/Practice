@@ -31,7 +31,7 @@ public class SpectateCommand implements CommandExecutor {
             Player player = (Player) sender;
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
             if(args.length > 0) {
-                if(!profile.getState().equals(GameProfile.State.LOBBY)) {
+                if(!profile.getState().equals(GameProfile.State.LOBBY) && !profile.getState().equals(GameProfile.State.LOBBY_TOURNAMENT)) {
                     player.sendMessage(ChatColor.RED + "You cannot spectate a game right now.");
                     return true;
                 }
@@ -54,7 +54,7 @@ public class SpectateCommand implements CommandExecutor {
                     game.spectateStart(player, target.getLocation());
                 } else if (uuid != null) {
                     Game game = plugin.getGameManager().getGames().get(uuid);
-                    if(game != null && game.getState().equals(Game.State.ACTIVE)) {
+                    if(game != null && !game.getState().equals(Game.State.ENDED)) {
                         game.spectateStart(player, game.getAlivePlayers().get(0).getLocation());
                     } else {
                         player.sendMessage(ChatColor.RED + "The game ID you specified is invalid.");

@@ -1,15 +1,26 @@
 package camp.pvp.commands;
 
 import camp.pvp.Practice;
+import camp.pvp.games.Game;
+import camp.pvp.games.GameParticipant;
+import camp.pvp.games.impl.Duel;
 import camp.pvp.games.tournaments.Tournament;
+import camp.pvp.kits.DuelKit;
 import camp.pvp.profiles.GameProfile;
 import camp.pvp.utils.Colors;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TournamentCommand implements CommandExecutor {
 
@@ -64,12 +75,36 @@ public class TournamentCommand implements CommandExecutor {
                                     sb.append("\n&6Round: &f" + tournament.getCurrentRound());
                                     sb.append("\n&6Players Left: &f" + tournament.getAlive().size());
                                     sb.append("\n&6Active Games: &f" + tournament.getActiveGames().size());
-                                    break;
+                                    sb.append("\n ");
+                                    player.sendMessage(Colors.get(sb.toString()));
+                                    for(Game game : tournament.getActiveGames()) {
+                                        if(game instanceof Duel) {
+                                            Duel duel = (Duel) game;
+                                            List<GameParticipant> participants = new ArrayList<>(duel.getParticipants().values());
+                                            String match = "&f" + participants.get(0).getName()+ " &cvs. &f" + participants.get(1).getName();
+                                            TextComponent msg = new TextComponent(Colors.get(match));
+                                            msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/spectate " + duel.getUuid().toString()));
+                                            msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Colors.get("&aClick to spectate " + match)).create()));
+                                            player.spigot().sendMessage(msg);
+                                        }
+                                    }
+                                    return true;
                             }
 
                             player.sendMessage(Colors.get(sb.toString()));
                         } else {
                             player.sendMessage(ChatColor.RED + "There is not a tournament active at this time.");
+                        }
+                        return true;
+                    case "host":
+                        if(player.hasPermission("practice.events.host.tournament")) {
+                            if(plugin.getGameManager().getTournament() == null || plugin.getGameManager().getTournament().getState().equals(Tournament.State.ENDED)) {
+                                tournament = new Tournament(plugin, DuelKit.NO_DEBUFF, 1, 64);
+                                plugin.getGameManager().setTournament(tournament);
+                                tournament.start();
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "No permission.");
                         }
                         return true;
                 }

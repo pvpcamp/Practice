@@ -117,6 +117,8 @@ public class GameProfile {
             } else {
                 return State.SPECTATING;
             }
+        } else if(tournament != null) {
+            return State.LOBBY_TOURNAMENT;
         } else if(Practice.instance.getGameQueueManager().getQueue(uuid) != null) {
             return State.LOBBY_QUEUE;
         } else if(editingKit != null){
@@ -138,6 +140,24 @@ public class GameProfile {
                 InteractableItem ii = i.getItem();
                 pi.setItem(ii.getSlot(), ii.getItem().clone());
             }
+
+            int slot = 0;
+            switch(this.getState()) {
+                case LOBBY_TOURNAMENT:
+                case LOBBY:
+                    slot = 1;
+                    break;
+                case LOBBY_PARTY:
+                    slot = 2;
+                    break;
+                case SPECTATING:
+                case IN_GAME:
+                case LOBBY_QUEUE:
+                    slot = 0;
+                    break;
+            }
+
+            player.getInventory().setHeldItemSlot(slot);
 
             if(game != null && game.getAlive().get(this.getUuid()) != null) {
                 DuelKit kit = game.getKit();
@@ -174,6 +194,7 @@ public class GameProfile {
             switch(state) {
                 case LOBBY_QUEUE:
                 case LOBBY_PARTY:
+                case LOBBY_TOURNAMENT:
                 case LOBBY:
                     if(player.hasPermission("practice.lobby.fly")) {
                         player.setAllowFlight(true);
