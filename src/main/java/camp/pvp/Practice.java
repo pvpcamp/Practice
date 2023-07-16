@@ -153,6 +153,7 @@ public class Practice extends JavaPlugin {
 
         new FoodLevelChangeListener(this);
 //        new PlayerBucketEmptyListener(this);
+        new PlayerCommandPreprocessListener(this);
         new PlayerDeathListener(this);
         new PlayerDropItemListener(this);
         new PlayerInteractEntityListener(this);

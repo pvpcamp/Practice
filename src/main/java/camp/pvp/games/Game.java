@@ -220,15 +220,15 @@ public abstract class Game {
                         switch ((int) participant.getCurrentCombo()) {
                             case 5:
                                 attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
-                                attacker.sendMessage(Colors.get("&a5 Hit Combo!"));
+                                attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
                                 break;
                             case 10:
                                 attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
-                                attacker.sendMessage(Colors.get("&6&o10 HIT COMBO!"));
+                                attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
                                 break;
                             case 20:
                                 attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
-                                attacker.sendMessage(Colors.get("&4&l&o20 HIT COMBO!!!"));
+                                attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
                                 break;
                         }
                     }

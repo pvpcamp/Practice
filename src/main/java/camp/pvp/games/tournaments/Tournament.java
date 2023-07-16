@@ -20,7 +20,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.*;
 
 @Getter @Setter
-public abstract class Tournament {
+public class Tournament {
 
     public enum State {
         INACTIVE, STARTING, NEXT_ROUND_STARTING, IN_GAME, ENDED;
@@ -57,6 +57,8 @@ public abstract class Tournament {
                 profile.setTournament(this);
                 profile.givePlayerItems();
 
+                announce(player.getName() + "&a joined the tournament. &7(" + this.getTournamentParticipants().size() + "/" + this.getMaxPlayers() + ")");
+
                 this.getTournamentParticipants().put(player.getUniqueId(), participant);
                 return participant;
             } else {
@@ -76,7 +78,7 @@ public abstract class Tournament {
                 case STARTING:
                     player.sendMessage(ChatColor.GREEN + "You have left the tournament.");
                     this.getTournamentParticipants().remove(player.getUniqueId());
-                    announce(player.getName() + "&a left the tournament. &7(" + this.getTournamentParticipants().size() + ")");
+                    announce(player.getName() + "&a left the tournament. &7(" + this.getTournamentParticipants().size() + "/" + this.getMaxPlayers() + ")");
                     GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
                     profile.setTournament(null);
                     profile.playerUpdate();
@@ -110,7 +112,23 @@ public abstract class Tournament {
     }
 
     public void start() {
+        startingTimer = Bukkit.getScheduler().runTaskTimer(plugin, new BukkitRunnable() {
+            int i = 120;
+            @Override
+            public void run() {
+                List<Integer> times = Arrays.asList(120, 90, 60, 30, 15, 10, 5,4,3,2,1);
+                if(i == 0) {
+                    nextRound();
+                    this.cancel();
+                    return;
+                }
 
+                if(times.contains(i)) {
+                    announce("&eTournament starting in " + i + "second(s).");
+                }
+                i--;
+            }
+        }, 10, 10);
     }
 
     public void nextRound() {
@@ -130,9 +148,9 @@ public abstract class Tournament {
                         duel.setKit(duelKit);
 
                         match = new TournamentMatch(duel, participantOne, participantTwo);
+                        this.getQueuedGames().add(match);
                 }
             }
-
         }
 
         roundStartingTimer = Bukkit.getScheduler().runTaskTimer(plugin, new BukkitRunnable() {
@@ -141,7 +159,6 @@ public abstract class Tournament {
             public void run() {
                 List<Integer> times = Arrays.asList(30, 15, 10, 5,4,3,2,1);
                 if(i == 0) {
-                    announce("&eRound " + currentRound + " has started!");
                     startGames();
                     this.cancel();
                     return;
@@ -160,11 +177,20 @@ public abstract class Tournament {
             match.startGame();
         }
 
+        announce("&eRound " + currentRound + " has started!");
+
         getQueuedGames().clear();
     }
 
     public void end() {
+        TournamentParticipant participant = this.getAlive().get(0);
 
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n");
+        sb.append("\n&6&l" + duelKit.getDisplayName() + " Tournament");
+        sb.append("\n&6Winner: &f" + participant.getName());
+        sb.append("\n");
+        announceAll(sb.toString());
     }
 
     public List<Game> getActiveGames() {
@@ -202,7 +228,7 @@ public abstract class Tournament {
 
     public void announce(String s) {
         for(Player player : getAllPlayers()) {
-            player.sendMessage(Colors.get("&6[Tournament] &f"));
+            player.sendMessage(Colors.get("&6[Tournament] &f" + s));
         }
     }
 
@@ -219,7 +245,7 @@ public abstract class Tournament {
     public void staffAnnounce(String s) {
         for(Player player : getAllPlayers()) {
             if(player.hasPermission("practice.staff")) {
-                player.sendMessage(Colors.get("&6&l[Tournament STAFF] &f"));
+                player.sendMessage(Colors.get("&6&l[Tournament STAFF] &f" + s));
             }
         }
     }

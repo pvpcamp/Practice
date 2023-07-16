@@ -31,8 +31,8 @@ public class PingCommand implements CommandExecutor {
                     int targetPing = PlayerUtils.getPing(target);
                     int difference = targetPing - ping;
                     StringBuilder sb = new StringBuilder();
-                    sb.append("&aYour Ping: &f" + ping + " ms");
-                    sb.append("\n&6" + target.getName() + "'s Ping: &f" + targetPing);
+                    sb.append("&eYour Ping: &f" + ping + " ms");
+                    sb.append("\n&a" + target.getName() + "'s Ping: &f" + targetPing + " ms");
                     sb.append("\n&6Difference: &f" + (difference > 0 ? "+" + difference : difference) + " ms");
 
                     player.sendMessage(Colors.get(sb.toString()));

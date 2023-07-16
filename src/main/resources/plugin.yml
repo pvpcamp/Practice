@@ -49,3 +49,5 @@ commands:
     description: Spectate a game.
   stats:
     description: View the statistics of yourself or another player.
+  tournament:
+    description: Join, leave, or host a tournament.

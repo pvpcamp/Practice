@@ -363,9 +363,9 @@ public class Duel extends Game {
                     if(difference == 0) {
                         lines.add("&7First to 100.");
                     } else if(difference > 0){
-                        lines.add(" &e● +" + difference + " Hits");
+                        lines.add(" &e+" + difference + " Hits");
                     } else {
-                        lines.add(" &c● " + difference + " Hits");
+                        lines.add(" &c" + difference + " Hits");
                     }
 
                     lines.add(" ");

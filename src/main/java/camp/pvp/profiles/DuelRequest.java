@@ -47,10 +47,20 @@ public class DuelRequest {
             senderPlayer.sendMessage(ChatColor.GREEN + "You sent a duel request to " + opponentPlayer.getName() + ".");
 
 
-            TextComponent msg = new TextComponent(Colors.get("&aYou received a duel request from " + senderPlayer.getName() + ", click to accept."));
+            StringBuilder sb = new StringBuilder();
+            sb.append("\n&6&lNew Duel Request\n");
+            sb.append("\n &7● &6From: &f" + senderPlayer.getName());
+            sb.append("\n &7● &6Kit: &f" + kit.getColor() + kit.getDisplayName());
+            sb.append("\n &7● &6Arena: &f" + (arena == null ? "Random" : arena.getDisplayName()));
+            sb.append("\n");
+            opponentPlayer.sendMessage(Colors.get(sb.toString()));
+
+            TextComponent msg = new TextComponent(Colors.get("&6[Click to accept this duel]"));
             msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/accept " + senderPlayer.getName()));
             msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Colors.get("&a/accept " + senderPlayer.getName())).create()));
             opponentPlayer.spigot().sendMessage(msg);
+
+            opponentPlayer.sendMessage(" ");
         }
     }
 
