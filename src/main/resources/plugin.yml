@@ -1,4 +1,4 @@
-main: camp.pvp.Practice
+main: camp.pvp.practice.Practice
 name: Practice
 version: ${plugin.desc}
 author: leuo
