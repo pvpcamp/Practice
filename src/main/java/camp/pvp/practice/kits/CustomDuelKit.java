@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +67,13 @@ public class CustomDuelKit {
 
         PlayerUtils.reset(player);
 
+        for(PotionEffect effect : gi.getPotionEffects()) {
+            player.addPotionEffect(effect);
+        }
+
         pi.setArmorContents(gi.getArmor());
         pi.setContents(this.items);
+
+
     }
 }

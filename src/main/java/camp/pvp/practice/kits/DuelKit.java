@@ -397,7 +397,8 @@ public enum DuelKit {
                 inv[9] = new ItemStack(Material.ARROW, 12);
                 break;
             case SUMO:
-                inventory.getPotionEffects().add(new PotionEffect(PotionEffectType.JUMP, 99999, 245));
+                PotionEffect jump = new PotionEffect(PotionEffectType.JUMP, 99999, 245, true, false);
+                inventory.getPotionEffects().add(jump);
                 break;
             case BOXING:
                 inv[0] = new ItemStack(Material.DIAMOND_SWORD);

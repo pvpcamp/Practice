@@ -36,7 +36,7 @@ public class GameQueueManager {
 
             DuelKit kit = gameQueue.getDuelKit();
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-            profile.givePlayerItems();
+            profile.playerUpdate(false);
             player.sendMessage(ChatColor.GREEN + "You have joined the queue for " + gameQueue.getType().name().toLowerCase() + " " + kit.getColor() + kit.getDisplayName() + ChatColor.GREEN + ".");
 
             return gqm;
@@ -58,7 +58,7 @@ public class GameQueueManager {
             Player player = gqm.getPlayer();
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
             player.sendMessage(ChatColor.RED + "You have left the queue.");
-            profile.givePlayerItems();
+            profile.playerUpdate(false);
         }
         return false;
     }
