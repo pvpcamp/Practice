@@ -91,7 +91,7 @@ public class GameQueue {
 
         for(GameQueueMember gqm : queueMembers) {
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(gqm.getUuid());
-            profile.playerUpdate();
+            profile.playerUpdate(true);
         }
 
         plugin.getGameQueueManager().removeQueue(this);

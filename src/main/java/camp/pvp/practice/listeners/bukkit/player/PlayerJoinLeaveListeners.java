@@ -39,7 +39,7 @@ public class PlayerJoinLeaveListeners implements Listener {
         }
 
         profile.setName(player.getName());
-        profile.playerUpdate();
+        profile.playerUpdate(true);
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 

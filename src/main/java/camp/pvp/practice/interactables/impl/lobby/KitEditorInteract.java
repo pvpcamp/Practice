@@ -25,7 +25,7 @@ public class KitEditorInteract implements ItemInteract {
                     @Override
                     public void run(Player player, Gui gui) {
                         gameProfile.setEditingKit(kit);
-                        gameProfile.playerUpdate();
+                        gameProfile.playerUpdate(true);
                         kit.apply(player);
                         player.getInventory().setArmorContents(null);
                     }

@@ -1,4 +1,4 @@
-package camp.pvp.practice.interactables.impl.lobby;
+package camp.pvp.practice.interactables.impl.party;
 
 import camp.pvp.practice.interactables.ItemInteract;
 import camp.pvp.practice.parties.Party;

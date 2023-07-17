@@ -57,6 +57,7 @@ public class SidebarAdapter implements AssembleAdapter {
                     if(profile.isDebugMode()) {
                         lines.add(" ");
                         lines.add("&6Debug:");
+                        lines.add(" &6&oVersion: &f" + plugin.getDescription().getVersion());
                         lines.add(" &6&oBuild mode: &f" + profile.isBuildMode());
                         lines.add(" &6&oLC Players: &f" + plugin.getLunarClientAPI().getPlayersRunningLunarClient().size() + "/" + online);
                     }
@@ -120,7 +121,6 @@ public class SidebarAdapter implements AssembleAdapter {
             }
 
             lines.add(" ");
-            lines.add("&8&oBuild: " + plugin.getDescription().getVersion());
             lines.add("&6pvp.camp");
             lines.add("&7&m------------------");
         }

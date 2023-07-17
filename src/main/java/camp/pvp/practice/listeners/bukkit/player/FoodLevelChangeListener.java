@@ -28,6 +28,10 @@ public class FoodLevelChangeListener implements Listener {
                         event.setCancelled(true);
                     }
                 }
+
+                if(game.getSpectators().get(player.getUniqueId()) != null) {
+                    event.setCancelled(true);
+                }
             } else {
                 event.setCancelled(true);
             }

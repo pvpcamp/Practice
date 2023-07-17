@@ -120,6 +120,10 @@ public class GameProfileManager {
     }
 
     public void shutdown() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            exportToDatabase(player.getUniqueId(), false, false);
+        }
 
+        plugin.getLogger().info("All player profiles have been exported to the database.");
     }
 }

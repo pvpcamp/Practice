@@ -178,7 +178,7 @@ public class GameProfile {
         }
     }
 
-    public void playerUpdate() {
+    public void playerUpdate(boolean updateLocation) {
         Player player = getPlayer();
         if(player != null) {
             updatePlayerVisibility();
@@ -186,15 +186,17 @@ public class GameProfile {
 //            setEditing(null);
 //            setRenaming(null);
 
+            player.setPlayerTime(this.getTime().getTime(), false);
+
             Location location = null;
             State state = getState();
             boolean check = false;
-            switch(state) {
+            switch (state) {
                 case LOBBY_QUEUE:
                 case LOBBY_PARTY:
                 case LOBBY_TOURNAMENT:
                 case LOBBY:
-                    if(player.hasPermission("practice.lobby.fly")) {
+                    if (player.hasPermission("practice.lobby.fly")) {
                         player.setAllowFlight(true);
                     }
                     location = Practice.instance.getLobbyLocation();
@@ -206,22 +208,64 @@ public class GameProfile {
                     break;
             }
 
-            player.setPlayerTime(time.getTime(), false);
-
-            if(check) {
-                if(location == null) {
-                    player.sendMessage(ChatColor.RED + "Location for " + getState().toString().toLowerCase() + " could not be found.");
-                } else {
-                    player.teleport(location);
+            if(updateLocation) {
+                if (check) {
+                    if (location == null) {
+                        player.sendMessage(ChatColor.RED + "Location for " + getState().toString().toLowerCase() + " could not be found.");
+                    } else {
+                        player.teleport(location);
+                    }
                 }
             }
         }
+
     }
+
+//    public void playerUpdate() {
+//        Player player = getPlayer();
+//        if(player != null) {
+//            updatePlayerVisibility();
+//            givePlayerItems();
+//            setEditing(null);
+//            setRenaming(null);
+//
+//            Location location = null;
+//            State state = getState();
+//            boolean check = false;
+//            switch(state) {
+//                case LOBBY_QUEUE:
+//                case LOBBY_PARTY:
+//                case LOBBY_TOURNAMENT:
+//                case LOBBY:
+//                    if(player.hasPermission("practice.lobby.fly")) {
+//                        player.setAllowFlight(true);
+//                    }
+//                    location = Practice.instance.getLobbyLocation();
+//                    check = true;
+//                    break;
+//                case KIT_EDITOR:
+//                    location = Practice.instance.getKitEditorLocation();
+//                    check = true;
+//                    break;
+//            }
+//
+//            player.setPlayerTime(time.getTime(), false);
+//
+//            if(check) {
+//                if(location == null) {
+//                    player.sendMessage(ChatColor.RED + "Location for " + getState().toString().toLowerCase() + " could not be found.");
+//                } else {
+//                    player.teleport(location);
+//                }
+//            }
+//        }
+//    }
 
     public void updatePlayerVisibility() {
         Player player = getPlayer();
         GameProfileManager gpm = Practice.instance.getGameProfileManager();
         if(player != null) {
+
             if(game != null) {
                 if(game.getCurrentPlaying().contains(player)) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
@@ -253,7 +297,7 @@ public class GameProfile {
             } else {
                 for(Player p : Bukkit.getOnlinePlayers()) {
                     GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
-                    if((profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) || !this.isLobbyVisibility()) {
+                    if((profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) || !this.isLobbyVisibility() || this.getState().equals(State.KIT_EDITOR)) {
                         if(player.canSee(p)) {
                             player.hidePlayer(p);
                         }
@@ -329,7 +373,7 @@ public class GameProfile {
         values.put("debug_mode", debugMode);
         values.put("spectator_visibility", spectatorVisibility);
         values.put("lobby_visibility", lobbyVisibility);
-        values.put("death_animation", deathAnimation);
+        values.put("death_animation", deathAnimation.name());
         values.put("combo_messages", comboMessages);
 
         // Convert CustomDuelKits to serialized form for DB storage.

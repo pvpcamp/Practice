@@ -36,7 +36,7 @@ public class Party {
         this.members.put(member.getUuid(), member);
 
         profile.setParty(this);
-        profile.givePlayerItems();
+        profile.playerUpdate(false);
 
         this.announce("&3[Party] &f" + player.getName() + " &3has joined the party.");
 
@@ -49,7 +49,7 @@ public class Party {
 
         profile.setParty(null);
         if(profile.getState().equals(GameProfile.State.LOBBY)) {
-            profile.givePlayerItems();
+            profile.playerUpdate(false);
         }
 
         this.announce("&3[Party] &f" + player.getName() + " &3has left the party.");

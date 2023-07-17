@@ -56,12 +56,12 @@ public class DuelRequest {
             opponentPlayer.sendMessage(Colors.get(sb.toString()));
 
             TextComponent msg = new TextComponent(Colors.get("&6[Click to accept this duel]"));
-            TextComponent spacer = new TextComponent("\n ");
 
             msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/accept " + senderPlayer.getName()));
             msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Colors.get("&a/accept " + senderPlayer.getName())).create()));
 
-            opponentPlayer.spigot().sendMessage(msg, spacer);
+            opponentPlayer.spigot().sendMessage(msg);
+            opponentPlayer.sendMessage(" ");
 
         }
     }

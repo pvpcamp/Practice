@@ -87,7 +87,7 @@ public class Tournament {
 
                     GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
                     profile.setTournament(null);
-                    profile.playerUpdate();
+                    profile.playerUpdate(false);
 
                     this.getTournamentParticipants().remove(player.getUniqueId());
                     break;
@@ -104,9 +104,13 @@ public class Tournament {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         if(participant != null) {
             participant.setEliminated(true);
-            announce(player.getName() + "&a has been eliminated. &7(" + this.getAlive().size() + "/" + this.getTournamentParticipants().size() + ")");
+            announceAll(player.getName() + "&a has been eliminated. &7(" + this.getAlive().size() + "/" + this.getTournamentParticipants().size() + ")");
 
             profile.setTournament(null);
+
+            if(!profile.getState().equals(GameProfile.State.IN_GAME)) {
+                profile.playerUpdate(false);
+            }
 
             Bukkit.getScheduler().runTaskLater(plugin, ()-> {
                 if (this.getAlive().size() < 2) {
@@ -131,20 +135,7 @@ public class Tournament {
             public void run() {
                 List<Integer> times = Arrays.asList(120, 105, 90, 75, 60, 30, 15, 5);
                 if(timer == 0) {
-                    if(Tournament.this.getTournamentParticipants().size() > 1) {
-                        nextRound();
-                    } else {
-                        announce("&cNot enough players joined the tournament, cancelling.");
-                        for(TournamentParticipant p : Tournament.this.getTournamentParticipants().values()) {
-                            GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(p.getUuid());
-                            profile.setTournament(null);
-                            profile.playerUpdate();
-                        }
-
-                        setState(State.ENDED);
-
-                        Tournament.this.getTournamentParticipants().clear();
-                    }
+                    nextRound();
 
                     startingTimer.cancel();
                 } else {
@@ -167,7 +158,7 @@ public class Tournament {
                 for(TournamentParticipant p : Tournament.this.getTournamentParticipants().values()) {
                     GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(p.getUuid());
                     profile.setTournament(null);
-                    profile.playerUpdate();
+                    profile.playerUpdate(true);
 
                     setState(State.ENDED);
                 }
@@ -236,7 +227,7 @@ public class Tournament {
 
         setState(State.IN_GAME);
 
-        announce("&eRound " + currentRound + " has started!");
+        announceAll("&eRound " + currentRound + " has started!");
 
         getQueuedGames().clear();
     }
@@ -387,13 +378,13 @@ public class Tournament {
                 player.sendMessage(Colors.get(sb.toString()));
 
                 TextComponent msg = new TextComponent(Colors.get("&6[Click to join]"));
-                TextComponent spacer = new TextComponent("\n ");
 
                 msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tournament join "));
                 msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Colors.get("&aClick to join the tournament!")).create()));
 
 
-                player.spigot().sendMessage(msg, spacer);
+                player.spigot().sendMessage(msg);
+                player.sendMessage(" ");
             }
         }
     }

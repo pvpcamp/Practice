@@ -1,13 +1,14 @@
 package camp.pvp.practice.interactables;
 
 import camp.pvp.practice.interactables.impl.game.StopSpectatingInteract;
+import camp.pvp.practice.interactables.impl.lobby.HostEventInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentLeaveInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentStatusInteract;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.interactables.impl.lobby.KitEditorInteract;
-import camp.pvp.practice.interactables.impl.lobby.PartyCreateInteract;
+import camp.pvp.practice.interactables.impl.party.PartyCreateInteract;
 import camp.pvp.practice.interactables.impl.lobby.SettingsInteract;
 import camp.pvp.practice.interactables.impl.queue.LeaveQueueInteract;
 import camp.pvp.practice.interactables.impl.queue.QueueInteract;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum InteractableItems {
-    QUEUE, PARTY_CREATE, KIT_EDITOR, SETTINGS,
+    QUEUE, HOST_EVENT, PARTY_CREATE, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_TEAMS, PARTY_LEAVE, PARTY_SETTINGS,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
@@ -30,6 +31,9 @@ public enum InteractableItems {
             case QUEUE:
                 return new InteractableItem(
                         new ItemBuilder(Material.DIAMOND_SWORD, "&6Join a Queue &7(Right Click)").create(), 0, new QueueInteract());
+            case HOST_EVENT:
+                return new InteractableItem(
+                        new ItemBuilder(Material.IRON_AXE, "&6Host an Event &7(Right Click)").create(), 1, new HostEventInteract());
             case PARTY_CREATE:
                 return new InteractableItem(
                         new ItemBuilder(Material.NETHER_STAR, "&6Create a Party &7(Right Click)").create(), 4, new PartyCreateInteract());
@@ -83,6 +87,7 @@ public enum InteractableItems {
         switch(profile.getState()) {
             case LOBBY:
                 items.add(QUEUE);
+                items.add(HOST_EVENT);
                 items.add(PARTY_CREATE);
                 items.add(KIT_EDITOR);
                 items.add(SETTINGS);

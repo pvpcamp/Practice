@@ -238,7 +238,7 @@ public class PlayerInteractListener implements Listener {
                         case WALL_SIGN:
                             profile.setEditingKit(null);
                             profile.setEditingCustomKit(null);
-                            profile.playerUpdate();
+                            profile.playerUpdate(true);
                             break;
                     }
                 }

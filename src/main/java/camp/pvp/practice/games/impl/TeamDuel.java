@@ -126,7 +126,7 @@ public class TeamDuel extends TeamGame {
                 GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
                 p.sendMessage(ChatColor.RED + "There are no arenas currently available for the ladder selected. Please notify a staff member.");
                 profile.setGame(null);
-                profile.playerUpdate();
+                profile.playerUpdate(true);
             }
             return;
         }
@@ -301,7 +301,7 @@ public class TeamDuel extends TeamGame {
                         participant.clearCooldowns();
 
                         profile.setGame(null);
-                        profile.playerUpdate();
+                        profile.playerUpdate(true);
                     }
                 }
             }

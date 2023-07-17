@@ -43,7 +43,7 @@ public class PracticeUtilCommand implements CommandExecutor {
                         player.sendMessage(ChatColor.GREEN + "The kit editor has been set to your current location.");
                         return true;
                     case "reset":
-                        profile.playerUpdate();
+                        profile.playerUpdate(true);
                         return true;
                     case "staffmodules":
                         LunarClientAPI lcApi = plugin.getLunarClientAPI();

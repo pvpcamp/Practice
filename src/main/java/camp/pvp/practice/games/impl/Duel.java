@@ -58,7 +58,7 @@ public class Duel extends Game {
                 GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
                 p.sendMessage(ChatColor.RED + "There are no arenas currently available for the ladder selected. Please notify a staff member.");
                 profile.setGame(null);
-                profile.playerUpdate();
+                profile.playerUpdate(true);
             }
             return;
         }
@@ -160,7 +160,7 @@ public class Duel extends Game {
                 GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
                 p.sendMessage(ChatColor.RED + "The arena " + arena.getName() + " does not have valid spawn points, please notify a staff member.");
                 profile.setGame(null);
-                profile.playerUpdate();
+                profile.playerUpdate(true);
             }
         }
     }
@@ -293,7 +293,7 @@ public class Duel extends Game {
                         }
 
                         profile.setGame(null);
-                        profile.playerUpdate();
+                        profile.playerUpdate(true);
                     }
                 }
             }

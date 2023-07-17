@@ -95,7 +95,7 @@ public abstract class Game {
                     participant.clearCooldowns();
 
                     profile.setGame(null);
-                    profile.playerUpdate();
+                    profile.playerUpdate(true);
                 }
             }
         }
@@ -328,7 +328,7 @@ public abstract class Game {
         this.getSpectators().remove(player.getUniqueId());
 
         profile.setGame(null);
-        profile.playerUpdate();
+        profile.playerUpdate(true);
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
         updateEntities();
