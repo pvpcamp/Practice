@@ -45,13 +45,6 @@ public class PlayerJoinLeaveListeners implements Listener {
 
         event.setJoinMessage(null);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(" ");
-        sb.append("\n&6Welcome to &6&lPvP Camp&r&6!");
-        sb.append("\n&7&oWe are currently in development, please report any bugs to the developers.");
-        sb.append("\n ");
-        player.sendMessage(Colors.get(sb.toString()));
-
         LunarClientAPI lcApi = LunarClientAPI.getInstance();
 
         Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
