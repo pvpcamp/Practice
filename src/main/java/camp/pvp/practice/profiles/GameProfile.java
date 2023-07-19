@@ -221,46 +221,6 @@ public class GameProfile {
 
     }
 
-//    public void playerUpdate() {
-//        Player player = getPlayer();
-//        if(player != null) {
-//            updatePlayerVisibility();
-//            givePlayerItems();
-//            setEditing(null);
-//            setRenaming(null);
-//
-//            Location location = null;
-//            State state = getState();
-//            boolean check = false;
-//            switch(state) {
-//                case LOBBY_QUEUE:
-//                case LOBBY_PARTY:
-//                case LOBBY_TOURNAMENT:
-//                case LOBBY:
-//                    if(player.hasPermission("practice.lobby.fly")) {
-//                        player.setAllowFlight(true);
-//                    }
-//                    location = Practice.instance.getLobbyLocation();
-//                    check = true;
-//                    break;
-//                case KIT_EDITOR:
-//                    location = Practice.instance.getKitEditorLocation();
-//                    check = true;
-//                    break;
-//            }
-//
-//            player.setPlayerTime(time.getTime(), false);
-//
-//            if(check) {
-//                if(location == null) {
-//                    player.sendMessage(ChatColor.RED + "Location for " + getState().toString().toLowerCase() + " could not be found.");
-//                } else {
-//                    player.teleport(location);
-//                }
-//            }
-//        }
-//    }
-
     public void updatePlayerVisibility() {
         Player player = getPlayer();
         GameProfileManager gpm = Practice.instance.getGameProfileManager();

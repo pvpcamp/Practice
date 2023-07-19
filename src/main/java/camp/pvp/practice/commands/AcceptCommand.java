@@ -21,7 +21,7 @@ public class AcceptCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(sender instanceof Player) {
+        if(sender instanceof Player && args.length > 0) {
             Player player = (Player) sender;
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
@@ -54,6 +54,8 @@ public class AcceptCommand implements CommandExecutor {
             } else {
                 player.sendMessage(ChatColor.RED + "You cannot duel someone right now.");
             }
+        } else {
+            sender.sendMessage(ChatColor.RED + "Usage: /accept <player>");
         }
 
         return true;
