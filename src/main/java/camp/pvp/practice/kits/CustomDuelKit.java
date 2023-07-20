@@ -1,8 +1,12 @@
 package camp.pvp.practice.kits;
 
 import camp.pvp.practice.games.GameInventory;
-import camp.pvp.practice.utils.ItemUtils;
 import camp.pvp.practice.utils.PlayerUtils;
+import camp.pvp.practice.utils.items.ItemStackDeserializer;
+import camp.pvp.practice.utils.items.ItemStackSerializer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
@@ -35,24 +39,34 @@ public class CustomDuelKit {
     }
 
     public void importFromMap(Map<String, Object> map) {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(ItemStack.class, new ItemStackSerializer())
+                .registerTypeAdapter(ItemStack.class, new ItemStackDeserializer())
+                .create();
+
         this.name = (String) map.get("name");
 
-        for(Map.Entry<String, Object> entry : ((Map<String, Object>) map.get("items")).entrySet()) {
+        for(Map.Entry<String, String> entry : ((Map<String, String>) map.get("items")).entrySet()) {
             int i = Integer.parseInt(entry.getKey());
-            items[i] = ItemUtils.convert((String) entry.getValue());
+            items[i] = gson.fromJson(entry.getValue(), ItemStack.class);
         }
     }
 
     public Map<String, Object> exportItems() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(ItemStack.class, new ItemStackSerializer())
+                .registerTypeAdapter(ItemStack.class, new ItemStackDeserializer())
+                .create();
+
         Map<String, Object> map = new HashMap<>();
 
-        map.put("name", getName());
+        map.put("name", this.getName());
 
         Map<String, String> items = new HashMap<>();
         for(int x = 0; x < 36; x++) {
             ItemStack i = getItems()[x];
             if(i != null && !i.getType().equals(Material.AIR)) {
-                items.put(String.valueOf(x), ItemUtils.convert(getItems()[x]));
+                items.put(String.valueOf(x), gson.toJson(i, ItemStack.class));
             }
         }
 

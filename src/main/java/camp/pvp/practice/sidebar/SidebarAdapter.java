@@ -121,7 +121,7 @@ public class SidebarAdapter implements AssembleAdapter {
             }
 
             lines.add(" ");
-            lines.add("&6pvp.camp");
+            lines.add("&7&opvp.camp");
             lines.add("&7&m------------------");
         }
 

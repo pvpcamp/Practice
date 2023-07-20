@@ -107,6 +107,39 @@ public class TournamentCommand implements CommandExecutor {
                             player.sendMessage(ChatColor.RED + "No permission.");
                         }
                         return true;
+                    case "timer":
+                        if(args.length > 1) {
+                            if (player.hasPermission("practice.staff")) {
+                                if(tournament != null && !tournament.getState().equals(Tournament.State.ENDED)) {
+                                    int time = 0;
+                                    try {
+                                        time = Integer.parseInt(args[1]);
+                                    } catch(NumberFormatException ignored) {
+                                        player.sendMessage(ChatColor.RED + "Invalid time.");
+                                    }
+
+                                    if(time > 0) {
+                                        switch(tournament.getState()) {
+                                            case STARTING:
+                                            case NEXT_ROUND_STARTING:
+                                                tournament.setTimer(time);
+                                                player.sendMessage(ChatColor.GREEN + "Tournament timer has been set to " + ChatColor.WHITE + time + ChatColor.GREEN + ".");
+                                                break;
+                                            default:
+                                                player.sendMessage(ChatColor.RED + "Tournament state " + tournament.getState() + " does not have a timer.");
+                                                break;
+                                        }
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "Number must be greater than 0.");
+                                    }
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "There is not a tournament active at this time.");
+                                }
+                            } else {
+                                player.sendMessage(ChatColor.RED + "No permission.");
+                            }
+                            return true;
+                        }
                 }
             }
 
@@ -118,6 +151,10 @@ public class TournamentCommand implements CommandExecutor {
 
             if(player.hasPermission("practice.events.host.tournament")) {
                 help.append("\n&6/tournament host &7- &fHost a tournament.");
+            }
+
+            if(player.hasPermission("practice.staff")) {
+                help.append("\n&6/tournament timer <time> &7- &fSets the tournament timer.");
             }
 
             player.sendMessage(Colors.get(help.toString()));
