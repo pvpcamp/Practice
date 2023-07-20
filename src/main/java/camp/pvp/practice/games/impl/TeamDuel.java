@@ -1,6 +1,8 @@
 package camp.pvp.practice.games.impl;
 
 import camp.pvp.practice.games.GameTeam;
+import camp.pvp.practice.games.tasks.EndingTask;
+import camp.pvp.practice.games.tasks.StartingTask;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
@@ -193,34 +195,7 @@ public class TeamDuel extends TeamGame {
 
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
-        this.startingTimer = new BukkitRunnable() {
-            int i = 5;
-            public void run() {
-                if (i == 0) {
-                    for(Player p : TeamDuel.this.getAllPlayers()) {
-                        if(p != null) {
-                            p.playSound(p.getLocation(), Sound.NOTE_PIANO, 1, 12);
-                            p.sendMessage(ChatColor.GREEN + "The game has started, good luck!");
-                        }
-                    }
-
-                    TeamDuel duel = TeamDuel.this;
-                    duel.setStarted(new Date());
-                    duel.setState(State.ACTIVE);
-
-                    this.cancel();
-                } else {
-                    if (i > 0) {
-                        for (Player p : TeamDuel.this.getAllPlayers()) {
-                            p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
-                            p.sendMessage(ChatColor.GREEN.toString() + i + "...");
-                        }
-                    }
-
-                    i -= 1;
-                }
-            }
-        }.runTaskTimer(this.getPlugin(), 20, 20);
+        this.startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
     }
 
     @Override
@@ -290,28 +265,6 @@ public class TeamDuel extends TeamGame {
             player.sendMessage(" ");
         }
 
-        this.endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
-            for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
-                Player player = Bukkit.getPlayer(entry.getKey());
-                GameParticipant participant = entry.getValue();
-                GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
-
-                if(player != null) {
-                    if(entry.getValue().isAlive()) {
-                        participant.clearCooldowns();
-
-                        profile.setGame(null);
-                        profile.playerUpdate(true);
-                    }
-                }
-            }
-
-            for(GameSpectator spectator : new ArrayList<>(this.getSpectators().values())) {
-                Player player = Bukkit.getPlayer(spectator.getUuid());
-                this.spectateEnd(player);
-            }
-
-            this.clearEntities();
-        }, 60);
+        this.endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), new EndingTask(this), 100);
     }
 }

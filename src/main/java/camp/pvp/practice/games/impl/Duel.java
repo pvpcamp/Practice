@@ -4,6 +4,8 @@ import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.PostGameInventory;
+import camp.pvp.practice.games.tasks.EndingTask;
+import camp.pvp.practice.games.tasks.StartingTask;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
@@ -90,7 +92,7 @@ public class Duel extends Game {
 
             for(Player p : this.getAllPlayers()) {
                 p.sendMessage(" ");
-                p.sendMessage(Colors.get("&6&lDuel starting in 5 seconds."));
+                p.sendMessage(Colors.get("&6&lDuel starting in 3 seconds."));
                 p.sendMessage(Colors.get(" &7● &6Mode: &f" + this.queueType.toString()));
                 p.sendMessage(Colors.get(" &7● &6Kit: &f" + kit.getColor() + kit.getDisplayName()));
                 p.sendMessage(Colors.get(" &7● &6Map: &f" + Colors.get(getArena().getDisplayName())));
@@ -122,39 +124,7 @@ public class Duel extends Game {
 
             getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
-            this.startingTimer = new BukkitRunnable() {
-                int i = 5;
-                public void run() {
-                    if (i == 0) {
-                        boolean b = getKit().isMoveOnStart();
-                        for(Player p : Duel.this.getAlivePlayers()) {
-                            if(p != null) {
-                                if(!b) {
-                                    p.removePotionEffect(PotionEffectType.JUMP);
-                                }
-
-                                p.playSound(p.getLocation(), Sound.GLASS, 1, 1);
-                                p.sendMessage(ChatColor.GREEN + "The game has started, good luck!");
-                            }
-                        }
-
-                        Duel duel = Duel.this;
-                        duel.setStarted(new Date());
-                        duel.setState(State.ACTIVE);
-
-                        this.cancel();
-                    } else {
-                        if (i > 0) {
-                            for (Player p : Duel.this.getAllPlayers()) {
-                                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
-                                p.sendMessage(ChatColor.GREEN.toString() + i + "...");
-                            }
-                        }
-
-                        i -= 1;
-                    }
-                }
-            }.runTaskTimer(this.getPlugin(), 20, 20);
+            this.startingTimer = new StartingTask(this, 3).runTaskTimer(this.getPlugin(), 20, 20);
         } else {
             for(Player p : getAlivePlayers()) {
                 GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
@@ -279,48 +249,7 @@ public class Duel extends Game {
             player.sendMessage(" ");
         }
 
-        this.endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
-            for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
-                Player player = Bukkit.getPlayer(entry.getKey());
-                GameParticipant participant = entry.getValue();
-                GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
-
-                if(player != null) {
-                    if(entry.getValue().isAlive()) {
-
-                        for(PlayerCooldown cooldown : participant.getCooldowns().values()) {
-                            cooldown.remove();
-                        }
-
-                        profile.setGame(null);
-                        profile.playerUpdate(true);
-                    }
-                }
-            }
-
-            for(GameSpectator spectator : new ArrayList<>(this.getSpectators().values())) {
-                Player player = Bukkit.getPlayer(spectator.getUuid());
-                this.spectateEnd(player);
-            }
-
-            this.clearEntities();
-
-            // TODO: Replace built blocks from build duel.
-
-//            for(Block block : this.getPlacedBlocks()) {
-//                block.setType(Material.AIR);
-//            }
-//
-//            for(BrokenBlock block : this.getBrokenBlocks()) {
-//                Block b = block.getBlock();
-//                b.setType(block.getMaterial());
-//                b.setData(block.getData());
-//            }
-
-//            if(this.getKit().getType().equals(Kit.Type.BUILD)) {
-//                this.getArena().setInUse(false);
-//            }
-        }, 60);
+        this.endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), new EndingTask(this), 60);
     }
 
     @Override

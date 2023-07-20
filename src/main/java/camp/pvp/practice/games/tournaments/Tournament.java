@@ -145,7 +145,7 @@ public class Tournament {
                     timer--;
                 }
             }
-        }, 0, 20);
+        }, 20, 20);
     }
 
     public void nextRound() {
@@ -217,7 +217,7 @@ public class Tournament {
                     timer--;
                 }
             }
-        }, 0, 20);
+        }, 20, 20);
     }
 
     public void startGames() {

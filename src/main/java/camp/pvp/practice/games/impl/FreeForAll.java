@@ -1,5 +1,7 @@
 package camp.pvp.practice.games.impl;
 
+import camp.pvp.practice.games.tasks.EndingTask;
+import camp.pvp.practice.games.tasks.StartingTask;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
@@ -180,34 +182,8 @@ public class FreeForAll extends Game {
 
             getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
-            this.startingTimer = new BukkitRunnable() {
-                int i = 10;
-                public void run() {
-                    if (i == 0) {
-                        for(Player p : FreeForAll.this.getAlivePlayers()) {
-                            if(p != null) {
-                                p.playSound(p.getLocation(), Sound.NOTE_PIANO, 1, 12);
-                                p.sendMessage(ChatColor.GREEN + "The game has started, good luck!");
-                            }
-                        }
+            this.startingTimer = new StartingTask(this, 10).runTaskTimer(this.getPlugin(), 20, 20);
 
-                        FreeForAll ffa = FreeForAll.this;
-                        ffa.setStarted(new Date());
-                        ffa.setState(State.ACTIVE);
-
-                        this.cancel();
-                    } else {
-                        if (i > 0) {
-                            for (Player p : FreeForAll.this.getAllPlayers()) {
-                                p.playSound(p.getLocation(), Sound.CLICK, 1, 1);
-                                p.sendMessage(ChatColor.GREEN.toString() + i + "...");
-                            }
-                        }
-
-                        i -= 1;
-                    }
-                }
-            }.runTaskTimer(this.getPlugin(), 20, 20);
         } else {
             for(Player p : getAlivePlayers()) {
                 GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
@@ -289,31 +265,6 @@ public class FreeForAll extends Game {
             player.sendMessage(" ");
         }
 
-        this.endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), () -> {
-            for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
-                Player player = Bukkit.getPlayer(entry.getKey());
-                GameParticipant participant = entry.getValue();
-                GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
-
-                if(player != null) {
-                    if(entry.getValue().isAlive()) {
-
-                        for(PlayerCooldown cooldown : participant.getCooldowns().values()) {
-                            cooldown.remove();
-                        }
-
-                        profile.setGame(null);
-                        profile.playerUpdate(true);
-                    }
-                }
-            }
-
-            for(GameSpectator spectator : new ArrayList<>(this.getSpectators().values())) {
-                Player player = Bukkit.getPlayer(spectator.getUuid());
-                this.spectateEnd(player);
-            }
-
-            FreeForAll.this.clearEntities();
-        }, 100);
+        this.endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), new EndingTask(this), 100);
     }
 }
