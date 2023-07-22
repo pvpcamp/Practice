@@ -198,9 +198,14 @@ public abstract class Game {
         if(victimParticipant != null && participant != null) {
             if(victimParticipant.isAlive() && participant.isAlive()) {
 
+                if(participant.getAttacking() != null && !participant.getAttacking().equals(victim.getUniqueId())) {
+                    participant.setCurrentCombo(0);
+                }
+
                 participant.setHealth(Math.round(attacker.getHealth()));
                 participant.setMaxHealth(Math.round(attacker.getMaxHealth()));
                 participant.setHunger(attacker.getFoodLevel());
+                participant.setAttacking(victim.getUniqueId());
 
                 victimParticipant.setAttacker(attacker.getUniqueId());
 
@@ -264,6 +269,8 @@ public abstract class Game {
 
         GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
         participant.setComboMessages(profile.isComboMessages());
+        participant.setLunarCooldowns(profile.isLunarCooldowns());
+
         this.participants.put(player.getUniqueId(), participant);
         return participant;
     }
@@ -283,6 +290,10 @@ public abstract class Game {
 
     public void spectateStart(Player player, Location location) {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+
+        if(profile.getGame() != null && !profile.getGame().equals(this)) {
+            profile.getGame().leave(player);
+        }
 
         this.getSpectators().put(player.getUniqueId(), new GameSpectator(player.getUniqueId(), player.getName()));
 

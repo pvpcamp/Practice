@@ -93,13 +93,13 @@ public class Tournament {
                     break;
                 case NEXT_ROUND_STARTING:
                 case IN_GAME:
-                    eliminate(player, true);
+                    eliminate(player);
                     break;
             }
         }
     }
 
-    public void eliminate(Player player, boolean leftGame) {
+    public void eliminate(Player player) {
         TournamentParticipant participant = this.getTournamentParticipants().get(player.getUniqueId());
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         if(participant != null) {
@@ -318,7 +318,7 @@ public class Tournament {
             case IN_GAME:
                 lines.add(" &7● &6Round: &f" + this.getCurrentRound());
                 lines.add(" &7● &6Players Left: &f" + this.getAlive().size() + "/" + this.getTournamentParticipants().size());
-                lines.add(" &7● &6Active Games: &f" + this.getActiveGames());
+                lines.add(" &7● &6Active Games: &f" + this.getActiveGames().size());
                 break;
         }
 

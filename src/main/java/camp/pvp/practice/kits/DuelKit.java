@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 public enum DuelKit {
-    NO_DEBUFF, SPEED_NODEBUFF, CLASSIC, HCF, BOXING, SUMO;
+    NO_DEBUFF, SPEED_NODEBUFF, CLASSIC, SOUP, HCF, BOXING, SUMO;
 
     public String getDisplayName() {
         switch(this) {
@@ -33,6 +33,8 @@ public enum DuelKit {
                 return "HCF";
             case CLASSIC:
                 return "Classic";
+            case SOUP:
+                return "Soup";
             case BOXING:
                 return "Boxing";
             case SUMO:
@@ -49,6 +51,7 @@ public enum DuelKit {
             case SPEED_NODEBUFF:
             case HCF:
                 return ChatColor.DARK_RED;
+            case SOUP:
             case CLASSIC:
                 return ChatColor.LIGHT_PURPLE;
             case BOXING:
@@ -81,6 +84,8 @@ public enum DuelKit {
                 return 12;
             case CLASSIC:
                 return 13;
+            case SOUP:
+                return 14;
             case BOXING:
                 return 15;
             case SUMO:
@@ -103,6 +108,7 @@ public enum DuelKit {
             case SPEED_NODEBUFF:
             case HCF:
             case CLASSIC:
+            case SOUP:
             case BOXING:
             case SUMO:
                 return true;
@@ -152,6 +158,7 @@ public enum DuelKit {
 
     public boolean isHunger() {
         switch(this) {
+            case SOUP:
             case BOXING:
             case SUMO:
                 return false;
@@ -215,6 +222,9 @@ public enum DuelKit {
                 break;
             case CLASSIC:
                 item = new ItemStack(Material.DIAMOND_SWORD);
+                break;
+            case SOUP:
+                item = new ItemStack(Material.MUSHROOM_SOUP);
                 break;
             case BOXING:
                 item = new ItemStack(Material.DIAMOND_CHESTPLATE);
@@ -395,6 +405,21 @@ public enum DuelKit {
                 inv[3] = new ItemStack(Material.GOLDEN_APPLE, 8);
 
                 inv[9] = new ItemStack(Material.ARROW, 12);
+                break;
+            case SOUP:
+                armor[3] = new ItemStack(Material.IRON_HELMET);
+                armor[2] = new ItemStack(Material.IRON_CHESTPLATE);
+                armor[1] = new ItemStack(Material.IRON_LEGGINGS);
+                armor[0] = new ItemStack(Material.IRON_BOOTS);
+
+                inv[0] = new ItemStack(Material.DIAMOND_SWORD);
+
+                for(int x = 0; x < 36; x++) {
+                    ItemStack i = inv[x];
+                    if(i == null) {
+                        inv[x] = new ItemStack(Material.MUSHROOM_SOUP);
+                    }
+                }
                 break;
             case SUMO:
                 PotionEffect jump = new PotionEffect(PotionEffectType.JUMP, 99999, 245, true, false);

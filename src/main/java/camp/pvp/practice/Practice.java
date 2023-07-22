@@ -6,10 +6,7 @@ import camp.pvp.practice.games.GameManager;
 import camp.pvp.practice.kits.EnergyRunnable;
 import camp.pvp.practice.listeners.bukkit.block.BlockBreakListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockPlaceListener;
-import camp.pvp.practice.listeners.bukkit.entity.EntityDamageByEntityListener;
-import camp.pvp.practice.listeners.bukkit.entity.EntityDamageListener;
-import camp.pvp.practice.listeners.bukkit.entity.EntityRegainHealthListener;
-import camp.pvp.practice.listeners.bukkit.entity.EntitySpawnListener;
+import camp.pvp.practice.listeners.bukkit.entity.*;
 import camp.pvp.practice.listeners.bukkit.inventory.InventoryClickListener;
 import camp.pvp.practice.listeners.bukkit.inventory.InventoryMoveItemListener;
 import camp.pvp.practice.listeners.bukkit.potion.PotionSplashListener;
@@ -28,11 +25,13 @@ import camp.pvp.practice.listeners.bukkit.player.*;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.lunarclient.bukkitapi.LunarClientAPI;
+import com.sk89q.worldedit.WorldEdit;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -48,6 +47,8 @@ public class Practice extends JavaPlugin {
     private Assemble assemble;
 
     private LunarClientAPI lunarClientAPI;
+
+    private WorldEdit worldEdit;
 
     private Location lobbyLocation;
     private Location kitEditorLocation;
@@ -69,6 +70,10 @@ public class Practice extends JavaPlugin {
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.entityHider = new EntityHider(this, EntityHider.Policy.BLACKLIST);
 
+        this.lunarClientAPI = LunarClientAPI.getInstance();
+
+        this.worldEdit = WorldEdit.getInstance();
+
         this.arenaManager = new ArenaManager(this);
         this.gameManager = new GameManager(this);
         this.gameQueueManager = new GameQueueManager(this);
@@ -79,8 +84,6 @@ public class Practice extends JavaPlugin {
         assemble.setTicks(5);
         assemble.setAssembleStyle(AssembleStyle.MODERN);
         assemble.setup();
-
-        this.lunarClientAPI = LunarClientAPI.getInstance();
 
         cooldownTask = this.getServer().getScheduler().runTaskTimer(this, new CooldownRunnable(this), 2, 2);
         energyTask = this.getServer().getScheduler().runTaskTimer(this, new EnergyRunnable(this), 10, 10);

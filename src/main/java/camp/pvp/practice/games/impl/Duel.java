@@ -6,6 +6,7 @@ import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.PostGameInventory;
 import camp.pvp.practice.games.tasks.EndingTask;
 import camp.pvp.practice.games.tasks.StartingTask;
+import camp.pvp.practice.games.tasks.TeleportFixTask;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
@@ -124,6 +125,7 @@ public class Duel extends Game {
 
             getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
+            new TeleportFixTask(this).run();
             this.startingTimer = new StartingTask(this, 3).runTaskTimer(this.getPlugin(), 20, 20);
         } else {
             for(Player p : getAlivePlayers()) {
@@ -257,7 +259,7 @@ public class Duel extends Game {
         super.eliminate(player, leftGame);
 
         if(getTournament() != null) {
-            getTournament().eliminate(player, leftGame);
+            getTournament().eliminate(player);
         }
 
         if(this.getAlive().size() < 2) {

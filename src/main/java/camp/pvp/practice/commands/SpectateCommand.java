@@ -10,10 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class SpectateCommand implements CommandExecutor {
 
@@ -30,7 +27,7 @@ public class SpectateCommand implements CommandExecutor {
             Player player = (Player) sender;
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
             if(args.length > 0) {
-                if(!profile.getState().equals(GameProfile.State.LOBBY) && !profile.getState().equals(GameProfile.State.LOBBY_TOURNAMENT)) {
+                if(!Arrays.asList(GameProfile.State.LOBBY, GameProfile.State.LOBBY_TOURNAMENT, GameProfile.State.LOBBY_PARTY, GameProfile.State.SPECTATING).contains(profile.getState())) {
                     player.sendMessage(ChatColor.RED + "You cannot spectate a game right now.");
                     return true;
                 }

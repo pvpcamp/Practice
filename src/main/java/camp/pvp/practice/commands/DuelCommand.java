@@ -1,5 +1,6 @@
 package camp.pvp.practice.commands;
 
+import camp.pvp.practice.guis.duel.DuelRequestKitSelectionGui;
 import camp.pvp.practice.profiles.DuelRequest;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
@@ -45,45 +46,8 @@ public class DuelCommand implements CommandExecutor {
                         GameProfile targetProfile = gpm.getLoadedProfiles().get(target.getUniqueId());
 
                         if(targetProfile.getState().equals(GameProfile.State.LOBBY)) {
-                            StandardGui requestGui = new StandardGui("Duel " + target.getName(), 9);
-
-                            int x = 0;
-                            for(DuelKit duelKit : DuelKit.values()) {
-                                if(duelKit.isQueueable()) {
-                                    ItemStack item = duelKit.getIcon();
-                                    GuiButton button = new GuiButton(item, duelKit.getColor() + duelKit.getDisplayName());
-
-                                    button.setCloseOnClick(true);
-                                    button.setLore(
-                                            "&7Click to duel &6" + targetProfile.getName() + "&7!"
-                                    );
-
-                                    button.setAction((pl, igui) -> {
-                                        GameProfile gp = gpm.getLoadedProfiles().get(target.getUniqueId());
-                                        if(gp != null) {
-                                            DuelRequest oldRequest = gp.getDuelRequests().get(pl.getUniqueId());
-                                            if(gp.getState().equals(GameProfile.State.LOBBY)) {
-                                                if(oldRequest != null && oldRequest.getKit().equals(duelKit) && !oldRequest.isExpired()) {
-                                                    player.sendMessage(ChatColor.RED + "You already sent this player a duel request recently for this same kit.");
-                                                    return;
-                                                }
-
-                                                DuelRequest duelRequest = new DuelRequest(pl.getUniqueId(), target.getUniqueId(), duelKit, null, 30);
-                                                duelRequest.send();
-                                                gp.getDuelRequests().put(pl.getUniqueId(), duelRequest);
-                                            } else {
-                                                player.sendMessage(ChatColor.RED + "You cannot send a duel to this player right now as they are busy.");
-                                            }
-                                        } else {
-                                            pl.sendMessage(ChatColor.RED + "The player you specified is not on this server.");
-                                        }
-                                    });
-
-                                    button.setSlot(x);
-                                    requestGui.addButton(button, false);
-                                    x++;
-                                }
-                            }
+                            DuelRequest newRequest = new DuelRequest(profile, targetProfile);
+                            StandardGui requestGui = new DuelRequestKitSelectionGui(plugin, newRequest);
 
                             DuelRequest duelRequest = profile.getDuelRequests().get(target.getUniqueId());
 

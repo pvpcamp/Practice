@@ -103,6 +103,7 @@ public class PostGameInventory extends GameInventory {
 
         if(soups) {
             GuiButton button = new GuiButton(Material.MUSHROOM_SOUP, "&a" + soupsCount + " soups left.");
+            button.setAmount(Math.max(potCount, 1));
             button.setSlot(45);
             gui.addButton(button, false);
         }

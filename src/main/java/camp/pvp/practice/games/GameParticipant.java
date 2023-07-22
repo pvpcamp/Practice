@@ -18,7 +18,7 @@ public class GameParticipant {
     private final UUID uuid;
     private final String name;
     private GameTeam team;
-    private boolean alive, kitApplied, hittable, comboMessages;
+    private boolean alive, kitApplied, hittable, comboMessages, lunarCooldowns;
 
     // HCFTEAMS ONLY
     private HCFKit appliedHcfKit;
@@ -26,7 +26,7 @@ public class GameParticipant {
 
     private Map<PlayerCooldown.Type, PlayerCooldown> cooldowns;
 
-    private UUID attacker;
+    private UUID attacker, attacking;
     private EntityDamageEvent.DamageCause lastDamageCause;
 
     public long health, maxHealth, hunger,

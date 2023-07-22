@@ -45,7 +45,7 @@ public class SidebarAdapter implements AssembleAdapter {
         List<String> lines = new ArrayList<>();
 
         GameProfile profile = gameProfileManager.getLoadedProfiles().get(player.getUniqueId());
-        if(profile != null) {
+        if(profile != null && profile.isShowSidebar()) {
             GameProfile.State state = profile.getState();
 
             lines.add("&7&m------------------");

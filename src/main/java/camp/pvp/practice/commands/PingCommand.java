@@ -15,7 +15,7 @@ public class PingCommand implements CommandExecutor {
     private Practice plugin;
     public PingCommand(Practice plugin) {
         this.plugin = plugin;
-        plugin.getServer().getPluginCommand("ping").setExecutor(this);
+        plugin.getCommand("ping").setExecutor(this);
     }
 
     @Override

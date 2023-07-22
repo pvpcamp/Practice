@@ -43,7 +43,7 @@ public class GameManager {
         List<Game> g = new ArrayList<>();
         for(Game game : games.values()) {
             Game.State state = game.getState();
-            if(state.equals(Game.State.INACTIVE) || !state.equals(Game.State.ENDED)) {
+            if(!Arrays.asList(Game.State.INACTIVE, Game.State.ENDED).contains(state)) {
                 g.add(game);
             }
         }

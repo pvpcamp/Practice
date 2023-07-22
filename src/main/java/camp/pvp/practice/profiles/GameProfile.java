@@ -52,7 +52,8 @@ public class GameProfile {
     private final UUID uuid;
     private String name;
     private Time time;
-    private boolean buildMode, debugMode, spectatorVisibility, lobbyVisibility, comboMessages, tournamentNotifications;
+    private boolean spectatorVisibility, lobbyVisibility, comboMessages, tournamentNotifications, lunarCooldowns,
+            showSidebar, buildMode, debugMode;
     private DeathAnimation deathAnimation;
 
     private Game game;
@@ -66,8 +67,6 @@ public class GameProfile {
     private CustomDuelKit editingCustomKit;
     private Map<DuelKit, Map<Integer, CustomDuelKit>> customDuelKits;
 
-    private Map<GameQueue.Type, Map<DuelKit, DuelKitQueueStatistics>> duelKitQueueStatistics;
-
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
 
@@ -78,28 +77,17 @@ public class GameProfile {
         this.duelRequests = new HashMap<>();
         this.customDuelKits = new HashMap<>();
 
-        this.duelKitQueueStatistics = new HashMap<>();
-
         this.time = Time.DAY;
-        this.buildMode = false;
         this.lobbyVisibility = true;
         this.spectatorVisibility = true;
         this.comboMessages = true;
         this.tournamentNotifications = true;
-
-        duelKitQueueStatistics.put(GameQueue.Type.UNRANKED, new HashMap<>());
-        duelKitQueueStatistics.put(GameQueue.Type.RANKED, new HashMap<>());
+        this.lunarCooldowns = true;
+        this.showSidebar = true;
 
         for(DuelKit kit : DuelKit.values()) {
             if(kit.isEditable()) {
                 customDuelKits.put(kit, new HashMap<>());
-            }
-
-            if(kit.isQueueable()) {
-                duelKitQueueStatistics.get(GameQueue.Type.UNRANKED).put(kit, new DuelKitQueueStatistics(kit, GameQueue.Type.UNRANKED));
-                if(kit.isRanked()) {
-                    duelKitQueueStatistics.get(GameQueue.Type.RANKED).put(kit, new DuelKitQueueStatistics(kit, GameQueue.Type.RANKED));
-                }
             }
         }
     }
@@ -273,13 +261,16 @@ public class GameProfile {
 
     public void documentImport(Document document) {
         this.name = document.getString("name");
-        this.time = Time.valueOf(document.getString("player_time"));
         this.buildMode = document.getBoolean("build_mode");
         this.debugMode = document.getBoolean("debug_mode");
         this.spectatorVisibility = document.getBoolean("spectator_visibility");
         this.lobbyVisibility = document.getBoolean("lobby_visibility");
-        this.deathAnimation = DeathAnimation.valueOf(document.getString("death_animation"));
+        this.tournamentNotifications = document.getBoolean("tournament_notifications");
+        this.lunarCooldowns = document.getBoolean("lunar_cooldowns");
         this.comboMessages = document.getBoolean("combo_messages");
+        this.time = Time.valueOf(document.getString("player_time"));
+        this.deathAnimation = DeathAnimation.valueOf(document.getString("death_animation"));
+        this.showSidebar = document.getBoolean("show_sidebar");
 
         // Get serialized kits from document, and turn them back into CustomDuelKits.
         Object serializedKits = document.get("custom_duel_kits");
@@ -302,27 +293,6 @@ public class GameProfile {
                 customDuelKit.importFromMap(map);
             }
         }
-
-        // Get serialized kits from document, and turn them back into CustomDuelKits.
-        Object serializedDkqs = document.get("duelkit_queue_stats");
-
-        Map<String, Map<String, Map<String, Object>>> dkqsSerialized = (Map<String, Map<String, Map<String, Object>>>) serializedDkqs;
-
-        for(Map.Entry<String, Map<String, Map<String, Object>>> queueEntry : dkqsSerialized.entrySet()) {
-
-            GameQueue.Type type = GameQueue.Type.valueOf(queueEntry.getKey());
-
-            for(Map.Entry<String, Map<String, Object>> statsEntry : queueEntry.getValue().entrySet()) {
-
-                DuelKit kit = DuelKit.valueOf(statsEntry.getKey());
-
-                Map<String, Object> map = statsEntry.getValue();
-
-                DuelKitQueueStatistics dkqs = new DuelKitQueueStatistics(kit, type);
-
-                dkqs.importFromMap(map);
-            }
-        }
     }
 
     public Map<String, Object> export() {
@@ -333,8 +303,11 @@ public class GameProfile {
         values.put("debug_mode", debugMode);
         values.put("spectator_visibility", spectatorVisibility);
         values.put("lobby_visibility", lobbyVisibility);
+        values.put("tournament_notifications", tournamentNotifications);
+        values.put("lunar_cooldowns", lunarCooldowns);
         values.put("death_animation", deathAnimation.name());
         values.put("combo_messages", comboMessages);
+        values.put("show_sidebar", isShowSidebar());
 
         // Convert CustomDuelKits to serialized form for DB storage.
         Map<String, Map<String, Map<String, Object>>> ck = new HashMap<>();
@@ -348,19 +321,6 @@ public class GameProfile {
         }
 
         values.put("custom_duel_kits", ck);
-
-        // Convert DuelKitQueueStatistics to serialized form for DB storage.
-        Map<String, Map<String, Map<String, Object>>> dkqs = new HashMap<>();
-        for(Map.Entry<GameQueue.Type, Map<DuelKit, DuelKitQueueStatistics>> queueTypeEntry : getDuelKitQueueStatistics().entrySet()) {
-            GameQueue.Type type = queueTypeEntry.getKey();
-            for(Map.Entry<DuelKit, DuelKitQueueStatistics> queueStatsEntry : queueTypeEntry.getValue().entrySet()) {
-                DuelKit kit = queueStatsEntry.getKey();
-                dkqs.computeIfAbsent(type.name(), v -> new HashMap<>());
-                dkqs.get(type.name()).put(String.valueOf(kit.toString()), queueStatsEntry.getValue().exportItems());
-            }
-        }
-
-        values.put("duelkit_queue_stats", dkqs);
 
         return values;
     }

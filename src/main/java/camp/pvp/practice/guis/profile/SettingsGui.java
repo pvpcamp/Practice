@@ -2,18 +2,20 @@ package camp.pvp.practice.guis.profile;
 
 import camp.pvp.practice.cosmetics.DeathAnimation;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.utils.Colors;
 import camp.pvp.utils.buttons.AbstractButtonUpdater;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
 import com.lunarclient.bukkitapi.LunarClientAPI;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class SettingsGui extends StandardGui {
     public SettingsGui(GameProfile gameProfile) {
-        super("&6Settings", 27);
+        super("&6Settings", 36);
         Player player = gameProfile.getPlayer();
 
         this.setDefaultBackground();
@@ -23,6 +25,7 @@ public class SettingsGui extends StandardGui {
             @Override
             public void run(Player player, Gui gui) {
                 gameProfile.setSpectatorVisibility(!gameProfile.isSpectatorVisibility());
+                gameProfile.updatePlayerVisibility();
                 gui.updateGui();
             }
         });
@@ -82,6 +85,50 @@ public class SettingsGui extends StandardGui {
         comboMessages.setSlot(12);
         this.addButton(comboMessages, false);
 
+        GuiButton tournamentMessages = new GuiButton(Material.DIAMOND_SWORD, "&4Tournament Notifications");
+        tournamentMessages.setAction(new GuiAction() {
+            @Override
+            public void run(Player player, Gui gui) {
+                gameProfile.setTournamentNotifications(!gameProfile.isTournamentNotifications());
+                gui.updateGui();
+            }
+        });
+
+        tournamentMessages.setButtonUpdater(new AbstractButtonUpdater() {
+            @Override
+            public void update(GuiButton guiButton, Gui gui) {
+                guiButton.setLore(
+                        "&7Would you like to receive tournament",
+                        "&7updates in chat, even when you're",
+                        "&7not in the tournament?",
+                        "&aCurrent Setting: &f" + (gameProfile.isTournamentNotifications() ? "Enabled" : "Disabled"));
+            }
+        });
+        tournamentMessages.setSlot(13);
+        this.addButton(tournamentMessages, false);
+
+        GuiButton lunarCooldowns = new GuiButton(Material.BEACON, "&bLunar Cooldowns");
+        lunarCooldowns.setAction(new GuiAction() {
+            @Override
+            public void run(Player player, Gui gui) {
+                gameProfile.setLunarCooldowns(!gameProfile.isLunarCooldowns());
+                gui.updateGui();
+            }
+        });
+
+        lunarCooldowns.setButtonUpdater(new AbstractButtonUpdater() {
+            @Override
+            public void update(GuiButton guiButton, Gui gui) {
+                guiButton.setLore(
+                        "&7Would you like to utilize",
+                        "&7Lunar Client cooldowns",
+                        "&7instead of your XP bar?",
+                        "&aCurrent Setting: &f" + (gameProfile.isLunarCooldowns() ? "Enabled (Recommended)" : "Disabled"));
+            }
+        });
+        lunarCooldowns.setSlot(14);
+        this.addButton(lunarCooldowns, false);
+
         GuiButton playerTime = new GuiButton(Material.WATCH, "&5Player Time");
         playerTime.setAction(new GuiAction() {
             @Override
@@ -110,20 +157,24 @@ public class SettingsGui extends StandardGui {
                         (time.equals(GameProfile.Time.NIGHT) ? "&6&l" : "&8") +" ● Night");
             }
         });
-        playerTime.setSlot(13);
+        playerTime.setSlot(15);
         this.addButton(playerTime, false);
 
         GuiButton deathAnimation = new GuiButton(Material.BLAZE_ROD, "&4Death Animation");
         deathAnimation.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
-                if(gameProfile.getDeathAnimation().ordinal() == DeathAnimation.values().length - 1) {
-                    gameProfile.setDeathAnimation(DeathAnimation.DEFAULT);
+                if(player.hasPermission("practice.cosmetics.death_animation")) {
+                    if (gameProfile.getDeathAnimation().ordinal() == DeathAnimation.values().length - 1) {
+                        gameProfile.setDeathAnimation(DeathAnimation.DEFAULT);
+                    } else {
+                        gameProfile.setDeathAnimation(DeathAnimation.values()[gameProfile.getDeathAnimation().ordinal() + 1]);
+                    }
+                    gui.updateGui();
                 } else {
-                    gameProfile.setDeathAnimation(DeathAnimation.values()[gameProfile.getDeathAnimation().ordinal() + 1]);
+                    player.sendMessage(Colors.get("&aThis feature is only available to players that have &5&lPlus Rank &aor higher." ));
+                    player.sendMessage(Colors.get("&aIf you would like to support us, you can buy a rank here: &fstore.pvp.camp" ));
                 }
-
-                gui.updateGui();
             }
         });
 
@@ -141,23 +192,45 @@ public class SettingsGui extends StandardGui {
                         (da.equals(DeathAnimation.EXPLOSION) ? "&6&l" : "&8") +" ● Explosion");
             }
         });
-        deathAnimation.setSlot(14);
+        deathAnimation.setSlot(16);
         this.addButton(deathAnimation, false);
 
-        if(!LunarClientAPI.getInstance().isRunningLunarClient(player)) {
-            GuiButton lunarNotice = new GuiButton(Material.BEACON, "&b&lNotice!");
-            lunarNotice.setLore(
-                    "&bMany of the features on our",
-                    "&bserver involve the use of",
-                    "&b&lLunarClientAPI&r&b, which provides",
-                    "&ba better playing experience.",
-                    " ",
-                    "&bPlease consider using &b&lLunar Client",
-                    "&bthe next time you connect our network."
-            );
-            lunarNotice.setSlot(4);
-            this.addButton(lunarNotice, false);
-        }
+        GuiButton sidebarVisibility = new GuiButton(Material.EMPTY_MAP, "&aSidebar Visibility");
+        sidebarVisibility.setAction(new GuiAction() {
+            @Override
+            public void run(Player player, Gui gui) {
+                gameProfile.setShowSidebar(!gameProfile.isShowSidebar());
+                gui.updateGui();
+            }
+        });
+
+        sidebarVisibility.setButtonUpdater(new AbstractButtonUpdater() {
+            @Override
+            public void update(GuiButton guiButton, Gui gui) {
+                guiButton.setLore(
+                        "&7Would you to see your sidebar?",
+                        "&aCurrent Setting: &f" + (gameProfile.isShowSidebar() ? "Enabled" : "Disabled"));
+            }
+        });
+        sidebarVisibility.setSlot(19);
+        this.addButton(sidebarVisibility, false);
+
+        GuiButton sidebarSettings = new GuiButton(Material.BOAT, "&dSidebar Settings");
+        sidebarSettings.setAction(new GuiAction() {
+            @Override
+            public void run(Player player, Gui gui) {
+                player.sendMessage(ChatColor.GREEN + "Coming soon!");
+            }
+        });
+
+        sidebarSettings.setButtonUpdater(new AbstractButtonUpdater() {
+            @Override
+            public void update(GuiButton guiButton, Gui gui) {
+                guiButton.setLore("&7Click to customize your sidebar.");
+            }
+        });
+        sidebarSettings.setSlot(20);
+        this.addButton(sidebarSettings, false);
 
         if(player.hasPermission("practice.staff.debug_mode")) {
             GuiButton debugMode = new GuiButton(Material.COMMAND, "&c&l&oDebug Mode");
@@ -178,7 +251,7 @@ public class SettingsGui extends StandardGui {
                             "&aCurrent Setting: &f" + (gameProfile.isDebugMode() ? "Enabled" : "Disabled"));
                 }
             });
-            debugMode.setSlot(26);
+            debugMode.setSlot(35);
             this.addButton(debugMode, false);
         }
 
@@ -201,7 +274,7 @@ public class SettingsGui extends StandardGui {
                             "&aCurrent Setting: &f" + (gameProfile.isBuildMode() ? "Enabled" : "Disabled"));
                 }
             });
-            buildMode.setSlot(25);
+            buildMode.setSlot(34);
             this.addButton(buildMode, false);
         }
     }

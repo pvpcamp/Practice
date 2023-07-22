@@ -32,7 +32,9 @@ public class EntityDamageByEntityListener implements Listener {
             player = (Player) event.getEntity();
             if(arrow.getShooter() instanceof Player) {
                 attacker = (Player) arrow.getShooter();
-                attacker.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GREEN + " is now at " + ChatColor.WHITE + Math.round(player.getHealth()) + " HP" + ChatColor.GREEN + ".");
+                if(attacker != player) {
+                    attacker.sendMessage(ChatColor.WHITE + player.getName() + ChatColor.GREEN + " is now at " + ChatColor.WHITE + Math.round(player.getHealth()) + " HP" + ChatColor.GREEN + ".");
+                }
             }
         }
 

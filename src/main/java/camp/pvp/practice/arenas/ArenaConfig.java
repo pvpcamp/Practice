@@ -53,6 +53,14 @@ public class ArenaConfig {
         arena.setDisplayName(config.getString(path + "display_name"));
         arena.setEnabled(config.getBoolean(path + "enabled"));
 
+        if(config.isSet(path + "parent")) {
+            arena.setParent(config.getString(path + "parent"));
+        }
+
+        if(config.isSet(path + "copies")) {
+            arena.setCopies(config.getStringList("copies"));
+        }
+
         for(String s : config.getConfigurationSection(path + "positions").getKeys(false)) {
             String p = path + "positions." + s;
 
@@ -74,6 +82,14 @@ public class ArenaConfig {
         config.set(path + ".type", arena.getType().toString());
         config.set(path + ".display_name", arena.getDisplayName());
         config.set(path + ".enabled", arena.isEnabled());
+
+        if(arena.getParent() != null) {
+            config.set(".parent", arena.getParent());
+        }
+
+        if(!arena.getCopies().isEmpty()) {
+            config.set(path + ".copies", arena.getCopies());
+        }
 
         for(ArenaPosition position : arena.getPositions().values()) {
             Location location = position.getLocation();

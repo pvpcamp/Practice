@@ -5,6 +5,9 @@ import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import com.lunarclient.bukkitapi.LunarClientAPI;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketModSettings;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketServerRule;
+import com.lunarclient.bukkitapi.nethandler.client.obj.ServerRule;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -54,10 +57,6 @@ public class PlayerJoinLeaveListeners implements Listener {
                 if (player.isOnline()) {
                     if (p == null) {
                         player.kickPlayer(ChatColor.RED + "There was an issue loading your profile, please reconnect.");
-                    }
-
-                    if (lcApi.isRunningLunarClient(player)) {
-                        player.sendMessage(Colors.get("&cReminder: &fWe have detected that you are using Lunar Client. To ensure your best experience on PvP Camp, please enable Lunar Client cooldowns."));
                     }
                 }
             }

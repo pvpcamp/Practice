@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -56,6 +57,15 @@ public class PlayerInteractListener implements Listener {
 
         GameProfile.State state = profile.getState();
 
+        if(event.getAction().equals(Action.PHYSICAL)){
+            Material mat = event.getClickedBlock().getType();
+            if(mat == Material.STONE_PLATE || mat == Material.WOOD_PLATE || mat == Material.IRON_PLATE || mat == Material.GOLD_PLATE) {
+                event.setCancelled(true);
+                event.setUseInteractedBlock(Event.Result.DENY);
+            }
+            return;
+        }
+
         if(action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
             if(profile.isBuildMode()) {
                 return;
@@ -73,53 +83,51 @@ public class PlayerInteractListener implements Listener {
             Game game = profile.getGame();
             if (game != null) {
                 GameParticipant participant = game.getAlive().get(player.getUniqueId());
-                if(participant != null && !participant.isKitApplied()) {
-                    DuelKit kit = game.getKit();
-                    switch(player.getItemInHand().getType()) {
-                        case ENCHANTED_BOOK:
-                            int slot = player.getInventory().getHeldItemSlot() + 1;
-                            CustomDuelKit cdk = profile.getCustomDuelKits().get(kit).get(slot);
-                            if(cdk != null) {
-                                cdk.apply(player);
+                if(participant != null) {
+                    if(participant.isKitApplied()) {
+                        switch(player.getItemInHand().getType()) {
+                            case MUSHROOM_SOUP:
+                                if(player.getHealth() != player.getMaxHealth()) {
+                                    double d = player.getMaxHealth() - player.getHealth() < 7 ? player.getMaxHealth() - player.getHealth() : 7;
+                                    player.setHealth(player.getHealth() + d);
+                                    player.setFoodLevel(20);
+                                    player.setSaturation(20);
+                                    item.setType(Material.BOWL);
+                                    event.setCancelled(true);
+                                }
+                                break;
+                        }
+                    } else {
+                        DuelKit kit = game.getKit();
+                        switch(player.getItemInHand().getType()) {
+                            case ENCHANTED_BOOK:
+                                int slot = player.getInventory().getHeldItemSlot() + 1;
+                                CustomDuelKit cdk = profile.getCustomDuelKits().get(kit).get(slot);
+                                if(cdk != null) {
+                                    cdk.apply(player);
+                                    participant.setKitApplied(true);
+                                    player.updateInventory();
+                                }
+                                break;
+                            case BOOK:
+                                kit.apply(player);
                                 participant.setKitApplied(true);
                                 player.updateInventory();
-                            }
-                            break;
-                        case BOOK:
-                            kit.apply(player);
-                            participant.setKitApplied(true);
-                            player.updateInventory();
-                            break;
+                                break;
+                        }
                     }
                 }
 
                 switch(player.getItemInHand().getType()) {
                     case ENDER_PEARL:
                         PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
-                        if(cooldown != null){
-                            if(!cooldown.isExpired()) {
+                        if (cooldown != null) {
+                            if (!cooldown.isExpired()) {
                                 player.sendMessage(cooldown.getBlockedMessage());
                                 player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL, 1));
                             }
                         }
                         break;
-//                    case ENCHANTED_BOOK:
-//                        if(participant != null && !participant.isKitApplied()) {
-//                            int slot = player.getInventory().getHeldItemSlot();
-//                            CustomKit customKit = profile.getCustomKits().get(game.getKit().getUuid()).get(slot + 1);
-//                            if(customKit != null) {
-//                                customKit.apply(player, true);
-//                                game.getKit().applyArmor(player);
-//                                participant.setKitApplied(true);
-//                            }
-//                        }
-//                        break;
-//                    case BOOK:
-//                        if(participant != null && !participant.isKitApplied()) {
-//                            game.getKit().apply(player);
-//                            participant.setKitApplied(true);
-//                        }
-//                        break;
                 }
 
                 if(profile.getGame().getCurrentPlaying().contains(player)) {
@@ -133,6 +141,8 @@ public class PlayerInteractListener implements Listener {
                         } else if (data instanceof Gate) {
                             event.setCancelled(true);
                         } else if(data instanceof Lever) {
+                            event.setCancelled(true);
+                        } else if(data instanceof Chest) {
                             event.setCancelled(true);
                         }
                     }

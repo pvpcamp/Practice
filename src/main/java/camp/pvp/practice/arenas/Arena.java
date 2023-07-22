@@ -1,11 +1,13 @@
 package camp.pvp.practice.arenas;
 
+import com.sk89q.worldedit.WorldEdit;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Location;
 
 import java.util.*;
 
-public class Arena {
+public class Arena implements Comparable<Arena>{
 
     public enum Type {
         DUEL, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_TEAMS, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_SPLEEF, EVENT_OITC;
@@ -29,10 +31,23 @@ public class Arena {
     private @Getter @Setter Map<String, ArenaPosition> positions;
     private @Getter @Setter boolean enabled, inUse;
 
+    private @Getter @Setter String parent;
+    private @Getter @Setter List<String> copies;
+
     public Arena(String name) {
         this.name = name;
         this.displayName = name;
         this.type = Type.DUEL;
         this.positions = new HashMap<>();
+        this.copies = new ArrayList<>();
+    }
+
+    public boolean isCopy() {
+        return this.getParent() != null;
+    }
+
+    @Override
+    public int compareTo(Arena arena) {
+        return this.getDisplayName().compareTo(arena.getDisplayName());
     }
 }
