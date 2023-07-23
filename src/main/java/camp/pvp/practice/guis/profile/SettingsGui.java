@@ -36,6 +36,7 @@ public class SettingsGui extends StandardGui {
                 guiButton.setLore(
                         "&7Would you like to see other",
                         "&7spectators while spectating?",
+                        " ",
                         "&aCurrent Setting: &f" + (gameProfile.isSpectatorVisibility() ? "Enabled" : "Disabled"));
             }
         });
@@ -58,6 +59,7 @@ public class SettingsGui extends StandardGui {
                 guiButton.setLore(
                         "&7Would you like to see other",
                         "&7players in the lobby?",
+                        " ",
                         "&aCurrent Setting: &f" + (gameProfile.isLobbyVisibility() ? "Enabled" : "Disabled"));
             }
         });
@@ -79,6 +81,7 @@ public class SettingsGui extends StandardGui {
                 guiButton.setLore(
                         "&7Would you like to receive combo",
                         "&7messages and sounds?",
+                        " ",
                         "&aCurrent Setting: &f" + (gameProfile.isComboMessages() ? "Enabled" : "Disabled"));
             }
         });
@@ -101,6 +104,7 @@ public class SettingsGui extends StandardGui {
                         "&7Would you like to receive tournament",
                         "&7updates in chat, even when you're",
                         "&7not in the tournament?",
+                        " ",
                         "&aCurrent Setting: &f" + (gameProfile.isTournamentNotifications() ? "Enabled" : "Disabled"));
             }
         });
@@ -123,7 +127,8 @@ public class SettingsGui extends StandardGui {
                         "&7Would you like to utilize",
                         "&7Lunar Client cooldowns",
                         "&7instead of your XP bar?",
-                        "&aCurrent Setting: &f" + (gameProfile.isLunarCooldowns() ? "Enabled (Recommended)" : "Disabled"));
+                        " ",
+                        "&aCurrent Setting: &f" + (gameProfile.isLunarCooldowns() ? "Enabled" : "Disabled"));
             }
         });
         lunarCooldowns.setSlot(14);
@@ -209,6 +214,7 @@ public class SettingsGui extends StandardGui {
             public void update(GuiButton guiButton, Gui gui) {
                 guiButton.setLore(
                         "&7Would you to see your sidebar?",
+                        " ",
                         "&aCurrent Setting: &f" + (gameProfile.isShowSidebar() ? "Enabled" : "Disabled"));
             }
         });

@@ -354,7 +354,7 @@ public abstract class Game {
     }
 
     public boolean isBuild() {
-        return false;
+        return kit.isBuild();
     }
 
     public List<Player> getAllPlayers() {

@@ -64,9 +64,9 @@ public class PlayerCooldown {
         this.issued = calendar.getTime();
 
         LunarClientAPI lcApi = LunarClientAPI.getInstance();
-        this.lunar = lcApi.isRunningLunarClient(player);
 
-        if(lunar && participant.isLunarCooldowns()) {
+        if(lcApi.isRunningLunarClient(player) && participant.isLunarCooldowns()) {
+            lunar = true;
             LunarClientAPI.getInstance().sendPacket(player, new LCCooldown("Pearl Cooldown", 16, Material.ENDER_PEARL).getPacket());
         }
     }
