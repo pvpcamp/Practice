@@ -29,7 +29,7 @@ public class Arena implements Comparable<Arena>{
     private @Getter @Setter String name, displayName;
     private @Getter @Setter Arena.Type type;
     private @Getter @Setter Map<String, ArenaPosition> positions;
-    private @Getter @Setter boolean enabled, inUse;
+    private @Getter @Setter boolean enabled, inUse, ranked;
 
     private @Getter @Setter String parent;
     private @Getter @Setter List<String> copies;
@@ -48,6 +48,6 @@ public class Arena implements Comparable<Arena>{
 
     @Override
     public int compareTo(Arena arena) {
-        return this.getDisplayName().compareTo(arena.getDisplayName());
+        return this.getName().compareTo(arena.getName());
     }
 }
