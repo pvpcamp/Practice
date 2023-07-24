@@ -10,8 +10,6 @@ import camp.pvp.practice.interactables.InteractableItems;
 import camp.pvp.practice.kits.CustomDuelKit;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.PartyInvite;
-import camp.pvp.practice.profiles.stats.DuelKitQueueStatistics;
-import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
@@ -215,10 +213,10 @@ public class GameProfile {
         if(player != null) {
 
             if(game != null) {
-                if(game.getCurrentPlaying().contains(player)) {
+                if(game.getCurrentPlayersPlaying().contains(player)) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
 //                        !game.seeEveryone() &&
-                        if(!game.getCurrentPlaying().contains(p)) {
+                        if(!game.getCurrentPlayersPlaying().contains(p)) {
                             if(player.canSee(p)) {
                                 player.hidePlayer(p);
                             }
@@ -230,7 +228,7 @@ public class GameProfile {
                     }
                 } else {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        boolean b = this.isSpectatorVisibility() ? game.getAllPlayers().contains(p) : game.getCurrentPlaying().contains(p);
+                        boolean b = this.isSpectatorVisibility() ? game.getAllPlayers().contains(p) : game.getCurrentPlayersPlaying().contains(p);
                         if (b) {
                             if(!player.canSee(p)) {
                                 player.showPlayer(p);

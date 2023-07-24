@@ -30,14 +30,14 @@ public class PlayerMoveListener implements Listener {
             Location to = event.getTo();
 
             if (game != null) {
-                if (event.getTo().getBlock().isLiquid() && game.getCurrentPlaying().contains(player)) {
+                if (event.getTo().getBlock().isLiquid() && game.getCurrentPlayersPlaying().contains(player)) {
                     if (game.getKit().isDieInWater() && game.getState().equals(Game.State.ACTIVE)) {
                         game.eliminate(player, false);
                     }
                 }
 
                 if (!game.getKit().isMoveOnStart()) {
-                    if (game.getState().equals(Game.State.STARTING) && game.getCurrentPlaying().contains(player)) {
+                    if (game.getState().equals(Game.State.STARTING) && game.getCurrentPlayersPlaying().contains(player)) {
                         if (from.getX() != to.getX() || from.getZ() != to.getZ()) {
                             player.teleport(from);
                         }

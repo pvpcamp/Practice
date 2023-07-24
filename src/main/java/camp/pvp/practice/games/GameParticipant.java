@@ -18,7 +18,7 @@ public class GameParticipant {
     private final UUID uuid;
     private final String name;
     private GameTeam team;
-    private boolean alive, kitApplied, hittable, comboMessages, lunarCooldowns;
+    private boolean alive, currentlyPlaying, kitApplied, hittable, comboMessages, lunarCooldowns;
 
     // HCFTEAMS ONLY
     private HCFKit appliedHcfKit;
@@ -60,5 +60,10 @@ public class GameParticipant {
         for(PlayerCooldown cooldown : cooldowns.values()) {
             cooldown.remove();
         }
+    }
+
+    public void eliminate() {
+        this.alive = false;
+        this.currentlyPlaying = false;
     }
 }

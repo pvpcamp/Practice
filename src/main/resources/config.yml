@@ -1,3 +1,11 @@
 locations:
   lobby:
   kit_editor:
+networking:
+  mongo:
+    uri: "uri"
+    database: "db"
+    profiles_collection: "practice_profiles"
+  redis:
+    host: "127.0.0.1"
+    port: 6379

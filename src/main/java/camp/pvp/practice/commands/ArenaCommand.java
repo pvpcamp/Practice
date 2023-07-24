@@ -5,6 +5,7 @@ import camp.pvp.practice.arenas.ArenaManager;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -54,11 +55,12 @@ public class ArenaCommand implements CommandExecutor {
                             spacer = "&7, ";
                         }
 
-                        TextComponent component = new TextComponent(name + spacer);
+                        TextComponent component = new TextComponent(Colors.get(name + spacer));
                         ComponentBuilder builder = new ComponentBuilder(Colors.get("&6Arena: &f" + a.getName()));
-                        builder.append(Colors.get("&6Enabled: &f" + a.isEnabled()));
-                        builder.append(Colors.get("&6Type: &f" + a.getType().name()));
+                        builder.append(Colors.get("\n&6Enabled: &f" + a.isEnabled()));
+                        builder.append(Colors.get("\n&6Type: &f" + a.getType().name()));
 
+                        component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/arena info " + a.getName()));
                         component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, builder.create()));
 
                         components[i + 1] = component;
@@ -232,6 +234,7 @@ public class ArenaCommand implements CommandExecutor {
                             player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName()
                                     + ChatColor.GREEN + " has been renamed to " + ChatColor.WHITE + args[2].toLowerCase() + ChatColor.GREEN + ".");
                             arena.setName(args[2].toLowerCase());
+                            return true;
                         }
                         break;
                     case "position":
@@ -240,42 +243,46 @@ public class ArenaCommand implements CommandExecutor {
                             return true;
                         }
 
-                        ArenaPosition position = null;
-                        Location location = player.getLocation();
-                        for(String s : arena.getType().getValidPositions()) {
-                            if(s.equalsIgnoreCase(args[2])) {
-                                position = new ArenaPosition(s, location);
-                                arena.getPositions().put(s, position);
-                                break;
-                            }
-                        }
+                        if(args.length > 2) {
 
-                        if(position == null) {
-                            List<String> list = new ArrayList<>(arena.getType().getValidPositions());
-
-                            sb = new StringBuilder();
-                            final int size = list.size();
-                            int x = size;
-                            while(x != 0) {
-                                final String s = list.get(0);
-                                list.remove(s);
-                                sb.append(s);
-
-                                x--;
-                                if(x == 0) {
-                                    sb.append(".");
-                                } else {
-                                    sb.append(", ");
+                            ArenaPosition position = null;
+                            Location location = player.getLocation();
+                            for (String s : arena.getType().getValidPositions()) {
+                                if (s.equalsIgnoreCase(args[2])) {
+                                    position = new ArenaPosition(s, location);
+                                    arena.getPositions().put(s, position);
+                                    break;
                                 }
                             }
 
-                            player.sendMessage(ChatColor.RED + "Invalid arena position. Valid positions for type '" + arena.getType().name() + "': " + sb.toString());
+                            if (position == null) {
+                                List<String> list = new ArrayList<>(arena.getType().getValidPositions());
+
+                                sb = new StringBuilder();
+                                final int size = list.size();
+                                int x = size;
+                                while (x != 0) {
+                                    final String s = list.get(0);
+                                    list.remove(s);
+                                    sb.append(s);
+
+                                    x--;
+                                    if (x == 0) {
+                                        sb.append(".");
+                                    } else {
+                                        sb.append(", ");
+                                    }
+                                }
+
+                                player.sendMessage(ChatColor.RED + "Invalid arena position. Valid positions for type '" + arena.getType().name() + "': " + sb.toString());
+                                return true;
+                            }
+
+                            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " position "
+                                    + ChatColor.WHITE + position.getPosition() + ChatColor.GREEN + " has been set to your current location.");
                             return true;
                         }
-
-                        player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " position "
-                                + ChatColor.WHITE + position.getPosition() + ChatColor.GREEN + " has been set to your current location.");
-                        return true;
+                        break;
                     case "teleport":
                         if(!exists) {
                             player.sendMessage(existsMessage);
@@ -283,7 +290,7 @@ public class ArenaCommand implements CommandExecutor {
                         }
 
                         if(args.length > 2) {
-                            position = arena.getPositions().get(args[2].toLowerCase());
+                            ArenaPosition position = arena.getPositions().get(args[2].toLowerCase());
                             if (position == null) {
                                 player.sendMessage(ChatColor.RED + "The position you have specified has not been set or is invalid for this arena type.");
                                 return true;
@@ -291,11 +298,12 @@ public class ArenaCommand implements CommandExecutor {
 
                             player.teleport(position.getLocation());
                             player.sendMessage(ChatColor.GREEN + "You have been teleported to " + ChatColor.WHITE + position.getPosition() + ChatColor.GREEN + ".");
+                            return true;
                         }
-                        return true;
+                        break;
                     case "copy":
                     case "getcopies":
-                        player.sendMessage(ChatColor.GREEN + "Come soon!");
+                        player.sendMessage(ChatColor.GREEN + "Coming soon!");
                         return true;
                 }
             }

@@ -165,7 +165,7 @@ public class SettingsGui extends StandardGui {
         playerTime.setSlot(15);
         this.addButton(playerTime, false);
 
-        GuiButton deathAnimation = new GuiButton(Material.BLAZE_ROD, "&4Death Animation");
+        GuiButton deathAnimation = new GuiButton(gameProfile.getDeathAnimation().getIcon().getType(), "&4Death Animation");
         deathAnimation.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {

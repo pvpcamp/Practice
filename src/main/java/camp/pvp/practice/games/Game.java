@@ -29,7 +29,7 @@ import java.util.*;
 public abstract class Game {
 
     public enum State {
-        INACTIVE, STARTING, ACTIVE, ENDED;
+        INACTIVE, STARTING, NEXT_ROUND_STARTING, ACTIVE, ROUND_ENDED, ENDED;
     }
 
     private final Practice plugin;
@@ -46,7 +46,7 @@ public abstract class Game {
     public Arena arena;
     public DuelKit kit;
 
-    public int round;
+    public int round, timer;
     public Date created, started, ended;
 
     public BukkitTask startingTimer, endingTimer;
@@ -114,7 +114,7 @@ public abstract class Game {
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         if(participant != null && !this.getState().equals(State.ENDED)) {
-            participant.setAlive(false);
+            participant.eliminate();
             participant.clearCooldowns();
 
             PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
@@ -384,8 +384,19 @@ public abstract class Game {
         return players;
     }
 
-    public List<Player> getCurrentPlaying() {
-        return getAlivePlayers();
+    public Map<UUID, GameParticipant> getCurrentPlaying() {
+        return this.getAlive();
+    }
+
+    public List<Player> getCurrentPlayersPlaying() {
+        List<Player> players = new ArrayList<>();
+        for(UUID uuid : getCurrentPlaying().keySet()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if(player != null) {
+                players.add(player);
+            }
+        }
+        return players;
     }
 
     public List<Player> getSpectatorsPlayers() {

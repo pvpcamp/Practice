@@ -130,24 +130,20 @@ public class PlayerInteractListener implements Listener {
                         break;
                 }
 
-                if(profile.getGame().getCurrentPlaying().contains(player)) {
-                    if(block != null) {
-                        BlockState blockState = block.getState();
-                        MaterialData data = blockState.getData();
-                        if (data instanceof Door) {
-                            event.setCancelled(true);
-                        } else if (data instanceof TrapDoor) {
-                            event.setCancelled(true);
-                        } else if (data instanceof Gate) {
-                            event.setCancelled(true);
-                        } else if(data instanceof Lever) {
-                            event.setCancelled(true);
-                        } else if(data instanceof Chest) {
-                            event.setCancelled(true);
-                        }
+                if(block != null) {
+                    BlockState blockState = block.getState();
+                    MaterialData data = blockState.getData();
+                    if (data instanceof Door) {
+                        event.setCancelled(true);
+                    } else if (data instanceof TrapDoor) {
+                        event.setCancelled(true);
+                    } else if (data instanceof Gate) {
+                        event.setCancelled(true);
+                    } else if(data instanceof Lever) {
+                        event.setCancelled(true);
+                    } else if(data instanceof Chest) {
+                        event.setCancelled(true);
                     }
-                } else {
-                    event.setCancelled(true);
                 }
             } else if(profile.getState().equals(GameProfile.State.KIT_EDITOR)) {
                 if(block != null) {

@@ -21,14 +21,12 @@ import java.util.Collections;
 import java.util.List;
 
 public enum DuelKit {
-    NO_DEBUFF, SPEED_NODEBUFF, CLASSIC, SOUP, HCF, BOXING, SUMO;
+    NO_DEBUFF, CLASSIC, SOUP, HCF, BOXING, SUMO;
 
     public String getDisplayName() {
         switch(this) {
             case NO_DEBUFF:
                 return "No Debuff";
-            case SPEED_NODEBUFF:
-                return "Speed No Debuff";
             case HCF:
                 return "HCF";
             case CLASSIC:
@@ -48,7 +46,6 @@ public enum DuelKit {
         switch(this) {
             case NO_DEBUFF:
                 return ChatColor.RED;
-            case SPEED_NODEBUFF:
             case HCF:
                 return ChatColor.DARK_RED;
             case SOUP:
@@ -78,14 +75,12 @@ public enum DuelKit {
         switch(this) {
             case NO_DEBUFF:
                 return 10;
-            case SPEED_NODEBUFF:
-                return 11;
             case HCF:
-                return 12;
+                return 11;
             case CLASSIC:
-                return 13;
+                return 12;
             case SOUP:
-                return 14;
+                return 13;
             case BOXING:
                 return 15;
             case SUMO:
@@ -105,7 +100,6 @@ public enum DuelKit {
     public boolean isQueueable () {
         switch(this) {
             case NO_DEBUFF:
-            case SPEED_NODEBUFF:
             case HCF:
             case CLASSIC:
             case SOUP:
@@ -133,7 +127,6 @@ public enum DuelKit {
 
     public boolean isEditable() {
         switch(this) {
-            case SPEED_NODEBUFF:
             case SUMO:
                 return false;
             default:
@@ -143,7 +136,6 @@ public enum DuelKit {
 
     public ItemStack[] getMoreItems() {
         switch(this) {
-            case SPEED_NODEBUFF:
             case NO_DEBUFF:
                 ItemStack[] items = this.getGameInventory().getInventory();
 
@@ -213,10 +205,6 @@ public enum DuelKit {
                 potion.setSplash(true);
                 item = potion.toItemStack(1);
                 break;
-            case SPEED_NODEBUFF:
-                potion = new Potion(PotionType.SPEED);
-                item = potion.toItemStack(1);
-                break;
             case HCF:
                 item = new ItemStack(Material.FENCE);
                 break;
@@ -279,59 +267,6 @@ public enum DuelKit {
                 inv[17] = speed.toItemStack(1);
                 inv[26] = speed.toItemStack(1);
                 inv[35] = speed.toItemStack(1);
-
-                inv[7] = fireResistance.toItemStack(1);
-
-                for(int x = 0; x < 36; x++) {
-                    ItemStack i = inv[x];
-                    if(i == null) {
-                        inv[x] = health.toItemStack(1);
-                    }
-                }
-
-                break;
-            case SPEED_NODEBUFF:
-                armor[3] = new ItemStack(Material.DIAMOND_HELMET);
-                armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[3].addEnchantment(Enchantment.DURABILITY, 3);
-
-                armor[2] = new ItemStack(Material.DIAMOND_CHESTPLATE);
-                armor[2].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[2].addEnchantment(Enchantment.DURABILITY, 3);
-
-                armor[1] = new ItemStack(Material.DIAMOND_LEGGINGS);
-                armor[1].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[1].addEnchantment(Enchantment.DURABILITY, 3);
-
-                armor[0] = new ItemStack(Material.DIAMOND_BOOTS);
-                armor[0].addEnchantment(Enchantment.PROTECTION_FALL, 4);
-                armor[0].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[0].addEnchantment(Enchantment.DURABILITY, 3);
-
-                inv[0] = new ItemStack(Material.DIAMOND_SWORD);
-                inv[0].addEnchantment(Enchantment.DAMAGE_ALL, 3);
-                inv[0].addEnchantment(Enchantment.FIRE_ASPECT, 2);
-                inv[0].addEnchantment(Enchantment.DURABILITY, 3);
-
-                inv[1] = new ItemStack(Material.ENDER_PEARL, 16);
-                inv[2] = new ItemStack(Material.COOKED_BEEF, 64);
-
-                ItemStack speed3Potion = new ItemStack(Material.POTION);
-                PotionMeta meta = (PotionMeta) speed3Potion.getItemMeta();
-                meta.setDisplayName(Colors.get("&b&lSpeed III Potion"));
-                meta.addCustomEffect(new PotionEffect(PotionEffectType.SPEED, 1800, 2), true);
-                speed3Potion.setItemMeta(meta);
-
-                fireResistance = new Potion(PotionType.FIRE_RESISTANCE, 1);
-                fireResistance.setHasExtendedDuration(true);
-
-                health = new Potion(PotionType.INSTANT_HEAL, 2);
-                health.setSplash(true);
-
-                inv[8] = speed3Potion.clone();
-                inv[17] = speed3Potion.clone();
-                inv[26] = speed3Potion.clone();
-                inv[35] = speed3Potion.clone();
 
                 inv[7] = fireResistance.toItemStack(1);
 

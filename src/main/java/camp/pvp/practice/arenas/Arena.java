@@ -10,12 +10,10 @@ import java.util.*;
 public class Arena implements Comparable<Arena>{
 
     public enum Type {
-        DUEL, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_TEAMS, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_SPLEEF, EVENT_OITC;
+        DUEL, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_SPLEEF, EVENT_OITC;
 
         public List<String> getValidPositions() {
             switch(this) {
-                case DUEL_TEAMS:
-                    return Arrays.asList("blue", "red", "yellow", "white", "center");
                 case DUEL_BUILD:
                     return Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
                 case FFA:

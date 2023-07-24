@@ -28,7 +28,7 @@ public class InventoryMoveItemListener implements Listener {
             Game game = profile.getGame();
 
             if(game != null) {
-                if(!game.getCurrentPlaying().contains(player)) {
+                if(!game.getCurrentPlayersPlaying().contains(player)) {
                     event.setCancelled(true);
                 }
             } else if(!profile.isBuildMode()) {

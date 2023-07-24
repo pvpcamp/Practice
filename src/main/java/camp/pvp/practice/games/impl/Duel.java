@@ -53,7 +53,9 @@ public class Duel extends Game {
             }
 
             Collections.shuffle(list);
-            this.setArena(list.get(0));
+            if(!list.isEmpty()) {
+                this.setArena(list.get(0));
+            }
         }
 
         if(arena == null) {

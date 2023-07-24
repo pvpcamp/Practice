@@ -10,6 +10,7 @@ import com.mongodb.client.model.Filters;
 import lombok.Getter;
 import org.bson.Document;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -23,13 +24,17 @@ public class GameProfileManager {
     private Logger logger;
     private @Getter Map<UUID, GameProfile> loadedProfiles;
 
-    private MongoManager mongoManager;
+    private @Getter MongoManager mongoManager;
+    private String profilesCollection;
     public GameProfileManager(Practice plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
         this.loadedProfiles = new HashMap<>();
 
-        this.mongoManager = NetworkHelper.getInstance().getMongoManager();
+        FileConfiguration config = plugin.getConfig();
+
+        this.mongoManager = new MongoManager(plugin, config.getString("networking.mongo.uri"), config.getString("networking.mongo.database"));
+        this.profilesCollection = config.getString("networking.mongo.profiles_collection");
 
         this.logger.info("Started GameProfileManager.");
     }
@@ -48,7 +53,7 @@ public class GameProfileManager {
 
     public GameProfile find(String name, boolean store) {
         final GameProfile[] profile = {null};
-        mongoManager.getCollection(false, "practice_profiles", new MongoCollectionResult() {
+        mongoManager.getCollection(false, profilesCollection, new MongoCollectionResult() {
             @Override
             public void call(MongoCollection<Document> mongoCollection) {
                 Document doc = mongoCollection.find(Filters.regex("name", "(?i)" + name)).first();
@@ -83,7 +88,7 @@ public class GameProfileManager {
 
         profile.setName(player.getName());
 
-        MongoUpdate mu = new MongoUpdate("practice_profiles", profile.getUuid());
+        MongoUpdate mu = new MongoUpdate(profilesCollection, profile.getUuid());
         mu.setUpdate(profile.export());
 
         mongoManager.massUpdate(false, mu);
@@ -93,7 +98,7 @@ public class GameProfileManager {
 
     public GameProfile importFromDatabase(UUID uuid, boolean store) {
         final GameProfile[] profile = {null};
-        mongoManager.getDocument(false, "practice_profiles", uuid, document -> {
+        mongoManager.getDocument(false, profilesCollection, uuid, document -> {
             if(document != null) {
                 profile[0] = new GameProfile(uuid);
                 profile[0].documentImport(document);
@@ -109,7 +114,7 @@ public class GameProfileManager {
     public void exportToDatabase(UUID uuid, boolean async, boolean store) {
         GameProfile profile = loadedProfiles.get(uuid);
         if(profile != null) {
-            MongoUpdate mu = new MongoUpdate("practice_profiles", profile.getUuid());
+            MongoUpdate mu = new MongoUpdate(profilesCollection, profile.getUuid());
             mu.setUpdate(profile.export());
             mongoManager.massUpdate(async, mu);
         }

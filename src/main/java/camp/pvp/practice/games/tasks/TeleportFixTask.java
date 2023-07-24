@@ -1,6 +1,5 @@
 package camp.pvp.practice.games.tasks;
 
-import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,7 +16,7 @@ public class TeleportFixTask implements Runnable{
     @Override
     public void run() {
         if(game.getState().equals(Game.State.STARTING)) {
-            for(Player player : game.getCurrentPlaying()) {
+            for(Player player : game.getCurrentPlayersPlaying()) {
                 Location location = player.getLocation();
                 Block block = location.getBlock();
                 if(location.getBlock() != null) {
