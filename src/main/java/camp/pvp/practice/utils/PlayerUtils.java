@@ -27,6 +27,7 @@ public class PlayerUtils {
         player.setFlySpeed(0.1F);
         player.setFireTicks(0);
         player.setSaturation(13);
+        player.setItemOnCursor(null);
         for(PotionEffect effect : player.getActivePotionEffects()){
             player.removePotionEffect(effect.getType());
         }

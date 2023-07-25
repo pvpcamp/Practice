@@ -80,6 +80,22 @@ public class PlayerInteractListener implements Listener {
                 }
             }
 
+            if(block != null) {
+                BlockState blockState = block.getState();
+                MaterialData data = blockState.getData();
+                if (data instanceof Door) {
+                    event.setCancelled(true);
+                } else if (data instanceof TrapDoor) {
+                    event.setCancelled(true);
+                } else if (data instanceof Gate) {
+                    event.setCancelled(true);
+                } else if(data instanceof Lever) {
+                    event.setCancelled(true);
+                } else if(data instanceof Chest) {
+                    event.setCancelled(true);
+                }
+            }
+
             Game game = profile.getGame();
             if (game != null) {
                 GameParticipant participant = game.getAlive().get(player.getUniqueId());
@@ -128,22 +144,6 @@ public class PlayerInteractListener implements Listener {
                             }
                         }
                         break;
-                }
-
-                if(block != null) {
-                    BlockState blockState = block.getState();
-                    MaterialData data = blockState.getData();
-                    if (data instanceof Door) {
-                        event.setCancelled(true);
-                    } else if (data instanceof TrapDoor) {
-                        event.setCancelled(true);
-                    } else if (data instanceof Gate) {
-                        event.setCancelled(true);
-                    } else if(data instanceof Lever) {
-                        event.setCancelled(true);
-                    } else if(data instanceof Chest) {
-                        event.setCancelled(true);
-                    }
                 }
             } else if(profile.getState().equals(GameProfile.State.KIT_EDITOR)) {
                 if(block != null) {

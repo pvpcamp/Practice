@@ -9,3 +9,9 @@ networking:
   redis:
     host: "127.0.0.1"
     port: 6379
+npc_ids:
+  unranked: 0
+  ranked: 1
+  host_event: 2
+  statistics: 3
+  leaderboards: 4

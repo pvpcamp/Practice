@@ -3,6 +3,7 @@ name: Practice
 version: ${plugin.desc}
 author: leuo
 depend:
+  - Citizens
   - Gooey2
   - NetworkHelper
   - ProtocolLib

@@ -22,6 +22,12 @@ public class EntityDamageByEntityListener implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Player player = null;
         Player attacker = null;
+
+        if(event.getEntity().hasMetadata("NPC")) {
+            event.setCancelled(true);
+            return;
+        }
+
         if(event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
             player = (Player) event.getEntity();
             attacker = (Player) event.getDamager();

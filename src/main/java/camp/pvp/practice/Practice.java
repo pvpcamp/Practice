@@ -13,6 +13,7 @@ import camp.pvp.practice.listeners.bukkit.potion.PotionSplashListener;
 import camp.pvp.practice.listeners.bukkit.projectile.ProjectileHitListener;
 import camp.pvp.practice.listeners.bukkit.projectile.ProjectileLaunchListener;
 import camp.pvp.practice.listeners.bukkit.world.WeatherChangeListener;
+import camp.pvp.practice.listeners.citizens.NPCRightClickListener;
 import camp.pvp.practice.listeners.packets.EnderpearlSound;
 import camp.pvp.practice.nametags.NameColorRunnable;
 import camp.pvp.practice.parties.PartyManager;
@@ -173,6 +174,9 @@ public class Practice extends JavaPlugin {
         new ProjectileLaunchListener(this);
 
         new WeatherChangeListener(this);
+
+        // Citizens
+        new NPCRightClickListener(this);
 
         // Packets
         protocolManager.addPacketListener(new EnderpearlSound(this));

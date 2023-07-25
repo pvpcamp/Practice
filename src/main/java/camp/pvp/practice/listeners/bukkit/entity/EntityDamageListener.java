@@ -4,6 +4,7 @@ import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,7 +20,9 @@ public class EntityDamageListener implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        if(event.getEntity() instanceof Player) {
+        Entity entity = event.getEntity();
+        boolean isCitizensNPC = entity.hasMetadata("NPC");
+        if(!isCitizensNPC && event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
             if(profile.getState().equals(GameProfile.State.IN_GAME)) {

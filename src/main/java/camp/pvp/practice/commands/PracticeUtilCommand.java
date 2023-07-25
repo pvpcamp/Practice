@@ -1,5 +1,6 @@
 package camp.pvp.practice.commands;
 
+import camp.pvp.practice.listeners.citizens.NPCClickable;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
@@ -54,6 +55,30 @@ public class PracticeUtilCommand implements CommandExecutor {
                             player.sendMessage(ChatColor.RED + "You are not running Lunar Client.");
                         }
                         return true;
+                    case "setnpcid":
+                        if(args.length > 2) {
+                            NPCClickable clickable;
+                            try {
+                                clickable = NPCClickable.valueOf(args[1].toUpperCase());
+                            } catch (IllegalArgumentException ignored) {
+                                player.sendMessage(ChatColor.RED + "Invalid clickable type. Valid options: UNRANKED, RANKED, HOST_EVENT, STATISTICS, LEADERBOARDS");
+                                return true;
+                            }
+
+                            int npcId = 0;
+
+                            try {
+                                npcId = Integer.parseInt(args[2]);
+                            } catch (NumberFormatException ignored) {
+                                player.sendMessage(ChatColor.RED + "Invalid ID.");
+                                return true;
+                            }
+
+                            plugin.getConfig().set("npc_ids." + clickable.name().toLowerCase(), npcId);
+                            player.sendMessage(Colors.get("&aNPC id &f" + npcId + "&a is now assigned to &f" + clickable.name().toLowerCase() + "&a."));
+                            return true;
+                        }
+                        break;
                     case "restart":
                     case "stop":
                     case "shutdown":
@@ -89,6 +114,7 @@ public class PracticeUtilCommand implements CommandExecutor {
             sb.append("\n&6/practiceutil setkiteditor &7- &fSets the kit editor location.");
             sb.append("\n&6/practiceutil reset &7- &fResets your player.");
             sb.append("\n&6/practiceutil staffmodules &7- &fGives you the Lunar Client staff modules.");
+            sb.append("\n&6/practiceutil setnpcid <clickable type> <npc id> &7- &fAssign a clickable type to an NPC.");
             sb.append("\n&6/practiceutil shutdown &7- &fShutdown the server.");
 
             player.sendMessage(Colors.get(sb.toString()));
