@@ -76,13 +76,40 @@ public class GameQueue {
                         duel.join(member1.getPlayer());
                         duel.join(member2.getPlayer());
 
-                        plugin.getGameManager().addGame(duel);
-
                         duel.start();
                     }
                 }, 5, 5);
+                break;
             case RANKED:
-                // TODO: Ranked Matchmaking
+                queueTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+                    if(queueMembers.size() > 1) {
+                        for(GameQueueMember member1 : queueMembers) {
+                            for(GameQueueMember member2 : queueMembers) {
+                                if(member1 != member2) {
+                                    if(member2.getEloLow() <= member1.getElo() && member2.getEloHigh() >= member1.getElo()) {
+                                        if (member1.getEloLow() <= member2.getElo() && member1.getEloHigh() >= member2.getElo()) {
+                                            queueMembers.remove(member1);
+                                            queueMembers.remove(member2);
+                                            member1.getQueueUpdater().cancel();
+                                            member2.getQueueUpdater().cancel();
+
+                                            Duel duel = new Duel(plugin, UUID.randomUUID());
+
+                                            duel.setQueueType(type);
+                                            duel.setKit(duelKit);
+
+                                            duel.join(member1.getPlayer());
+                                            duel.join(member2.getPlayer());
+
+                                            duel.start();
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }, 5, 5);
         }
     }
 

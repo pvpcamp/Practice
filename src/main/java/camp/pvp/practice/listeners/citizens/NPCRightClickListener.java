@@ -1,12 +1,12 @@
 package camp.pvp.practice.listeners.citizens;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.guis.queue.UnrankedQueueGui;
+import camp.pvp.practice.guis.queue.QueueGui;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.queue.GameQueue;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,7 +33,12 @@ public class NPCRightClickListener implements Listener {
                 switch (clickable) {
                     case UNRANKED:
                         if(profile.getState().equals(GameProfile.State.LOBBY)) {
-                            new UnrankedQueueGui().open(player);
+                            new QueueGui(GameQueue.Type.UNRANKED, profile).open(player);
+                        }
+                        break;
+                    case RANKED:
+                        if(profile.getState().equals(GameProfile.State.LOBBY)) {
+                            new QueueGui(GameQueue.Type.RANKED, profile).open(player);
                         }
                         break;
                     default:

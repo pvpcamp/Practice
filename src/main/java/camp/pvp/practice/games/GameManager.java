@@ -1,8 +1,10 @@
 package camp.pvp.practice.games;
 
+import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.impl.events.SumoEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.queue.GameQueue;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -55,6 +57,20 @@ public class GameManager {
         int i = 0;
         for(Game game : getActiveGames()) {
             i += game.countAll();
+        }
+
+        return i;
+    }
+
+    public int getTotalInGame(GameQueue.Type queueType) {
+        int i = 0;
+        for(Game game : getActiveGames()) {
+            if(game instanceof Duel) {
+                Duel duel = (Duel) game;
+                if(duel.getQueueType().equals(queueType)) {
+                    i += game.getAlive().size();
+                }
+            }
         }
 
         return i;

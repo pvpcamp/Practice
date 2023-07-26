@@ -107,7 +107,7 @@ public class NameColorRunnable implements Runnable{
                             redTeam.addEntry(p.getName());
                         }
                     } else {
-                        if (plugin.getGameProfileManager().getState(profile).equals(GameProfile.State.SPECTATING)) {
+                        if (profile.getState().equals(GameProfile.State.SPECTATING)) {
                             for (Player p : profile.getGame().getAlivePlayers()) {
                                 playingTeam.addEntry(p.getName());
                             }

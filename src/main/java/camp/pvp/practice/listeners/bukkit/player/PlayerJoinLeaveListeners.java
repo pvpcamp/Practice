@@ -42,13 +42,12 @@ public class PlayerJoinLeaveListeners implements Listener {
         }
 
         profile.setName(player.getName());
+        profile.getProfileElo().setName(player.getName());
         profile.playerUpdate(true);
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
         event.setJoinMessage(null);
-
-        LunarClientAPI lcApi = LunarClientAPI.getInstance();
 
         Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
             @Override
@@ -57,6 +56,10 @@ public class PlayerJoinLeaveListeners implements Listener {
                 if (player.isOnline()) {
                     if (p == null) {
                         player.kickPlayer(ChatColor.RED + "There was an issue loading your profile, please reconnect.");
+                    } else {
+                        if(!player.hasPermission("practice.staff")) {
+                            p.setStaffMode(false);
+                        }
                     }
                 }
             }

@@ -58,23 +58,27 @@ public class SidebarAdapter implements AssembleAdapter {
                         lines.add(" ");
                         lines.add("&6Debug:");
                         lines.add(" &6&oVersion: &f" + plugin.getDescription().getVersion());
-                        lines.add(" &6&oBuild mode: &f" + profile.isBuildMode());
                         lines.add(" &6&oLC Players: &f" + plugin.getLunarClientAPI().getPlayersRunningLunarClient().size() + "/" + online);
+                        lines.add(" &6&oBuild mode: &f" + profile.isBuildMode());
+                        lines.add(" &6&oStaff mode: &f" + profile.isStaffMode());
                     }
                     break;
                 case LOBBY_QUEUE:
                     GameQueue queue = gameQueueManager.getQueue(player);
                     GameQueueMember queueMember = gameQueueManager.findQueueMember(queue, player.getUniqueId());
-                    boolean ranked = queue.getType().equals(GameQueue.Type.UNRANKED);
+                    boolean ranked = queue.getType().equals(GameQueue.Type.RANKED);
                     lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
                     lines.add("&6In Queue:");
-                    lines.add(" &7● " + queue.getDuelKit().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f(U)" : "&f&l(R)"));
+                    lines.add(" &7● " + queue.getDuelKit().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : "&f(U)"));
+
+                    if(queue.getType().equals(GameQueue.Type.RANKED)) {
+                        lines.add(" &7● &6ELO: &f" + profile.getProfileElo().getRatings().get(queue.getDuelKit()));
+                        lines.add(" &7● &6Range: &f" + queueMember.getEloLow() + " - " + queueMember.getEloHigh());
+                    }
+
                     lines.add(" &7● &f" + TimeUtil.get(new Date(), queueMember.getJoined()));
-//                    if(ranked) {
-//                        lines.add(" &7● &f(900-1100)");
-//                    }
                     break;
                 case LOBBY_PARTY:
                     lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());

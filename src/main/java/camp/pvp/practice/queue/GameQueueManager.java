@@ -30,12 +30,18 @@ public class GameQueueManager {
 
     public GameQueueMember addToQueue(Player player, GameQueue gameQueue) {
         if(getQueue(player) == null) {
-            GameQueueMember gqm = new GameQueueMember(player.getUniqueId(), player.getName());
+            GameQueueMember gqm;
+            GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+            if(gameQueue.getType().equals(GameQueue.Type.RANKED)) {
+                gqm = new GameQueueMember(player.getUniqueId(), player.getName(), profile.getProfileElo().getRatings().get(gameQueue.getDuelKit()));
+            } else {
+                gqm = new GameQueueMember(player.getUniqueId(), player.getName());
+            }
+
             gqm.setQueue(gameQueue);
             gameQueue.getQueueMembers().add(gqm);
 
             DuelKit kit = gameQueue.getDuelKit();
-            GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
             profile.playerUpdate(false);
             player.sendMessage(ChatColor.GREEN + "You have joined the queue for " + gameQueue.getType().name().toLowerCase() + " " + kit.getColor() + kit.getDisplayName() + ChatColor.GREEN + ".");
 
@@ -92,6 +98,17 @@ public class GameQueueManager {
         int i = 0;
         for(GameQueue q : gameQueues) {
             i += q.getQueueMembers().size();
+        }
+
+        return i;
+    }
+
+    public int getTotalInQueue(GameQueue.Type queueType) {
+        int i = 0;
+        for(GameQueue q : gameQueues) {
+            if(queueType.equals(q.getType())) {
+                i += q.getQueueMembers().size();
+            }
         }
 
         return i;

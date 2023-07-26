@@ -14,8 +14,10 @@ import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfileManager;
+import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.Colors;
+import camp.pvp.practice.utils.EloCalculator;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
 import lombok.Getter;
@@ -163,10 +165,6 @@ public class Duel extends Game {
 
         for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
             GameParticipant participant = entry.getValue();
-            Player player = Bukkit.getPlayer(entry.getKey());
-
-            PostGameInventory pgi;
-            UUID uuid = UUID.randomUUID();
 
             boolean alive = participant.isAlive();
             if(alive) {
@@ -195,7 +193,6 @@ public class Duel extends Game {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(" ");
         stringBuilder.append(Colors.get("&6&lMatch ended."));
-        stringBuilder.append(Colors.get("\n &7● &6Winner: &f" + winnerParticipant.getName()));
 
         TextComponent text = new TextComponent(ChatColor.GRAY + " ● " + ChatColor.GOLD + "Inventories: ");
         final int size = components.size();
@@ -212,39 +209,26 @@ public class Duel extends Game {
             }
         }
 
-        // TODO: Unranked and Ranked Stats + Ranked ELO
-//        switch (this.getType()) {
-//            case UNRANKED:
-//                winnerProfile.setUnrankedWins(winnerProfile.getUnrankedWins() + 1);
-//                loserProfile.setUnrankedLosses(loserProfile.getUnrankedLosses() + 1);
-//
-//                break;
-//            case RANKED:
-//                winnerProfile.setRankedWins(winnerProfile.getRankedWins() + 1);
-//                loserProfile.setRankedLosses(loserProfile.getRankedLosses() + 1);
-//
-//                double winnerElo = winnerProfile.getKitElo(this.getKit());
-//                double loserElo = loserProfile.getKitElo(this.getKit());
-//
-//                // before it was 10                            ||
-//                double multiplier = Math.pow(1 / (1 + Math.pow(24, (winnerElo - loserElo) / 400)), 2);
-//
-//                double difference = 50 * multiplier;
-//                int newWinnerElo = (int) Math.round(winnerElo + difference);
-//                int newLoserElo = (int) Math.round(loserElo - difference);
-//
-//                winnerProfile.setKitElo(this.getKit(), newWinnerElo);
-//                loserProfile.setKitElo(this.getKit(), newLoserElo);
-//
-//                stringBuilder.append(Colors.get("\n &7● &bELO Changes: &f" + winnerProfile.getName() + " &7- &f" + newWinnerElo + " ELO &7(+" + Math.round(difference) + ")" +
-//                        "&7, &f" + loserProfile.getName() + " &7- &f" + newLoserElo + " ELO &7(-" + Math.round(difference) + ")"));
-//                break;
-//            case TOURNAMENT:
-//                if(Practice.instance.getTournament() != null) {
-//                    Practice.instance.getTournament().leave(Bukkit.getPlayer(loser));
-//                }
-//                break;
-//        }
+        if(queueType.equals(GameQueue.Type.RANKED)) {
+            ProfileELO winnerEloProfile, loserEloProfile;
+            winnerEloProfile = winnerProfile.getProfileElo();
+            loserEloProfile = loserProfile.getProfileElo();
+
+            int winnerElo = winnerEloProfile.getRatings().get(kit);
+            int loserElo = loserEloProfile.getRatings().get(kit);
+            int difference = EloCalculator.getEloDifference(winnerElo, loserElo);
+
+            stringBuilder.append(Colors.get("\n &7● &aWinner: &f" + winnerParticipant.getName() + " &7- &a" + (winnerElo + difference) + " +" + difference));
+            stringBuilder.append(Colors.get("\n &7● &cLoser: &f" + loserParticipant.getName()+ " &7- &c" + (loserElo - difference) + " -" + difference));
+
+            winnerEloProfile.getRatings().put(kit, EloCalculator.getNewWinnerElo(winnerElo, loserElo));
+            loserEloProfile.getRatings().put(kit, EloCalculator.getNewLoserElo(winnerElo, loserElo));
+
+            gpm.exportElo(winnerEloProfile, true);
+            gpm.exportElo(loserEloProfile, true);
+        } else {
+            stringBuilder.append(Colors.get("\n &7● &6Winner: &f" + winnerParticipant.getName()));
+        }
 
         for(Player player : this.getAllPlayers()) {
             player.sendMessage(" ");

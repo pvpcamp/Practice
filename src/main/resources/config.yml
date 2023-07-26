@@ -6,12 +6,12 @@ networking:
     uri: "uri"
     database: "db"
     profiles_collection: "practice_profiles"
+    elo_collection: "practice_elo_profiles"
   redis:
     host: "127.0.0.1"
     port: 6379
 npc_ids:
   unranked: 0
   ranked: 1
-  host_event: 2
-  statistics: 3
-  leaderboards: 4
+  statistics: 2
+  leaderboards: 3

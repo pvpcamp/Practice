@@ -145,7 +145,7 @@ public class Tournament {
                     timer--;
                 }
             }
-        }, 20, 20);
+        }, 0, 20);
     }
 
     public void nextRound() {
@@ -217,7 +217,7 @@ public class Tournament {
                     timer--;
                 }
             }
-        }, 20, 20);
+        }, 0, 20);
     }
 
     public void startGames() {
@@ -304,7 +304,7 @@ public class Tournament {
                         }
 
                         lines.add(" ");
-                        lines.add("&6&nNext Round:");
+                        lines.add("&6Next Round:");
 
                         if(opponent != null) {
                             lines.add("&e" + profile.getName());

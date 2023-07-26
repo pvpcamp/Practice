@@ -238,6 +238,30 @@ public class SettingsGui extends StandardGui {
         sidebarSettings.setSlot(20);
         this.addButton(sidebarSettings, false);
 
+        if(player.hasPermission("practice.staff")) {
+            GuiButton staffMode = new GuiButton(Material.DIAMOND, "&d&l&oStaff Mode");
+            staffMode.setAction(new GuiAction() {
+                @Override
+                public void run(Player player, Gui gui) {
+                    gameProfile.setStaffMode(!gameProfile.isStaffMode());
+                    gui.updateGui();
+                }
+            });
+
+            staffMode.setButtonUpdater(new AbstractButtonUpdater() {
+                @Override
+                public void update(GuiButton guiButton, Gui gui) {
+                    guiButton.setLore(
+                            "&7Staff mode disables spectating messages,",
+                            "&7hides you from other spectators,",
+                            "&7and hides you in the lobby.",
+                            "&aCurrent Setting: &f" + (gameProfile.isStaffMode() ? "Enabled" : "Disabled"));
+                }
+            });
+            staffMode.setSlot(33);
+            this.addButton(staffMode, false);
+        }
+
         if(player.hasPermission("practice.staff.debug_mode")) {
             GuiButton debugMode = new GuiButton(Material.COMMAND, "&c&l&oDebug Mode");
             debugMode.setAction(new GuiAction() {

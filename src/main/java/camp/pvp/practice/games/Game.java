@@ -300,7 +300,7 @@ public abstract class Game {
         if(!this.getParticipants().containsKey(player.getUniqueId())) {
             String message = "&f" + player.getName() + "&6 has started spectating.";
             player.sendMessage(ChatColor.GREEN + "You have started spectating.");
-            if(player.hasPermission("practice.staff")) {
+            if(profile.isStaffMode()) {
                 this.staffAnnounce("&7[Staff] " + message);
             } else {
                 this.announce(message);

@@ -66,8 +66,10 @@ public enum DuelKit {
                 return Arrays.asList(Arena.Type.DUEL_HCF, Arena.Type.HCF_TEAMFIGHT);
             case SUMO:
                 return Collections.singletonList(Arena.Type.DUEL_SUMO);
+            case BOXING:
+                return Collections.singletonList(Arena.Type.DUEL_FLAT);
             default:
-                return Collections.singletonList(Arena.Type.DUEL);
+                return Arrays.asList(Arena.Type.DUEL, Arena.Type.DUEL_FLAT);
         }
     }
 
@@ -81,6 +83,23 @@ public enum DuelKit {
                 return 12;
             case SOUP:
                 return 13;
+            case BOXING:
+                return 15;
+            case SUMO:
+                return 16;
+        }
+
+        return 0;
+    }
+
+    public int getRankedSlot() {
+        switch(this) {
+            case NO_DEBUFF:
+                return 10;
+            case CLASSIC:
+                return 11;
+            case SOUP:
+                return 12;
             case BOXING:
                 return 15;
             case SUMO:
@@ -112,7 +131,12 @@ public enum DuelKit {
     }
 
     public boolean isRanked() {
-        return false;
+        switch(this) {
+            case HCF:
+                return false;
+            default:
+                return true;
+        }
     }
 
     public boolean isTournament() {

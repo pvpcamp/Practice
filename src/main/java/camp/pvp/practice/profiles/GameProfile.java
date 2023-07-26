@@ -10,6 +10,7 @@ import camp.pvp.practice.interactables.InteractableItems;
 import camp.pvp.practice.kits.CustomDuelKit;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.PartyInvite;
+import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
@@ -51,7 +52,7 @@ public class GameProfile {
     private String name;
     private Time time;
     private boolean spectatorVisibility, lobbyVisibility, comboMessages, tournamentNotifications, lunarCooldowns,
-            showSidebar, buildMode, debugMode;
+            showSidebar, staffMode, buildMode, debugMode;
     private DeathAnimation deathAnimation;
 
     private Game game;
@@ -64,6 +65,8 @@ public class GameProfile {
     private DuelKit editingKit;
     private CustomDuelKit editingCustomKit;
     private Map<DuelKit, Map<Integer, CustomDuelKit>> customDuelKits;
+
+    private ProfileELO profileElo;
 
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
@@ -82,6 +85,8 @@ public class GameProfile {
         this.tournamentNotifications = true;
         this.lunarCooldowns = true;
         this.showSidebar = true;
+
+        this.profileElo = new ProfileELO(uuid);
 
         for(DuelKit kit : DuelKit.values()) {
             if(kit.isEditable()) {
@@ -227,15 +232,29 @@ public class GameProfile {
                         }
                     }
                 } else {
+                    boolean seeSpectators = this.isSpectatorVisibility();
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        boolean b = this.isSpectatorVisibility() ? game.getAllPlayers().contains(p) : game.getCurrentPlayersPlaying().contains(p);
-                        if (b) {
-                            if(!player.canSee(p)) {
-                                player.showPlayer(p);
+                        GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
+                        boolean allPlayerVisiblity = game.getAllPlayers().contains(p);
+                        boolean currentlyPlaying = game.getCurrentPlayersPlaying().contains(p);
+                        boolean hide = false;
+                        if(!currentlyPlaying) {
+                            if (seeSpectators) {
+                                if (profile.isStaffMode() && !player.hasPermission("practice.staff")) {
+                                    hide = true;
+                                }
+                            } else {
+                                hide = true;
                             }
-                        } else {
+                        }
+
+                        if(hide) {
                             if(player.canSee(p)) {
                                 player.hidePlayer(p);
+                            }
+                        } else {
+                            if(!player.canSee(p)) {
+                                player.showPlayer(p);
                             }
                         }
                     }
@@ -248,8 +267,14 @@ public class GameProfile {
                             player.hidePlayer(p);
                         }
                     } else {
-                        if(!player.canSee(p)) {
-                            player.showPlayer(p);
+                        if(profile.isStaffMode() && !player.hasPermission("practice.staff")) {
+                            if(player.canSee(p)) {
+                                player.hidePlayer(p);
+                            }
+                        } else {
+                            if(!player.canSee(p)) {
+                                player.showPlayer(p);
+                            }
                         }
                     }
                 }
@@ -261,6 +286,7 @@ public class GameProfile {
         this.name = document.getString("name");
         this.buildMode = document.getBoolean("build_mode");
         this.debugMode = document.getBoolean("debug_mode");
+        this.staffMode = document.getBoolean("staff_mode");
         this.spectatorVisibility = document.getBoolean("spectator_visibility");
         this.lobbyVisibility = document.getBoolean("lobby_visibility");
         this.tournamentNotifications = document.getBoolean("tournament_notifications");
@@ -299,6 +325,7 @@ public class GameProfile {
         values.put("player_time", time.toString());
         values.put("build_mode", buildMode);
         values.put("debug_mode", debugMode);
+        values.put("staff_mode", staffMode);
         values.put("spectator_visibility", spectatorVisibility);
         values.put("lobby_visibility", lobbyVisibility);
         values.put("tournament_notifications", tournamentNotifications);
