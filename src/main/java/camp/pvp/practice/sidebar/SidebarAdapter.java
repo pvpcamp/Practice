@@ -71,7 +71,7 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
                     lines.add("&6In Queue:");
-                    lines.add(" &7● " + queue.getDuelKit().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : "&f(U)"));
+                    lines.add(" &7● " + queue.getDuelKit().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
 
                     if(queue.getType().equals(GameQueue.Type.RANKED)) {
                         lines.add(" &7● &6ELO: &f" + profile.getProfileElo().getRatings().get(queue.getDuelKit()));

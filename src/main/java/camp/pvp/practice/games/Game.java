@@ -328,7 +328,7 @@ public abstract class Game {
         if(!this.getState().equals(State.ENDED)) {
             if (!this.getParticipants().containsKey(player.getUniqueId())) {
                 String message = "&f" + player.getName() + "&6 has stopped spectating.";
-                if (player.hasPermission("practice.staff")) {
+                if (profile.isStaffMode()) {
                     this.staffAnnounce("&7[Staff] " + message);
                 } else {
                     this.announce(message);

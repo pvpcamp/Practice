@@ -235,12 +235,18 @@ public class GameProfile {
                     boolean seeSpectators = this.isSpectatorVisibility();
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
-                        boolean allPlayerVisiblity = game.getAllPlayers().contains(p);
-                        boolean currentlyPlaying = game.getCurrentPlayersPlaying().contains(p);
+                        boolean spectating = game.getSpectators().containsKey(p.getUniqueId());
+                        boolean playing = game.getCurrentPlayersPlaying().contains(p);
                         boolean hide = false;
-                        if(!currentlyPlaying) {
-                            if (seeSpectators) {
-                                if (profile.isStaffMode() && !player.hasPermission("practice.staff")) {
+                        if(playing) {
+
+                        } else {
+                            if(spectating) {
+                                if (seeSpectators) {
+                                    if (profile.isStaffMode() && !player.hasPermission("practice.staff")) {
+                                        hide = true;
+                                    }
+                                } else {
                                     hide = true;
                                 }
                             } else {

@@ -7,6 +7,7 @@ import camp.pvp.mongo.MongoManager;
 import camp.pvp.mongo.MongoUpdate;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.profiles.stats.ProfileELO;
+import camp.pvp.practice.profiles.tasks.LeaderboardUpdater;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +29,10 @@ public class GameProfileManager {
     private @Getter Map<UUID, GameProfile> loadedProfiles;
 
     private @Getter MongoManager mongoManager;
-    private String profilesCollection, eloCollection;
+    private @Getter String profilesCollection, eloCollection;
+
+    private BukkitTask leaderboardUpdaterTask;
+    private @Getter LeaderboardUpdater leaderboardUpdater;
     public GameProfileManager(Practice plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
@@ -38,6 +43,9 @@ public class GameProfileManager {
         this.mongoManager = new MongoManager(plugin, config.getString("networking.mongo.uri"), config.getString("networking.mongo.database"));
         this.profilesCollection = config.getString("networking.mongo.profiles_collection");
         this.eloCollection = config.getString("networking.mongo.elo_collection");
+
+        this.leaderboardUpdater = new LeaderboardUpdater(this);
+        this.leaderboardUpdaterTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, leaderboardUpdater, 0, 2400);
 
         this.logger.info("Started GameProfileManager.");
     }
@@ -106,10 +114,7 @@ public class GameProfileManager {
             if(document != null) {
                 profile[0] = new GameProfile(uuid);
                 profile[0].documentImport(document);
-                ProfileELO elo = importElo(uuid, false);
-                if(elo != null) {
-                    profile[0].setProfileElo(elo);
-                }
+                profile[0].setProfileElo(importElo(uuid, false));
 
                 if(store) {
                     loadedProfiles.put(uuid, profile[0]);

@@ -2,6 +2,8 @@ package camp.pvp.practice.listeners.citizens;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.guis.queue.QueueGui;
+import camp.pvp.practice.guis.statistics.LeaderboardsGui;
+import camp.pvp.practice.guis.statistics.StatisticsGui;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.queue.GameQueue;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
@@ -40,6 +42,12 @@ public class NPCRightClickListener implements Listener {
                         if(profile.getState().equals(GameProfile.State.LOBBY)) {
                             new QueueGui(GameQueue.Type.RANKED, profile).open(player);
                         }
+                        break;
+                    case LEADERBOARDS:
+                        new LeaderboardsGui().open(player);
+                        break;
+                    case STATISTICS:
+                        new StatisticsGui(profile.getProfileElo()).open(player);
                         break;
                     default:
                         player.sendMessage(ChatColor.GREEN + "Coming soon!");

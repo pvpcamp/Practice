@@ -3,6 +3,7 @@ package camp.pvp.practice;
 import camp.pvp.practice.arenas.ArenaManager;
 import camp.pvp.practice.cooldowns.CooldownRunnable;
 import camp.pvp.practice.games.GameManager;
+import camp.pvp.practice.guis.statistics.LeaderboardsGui;
 import camp.pvp.practice.kits.EnergyRunnable;
 import camp.pvp.practice.listeners.bukkit.block.BlockBreakListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockPlaceListener;
@@ -132,6 +133,7 @@ public class Practice extends JavaPlugin {
         new BuildCommand(this);
         new DuelCommand(this);
         new GamesCommand(this);
+        new LeaderboardsCommand(this);
         new PartyCommand(this);
         new PingCommand(this);
         new PlayerTimeCommand(this);

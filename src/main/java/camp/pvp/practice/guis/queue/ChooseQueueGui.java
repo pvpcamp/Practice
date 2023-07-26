@@ -26,10 +26,10 @@ public class ChooseQueueGui extends StandardGui {
 
         GuiButton unranked = new GuiButton(Material.IRON_SWORD, "&a&lUnranked Queue");
         unranked.setButtonUpdater(new AbstractButtonUpdater() {
-            int playing = gm.getTotalInGame(GameQueue.Type.UNRANKED);
-            int inQueue = gqm.getTotalInQueue(GameQueue.Type.UNRANKED);
             @Override
             public void update(GuiButton guiButton, Gui gui) {
+                int playing = gm.getTotalInGame(GameQueue.Type.UNRANKED);
+                int inQueue = gqm.getTotalInQueue(GameQueue.Type.UNRANKED);
                 guiButton.setLore(
                         "&aPlaying: &f" + playing,
                         "&aIn Queue: &f" + inQueue,
@@ -52,10 +52,10 @@ public class ChooseQueueGui extends StandardGui {
 
         GuiButton ranked = new GuiButton(Material.DIAMOND_SWORD, "&6&lRanked Queue");
         ranked.setButtonUpdater(new AbstractButtonUpdater() {
-            int playing = gm.getTotalInGame(GameQueue.Type.RANKED);
-            int inQueue = gqm.getTotalInQueue(GameQueue.Type.RANKED);
             @Override
             public void update(GuiButton guiButton, Gui gui) {
+                int playing = gm.getTotalInGame(GameQueue.Type.RANKED);
+                int inQueue = gqm.getTotalInQueue(GameQueue.Type.RANKED);
                 guiButton.setLore(
                         "&6Playing: &f" + playing,
                         "&6In Queue: &f" + inQueue,
