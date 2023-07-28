@@ -9,6 +9,6 @@ public class HostEventInteract implements ItemInteract
 {
     @Override
     public void onInteract(Player player, GameProfile gameProfile) {
-        player.sendMessage(ChatColor.GREEN + "Coming soon!");
+        player.performCommand("event host");
     }
 }

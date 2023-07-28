@@ -37,7 +37,7 @@ public class SidebarAdapter implements AssembleAdapter {
 
     @Override
     public String getTitle(Player player) {
-        return "&6&lPvP Camp &7[Beta]";
+        return "&6&lPractice &7[Beta]";
     }
 
     @Override
@@ -125,7 +125,12 @@ public class SidebarAdapter implements AssembleAdapter {
             }
 
             lines.add(" ");
-            lines.add("&7&opvp.camp");
+
+            if(profile.isDebugMode()) {
+                lines.add("&7&oniggapvp.com");
+            } else {
+                lines.add("&7&opvp.camp");
+            }
             lines.add("&7&m------------------");
         }
 

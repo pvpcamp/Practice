@@ -77,6 +77,30 @@ public class SumoEvent extends GameEvent {
     @Override
     public void end() {
         setState(State.ENDED);
+        if(getAlive().size() == 1) {
+            String winner = new ArrayList<>(getAlive().values()).get(0).getName();
+            this.announceAll(
+                    " ",
+                    "&6[Sumo Event] &f" + winner + "&6 has won the event!",
+                    " ");
+        }
+
+        if(this.getStartingTimer() != null) {
+            getStartingTimer().cancel();
+        }
+
+        if(this.getEndingTimer() != null) {
+            getEndingTimer().cancel();
+        }
+
+        if(roundStartingTask != null) {
+            roundStartingTask.cancel();
+        }
+
+        if(roundEndingTask != null) {
+            roundEndingTask.cancel();
+        }
+
         for(Player player : getAllPlayers()) {
             GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
             profile.setGame(null);
@@ -119,7 +143,7 @@ public class SumoEvent extends GameEvent {
 
             this.announce("&6Round " + round + " starting between &f" + player1.getName() + " &6and &f" + player2.getName() + "&6.");
 
-            timer = 5;
+            timer = 3;
             roundStartingTask = new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -200,24 +224,25 @@ public class SumoEvent extends GameEvent {
             switch(this.getState()) {
                 case STARTING:
                     participants.remove(participant.getUuid());
-                    player.sendMessage("you left the game");
                     profile.setGame(null);
                     profile.playerUpdate(true);
                     getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
-                    break;
-                case ENDED:
-                    break;
-                case ACTIVE:
-                    spectateStart(player);
 
+                    announce("&6[Event] &f" + player.getName() + "&a left the event.");
+                    break;
+                case NEXT_ROUND_STARTING:
+                case ACTIVE:
                     participant.eliminate();
                     participant.clearCooldowns();
 
-                    profile.playerUpdate(true);
+                    spectateStart(player);
+
+                    announce("&f" + participant.getName() + "&a has been eliminated. &7(" + this.getAlive().size() + "/" + this.getParticipants().size() + ")");
+
                     endRound();
                     break;
                 default:
-                    announce("&f" + participant.getName() + "&a left the event.");
+                    announce("&f" + participant.getName() + "&a left the event. &7(" + this.getAlive().size() + "/" + this.getParticipants().size() + ")");
 
                     participant.eliminate();
                     participant.clearCooldowns();
@@ -243,7 +268,7 @@ public class SumoEvent extends GameEvent {
         player.teleport(getArena().getPositions().get("lobby").getLocation());
         PlayerUtils.reset(player);
 
-        this.announce("&6[Sumo Event] &f" + player.getName() + "&a has joined. &7(" + this.getAlive().size() + " players)");
+        this.announce("&6[Event] &f" + player.getName() + "&a joined the event.");
 
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
@@ -292,19 +317,20 @@ public class SumoEvent extends GameEvent {
         for(Player player : Bukkit.getOnlinePlayers()) {
             GameProfile profile = gpm.getLoadedProfiles().get(player.getUniqueId());
             if(profile != null && profile.isTournamentNotifications()) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("\n&6&lEvent\n");
-                sb.append("\n &7● &6Event: &fSumo");
-                sb.append("\n &7● &6Starting In: &f" + timer + " seconds");
-                sb.append("\n &7● &6Players: &f" + getParticipants().size());
-                sb.append("\n");
-                player.sendMessage(Colors.get(sb.toString()));
+                String[] strings = new String[] {
+                        " ",
+                        Colors.get("&6&lEvent"),
+                        Colors.get(" &7● &6Event: &fSumo"),
+                        Colors.get(" &7● &6Starting In: &f" + timer + " seconds"),
+                        Colors.get(" &7● &6Players: &f" + getParticipants().size())
+                };
+
+                player.sendMessage(strings);
 
                 TextComponent msg = new TextComponent(Colors.get("&6[Click to join]"));
 
                 msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/event join"));
                 msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Colors.get("&aClick to join the event!")).create()));
-
 
                 player.spigot().sendMessage(msg);
                 player.sendMessage(" ");
@@ -315,31 +341,30 @@ public class SumoEvent extends GameEvent {
     @Override
     public List<String> getScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
+        List<Player> ps = getCurrentPlayersPlaying();
+        lines.add(" &7● &6Event: &fSumo");
         switch(this.getState()) {
             case STARTING:
-                lines.add(" &7● &6Event: &fSumo");
+                lines.add(" &7● &6Players: &f" + this.getAlive().size());
                 lines.add(" &7● &6Starting In: &f" + (timer + 1) + "s");
                 break;
             case NEXT_ROUND_STARTING:
-                lines.add(" &7● &6Event: &fSumo");
+                lines.add(" &7● &6Players: &f" + this.getAlive().size() + "/" + this.getParticipants().size());
                 lines.add(" &7● &6Round: &f" + getRound());
                 lines.add(" &7● &6Starting In: &f" + (timer + 1) + "s");
                 lines.add("&7&m------------------");
-                lines.add("&a" + getCurrentPlayersPlaying().get(0).getName());
-                lines.add("&cvs.");
-                lines.add("&a" + getCurrentPlayersPlaying().get(1).getName());
+                lines.add("&a" + ps.get(0).getName() + " &f" + PlayerUtils.getPing(ps.get(0)) + " ms");
+                lines.add("&a" + ps.get(1).getName() + " &f" + PlayerUtils.getPing(ps.get(1)) + " ms");
                 break;
             case ACTIVE:
-                List<GameParticipant> ps = new ArrayList<>(getCurrentPlaying().values());
-                lines.add(" &7● &6Event: &fSumo");
+                lines.add(" &7● &6Players: &f" + this.getAlive().size() + "/" + this.getParticipants().size());
                 lines.add(" &7● &6Round: &f" + getRound());
                 lines.add("&7&m------------------");
-                lines.add("&a" + ps.get(0).getName());
-                lines.add("&cvs.");
-                lines.add("&a" + ps.get(1).getName());
+                lines.add("&a" + ps.get(0).getName() + " &f" + PlayerUtils.getPing(ps.get(0)) + " ms");
+                lines.add("&a" + ps.get(1).getName() + " &f" + PlayerUtils.getPing(ps.get(1)) + " ms");
                 break;
             case ROUND_ENDED:
-                lines.add(" &7● &6Event: &fSumo");
+                lines.add(" &7● &6Players: &f" + this.getAlive().size() + "/" + this.getParticipants().size());
                 lines.add(" &7● &6Round: &f" + getRound());
                 break;
             case ENDED:

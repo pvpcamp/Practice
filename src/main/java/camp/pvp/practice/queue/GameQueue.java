@@ -50,13 +50,14 @@ public class GameQueue {
     }
 
     public int getPlaying() {
+        int i = 0;
         for(Game game : getPlugin().getGameManager().getActiveGames()) {
             if(game instanceof Duel && game.getKit().equals(duelKit) && ((Duel) game).getQueueType().equals(getType())) {
-                return game.getAlive().size();
+                i += game.getAlive().size();
             }
         }
 
-        return 0;
+        return i;
     }
 
     public void startQueue() {

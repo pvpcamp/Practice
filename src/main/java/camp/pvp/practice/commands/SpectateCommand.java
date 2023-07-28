@@ -47,6 +47,11 @@ public class SpectateCommand implements CommandExecutor {
                         return true;
                     }
 
+                    if(game.equals(profile.getGame())) {
+                        player.sendMessage(ChatColor.RED + "You are already spectating this game.");
+                        return true;
+                    }
+
                     game.spectateStart(player, target.getLocation());
                 } else if (uuid != null) {
                     Game game = plugin.getGameManager().getGames().get(uuid);

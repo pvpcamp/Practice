@@ -318,7 +318,6 @@ public abstract class Game {
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
         updateEntities();
 
-        player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 1, true, false));
         if(location != null) {
             player.teleport(location);
         }
@@ -423,6 +422,10 @@ public abstract class Game {
         return i;
     }
 
+    public boolean seeEveryone() {
+        return false;
+    }
+
     public <T> void playEffect(Location location, Effect effect, T t) {
         for(Player player : getAllPlayers()) {
             player.playEffect(location, effect, t);
@@ -452,16 +455,6 @@ public abstract class Game {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    public void sendPacketToAllPlayers(PacketContainer pc) {
-        for(Player player : getAllPlayers()) {
-            try {
-                plugin.getProtocolManager().sendServerPacket(player, pc);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
             }
         }
     }
@@ -497,14 +490,18 @@ public abstract class Game {
     }
 
     public void staffAnnounce(String s) {
-        for(Player p : getAllPlayers()) {
-            if(p.hasPermission("practice.staff")) {
+        for (Player p : getAllPlayers()) {
+            if (p.hasPermission("practice.staff")) {
                 p.sendMessage(Colors.get(s));
             }
         }
     }
 
-    public boolean seeEveryone() {
-        return false;
+    public void announceAll(String... strings) {
+        for(Player p : getAllPlayers()) {
+            for(String s : strings) {
+                p.sendMessage(Colors.get(s));
+            }
+        }
     }
 }

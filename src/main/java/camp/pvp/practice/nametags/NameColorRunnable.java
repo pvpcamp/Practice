@@ -7,6 +7,7 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameParticipant;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;

@@ -67,12 +67,12 @@ public class EventCommand implements CommandExecutor {
 
                         return true;
                     case "host":
-                        if(event != null) {
+                        if(plugin.getGameManager().isEventRunning()) {
                             player.sendMessage(ChatColor.RED + "There is already an event running.");
                             return true;
                         }
 
-                        new HostEventGui().open(player);
+                        new HostEventGui(player).open(player);
                         return true;
                     case "timer":
                         if(args.length > 1) {

@@ -109,7 +109,7 @@ public class TournamentCommand implements CommandExecutor {
                         return true;
                     case "timer":
                         if(args.length > 1) {
-                            if (player.hasPermission("practice.staff")) {
+                            if (player.hasPermission("practice.events.manage")) {
                                 if(tournament != null && !tournament.getState().equals(Tournament.State.ENDED)) {
                                     int time = 0;
                                     try {
@@ -149,11 +149,7 @@ public class TournamentCommand implements CommandExecutor {
             help.append("\n&6/tournament leave &7- &fLeave the tournament.");
             help.append("\n&6/tournament status &7- &fView the current tournament status.");
 
-            if(player.hasPermission("practice.events.host.tournament")) {
-                help.append("\n&6/tournament host &7- &fHost a tournament.");
-            }
-
-            if(player.hasPermission("practice.staff")) {
+            if(player.hasPermission("practice.events.manage")) {
                 help.append("\n&6/tournament timer <time> &7- &fSets the tournament timer.");
             }
 

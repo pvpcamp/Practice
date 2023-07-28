@@ -53,6 +53,14 @@ public class GameManager {
         return g;
     }
 
+    public boolean isEventRunning() {
+        if(getActiveEvent() == null) {
+            return getTournament() != null;
+        } else {
+            return true;
+        }
+    }
+
     public int getTotalInGame() {
         int i = 0;
         for(Game game : getActiveGames()) {

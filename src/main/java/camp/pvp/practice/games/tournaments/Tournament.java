@@ -227,7 +227,7 @@ public class Tournament {
 
         setState(State.IN_GAME);
 
-        announceAll("&eRound " + currentRound + " has started!");
+        announceAll("&eRound " + currentRound + " has started.");
 
         getQueuedGames().clear();
     }
@@ -235,9 +235,10 @@ public class Tournament {
     public void end() {
         TournamentParticipant participant = this.getAlive().get(0);
 
-        announceAll("&6Winner: &f" + participant.getName());
-        announceAll("&6Winner: &f" + participant.getName());
-        announceAll("&6Winner: &f" + participant.getName());
+        announceAll(
+                " ",
+                "&6Winner: &f" + participant.getName(),
+                " ");
 
 
         for(TournamentParticipant p : getAlive()) {
@@ -245,6 +246,8 @@ public class Tournament {
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
             profile.setTournament(null);
         }
+
+        plugin.getGameManager().setTournament(null);
 
         setState(State.ENDED);
     }
@@ -275,7 +278,7 @@ public class Tournament {
 
     public List<String> getScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
-        lines.add("&6Tournament:");
+        lines.add(" &7● &6Event: &fTournament");
         switch(this.getState()) {
             case STARTING:
                 lines.add(" &7● &6Starting In: &f" + this.getTimer() + "s");
@@ -286,7 +289,7 @@ public class Tournament {
                 break;
             case NEXT_ROUND_STARTING:
                 lines.add(" &7● &6Round: &f" + this.getCurrentRound());
-                lines.add(" &7● &6Time Until: &f" + this.getTimer() + "s");
+                lines.add(" &7● &6Starting In: &f" + this.getTimer() + "s");
                 lines.add(" &7● &6Players Left: &f" + this.getAlive().size() + "/" + this.getTournamentParticipants().size());
                 switch(teamSize) {
                     case 1:
@@ -369,17 +372,20 @@ public class Tournament {
         for(Player player : Bukkit.getOnlinePlayers()) {
             GameProfile profile = gpm.getLoadedProfiles().get(player.getUniqueId());
             if(profile != null && profile.isTournamentNotifications()) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("\n&6&lTournament\n");
-                sb.append("\n &7● &6Starting In: &f" + timer + " seconds");
-                sb.append("\n &7● &6Kit: &f" + getDuelKit().getColor() + getDuelKit().getDisplayName());
-                sb.append("\n &7● &6Players: &f" + getTournamentParticipants().size());
-                sb.append("\n");
-                player.sendMessage(Colors.get(sb.toString()));
+                String[] strings = new String[]{
+                        " ",
+                        Colors.get("&6&lEvent"),
+                        Colors.get(" &7● &6Event: &fTournament"),
+                        Colors.get(" &7● &6Starting In: &f" + timer + " seconds"),
+                        Colors.get(" &7● &6Kit: &f" + getDuelKit().getColor() + getDuelKit().getDisplayName()),
+                        Colors.get(" &7● &6Players: &f" + getTournamentParticipants().size())
+                };
+
+                player.sendMessage(strings);
 
                 TextComponent msg = new TextComponent(Colors.get("&6[Click to join]"));
 
-                msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tournament join "));
+                msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tournament join"));
                 msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Colors.get("&aClick to join the tournament!")).create()));
 
 
@@ -389,27 +395,15 @@ public class Tournament {
         }
     }
 
-    public void announceAll(String s) {
+    public void announceAll(String... strings) {
         GameProfileManager gpm = plugin.getGameProfileManager();
-        for(Player player : Bukkit.getOnlinePlayers()) {
-            GameProfile profile = gpm.getLoadedProfiles().get(player.getUniqueId());
+        for(Player p : Bukkit.getOnlinePlayers()) {
+            GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
             if(profile != null && profile.isTournamentNotifications()) {
-                player.sendMessage(Colors.get("&6[Tournament] &f" + s));
+                for(String s : strings) {
+                    p.sendMessage(Colors.get(s));
+                }
             }
         }
     }
-
-    public void staffAnnounce(String s) {
-        for(Player player : getAllPlayers()) {
-            if(player.hasPermission("practice.staff")) {
-                player.sendMessage(Colors.get("&6&l[Tournament STAFF] &f" + s));
-            }
-        }
-    }
-
-    public void debugAnnounce(String s) {
-
-    }
-
-
 }
