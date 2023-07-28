@@ -252,9 +252,11 @@ public class SettingsGui extends StandardGui {
                 @Override
                 public void update(GuiButton guiButton, Gui gui) {
                     guiButton.setLore(
-                            "&7Staff mode disables spectating messages,",
-                            "&7hides you from other spectators,",
-                            "&7and hides you in the lobby.",
+                            "&7Staff mode disables spectating",
+                            "&7messages, hides you from other",
+                            "&7spectators, and makes you hidden",
+                            "&7in the lobby.",
+                            " ",
                             "&aCurrent Setting: &f" + (gameProfile.isStaffMode() ? "Enabled" : "Disabled"));
                 }
             });
@@ -278,6 +280,7 @@ public class SettingsGui extends StandardGui {
                     guiButton.setLore(
                             "&7If you see this, you should ",
                             "&7know what this does.",
+                            " ",
                             "&aCurrent Setting: &f" + (gameProfile.isDebugMode() ? "Enabled" : "Disabled"));
                 }
             });
@@ -301,6 +304,7 @@ public class SettingsGui extends StandardGui {
                     guiButton.setLore(
                             "&7Would you like to enable",
                             "&7build mode?",
+                            " ",
                             "&aCurrent Setting: &f" + (gameProfile.isBuildMode() ? "Enabled" : "Disabled"));
                 }
             });

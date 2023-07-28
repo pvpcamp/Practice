@@ -140,7 +140,8 @@ public class PlayerInteractListener implements Listener {
                         if (cooldown != null) {
                             if (!cooldown.isExpired()) {
                                 player.sendMessage(cooldown.getBlockedMessage());
-                                player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL, 1));
+                                event.setCancelled(true);
+                                player.updateInventory();
                             }
                         }
                         break;

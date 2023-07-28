@@ -9,6 +9,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.util.Arrays;
+
 public class PlayerMoveListener implements Listener {
 
     private Practice plugin;
@@ -37,7 +39,7 @@ public class PlayerMoveListener implements Listener {
                 }
 
                 if (!game.getKit().isMoveOnStart()) {
-                    if (game.getState().equals(Game.State.STARTING) && game.getCurrentPlayersPlaying().contains(player)) {
+                    if (!Arrays.asList(Game.State.ACTIVE, Game.State.ENDED).contains(game.getState()) && game.getCurrentPlayersPlaying().contains(player)) {
                         if (from.getX() != to.getX() || from.getZ() != to.getZ()) {
                             player.teleport(from);
                         }

@@ -7,8 +7,8 @@ import camp.pvp.practice.profiles.GameProfile;
 import java.util.List;
 import java.util.UUID;
 
-public class Event extends Game {
-    protected Event(Practice plugin, UUID uuid) {
+public class GameEvent extends Game {
+    protected GameEvent(Practice plugin, UUID uuid) {
         super(plugin, uuid);
     }
 

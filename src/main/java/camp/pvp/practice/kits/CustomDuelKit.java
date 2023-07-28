@@ -87,7 +87,6 @@ public class CustomDuelKit {
 
         pi.setArmorContents(gi.getArmor());
         pi.setContents(this.items);
-
-
+        player.updateInventory();
     }
 }

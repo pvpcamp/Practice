@@ -132,6 +132,7 @@ public class Practice extends JavaPlugin {
         new ArenaCommand(this);
         new BuildCommand(this);
         new DuelCommand(this);
+        new EventCommand(this);
         new GamesCommand(this);
         new LeaderboardsCommand(this);
         new PartyCommand(this);

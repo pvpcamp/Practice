@@ -1,6 +1,7 @@
 package camp.pvp.practice.listeners.bukkit.player;
 
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
@@ -42,7 +43,15 @@ public class PlayerJoinLeaveListeners implements Listener {
         }
 
         profile.setName(player.getName());
+
+        if(profile.getProfileElo() == null) {
+            profile.setProfileElo(new ProfileELO(profile.getUuid()));
+            profile.getProfileElo().setName(player.getName());
+            plugin.getGameProfileManager().exportElo(profile.getProfileElo(), true);
+        }
+
         profile.getProfileElo().setName(player.getName());
+
         profile.playerUpdate(true);
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();

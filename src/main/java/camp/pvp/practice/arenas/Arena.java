@@ -16,6 +16,8 @@ public class Arena implements Comparable<Arena>{
             switch(this) {
                 case DUEL_BUILD:
                     return Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
+                case EVENT_SUMO:
+                    return Arrays.asList("spawn1", "spawn2", "lobby");
                 case FFA:
                     return Arrays.asList("spawn");
                 default:

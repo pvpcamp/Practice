@@ -90,8 +90,6 @@ public class DuelRequest {
             duel.join(senderPlayer);
             duel.join(opponentPlayer);
 
-            Practice.instance.getGameManager().addGame(duel);
-
             this.expires = new Date();
 
             duel.start();

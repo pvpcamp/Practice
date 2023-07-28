@@ -216,51 +216,64 @@ public class GameProfile {
         Player player = getPlayer();
         GameProfileManager gpm = Practice.instance.getGameProfileManager();
         if(player != null) {
-
             if(game != null) {
-                if(game.getCurrentPlayersPlaying().contains(player)) {
+                if(game.seeEveryone()) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-//                        !game.seeEveryone() &&
-                        if(!game.getCurrentPlayersPlaying().contains(p)) {
-                            if(player.canSee(p)) {
-                                player.hidePlayer(p);
-                            }
-                        } else {
+                        if(game.getAllPlayers().contains(p)) {
                             if(!player.canSee(p)) {
                                 player.showPlayer(p);
+                            }
+                        } else {
+                            if(player.canSee(p)) {
+                                player.hidePlayer(p);
                             }
                         }
                     }
                 } else {
-                    boolean seeSpectators = this.isSpectatorVisibility();
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
-                        boolean spectating = game.getSpectators().containsKey(p.getUniqueId());
-                        boolean playing = game.getCurrentPlayersPlaying().contains(p);
-                        boolean hide = false;
-                        if(playing) {
+                    if(game.getCurrentPlayersPlaying().contains(player)) {
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+//                        !game.seeEveryone() &&
+                            if(!game.getCurrentPlayersPlaying().contains(p)) {
+                                if(player.canSee(p)) {
+                                    player.hidePlayer(p);
+                                }
+                            } else {
+                                if(!player.canSee(p)) {
+                                    player.showPlayer(p);
+                                }
+                            }
+                        }
+                    } else {
+                        boolean seeSpectators = this.isSpectatorVisibility();
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
+                            boolean spectating = game.getSpectators().containsKey(p.getUniqueId());
+                            boolean playing = game.getCurrentPlayersPlaying().contains(p);
+                            boolean hide = false;
+                            if(playing) {
 
-                        } else {
-                            if(spectating) {
-                                if (seeSpectators) {
-                                    if (profile.isStaffMode() && !player.hasPermission("practice.staff")) {
+                            } else {
+                                if(spectating) {
+                                    if (seeSpectators) {
+                                        if (profile.isStaffMode() && !player.hasPermission("practice.staff")) {
+                                            hide = true;
+                                        }
+                                    } else {
                                         hide = true;
                                     }
                                 } else {
                                     hide = true;
                                 }
-                            } else {
-                                hide = true;
                             }
-                        }
 
-                        if(hide) {
-                            if(player.canSee(p)) {
-                                player.hidePlayer(p);
-                            }
-                        } else {
-                            if(!player.canSee(p)) {
-                                player.showPlayer(p);
+                            if(hide) {
+                                if(player.canSee(p)) {
+                                    player.hidePlayer(p);
+                                }
+                            } else {
+                                if(!player.canSee(p)) {
+                                    player.showPlayer(p);
+                                }
                             }
                         }
                     }

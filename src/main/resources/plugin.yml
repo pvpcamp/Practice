@@ -21,7 +21,7 @@ commands:
   duel:
     description: Duel another player or team.
   event:
-    description: Host an event.
+    description: Join, leave, or host event.
   games:
     permission: practice.commands.games
     description: Gets all active games.

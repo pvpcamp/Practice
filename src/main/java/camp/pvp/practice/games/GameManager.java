@@ -1,7 +1,7 @@
 package camp.pvp.practice.games;
 
 import camp.pvp.practice.games.impl.Duel;
-import camp.pvp.practice.games.impl.events.SumoEvent;
+import camp.pvp.practice.games.impl.events.GameEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.queue.GameQueue;
@@ -30,11 +30,11 @@ public class GameManager {
         this.logger.info("Started GameManager.");
     }
 
-    public SumoEvent getActiveSumoEvent() {
+    public GameEvent getActiveEvent() {
         for(Game game : games.values()) {
             Game.State state = game.getState();
-            if(game instanceof SumoEvent && !state.equals(Game.State.INACTIVE) || !state.equals(Game.State.ENDED)) {
-                return (SumoEvent) game;
+            if(game instanceof GameEvent && !state.equals(Game.State.ENDED)) {
+                return (GameEvent) game;
             }
         }
 

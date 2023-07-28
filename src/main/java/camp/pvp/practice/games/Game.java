@@ -5,6 +5,7 @@ import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.utils.BukkitReflection;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.Practice;
@@ -12,6 +13,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -137,15 +140,17 @@ public abstract class Game {
                 Game.this.announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
             }
 
+            plugin.getGameProfileManager().updateGlobalPlayerVisibility();
+
             Location location = player.getLocation();
 
             if(participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
                 GameProfile attackerProfile = plugin.getGameProfileManager().getLoadedProfiles().get(participant.getAttacker());
                 if(attackerProfile != null) {
-                    attackerProfile.getDeathAnimation().playAnimation(this, player, true);
+                    attackerProfile.getDeathAnimation().playAnimation(this, player, location, true);
                 }
             } else {
-                profile.getDeathAnimation().playAnimation(this, player, false);
+                profile.getDeathAnimation().playAnimation(this, player, location, false);
             }
         }
     }
@@ -193,8 +198,8 @@ public abstract class Game {
     }
 
     public void handleHit(Player victim, Player attacker, EntityDamageByEntityEvent event) {
-        GameParticipant victimParticipant = this.getParticipants().get(victim.getUniqueId());
-        GameParticipant participant = this.getParticipants().get(attacker.getUniqueId());
+        GameParticipant victimParticipant = this.getCurrentPlaying().get(victim.getUniqueId());
+        GameParticipant participant = this.getCurrentPlaying().get(attacker.getUniqueId());
         if(victimParticipant != null && participant != null) {
             if(victimParticipant.isAlive() && participant.isAlive()) {
 
@@ -272,6 +277,7 @@ public abstract class Game {
         participant.setLunarCooldowns(profile.isLunarCooldowns());
 
         this.participants.put(player.getUniqueId(), participant);
+
         return participant;
     }
 
@@ -429,6 +435,27 @@ public abstract class Game {
         }
     }
 
+    public void playLightning(Location location) {
+        for(Player player : getAllPlayers()) {
+            BukkitReflection.sendLightning(player, location);
+        }
+
+        for(int x = location.getBlockX() - 2; x < location.getBlockX() + 2; x++) {
+            for(int y = location.getBlockY() - 2; y < location.getBlockY() + 2; y++) {
+                for(int z = location.getBlockZ() - 2; z < location.getBlockZ() + 2; z++) {
+                    Location l = new Location(location.getWorld(), x, y, z);
+                    Block block = l.getBlock();
+                    if (block != null) {
+                        Block fire = block.getRelative(BlockFace.UP);
+                        if (fire != null && fire.getType().equals(Material.FIRE)) {
+                            fire.setType(Material.AIR);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void sendPacketToAllPlayers(PacketContainer pc) {
         for(Player player : getAllPlayers()) {
             try {
@@ -475,5 +502,9 @@ public abstract class Game {
                 p.sendMessage(Colors.get(s));
             }
         }
+    }
+
+    public boolean seeEveryone() {
+        return false;
     }
 }

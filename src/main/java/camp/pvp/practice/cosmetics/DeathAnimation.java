@@ -36,9 +36,8 @@ public enum DeathAnimation {
         }
     }
 
-    public void playAnimation(Game game, Player victim, boolean velocity) {
-        World world = victim.getWorld();
-        Location location = victim.getLocation();
+    public void playAnimation(Game game, Player victim, Location location, boolean velocity) {
+        World world = location.getWorld();
         switch(this) {
             case BLOOD:
                 Location l = new Location(world, location.getX(), location.getY() + 0.5, location.getZ());
@@ -93,12 +92,12 @@ public enum DeathAnimation {
 
                 break;
             default:
+                l = new Location(world, location.getX(), location.getY() + 0.5, location.getZ());
                 if(velocity) {
                     victim.setVelocity(new Vector(0, 0.5, 0));
                 }
 
-                game.playSound(location, Sound.HURT_FLESH, 1F, 1F);
-                game.playSound(location, Sound.FIREWORK_BLAST, 1F, 1F);
+                game.playLightning(l);
                 break;
         }
     }
