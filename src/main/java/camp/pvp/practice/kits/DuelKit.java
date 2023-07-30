@@ -175,7 +175,7 @@ public enum DuelKit {
             case NO_DEBUFF:
                 ItemStack[] items = this.getGameInventory().getInventory();
 
-                items[3] = new ItemStack(Material.GOLDEN_CARROT, 64);
+                items[7] = new ItemStack(Material.GOLDEN_CARROT, 64);
                 return items;
             default:
                 break;
@@ -293,7 +293,7 @@ public enum DuelKit {
                 inv[0].addEnchantment(Enchantment.DURABILITY, 3);
 
                 inv[1] = new ItemStack(Material.ENDER_PEARL, 16);
-                inv[2] = new ItemStack(Material.COOKED_BEEF, 64);
+                inv[8] = new ItemStack(Material.COOKED_BEEF, 64);
 
                 Potion speed = new Potion(PotionType.SPEED, 2);
 
@@ -303,12 +303,12 @@ public enum DuelKit {
                 Potion health = new Potion(PotionType.INSTANT_HEAL, 2);
                 health.setSplash(true);
 
-                inv[8] = speed.toItemStack(1);
+                inv[2] = speed.toItemStack(1);
                 inv[17] = speed.toItemStack(1);
                 inv[26] = speed.toItemStack(1);
                 inv[35] = speed.toItemStack(1);
 
-                inv[7] = fireResistance.toItemStack(1);
+                inv[3] = fireResistance.toItemStack(1);
 
                 for(int x = 0; x < 36; x++) {
                     ItemStack i = inv[x];

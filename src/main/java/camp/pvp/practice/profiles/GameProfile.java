@@ -51,8 +51,9 @@ public class GameProfile {
     private final UUID uuid;
     private String name;
     private Time time;
-    private boolean spectatorVisibility, lobbyVisibility, comboMessages, tournamentNotifications, lunarCooldowns,
-            showSidebar, sidebarInGame, sidebarShowDuration, sidebarShowCps, sidebarShowLines, sidebarShowPing, staffMode, buildMode, debugMode;
+    private boolean spectatorVisibility, lobbyVisibility, comboMessages, tournamentNotifications, showSidebar,
+                    sidebarInGame, sidebarShowDuration, sidebarShowCps, sidebarShowLines, sidebarShowPing,
+                    staffMode, buildMode, debugMode;
     private DeathAnimation deathAnimation;
 
     private Game game;
@@ -83,8 +84,13 @@ public class GameProfile {
         this.spectatorVisibility = true;
         this.comboMessages = true;
         this.tournamentNotifications = true;
-        this.lunarCooldowns = true;
         this.showSidebar = true;
+
+        this.sidebarInGame = true;
+        this.sidebarShowDuration = true;
+        this.sidebarShowLines = true;
+        this.sidebarShowPing = true;
+
 
         this.profileElo = new ProfileELO(uuid);
 
@@ -308,11 +314,15 @@ public class GameProfile {
         this.spectatorVisibility = document.getBoolean("spectator_visibility");
         this.lobbyVisibility = document.getBoolean("lobby_visibility");
         this.tournamentNotifications = document.getBoolean("tournament_notifications");
-        this.lunarCooldowns = document.getBoolean("lunar_cooldowns");
         this.comboMessages = document.getBoolean("combo_messages");
         this.time = Time.valueOf(document.getString("player_time"));
         this.deathAnimation = DeathAnimation.valueOf(document.getString("death_animation"));
         this.showSidebar = document.getBoolean("show_sidebar");
+        this.sidebarInGame = document.getBoolean("sidebar_in_game");
+        this.sidebarShowCps = document.getBoolean("sidebar_show_cps");
+        this.sidebarShowDuration = document.getBoolean("sidebar_show_duration");
+        this.sidebarShowLines = document.getBoolean("sidebar_show_lines");
+        this.sidebarShowPing = document.getBoolean("sidebar_show_ping");
 
         // Get serialized kits from document, and turn them back into CustomDuelKits.
         Object serializedKits = document.get("custom_duel_kits");
@@ -347,10 +357,14 @@ public class GameProfile {
         values.put("spectator_visibility", spectatorVisibility);
         values.put("lobby_visibility", lobbyVisibility);
         values.put("tournament_notifications", tournamentNotifications);
-        values.put("lunar_cooldowns", lunarCooldowns);
         values.put("death_animation", deathAnimation.name());
         values.put("combo_messages", comboMessages);
         values.put("show_sidebar", isShowSidebar());
+        values.put("sidebar_in_game", isSidebarInGame());
+        values.put("sidebar_show_cps", isSidebarShowCps());
+        values.put("sidebar_show_duration", isSidebarShowDuration());
+        values.put("sidebar_show_lines", isSidebarShowLines());
+        values.put("sidebar_show_ping", isSidebarShowPing());
 
         // Convert CustomDuelKits to serialized form for DB storage.
         Map<String, Map<String, Map<String, Object>>> ck = new HashMap<>();

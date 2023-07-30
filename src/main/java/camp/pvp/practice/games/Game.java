@@ -273,7 +273,6 @@ public abstract class Game {
 
         GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
         participant.setComboMessages(profile.isComboMessages());
-        participant.setLunarCooldowns(profile.isLunarCooldowns());
 
         this.participants.put(player.getUniqueId(), participant);
 

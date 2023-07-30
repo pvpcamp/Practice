@@ -111,29 +111,6 @@ public class SettingsGui extends StandardGui {
         tournamentMessages.setSlot(13);
         this.addButton(tournamentMessages, false);
 
-        GuiButton lunarCooldowns = new GuiButton(Material.BEACON, "&bLunar Cooldowns");
-        lunarCooldowns.setAction(new GuiAction() {
-            @Override
-            public void run(Player player, Gui gui) {
-                gameProfile.setLunarCooldowns(!gameProfile.isLunarCooldowns());
-                gui.updateGui();
-            }
-        });
-
-        lunarCooldowns.setButtonUpdater(new AbstractButtonUpdater() {
-            @Override
-            public void update(GuiButton guiButton, Gui gui) {
-                guiButton.setLore(
-                        "&7Would you like to utilize",
-                        "&7Lunar Client cooldowns",
-                        "&7instead of your XP bar?",
-                        " ",
-                        "&aCurrent Setting: &f" + (gameProfile.isLunarCooldowns() ? "Enabled" : "Disabled"));
-            }
-        });
-        lunarCooldowns.setSlot(14);
-        this.addButton(lunarCooldowns, false);
-
         GuiButton playerTime = new GuiButton(Material.WATCH, "&5Player Time");
         playerTime.setAction(new GuiAction() {
             @Override
@@ -162,7 +139,7 @@ public class SettingsGui extends StandardGui {
                         (time.equals(GameProfile.Time.NIGHT) ? "&6&l" : "&8") +" ● Night");
             }
         });
-        playerTime.setSlot(15);
+        playerTime.setSlot(14);
         this.addButton(playerTime, false);
 
         GuiButton deathAnimation = new GuiButton(gameProfile.getDeathAnimation().getIcon().getType(), "&4Death Animation");
@@ -197,7 +174,7 @@ public class SettingsGui extends StandardGui {
                         (da.equals(DeathAnimation.EXPLOSION) ? "&6&l" : "&8") +" ● Explosion");
             }
         });
-        deathAnimation.setSlot(16);
+        deathAnimation.setSlot(15);
         this.addButton(deathAnimation, false);
 
         GuiButton sidebarVisibility = new GuiButton(Material.EMPTY_MAP, "&aSidebar Visibility");
@@ -218,14 +195,14 @@ public class SettingsGui extends StandardGui {
                         "&aCurrent Setting: &f" + (gameProfile.isShowSidebar() ? "Enabled" : "Disabled"));
             }
         });
-        sidebarVisibility.setSlot(19);
+        sidebarVisibility.setSlot(16);
         this.addButton(sidebarVisibility, false);
 
         GuiButton sidebarSettings = new GuiButton(Material.BOAT, "&dSidebar Settings");
         sidebarSettings.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
-                player.sendMessage(ChatColor.GREEN + "Coming soon!");
+                new SidebarSettingsGui(gameProfile).open(player);
             }
         });
 
@@ -235,7 +212,7 @@ public class SettingsGui extends StandardGui {
                 guiButton.setLore("&7Click to customize your sidebar.");
             }
         });
-        sidebarSettings.setSlot(20);
+        sidebarSettings.setSlot(22);
         this.addButton(sidebarSettings, false);
 
         if(player.hasPermission("practice.staff")) {

@@ -51,7 +51,7 @@ public class PlayerCooldown {
     private final Date issued;
     private final GameParticipant participant;
     private final Player player;
-    private boolean expired = false, lunar;
+    private boolean expired = false;
 
     public PlayerCooldown(Type type, GameParticipant participant, Player player) {
         this.type = type;
@@ -65,8 +65,7 @@ public class PlayerCooldown {
 
         LunarClientAPI lcApi = LunarClientAPI.getInstance();
 
-        if(lcApi.isRunningLunarClient(player) && participant.isLunarCooldowns()) {
-            lunar = true;
+        if(lcApi.isRunningLunarClient(player)) {
             LunarClientAPI.getInstance().sendPacket(player, new LCCooldown("Pearl Cooldown", 16, Material.ENDER_PEARL).getPacket());
         }
     }
@@ -94,7 +93,7 @@ public class PlayerCooldown {
                 expired = true;
                 expire();
             } else {
-                if(getType().equals(Type.ENDER_PEARL) && !lunar) {
+                if(getType().equals(Type.ENDER_PEARL)) {
                     long seconds = TimeUnit.MILLISECONDS.toSeconds(getRemaining()) % 60;
                     player.setLevel((int) seconds + 1);
                     player.setExp((getTicksRemaining().floatValue() / (float) (getType().getDuration() * 20)));
@@ -111,9 +110,7 @@ public class PlayerCooldown {
     public void remove() {
         expired = true;
 
-        if(!lunar) {
-            player.setExp(0);
-            player.setLevel(0);
-        }
+        player.setExp(0);
+        player.setLevel(0);
     }
 }

@@ -55,6 +55,8 @@ public class SidebarAdapter implements AssembleAdapter {
 
             if(showLines) {
                 lines.add("&7&m------------------");
+            } else {
+                lines.add(" ");
             }
 
             switch(state) {
