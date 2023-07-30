@@ -21,7 +21,7 @@ import java.util.List;
 public enum InteractableItems {
     QUEUE, HOST_EVENT, PARTY_CREATE, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
-    PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_TEAMS, PARTY_LEAVE, PARTY_SETTINGS,
+    PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
     STOP_SPECTATING;
 
@@ -60,9 +60,6 @@ public enum InteractableItems {
             case PARTY_LEAVE:
                 return new InteractableItem(
                         new ItemBuilder(Material.REDSTONE, "&6Leave Party &7(Right Click)").create(), 4, new PartyLeaveInteract());
-            case PARTY_TEAMS:
-                return new InteractableItem(
-                        new ItemBuilder(Material.EMERALD, "&6Assign Teams &7(Right Click)").create(), 6, new PartyTeamsInteract());
             case PARTY_SETTINGS:
                 return new InteractableItem(
                         new ItemBuilder(Material.PAPER, "&6Party Settings &7(Right Click)").create(), 7, new PartySettingsInteract());
@@ -97,7 +94,6 @@ public enum InteractableItems {
                 if(party.getMembers().get(profile.getUuid()).isLeader()) {
                     items.add(PARTY_EVENT);
                     items.add(PARTY_SETTINGS);
-                    items.add(PARTY_TEAMS);
                 }
 
                 if(party.getGame() != null) {

@@ -399,9 +399,11 @@ public class Tournament {
         GameProfileManager gpm = plugin.getGameProfileManager();
         for(Player p : Bukkit.getOnlinePlayers()) {
             GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
-            if(profile != null && profile.isTournamentNotifications()) {
-                for(String s : strings) {
-                    p.sendMessage(Colors.get(s));
+            if(profile != null) {
+                if(getAllPlayers().contains(p) || profile.isTournamentNotifications()) {
+                    for (String s : strings) {
+                        p.sendMessage(Colors.get(s));
+                    }
                 }
             }
         }

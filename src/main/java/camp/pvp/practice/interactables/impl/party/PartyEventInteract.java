@@ -1,5 +1,6 @@
 package camp.pvp.practice.interactables.impl.party;
 
+import camp.pvp.practice.guis.party.FindPartyGui;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
@@ -70,11 +71,10 @@ public class PartyEventInteract implements ItemInteract {
                                             ffa.join(member.getPlayer());
                                         }
 
-                                        ffa.setParty(party);
+                                        ffa.getParties().add(party);
                                         ffa.setKit(kit);
 
                                         ffa.start();
-                                        plugin.getGameManager().addGame(ffa);
                                     } else {
                                         player.sendMessage(ChatColor.RED + "You do not have enough players in your party to participate in this event.");
                                     }
@@ -91,8 +91,18 @@ public class PartyEventInteract implements ItemInteract {
                 }
             });
 
-            ffaEvent.setSlot(3);
+            ffaEvent.setSlot(2);
             gui.addButton(ffaEvent, false);
+
+            GuiButton duelOtherParties = new GuiButton(Material.NAME_TAG, "&6Duel Other Parties");
+            duelOtherParties.setAction(new GuiAction() {
+                @Override
+                public void run(Player player, Gui gui) {
+                    new FindPartyGui(gameProfile, party).open(player);
+                }
+            });
+            duelOtherParties.setSlot(4);
+            gui.addButton(duelOtherParties, false);
 
             GuiButton splitEvent = new GuiButton(Material.IRON_SWORD, "&6Split Teams");
             splitEvent.setAction(new GuiAction() {
@@ -146,10 +156,9 @@ public class PartyEventInteract implements ItemInteract {
                                         }
 
                                         teamDuel.setKit(kit);
-                                        teamDuel.setParty(party);
+                                        teamDuel.getParties().add(party);
 
                                         teamDuel.start();
-                                        plugin.getGameManager().addGame(teamDuel);
                                     } else {
                                         player.sendMessage(ChatColor.RED + "You do not have enough players in your party to participate in this event.");
                                     }
@@ -166,7 +175,7 @@ public class PartyEventInteract implements ItemInteract {
                 }
             });
 
-            splitEvent.setSlot(5);
+            splitEvent.setSlot(6);
             gui.addButton(splitEvent, false);
 
             gui.open(player);

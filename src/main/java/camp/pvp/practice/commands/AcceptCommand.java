@@ -1,5 +1,7 @@
 package camp.pvp.practice.commands;
 
+import camp.pvp.practice.parties.Party;
+import camp.pvp.practice.parties.PartyGameRequest;
 import camp.pvp.practice.profiles.DuelRequest;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
@@ -25,34 +27,61 @@ public class AcceptCommand implements CommandExecutor {
             Player player = (Player) sender;
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
-            if(profile.getState().equals(GameProfile.State.LOBBY)) {
+            Player target = Bukkit.getPlayer(args[0]);
 
-                Player target = Bukkit.getPlayer(args[0]);
+            if (target != null && target != player) {
 
-                if (target != null && target != player) {
+                GameProfile targetProfile = plugin.getGameProfileManager().getLoadedProfiles().get(target.getUniqueId());
 
-                    GameProfile targetProfile = plugin.getGameProfileManager().getLoadedProfiles().get(target.getUniqueId());
+                switch (profile.getState()) {
+                    case LOBBY:
+                        if (targetProfile.getGame() == null) {
+                            DuelRequest duelRequest = profile.getDuelRequests().get(targetProfile.getUuid());
+                            if (duelRequest != null) {
+                                if (duelRequest.isExpired()) {
+                                    player.sendMessage(ChatColor.RED + "This duel request has expired.");
+                                    return true;
+                                }
 
-                    if (targetProfile.getGame() == null) {
-                        DuelRequest duelRequest = profile.getDuelRequests().get(targetProfile.getUuid());
-                        if(duelRequest != null) {
-                            if (duelRequest.isExpired()) {
-                                player.sendMessage(ChatColor.RED + "This duel request has expired.");
-                                return true;
+                                duelRequest.startGame();
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You do not have a duel request from this player.");
                             }
-
-                            duelRequest.startGame();
                         } else {
-                            player.sendMessage(ChatColor.RED + "You do not have a duel request from this player.");
+                            player.sendMessage(ChatColor.RED + "The player you specified is in a game.");
                         }
-                    } else {
-                        player.sendMessage(ChatColor.RED + "The player you specified is in a game.");
-                    }
-                } else {
-                    player.sendMessage(ChatColor.RED + "The player you specified is not on this server.");
+                        break;
+                    case LOBBY_PARTY:
+                        Party party = profile.getParty();
+                        Party targetParty = targetProfile.getParty();
+                        if(targetParty == null) {
+                            player.sendMessage(ChatColor.RED + "This player is not in a party.");
+                            return true;
+                        }
+
+                        if(targetParty == party) {
+                            player.sendMessage(ChatColor.RED + "You cannot duel someone that is in your party.");
+                            return true;
+                        }
+
+                        PartyGameRequest pgr = party.getPartyGameRequest(target.getUniqueId());
+                        if(pgr != null) {
+                            boolean b = pgr.startGame();
+                            if(!b) {
+                                player.sendMessage(ChatColor.RED + "This party is now busy.");
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Your party either does not have a game invite from this party, or the request has expired.");
+                        }
+
+
+                        break;
+                    default:
+                        player.sendMessage(ChatColor.RED + "You cannot duel someone right now.");
+                        break;
                 }
             } else {
-                player.sendMessage(ChatColor.RED + "You cannot duel someone right now.");
+                player.sendMessage(ChatColor.RED + "The player you specified is not on this server.");
             }
         } else {
             sender.sendMessage(ChatColor.RED + "Usage: /accept <player>");

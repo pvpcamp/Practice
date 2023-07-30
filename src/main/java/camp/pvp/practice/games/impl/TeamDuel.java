@@ -3,6 +3,7 @@ package camp.pvp.practice.games.impl;
 import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.EndingTask;
 import camp.pvp.practice.games.tasks.StartingTask;
+import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
@@ -133,8 +134,8 @@ public class TeamDuel extends TeamGame {
             return;
         }
 
-        if(this.getParty() != null) {
-            getParty().setGame(this);
+        for(Party party : this.getParties()) {
+            party.setGame(this);
         }
 
         this.setState(State.STARTING);
@@ -209,8 +210,8 @@ public class TeamDuel extends TeamGame {
             getStartingTimer().cancel();
         }
 
-        if(getParty() != null) {
-            getParty().setGame(null);
+        for(Party party : this.getParties()) {
+            party.setGame(null);
         }
 
         GameTeam winningTeam;

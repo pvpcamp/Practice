@@ -95,7 +95,7 @@ public class DuelCommand implements CommandExecutor {
                         player.sendMessage(ChatColor.RED + "The player you specified is not on this server.");
                     }
                 } else {
-                    player.sendMessage(ChatColor.RED + "You cannot duel someone when you are in a game.");
+                    player.sendMessage(ChatColor.RED + "You cannot duel someone right now.");
                 }
             } else {
                 sender.sendMessage(ChatColor.RED + "Usage: /duel <player>");

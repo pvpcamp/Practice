@@ -52,7 +52,7 @@ public class GameProfile {
     private String name;
     private Time time;
     private boolean spectatorVisibility, lobbyVisibility, comboMessages, tournamentNotifications, lunarCooldowns,
-            showSidebar, staffMode, buildMode, debugMode;
+            showSidebar, sidebarInGame, sidebarShowDuration, sidebarShowCps, sidebarShowLines, sidebarShowPing, staffMode, buildMode, debugMode;
     private DeathAnimation deathAnimation;
 
     private Game game;
@@ -232,7 +232,6 @@ public class GameProfile {
                 } else {
                     if(game.getCurrentPlayersPlaying().contains(player)) {
                         for (Player p : Bukkit.getOnlinePlayers()) {
-//                        !game.seeEveryone() &&
                             if(!game.getCurrentPlayersPlaying().contains(p)) {
                                 if(player.canSee(p)) {
                                     player.hidePlayer(p);

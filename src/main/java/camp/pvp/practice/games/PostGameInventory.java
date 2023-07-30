@@ -111,7 +111,7 @@ public class PostGameInventory extends GameInventory {
     }
 
     public void setOpponentInventory(GameParticipant opponentParticipant, PostGameInventory postGameInventory) {
-        GuiButton opponentInventory = new GuiButton(Material.MAP, "&aOpen " + opponentParticipant.getName() + "'s Inventory");
+        GuiButton opponentInventory = new GuiButton(Material.EMPTY_MAP, "&aOpen " + opponentParticipant.getName() + "'s Inventory");
         opponentInventory.setAction((player, gui) -> postGameInventory.getGui().open(player));
 
         opponentInventory.setSlot(53);

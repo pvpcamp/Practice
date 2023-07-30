@@ -2,6 +2,7 @@ package camp.pvp.practice.games.impl;
 
 import camp.pvp.practice.games.tasks.EndingTask;
 import camp.pvp.practice.games.tasks.StartingTask;
+import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
@@ -131,8 +132,8 @@ public class FreeForAll extends Game {
             return;
         }
 
-        if(getParty() != null) {
-            getParty().setGame(this);
+        for(Party party : this.getParties()) {
+            party.setGame(this);
         }
 
         Map<String, ArenaPosition> positions = arena.getPositions();
@@ -205,8 +206,8 @@ public class FreeForAll extends Game {
             getStartingTimer().cancel();
         }
 
-        if(getParty() != null) {
-            getParty().setGame(null);
+        for(Party party : this.getParties()) {
+            party.setGame(null);
         }
 
         for(GameParticipant participant : getAlive().values()) {

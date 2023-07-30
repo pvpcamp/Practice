@@ -17,11 +17,13 @@ public class Party {
 
     private Practice plugin;
     private Map<UUID, PartyMember> members;
+    private List<PartyGameRequest> partyGameRequests;
     private Game game;
     private boolean chooseKits, open;
     public Party(Practice plugin) {
         this.plugin = plugin;
         this.members = new HashMap<>();
+        this.partyGameRequests = new ArrayList<>();
         this.chooseKits = false;
         this.open = false;
     }
@@ -89,6 +91,20 @@ public class Party {
         member.setLeader(true);
         member.getPlayer().sendMessage(ChatColor.GREEN + "You are the new party leader.");
         PlayerUtils.giveInteractableItems(member.getPlayer());
+    }
+
+    public PartyGameRequest getPartyGameRequest(UUID uuid) {
+        for(PartyGameRequest pgr : getPartyGameRequests()) {
+            if(!pgr.isExpired()) {
+                for(UUID u : pgr.getFromParty().getMembers().keySet()) {
+                    if(uuid.equals(u)) {
+                        return pgr;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     public void announce(String message) {

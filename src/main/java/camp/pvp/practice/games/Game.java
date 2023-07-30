@@ -9,7 +9,6 @@ import camp.pvp.practice.utils.BukkitReflection;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.Practice;
-import com.comphenix.protocol.events.PacketContainer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -21,11 +20,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 @Getter @Setter
@@ -42,7 +38,7 @@ public abstract class Game {
     public Map<UUID, GameParticipant> participants;
     public Map<UUID, GameSpectator> spectators;
 
-    private Party party;
+    private List<Party> parties;
     private Tournament tournament;
 
     public State state;
@@ -60,6 +56,7 @@ public abstract class Game {
         this.plugin = plugin;
         this.entityHider = plugin.getEntityHider();
         this.uuid = uuid;
+        this.parties = new ArrayList<>();
         this.participants = new HashMap<>();
         this.spectators = new HashMap<>();
         this.entities = new ArrayList<>();
@@ -242,11 +239,13 @@ public abstract class Game {
                     }
                 }
 
-                if(!kit.isTakeDamage()) {
-                    event.setDamage(0);
-                    victim.setHealth(victim.getMaxHealth());
-                    if(kit.equals(DuelKit.BOXING) && participant.getHits() > 99) {
-                        this.eliminate(victim, false);
+                if(kit != null) {
+                    if (!kit.isTakeDamage()) {
+                        event.setDamage(0);
+                        victim.setHealth(victim.getMaxHealth());
+                        if (kit.equals(DuelKit.BOXING) && participant.getHits() > 99) {
+                            this.eliminate(victim, false);
+                        }
                     }
                 }
 
