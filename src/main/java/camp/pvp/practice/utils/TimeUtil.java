@@ -15,7 +15,7 @@ public class TimeUtil {
     }
 
     public TimeUtil(Date date1, Date date2) {
-        long duration = date1.getTime() - date2.getTime();;
+        long duration = date1.getTime() - date2.getTime();
         this.minutes = TimeUnit.MILLISECONDS.toMinutes(duration) % 60;
         this.seconds = TimeUnit.MILLISECONDS.toSeconds(duration) % 60;
         this.milliseconds = TimeUnit.MILLISECONDS.toMillis(duration) % 1000;

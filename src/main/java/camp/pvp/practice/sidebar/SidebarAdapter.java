@@ -47,8 +47,16 @@ public class SidebarAdapter implements AssembleAdapter {
         GameProfile profile = gameProfileManager.getLoadedProfiles().get(player.getUniqueId());
         if(profile != null && profile.isShowSidebar()) {
             GameProfile.State state = profile.getState();
+            boolean showInGame = profile.isSidebarInGame(),
+                    showCps = profile.isSidebarShowCps(),
+                    showDuration = profile.isSidebarShowDuration(),
+                    showLines = profile.isSidebarShowLines(),
+                    showPing = profile.isSidebarShowPing();
 
-            lines.add("&7&m------------------");
+            if(showLines) {
+                lines.add("&7&m------------------");
+            }
+
             switch(state) {
                 case LOBBY:
                     int online = Bukkit.getOnlinePlayers().size();
@@ -78,7 +86,9 @@ public class SidebarAdapter implements AssembleAdapter {
                         lines.add(" &7● &6Range: &f" + queueMember.getEloLow() + " - " + queueMember.getEloHigh());
                     }
 
-                    lines.add(" &7● &f" + TimeUtil.get(new Date(), queueMember.getJoined()));
+                    if(showDuration) {
+                        lines.add(" &7● &f" + TimeUtil.get(new Date(), queueMember.getJoined()));
+                    }
                     break;
                 case LOBBY_PARTY:
                     lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
@@ -101,10 +111,20 @@ public class SidebarAdapter implements AssembleAdapter {
                     break;
                 case IN_GAME:
                     Game game = profile.getGame();
+
+                    if(game.getScoreboard(profile) == null) {
+                        return null;
+                    }
+
                     lines.addAll(game.getScoreboard(profile));
                     break;
                 case SPECTATING:
                     game = profile.getGame();
+
+                    if(game.getSpectatorScoreboard(profile) == null) {
+                        return null;
+                    }
+
                     lines.addAll(game.getSpectatorScoreboard(profile));
                     break;
                 case KIT_EDITOR:
@@ -129,7 +149,10 @@ public class SidebarAdapter implements AssembleAdapter {
             } else {
                 lines.add("&7&opvp.camp");
             }
-            lines.add("&7&m------------------");
+
+            if(showLines) {
+                lines.add("&7&m------------------");
+            }
         }
 
         return lines;

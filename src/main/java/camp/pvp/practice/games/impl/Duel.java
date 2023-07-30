@@ -81,6 +81,7 @@ public class Duel extends Game {
 
             StringBuilder stringBuilder = new StringBuilder();
             List<Player> players = new ArrayList<>(this.getAlivePlayers());
+
             int s = 0;
             while(s != this.getAlive().size()) {
                 Player p = players.get(0);
@@ -258,6 +259,12 @@ public class Duel extends Game {
         List<String> lines = new ArrayList<>();
         GameParticipant self = getAlive().get(profile.getUuid());
         GameParticipant opponent = null;
+
+        boolean showInGame = profile.isSidebarInGame(),
+                showCps = profile.isSidebarShowCps(),
+                showDuration = profile.isSidebarShowDuration(),
+                showPing = profile.isSidebarShowPing();
+
         for(GameParticipant p : getAlive().values()) {
             if(p.getUuid() != self.getUuid()) {
                 opponent = p;
@@ -272,35 +279,47 @@ public class Duel extends Game {
                 lines.add("&6Opponent: &f" + opponent.getName());
                 break;
             case ACTIVE:
-                int ping = 0, enemyPing = 0;
-                ping = PlayerUtils.getPing(self.getPlayer());
-                lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
-                lines.add(" ");
-                if(kit.equals(DuelKit.BOXING)) {
-                    long difference = self.getHits() - opponent.getHits();
-                    lines.add("&6Hits: &a" + self.getHits() + "&7/&c" + opponent.getHits());
+                if(showInGame) {
+                    int ping = 0, enemyPing = 0;
+                    ping = PlayerUtils.getPing(self.getPlayer());
 
-                    if(difference == 0) {
-                        lines.add("&7First to 100.");
-                    } else if(difference > 0){
-                        lines.add(" &e+" + difference + " Hits");
-                    } else {
-                        lines.add(" &c" + difference + " Hits");
+                    if(showDuration) {
+                        lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
                     }
 
                     lines.add(" ");
-                }
+                    if (kit.equals(DuelKit.BOXING)) {
+                        long difference = self.getHits() - opponent.getHits();
+                        lines.add("&6Hits: &a" + self.getHits() + "&7/&c" + opponent.getHits());
 
-                lines.add("&6Your Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms");
-                if(opponent != null) {
-                    enemyPing = PlayerUtils.getPing(opponent.getPlayer());
-                    lines.add("&6Enemy Ping: &f" + PlayerUtils.getPing(opponent.getPlayer()) + " ms");
-//                    lines.add("&7&o" +(difference > 0 ? "+" : "") + difference + " ms" );
+                        if (difference == 0) {
+                            lines.add("&7First to 100.");
+                        } else if (difference > 0) {
+                            lines.add(" &e+" + difference + " Hits");
+                        } else {
+                            lines.add(" &c" + difference + " Hits");
+                        }
+
+                        lines.add(" ");
+                    }
+
+                    if(showPing) {
+                        lines.add("&6Your Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms");
+                        if (opponent != null) {
+                            enemyPing = PlayerUtils.getPing(opponent.getPlayer());
+                            lines.add("&6Enemy Ping: &f" + PlayerUtils.getPing(opponent.getPlayer()) + " ms");
+                        }
+                    }
+                } else {
+                    return null;
                 }
                 break;
             case ENDED:
                 lines.add("&6&lYou win!");
-                lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
+
+                if(showDuration) {
+                    lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
+                }
                 break;
         }
         return lines;
@@ -309,6 +328,11 @@ public class Duel extends Game {
     @Override
     public List<String> getSpectatorScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
+
+        boolean showInGame = profile.isSidebarInGame(),
+                showCps = profile.isSidebarShowCps(),
+                showDuration = profile.isSidebarShowDuration(),
+                showPing = profile.isSidebarShowPing();
 
         lines.add("&6Players:");
 
@@ -337,10 +361,18 @@ public class Duel extends Game {
                 lines.add("&6Arena: &f" + arena.getDisplayName());
                 break;
             case ACTIVE:
-                lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
+                if(!showInGame) {
+                    return null;
+                }
+
+                if(showDuration) {
+                    lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
+                }
                 break;
             case ENDED:
-                lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
+                if(showDuration) {
+                    lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
+                }
                 break;
         }
 

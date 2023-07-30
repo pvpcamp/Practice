@@ -77,7 +77,7 @@ public class HostEventGui extends StandardGui {
             tournamentLines.add("&eClick to host this event.");
         } else {
             tournamentLines.add("&cYou must have &6&lPremium Rank");
-            tournamentLines.add("&cor higher to host this event.");
+            tournamentLines.add("&cto host this event.");
         }
 
         tournament.setLore(tournamentLines);
