@@ -1,5 +1,6 @@
 package camp.pvp.practice.listeners.bukkit.player;
 
+import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
@@ -7,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.Arrays;
@@ -34,6 +36,8 @@ public class PlayerMoveListener implements Listener {
             if (game != null) {
                 if (event.getTo().getBlock().isLiquid() && game.getCurrentPlayersPlaying().contains(player)) {
                     if (game.getKit().isDieInWater() && game.getState().equals(Game.State.ACTIVE)) {
+                        GameParticipant participant = game.getParticipants().get(player.getUniqueId());
+                        participant.setLastDamageCause(EntityDamageEvent.DamageCause.DROWNING);
                         game.eliminate(player, false);
                     }
                 }

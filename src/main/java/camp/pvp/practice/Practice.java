@@ -83,13 +83,13 @@ public class Practice extends JavaPlugin {
         this.partyManager = new PartyManager(this);
 
         this.assemble = new Assemble(this, new SidebarAdapter(this));
-        assemble.setTicks(5);
+        assemble.setTicks(4);
         assemble.setAssembleStyle(AssembleStyle.MODERN);
         assemble.setup();
 
         cooldownTask = this.getServer().getScheduler().runTaskTimer(this, new CooldownRunnable(this), 2, 2);
-        energyTask = this.getServer().getScheduler().runTaskTimer(this, new EnergyRunnable(this), 10, 10);
-        nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 20, 20);
+        energyTask = this.getServer().getScheduler().runTaskTimer(this, new EnergyRunnable(this), 0, 20);
+        nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 0, 20);
 
         if(getConfig().get("locations.lobby") != null) {
             this.lobbyLocation = (Location) getConfig().get("locations.lobby", Location.class);
@@ -140,6 +140,7 @@ public class Practice extends JavaPlugin {
         new PlayerTimeCommand(this);
         new PostGameInventoryCommand(this);
         new PracticeUtilCommand(this);
+        new RideCommand(this);
         new SettingsCommand(this);
         new SpectateCommand(this);
         new StatisticsCommand(this);
@@ -160,6 +161,7 @@ public class Practice extends JavaPlugin {
         new InventoryMoveItemListener(this);
 
         new FoodLevelChangeListener(this);
+        new HCFPlayerInteractListener(this);
 //        new PlayerBucketEmptyListener(this);
         new PlayerChatListener(this);
         new PlayerCommandPreprocessListener(this);

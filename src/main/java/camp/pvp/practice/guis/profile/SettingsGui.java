@@ -202,7 +202,12 @@ public class SettingsGui extends StandardGui {
         sidebarSettings.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
-                new SidebarSettingsGui(gameProfile).open(player);
+                if(player.hasPermission("practice.cosmetics.sidebar_settings")) {
+                    new SidebarSettingsGui(gameProfile).open(player);
+                } else {
+                    player.sendMessage(Colors.get("&aThis feature is only available to players that have &5&lPremium Rank &a." ));
+                    player.sendMessage(Colors.get("&aIf you would like to support us, you can buy a rank here: &fstore.pvp.camp" ));
+                }
             }
         });
 

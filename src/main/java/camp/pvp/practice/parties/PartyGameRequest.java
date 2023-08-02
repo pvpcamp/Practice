@@ -2,7 +2,8 @@ package camp.pvp.practice.parties;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.games.impl.TeamDuel;
+import camp.pvp.practice.games.impl.teams.HCFTeams;
+import camp.pvp.practice.games.impl.teams.TeamDuel;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
@@ -105,7 +106,28 @@ public class PartyGameRequest {
 
                 teamDuel.start();
             } else {
-                // WORK ON HCF TEAMFIGHTS
+                HCFTeams teamDuel = new HCFTeams(Practice.instance, UUID.randomUUID());
+
+                for (PartyMember member : toParty.getMembers().values()) {
+                    GameParticipant p = teamDuel.join(member.getPlayer());
+                    p.setAppliedHcfKit(member.getHcfKit());
+                    p.setTeam(teamDuel.getBlue());
+                }
+
+                for (PartyMember member : fromParty.getMembers().values()) {
+                    GameParticipant p = teamDuel.join(member.getPlayer());
+                    p.setAppliedHcfKit(member.getHcfKit());
+                    p.setTeam(teamDuel.getRed());
+                }
+
+                List<Party> parties = teamDuel.getParties();
+                parties.add(toParty);
+                parties.add(fromParty);
+
+                toParty.getPartyGameRequests().clear();
+                fromParty.getPartyGameRequests().clear();
+
+                teamDuel.start();
             }
 
             return true;

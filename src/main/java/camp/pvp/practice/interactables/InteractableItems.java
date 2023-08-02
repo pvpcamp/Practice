@@ -2,6 +2,7 @@ package camp.pvp.practice.interactables;
 
 import camp.pvp.practice.interactables.impl.game.StopSpectatingInteract;
 import camp.pvp.practice.interactables.impl.lobby.HostEventInteract;
+import camp.pvp.practice.interactables.impl.queue.RequeueInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentLeaveInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentStatusInteract;
 import camp.pvp.practice.parties.Party;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum InteractableItems {
-    QUEUE, HOST_EVENT, PARTY_CREATE, KIT_EDITOR, SETTINGS,
+    QUEUE, HOST_EVENT, REQUEUE, PARTY_CREATE, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
@@ -34,6 +35,10 @@ public enum InteractableItems {
             case HOST_EVENT:
                 return new InteractableItem(
                         new ItemBuilder(Material.IRON_AXE, "&6Host an Event &7(Right Click)").create(), 1, new HostEventInteract());
+            case REQUEUE:
+                return new InteractableItem(
+                        new ItemBuilder(Material.PAPER, "&6Play Again &7(Right Click)").create(), 2, new RequeueInteract()
+                );
             case PARTY_CREATE:
                 return new InteractableItem(
                         new ItemBuilder(Material.NETHER_STAR, "&6Create a Party &7(Right Click)").create(), 4, new PartyCreateInteract());
@@ -85,6 +90,11 @@ public enum InteractableItems {
             case LOBBY:
                 items.add(QUEUE);
                 items.add(HOST_EVENT);
+
+                if(profile.getPreviousQueue() != null) {
+                    items.add(REQUEUE);
+                }
+
                 items.add(PARTY_CREATE);
                 items.add(KIT_EDITOR);
                 items.add(SETTINGS);

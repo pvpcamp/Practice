@@ -42,6 +42,9 @@ commands:
     aliases: [putil, putils, pu]
     permission: practice.commands.practiceutil
     description: General staff utility command.
+  ride:
+    permission: practice.commands.ride
+    description: Ride a player.
   settings:
     aliases: [options]
     description: General server settings.

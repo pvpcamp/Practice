@@ -3,6 +3,7 @@ package camp.pvp.practice.games;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.BukkitReflection;
@@ -14,12 +15,14 @@ import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -173,6 +176,10 @@ public abstract class Game {
                 victim.setHealth(victim.getMaxHealth());
             }
 
+            if(participant.isArcherTagged()) {
+                event.setDamage(event.getDamage() * 1.25);
+            }
+
             participant.setHealth(Math.round(victim.getHealth()));
             participant.setMaxHealth(Math.round(victim.getMaxHealth()));
             participant.setHunger(victim.getFoodLevel());
@@ -183,7 +190,7 @@ public abstract class Game {
             }
 
             if(victim.getHealth() - damage < 0) {
-                if(canDie) {
+                if(canDie && getState().equals(State.ACTIVE)) {
                     this.eliminate(victim, false);
                     event.setCancelled(true);
                     Bukkit.getScheduler().runTaskLater(plugin, () -> victim.setHealth(20), 1);
@@ -216,10 +223,9 @@ public abstract class Game {
                 victimParticipant.setHunger(victim.getFoodLevel());
                 victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
 
-                if(victimParticipant.isHittable()) {
+                if(victim.getNoDamageTicks() < 10) {
                     participant.hits++;
                     participant.currentCombo++;
-                    victimParticipant.handleHit();
 
                     if(participant.isComboMessages()) {
                         switch ((int) participant.getCurrentCombo()) {
@@ -236,6 +242,10 @@ public abstract class Game {
                                 attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
                                 break;
                         }
+                    }
+                } else {
+                    if(event.getDamager() instanceof Player) {
+                        event.setCancelled(true);
                     }
                 }
 
@@ -273,6 +283,8 @@ public abstract class Game {
 
         GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
         participant.setComboMessages(profile.isComboMessages());
+
+        profile.updatePlayerVisibility();
 
         this.participants.put(player.getUniqueId(), participant);
 

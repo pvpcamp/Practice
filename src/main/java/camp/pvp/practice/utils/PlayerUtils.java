@@ -28,6 +28,13 @@ public class PlayerUtils {
         player.setFireTicks(0);
         player.setSaturation(13);
         player.setItemOnCursor(null);
+        player.eject();
+
+        if(player.getPassenger() != null && player.getPassenger() instanceof Player) {
+            Player passenger = (Player) player.getPassenger();
+            passenger.eject();
+        }
+
         for(PotionEffect effect : player.getActivePotionEffects()){
             player.removePotionEffect(effect.getType());
         }

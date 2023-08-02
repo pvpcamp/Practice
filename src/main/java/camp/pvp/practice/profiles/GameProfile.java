@@ -11,6 +11,7 @@ import camp.pvp.practice.kits.CustomDuelKit;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.PartyInvite;
 import camp.pvp.practice.profiles.stats.ProfileELO;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
@@ -57,8 +58,11 @@ public class GameProfile {
     private DeathAnimation deathAnimation;
 
     private Game game;
+    private GameQueue previousQueue;
     private Tournament tournament;
     private Map<UUID, DuelRequest> duelRequests;
+
+    private List<Date> clicks;
 
     private Party party;
     private Map<UUID, PartyInvite> partyInvites;
@@ -75,8 +79,9 @@ public class GameProfile {
         this.deathAnimation = DeathAnimation.DEFAULT;
 
         this.partyInvites = new HashMap<>();
-
         this.duelRequests = new HashMap<>();
+        this.clicks = new ArrayList<>();
+
         this.customDuelKits = new HashMap<>();
 
         this.time = Time.DAY;
@@ -90,7 +95,6 @@ public class GameProfile {
         this.sidebarShowDuration = true;
         this.sidebarShowLines = true;
         this.sidebarShowPing = true;
-
 
         this.profileElo = new ProfileELO(uuid);
 
@@ -226,26 +230,18 @@ public class GameProfile {
                 if(game.seeEveryone()) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         if(game.getAllPlayers().contains(p)) {
-                            if(!player.canSee(p)) {
-                                player.showPlayer(p);
-                            }
+                            player.showPlayer(p);
                         } else {
-                            if(player.canSee(p)) {
-                                player.hidePlayer(p);
-                            }
+                            player.hidePlayer(p);
                         }
                     }
                 } else {
                     if(game.getCurrentPlayersPlaying().contains(player)) {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             if(!game.getCurrentPlayersPlaying().contains(p)) {
-                                if(player.canSee(p)) {
-                                    player.hidePlayer(p);
-                                }
+                                player.hidePlayer(p);
                             } else {
-                                if(!player.canSee(p)) {
-                                    player.showPlayer(p);
-                                }
+                                player.showPlayer(p);
                             }
                         }
                     } else {
@@ -272,13 +268,9 @@ public class GameProfile {
                             }
 
                             if(hide) {
-                                if(player.canSee(p)) {
-                                    player.hidePlayer(p);
-                                }
+                                player.hidePlayer(p);
                             } else {
-                                if(!player.canSee(p)) {
-                                    player.showPlayer(p);
-                                }
+                                player.showPlayer(p);
                             }
                         }
                     }
@@ -287,23 +279,36 @@ public class GameProfile {
                 for(Player p : Bukkit.getOnlinePlayers()) {
                     GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
                     if((profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) || !this.isLobbyVisibility() || this.getState().equals(State.KIT_EDITOR)) {
-                        if(player.canSee(p)) {
-                            player.hidePlayer(p);
-                        }
+                        player.hidePlayer(p);
                     } else {
                         if(profile.isStaffMode() && !player.hasPermission("practice.staff")) {
-                            if(player.canSee(p)) {
-                                player.hidePlayer(p);
-                            }
+                            player.hidePlayer(p);
                         } else {
-                            if(!player.canSee(p)) {
-                                player.showPlayer(p);
-                            }
+                            player.showPlayer(p);
                         }
                     }
                 }
             }
         }
+    }
+
+    public void addClick() {
+        getClicks().add(new Date());
+    }
+
+    public int getCps() {
+        Date now = new Date();
+
+        int i = 0;
+        for(Date d : new ArrayList<>(getClicks())) {
+            if (now.getTime() - d.getTime() < 1000) {
+                i++;
+            } else {
+                getClicks().remove(d);
+            }
+        }
+
+        return i;
     }
 
     public void documentImport(Document document) {

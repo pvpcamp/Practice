@@ -1,5 +1,6 @@
 package camp.pvp.practice.games.tasks;
 
+import camp.pvp.practice.Practice;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
@@ -43,6 +44,8 @@ public class EndingTask implements Runnable{
             Player player = Bukkit.getPlayer(spectator.getUuid());
             game.spectateEnd(player);
         }
+
+        Practice.instance.getGameProfileManager().updateGlobalPlayerVisibility();
 
         game.clearEntities();
 

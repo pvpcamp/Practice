@@ -283,12 +283,15 @@ public class Duel extends Game {
                     int ping = 0, enemyPing = 0;
                     ping = PlayerUtils.getPing(self.getPlayer());
 
+                    boolean show = false;
+
                     if(showDuration) {
+                        show = true;
                         lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
                     }
 
-                    lines.add(" ");
                     if (kit.equals(DuelKit.BOXING)) {
+                        show = true;
                         long difference = self.getHits() - opponent.getHits();
                         lines.add("&6Hits: &a" + self.getHits() + "&7/&c" + opponent.getHits());
 
@@ -304,11 +307,27 @@ public class Duel extends Game {
                     }
 
                     if(showPing) {
-                        lines.add("&6Your Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms");
-                        if (opponent != null) {
+                        show = true;
+                        if (opponent == null) {
+                            lines.add("&6Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms");
+                        } else {
                             enemyPing = PlayerUtils.getPing(opponent.getPlayer());
-                            lines.add("&6Enemy Ping: &f" + PlayerUtils.getPing(opponent.getPlayer()) + " ms");
+                            lines.add("&6Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms &7┃ &f" + PlayerUtils.getPing(opponent.getPlayer()) + " ms");
                         }
+                    }
+
+                    if(showCps) {
+                        show = true;
+                        if(opponent == null) {
+                            lines.add("&6CPS: &f" + profile.getCps());
+                        } else {
+                            GameProfile opponentProfile = getPlugin().getGameProfileManager().getLoadedProfiles().get(opponent.getUuid());
+                            lines.add("&6CPS: &f" + profile.getCps() + " &7┃ &f" + opponentProfile.getCps());
+                        }
+                    }
+
+                    if(!show) {
+                        return null;
                     }
                 } else {
                     return null;
@@ -353,10 +372,9 @@ public class Duel extends Game {
             }
         }
 
-        lines.add(" ");
-
         switch(getState()) {
             case STARTING:
+                lines.add(" ");
                 lines.add("&6Kit: &f" + kit.getDisplayName());
                 lines.add("&6Arena: &f" + arena.getDisplayName());
                 break;
@@ -366,11 +384,13 @@ public class Duel extends Game {
                 }
 
                 if(showDuration) {
+                    lines.add(" ");
                     lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
                 }
                 break;
             case ENDED:
                 if(showDuration) {
+                    lines.add(" ");
                     lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
                 }
                 break;

@@ -19,7 +19,11 @@ public class ChoosePartyDuelEventGui extends StandardGui {
         this.setDefaultBackground();
 
         GuiButton teamFight = new GuiButton(Material.IRON_SWORD, "&6&lClassic Team Fight");
-        teamFight.setLore("&7Next, choose a kit for this event.");
+        teamFight.setLore(
+                "&7Classic Team vs Team fights",
+                "&7using a kit of your choosing.",
+                " ",
+                "&aNext, choose a kit for this duel.");
         teamFight.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -59,7 +63,25 @@ public class ChoosePartyDuelEventGui extends StandardGui {
         this.addButton(teamFight, false);
 
         GuiButton hcfFight = new GuiButton(Material.FENCE, "&6&lHCF Team Fight");
-        hcfFight.setLore("&aComing soon!");
+        hcfFight.setCloseOnClick(true);
+        hcfFight.setAction(new GuiAction() {
+            @Override
+            public void run(Player player, Gui gui) {
+                if(party.getGame() == null && profile.getParty().getGame() == null) {
+                    PartyGameRequest pgr = new PartyGameRequest(profile.getParty(), party, PartyGameRequest.Type.HCF);
+                    pgr.send();
+                } else {
+                    player.sendMessage(ChatColor.RED + "You cannot invite this party to a game right now.");
+                }
+            }
+        });
+
+        hcfFight.setLore(
+                "&7Team vs Team HCF fights",
+                "&7using classic HCF kits to",
+                "&7defeat another party.",
+                " ",
+                "&aClick to invite.");
         hcfFight.setSlot(15);
         this.addButton(hcfFight, false);
 

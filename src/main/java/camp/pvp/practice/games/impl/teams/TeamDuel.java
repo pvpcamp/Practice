@@ -1,4 +1,4 @@
-package camp.pvp.practice.games.impl;
+package camp.pvp.practice.games.impl.teams;
 
 import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.EndingTask;
@@ -66,7 +66,6 @@ public class TeamDuel extends TeamGame {
 
                 if(showDuration) {
                     lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
-                    lines.add("");
                 }
 
                 if(showPing) {
@@ -74,10 +73,10 @@ public class TeamDuel extends TeamGame {
                 }
 
                 if(showCps) {
-                    lines.add("&6Your CPS: &f0");
+                    lines.add("&6Your CPS: &f" + profile.getCps());
                 }
 
-                if(showPing || showCps) {
+                if(showPing || showCps || showDuration) {
                     lines.add("");
                 }
 
@@ -94,6 +93,8 @@ public class TeamDuel extends TeamGame {
 
                     i++;
                 }
+
+                lines.add(" ");
 
 
                 lines.add("&9Blue Team " + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? "(You)" : "") + ": &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
@@ -237,7 +238,10 @@ public class TeamDuel extends TeamGame {
 
     @Override
     public void end() {
-        GameProfileManager gpm = getPlugin().getGameProfileManager();
+        if(this.getState().equals(State.ENDED)) {
+            return;
+        }
+
         this.setEnded(new Date());
         this.setState(State.ENDED);
 
@@ -277,7 +281,7 @@ public class TeamDuel extends TeamGame {
         stringBuilder.append(" ");
         stringBuilder.append(Colors.get("&6&lMatch ended."));
         if(winningTeam != null) {
-            stringBuilder.append(Colors.get("\n&6Winning Team: " + winningTeam.getColor().getChatColor() + winningTeam.getColor().getName()));
+            stringBuilder.append(Colors.get("\n &7● &6Winning Team: " + winningTeam.getColor().getChatColor() + winningTeam.getColor().getName()));
         }
 
         TextComponent text = new TextComponent(ChatColor.GRAY + " ● " + ChatColor.GOLD + "Inventories: ");

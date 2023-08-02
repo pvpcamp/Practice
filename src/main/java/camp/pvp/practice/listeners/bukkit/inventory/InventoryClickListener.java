@@ -1,7 +1,7 @@
 package camp.pvp.practice.listeners.bukkit.inventory;
 
 import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.games.impl.HCFTeams;
+import camp.pvp.practice.games.impl.teams.HCFTeams;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
@@ -38,48 +38,6 @@ public class InventoryClickListener implements Listener {
                     if(participant != null) {
                         if(!participant.isKitApplied()) {
                             event.setCancelled(true);
-                        }
-
-                        if(game instanceof HCFTeams) {
-                            PlayerInventory pi = player.getInventory();
-                            HCFKit hcfKit = participant.getAppliedHcfKit(), currentKit = null;
-                            ItemStack[] armor = pi.getArmorContents();
-                            if(
-                                    // Check for Diamond armor.
-                                    armor[0].getType().equals(Material.DIAMOND_BOOTS)
-                                    && armor[1].getType().equals(Material.DIAMOND_LEGGINGS)
-                                    && armor[2].getType().equals(Material.DIAMOND_CHESTPLATE)
-                                    && armor[3].getType().equals(Material.DIAMOND_HELMET)
-                            ) {
-                                currentKit = HCFKit.DIAMOND;
-                            } else if (
-                                    // Check for Bard armor.
-                                    armor[0].getType().equals(Material.GOLD_BOOTS)
-                                    && armor[1].getType().equals(Material.GOLD_LEGGINGS)
-                                    && armor[2].getType().equals(Material.GOLD_CHESTPLATE)
-                                    && armor[3].getType().equals(Material.GOLD_HELMET)
-                            ) {
-                                currentKit = HCFKit.BARD;
-                            } else if(
-                                    // Check for Archer armor.
-                                    armor[0].getType().equals(Material.LEATHER_BOOTS)
-                                    && armor[1].getType().equals(Material.LEATHER_LEGGINGS)
-                                    && armor[2].getType().equals(Material.LEATHER_CHESTPLATE)
-                                    && armor[3].getType().equals(Material.LEATHER_HELMET)
-                            ) {
-                                currentKit = HCFKit.ARCHER;
-                            }
-
-                            if(currentKit != hcfKit) {
-                                participant.setAppliedHcfKit(currentKit);
-                                participant.setEnergy(0);
-
-                                if(currentKit != null) {
-                                    player.sendMessage(ChatColor.GREEN + "You have applied HCF kit " + currentKit.getColor() + currentKit + ChatColor.GREEN + ".");
-                                } else {
-
-                                }
-                            }
                         }
                     }
                 }

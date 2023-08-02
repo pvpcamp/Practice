@@ -2,6 +2,7 @@ package camp.pvp.practice.listeners.bukkit.player;
 
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.GameParticipant;
+import camp.pvp.practice.games.impl.teams.HCFTeams;
 import camp.pvp.practice.interactables.InteractableItem;
 import camp.pvp.practice.interactables.InteractableItems;
 import camp.pvp.practice.profiles.GameProfile;
@@ -29,6 +30,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.*;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Map;
 
@@ -54,9 +57,6 @@ public class PlayerInteractListener implements Listener {
             player.sendMessage(ChatColor.RED + "Your profile has not been loaded yet, if this persists please reconnect.");
             return;
         }
-
-        GameProfile.State state = profile.getState();
-
         if(event.getAction().equals(Action.PHYSICAL)){
             Material mat = event.getClickedBlock().getType();
             if(mat == Material.STONE_PLATE || mat == Material.WOOD_PLATE || mat == Material.IRON_PLATE || mat == Material.GOLD_PLATE) {
@@ -64,6 +64,10 @@ public class PlayerInteractListener implements Listener {
                 event.setUseInteractedBlock(Event.Result.DENY);
             }
             return;
+        }
+
+        if(action.equals(Action.LEFT_CLICK_AIR)) {
+            profile.addClick();
         }
 
         if(action.equals(Action.RIGHT_CLICK_AIR) || action.equals(Action.RIGHT_CLICK_BLOCK)) {
@@ -101,6 +105,7 @@ public class PlayerInteractListener implements Listener {
                 GameParticipant participant = game.getAlive().get(player.getUniqueId());
                 if(participant != null) {
                     if(participant.isKitApplied()) {
+
                         switch(player.getItemInHand().getType()) {
                             case MUSHROOM_SOUP:
                                 if(player.getHealth() != player.getMaxHealth()) {
@@ -177,7 +182,7 @@ public class PlayerInteractListener implements Listener {
                                     createButton.setAction(new GuiAction() {
                                         @Override
                                         public void run(Player player, Gui gui) {
-                                            CustomDuelKit cdk = new CustomDuelKit(editingKit, 1, false);
+                                            CustomDuelKit cdk = new CustomDuelKit(editingKit, finalX, false);
                                             cdk.setItems(player.getInventory().getContents());
                                             customKits.put(finalX, cdk);
                                             player.sendMessage(Colors.get("&aYour " + editingKit.getColor() + editingKit.getDisplayName() + "&a has been created and saved as " + cdk.getName() + "&a."));

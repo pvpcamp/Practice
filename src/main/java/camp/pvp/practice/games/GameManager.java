@@ -2,11 +2,13 @@ package camp.pvp.practice.games;
 
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.impl.events.GameEvent;
+import camp.pvp.practice.games.impl.teams.tasks.HCFEffectUpdater;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.queue.GameQueue;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -28,6 +30,8 @@ public class GameManager {
         this.postGameInventories = new HashMap<>();
 
         this.logger.info("Started GameManager.");
+
+        Bukkit.getScheduler().runTaskTimer(plugin, new HCFEffectUpdater(this), 0, 2);
     }
 
     public GameEvent getActiveEvent() {

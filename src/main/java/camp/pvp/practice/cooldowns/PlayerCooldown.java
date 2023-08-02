@@ -17,12 +17,20 @@ import java.util.concurrent.TimeUnit;
 public class PlayerCooldown {
 
     public enum Type {
-        ENDER_PEARL;
+        ENDER_PEARL, ENERGY_JUMP, ENERGY_REGEN, ENERGY_RESISTANCE, ENERGY_SPEED, ENERGY_STRENGTH;
 
         public int getDuration() {
             switch(this) {
                 case ENDER_PEARL:
                     return 16;
+                case ENERGY_JUMP:
+                    return 30;
+                case ENERGY_STRENGTH:
+                case ENERGY_RESISTANCE:
+                case ENERGY_REGEN:
+                    return 60;
+                case ENERGY_SPEED:
+                    return 45;
                 default:
                     return 0;
             }
@@ -32,6 +40,16 @@ public class PlayerCooldown {
             switch(this) {
                 case ENDER_PEARL:
                     return Colors.get("&cYou must wait <time> second(s) before pearling again.");
+                case ENERGY_JUMP:
+                    return Colors.get("&cYou must wait <time> second(s) before using your Jump Boost ability again.");
+                case ENERGY_REGEN:
+                    return Colors.get("&cYou must wait <time> second(s) before using your Regeneration ability again.");
+                case ENERGY_RESISTANCE:
+                    return Colors.get("&cYou must wait <time> second(s) before using your Resistance ability again.");
+                case ENERGY_STRENGTH:
+                    return Colors.get("&cYou must wait <time> second(s) before using your Strength ability again.");
+                case ENERGY_SPEED:
+                    return Colors.get("&cYou must wait <time> second(s) before using your Speed ability again.");
                 default:
                     return null;
             }
@@ -41,6 +59,35 @@ public class PlayerCooldown {
             switch(this) {
                 case ENDER_PEARL:
                     return Colors.get("&aYou can now use ender pearls again.");
+                case ENERGY_JUMP:
+                    return Colors.get("&aYou can now use your Jump Boost ability again.");
+                case ENERGY_REGEN:
+                    return Colors.get("&aYou can now use your Regeneration ability again.");
+                case ENERGY_RESISTANCE:
+                    return Colors.get("&aYou can now use your Resistance ability again.");
+                case ENERGY_STRENGTH:
+                    return Colors.get("&aYou can now use your Strength ability again.");
+                case ENERGY_SPEED:
+                    return Colors.get("&aYou can now use your Speed ability again.");
+                default:
+                    return null;
+            }
+        }
+
+        public LCCooldown getLCCooldown() {
+            switch(this) {
+                case ENDER_PEARL:
+                    return new LCCooldown("Pearl Cooldown", this.getDuration(), Material.ENDER_PEARL);
+                case ENERGY_JUMP:
+                    return new LCCooldown("Jump Boost Ability", this.getDuration(), Material.FEATHER);
+                case ENERGY_REGEN:
+                    return new LCCooldown("Regeneration Ability", this.getDuration(), Material.GHAST_TEAR);
+                case ENERGY_RESISTANCE:
+                    return new LCCooldown("Resistance Ability", this.getDuration(), Material.IRON_INGOT);
+                case ENERGY_STRENGTH:
+                    return new LCCooldown("Strength Ability", this.getDuration(), Material.BLAZE_POWDER);
+                case ENERGY_SPEED:
+                    return new LCCooldown("Speed Ability", this.getDuration(), Material.SUGAR);
                 default:
                     return null;
             }
@@ -66,7 +113,7 @@ public class PlayerCooldown {
         LunarClientAPI lcApi = LunarClientAPI.getInstance();
 
         if(lcApi.isRunningLunarClient(player)) {
-            LunarClientAPI.getInstance().sendPacket(player, new LCCooldown("Pearl Cooldown", 16, Material.ENDER_PEARL).getPacket());
+            LunarClientAPI.getInstance().sendPacket(player, type.getLCCooldown().getPacket());
         }
     }
 
@@ -84,7 +131,7 @@ public class PlayerCooldown {
 
     public String getBlockedMessage() {
         long seconds = TimeUnit.MILLISECONDS.toSeconds(getRemaining()) % 60;
-        return type.blockedMessage().replace("<time>", String.valueOf(seconds + 1));
+        return Colors.get(type.blockedMessage().replace("<time>", String.valueOf(seconds + 1)));
     }
 
     public void check() {
@@ -110,7 +157,9 @@ public class PlayerCooldown {
     public void remove() {
         expired = true;
 
-        player.setExp(0);
-        player.setLevel(0);
+        if(getType().equals(Type.ENDER_PEARL)) {
+            player.setExp(0);
+            player.setLevel(0);
+        }
     }
 }

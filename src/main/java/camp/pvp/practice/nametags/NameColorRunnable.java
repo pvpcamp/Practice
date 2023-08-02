@@ -40,39 +40,32 @@ public class NameColorRunnable implements Runnable{
                     }
                 }
 
-                Team playingTeam = scoreboard.getTeam("playing");
-                Team enemyTeam = scoreboard.getTeam("enemies");
                 Team blueTeam = scoreboard.getTeam("blue");
                 Team redTeam = scoreboard.getTeam("red");
+                Team taggedBlueTeam = scoreboard.getTeam("blue_tagged");
+                Team taggedRedTeam = scoreboard.getTeam("red_tagged");
                 Team spectatorTeam = scoreboard.getTeam("spectators");
-                Team lobbyTeam = scoreboard.getTeam("lobby");
                 Team partyTeam = scoreboard.getTeam("party");
                 Team tournamentTeam = scoreboard.getTeam("tournament");
 
-                if (playingTeam == null) {
-                    playingTeam = scoreboard.registerNewTeam("playing");
-                    playingTeam.setPrefix(Colors.get("&e"));
-                }
-
-                if (enemyTeam == null) {
-                    enemyTeam = scoreboard.registerNewTeam("enemies");
-                    enemyTeam.setPrefix(Colors.get("&c"));
-                }
-
                 if (blueTeam == null) {
                     blueTeam = scoreboard.registerNewTeam("blue");
-                    blueTeam.setPrefix(Colors.get("&9[Blue] "));
-                    blueTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
-                    blueTeam.setAllowFriendlyFire(false);
-                    blueTeam.setCanSeeFriendlyInvisibles(true);
+                    blueTeam.setPrefix(Colors.get("&9"));
                 }
 
                 if (redTeam == null) {
                     redTeam = scoreboard.registerNewTeam("red");
-                    redTeam.setPrefix(Colors.get("&c[Red] "));
-                    redTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
-                    redTeam.setAllowFriendlyFire(false);
-                    redTeam.setCanSeeFriendlyInvisibles(true);
+                    redTeam.setPrefix(Colors.get("&c"));
+                }
+
+                if (taggedBlueTeam == null) {
+                    taggedBlueTeam = scoreboard.registerNewTeam("blue_tagged");
+                    taggedBlueTeam.setPrefix(Colors.get("&a&l** &9"));
+                }
+
+                if (taggedRedTeam == null) {
+                    taggedRedTeam = scoreboard.registerNewTeam("red_tagged");
+                    taggedRedTeam.setPrefix(Colors.get("&a&l** &c"));
                 }
 
                 if (spectatorTeam == null) {
@@ -80,11 +73,6 @@ public class NameColorRunnable implements Runnable{
                     spectatorTeam.setPrefix(Colors.get("&7&o"));
                     spectatorTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
                     spectatorTeam.setCanSeeFriendlyInvisibles(true);
-                }
-
-                if (lobbyTeam == null) {
-                    lobbyTeam = scoreboard.registerNewTeam("lobby");
-                    lobbyTeam.setPrefix(Colors.get("&b"));
                 }
 
                 if (partyTeam == null) {
@@ -97,33 +85,34 @@ public class NameColorRunnable implements Runnable{
                     tournamentTeam.setPrefix(Colors.get("&6&l* &r&6"));
                 }
 
-                if (profile.getGame() != null) {
-                    if (profile.getGame() instanceof TeamGame) {
-                        TeamGame teamGame = (TeamGame) profile.getGame();
-                        for (GameParticipant p : teamGame.getBlue().getAliveParticipants().values()) {
-                            blueTeam.addEntry(p.getName());
-                        }
-
-                        for (GameParticipant p : teamGame.getRed().getAliveParticipants().values()) {
-                            redTeam.addEntry(p.getName());
-                        }
-                    } else {
-                        if (profile.getState().equals(GameProfile.State.SPECTATING)) {
-                            for (Player p : profile.getGame().getAlivePlayers()) {
-                                playingTeam.addEntry(p.getName());
+                switch(profile.getState()) {
+                    case SPECTATING:
+                    case IN_GAME:
+                        if (profile.getGame() instanceof TeamGame) {
+                            TeamGame teamGame = (TeamGame) profile.getGame();
+                            for (GameParticipant p : teamGame.getBlue().getAliveParticipants().values()) {
+                                if(p.isArcherTagged()) {
+                                    taggedBlueTeam.addEntry(p.getName());
+                                } else {
+                                    blueTeam.addEntry(p.getName());
+                                }
                             }
-                        } else {
-                            for (Player p : profile.getGame().getAlivePlayers()) {
-                                if (!p.equals(player)) {
-                                    enemyTeam.addEntry(p.getName());
+
+                            for (GameParticipant p : teamGame.getRed().getAliveParticipants().values()) {
+                                if(p.isArcherTagged()) {
+                                    taggedRedTeam.addEntry(p.getName());
+                                } else {
+                                    redTeam.addEntry(p.getName());
                                 }
                             }
                         }
-                    }
 
-                    for (Player p : profile.getGame().getSpectatorsPlayers()) {
-                        spectatorTeam.addEntry(p.getName());
-                    }
+                        for (Player p : profile.getGame().getSpectatorsPlayers()) {
+                            spectatorTeam.addEntry(p.getName());
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         }

@@ -6,7 +6,7 @@ import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.impl.FreeForAll;
-import camp.pvp.practice.games.impl.TeamDuel;
+import camp.pvp.practice.games.impl.teams.TeamDuel;
 import camp.pvp.practice.interactables.ItemInteract;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.PartyMember;

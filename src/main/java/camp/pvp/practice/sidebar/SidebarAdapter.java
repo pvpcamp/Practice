@@ -37,7 +37,7 @@ public class SidebarAdapter implements AssembleAdapter {
 
     @Override
     public String getTitle(Player player) {
-        return "&6&lPractice &7[Beta]";
+        return "&6&lPractice &7┃ &fBeta";
     }
 
     @Override
@@ -71,6 +71,7 @@ public class SidebarAdapter implements AssembleAdapter {
                         lines.add(" &6&oLC Players: &f" + plugin.getLunarClientAPI().getPlayersRunningLunarClient().size() + "/" + online);
                         lines.add(" &6&oBuild mode: &f" + profile.isBuildMode());
                         lines.add(" &6&oStaff mode: &f" + profile.isStaffMode());
+                        lines.add(" &6&oCPS: &f" + profile.getCps());
                     }
                     break;
                 case LOBBY_QUEUE:
