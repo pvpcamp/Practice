@@ -2,8 +2,7 @@ package camp.pvp.practice.guis.statistics;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
-import camp.pvp.practice.profiles.tasks.LeaderboardEntry;
-import camp.pvp.practice.profiles.tasks.LeaderboardUpdater;
+import camp.pvp.practice.profiles.leaderboard.LeaderboardEntry;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.StandardGui;
 

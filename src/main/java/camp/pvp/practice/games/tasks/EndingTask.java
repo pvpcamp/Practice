@@ -8,6 +8,7 @@ import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.PreviousQueue;
+import camp.pvp.practice.profiles.Rematch;
 import camp.pvp.practice.queue.GameQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -34,9 +35,26 @@ public class EndingTask implements Runnable{
                 if(game instanceof Duel) {
                     Duel duel = (Duel) game;
                     GameQueue.Type queueType = duel.getQueueType();
-                    if(queueType.equals(GameQueue.Type.UNRANKED) || queueType.equals(GameQueue.Type.RANKED)) {
-                        PreviousQueue previousQueue = new PreviousQueue(game.getKit(), queueType);
-                        profile.addPreviousQueue(previousQueue);
+                    boolean delayItems = false;
+                    if(queueType.equals(GameQueue.Type.UNRANKED) || queueType.equals(GameQueue.Type.RANKED) || queueType.equals(GameQueue.Type.PRIVATE)) {
+                        if(!queueType.equals(GameQueue.Type.PRIVATE)) {
+                            PreviousQueue previousQueue = new PreviousQueue(game.getKit(), queueType);
+                            profile.setPreviousQueue(previousQueue);
+                            delayItems = true;
+                        }
+
+                        Rematch rematch;
+                        for(GameParticipant p : game.getParticipants().values()) {
+                            if(p.getUuid() != participant.getUuid() && p.getPlayer() != null && p.getPlayer().isOnline()) {
+                                rematch = new Rematch(profile, p.getUuid(), p.getName(), duel.getKit());
+                                profile.setRematch(rematch);
+                                delayItems = true;
+                            }
+                        }
+                    }
+
+                    if(delayItems) {
+                        profile.delayGiveItemsTask();
                     }
                 }
 

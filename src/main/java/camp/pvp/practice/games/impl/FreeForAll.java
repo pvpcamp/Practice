@@ -135,7 +135,7 @@ public class FreeForAll extends Game {
         }
 
         Map<String, ArenaPosition> positions = arena.getPositions();
-        ArenaPosition spawn = positions.get("spawn");
+        ArenaPosition spawn = positions.get("center");
 
         if(spawn != null) {
 

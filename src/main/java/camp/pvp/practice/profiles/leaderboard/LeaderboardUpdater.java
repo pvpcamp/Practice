@@ -1,4 +1,4 @@
-package camp.pvp.practice.profiles.tasks;
+package camp.pvp.practice.profiles.leaderboard;
 
 import camp.pvp.mongo.MongoCollectionResult;
 import camp.pvp.practice.kits.DuelKit;

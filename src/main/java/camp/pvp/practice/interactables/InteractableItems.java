@@ -3,12 +3,14 @@ package camp.pvp.practice.interactables;
 import camp.pvp.practice.interactables.impl.game.StopSpectatingInteract;
 import camp.pvp.practice.interactables.impl.game.TeleporterInteract;
 import camp.pvp.practice.interactables.impl.lobby.HostEventInteract;
+import camp.pvp.practice.interactables.impl.lobby.RematchInteract;
 import camp.pvp.practice.interactables.impl.queue.RequeueInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentLeaveInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentStatusInteract;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.PreviousQueue;
+import camp.pvp.practice.profiles.Rematch;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.interactables.impl.lobby.KitEditorInteract;
 import camp.pvp.practice.interactables.impl.party.PartyCreateInteract;
@@ -23,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum InteractableItems {
-    QUEUE, HOST_EVENT, REQUEUE, PARTY_CREATE, KIT_EDITOR, SETTINGS,
+    QUEUE, HOST_EVENT, REQUEUE, REMATCH, PARTY_CREATE, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
@@ -40,13 +42,25 @@ public enum InteractableItems {
                         new ItemBuilder(Material.IRON_AXE, "&6Host an Event &7(Right Click)").create(), 1, new HostEventInteract());
             case REQUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.PAPER, "&6Play Again &7(Right Click)").create(), 2,
+                        new ItemBuilder(Material.PAPER, "&6Play Again &7(Right Click)").create(), 3,
                         new RequeueInteract(),
                         new ItemUpdater() {
                             @Override
                             public void onUpdate(InteractableItem item, GameProfile profile) {
                                 PreviousQueue queue = profile.getPreviousQueue();
                                 item.updateName("&6Queue " + queue.getQueueType().toString() + " " + queue.getKit().getDisplayName() + " &7(Right Click)");
+                            }
+                        }
+                );
+            case REMATCH:
+                return new InteractableItem(
+                        new ItemBuilder(Material.BLAZE_POWDER, "&6Rematch &7(Right Click)").create(), 2,
+                        new RematchInteract(),
+                        new ItemUpdater() {
+                            @Override
+                            public void onUpdate(InteractableItem item, GameProfile profile) {
+                                Rematch rematch = profile.getRematch();
+                                item.updateName("&6Rematch " + rematch.getName() + " &7(Right Click)");
                             }
                         }
                 );
@@ -104,6 +118,10 @@ public enum InteractableItems {
             case LOBBY:
                 items.add(QUEUE);
                 items.add(HOST_EVENT);
+
+                if(profile.getRematch() != null) {
+                    items.add(REMATCH);
+                }
 
                 if(profile.getPreviousQueue() != null) {
                     items.add(REQUEUE);

@@ -1,15 +1,12 @@
 package camp.pvp.practice.guis.statistics;
 
-import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.stats.ProfileELO;
-import camp.pvp.practice.profiles.tasks.LeaderboardEntry;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.StandardGui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class StatisticsGui extends StandardGui {
     public StatisticsGui(ProfileELO profileELO) {

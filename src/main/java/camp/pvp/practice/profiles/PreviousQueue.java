@@ -10,6 +10,7 @@ public class PreviousQueue {
     private final DuelKit kit;
     private final GameQueue.Type queueType;
 
+
     public PreviousQueue(DuelKit kit, GameQueue.Type queueType) {
         this.kit = kit;
         this.queueType = queueType;

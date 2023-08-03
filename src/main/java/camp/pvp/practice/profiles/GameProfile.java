@@ -61,6 +61,7 @@ public class GameProfile {
 
     private Game game;
     private PreviousQueue previousQueue;
+    private Rematch rematch;
     private Tournament tournament;
     private Map<UUID, DuelRequest> duelRequests;
 
@@ -130,18 +131,17 @@ public class GameProfile {
         }
     }
 
-    public void addPreviousQueue(PreviousQueue queue) {
-        this.previousQueue = queue;
+    public void delayGiveItemsTask() {
         this.giveItemsTask = Bukkit.getScheduler().runTaskLater(Practice.instance, new Runnable() {
             @Override
             public void run() {
                 previousQueue = null;
+                rematch = null;
                 if(getState().equals(State.LOBBY)) {
                     givePlayerItems();
                 }
             }
         }, 20 * 15);
-
     }
 
     public void givePlayerItems() {

@@ -337,10 +337,10 @@ public abstract class Game {
             player.teleport(location);
         }
 
+        profile.givePlayerItems();
+
         player.setAllowFlight(true);
         player.setFlying(true);
-
-        profile.givePlayerItems();
     }
 
     public void spectateEnd(Player player) {
