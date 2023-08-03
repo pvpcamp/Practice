@@ -1,4 +1,4 @@
-package camp.pvp.practice.guis.duel;
+package camp.pvp.practice.guis.games.duel;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;

@@ -223,28 +223,28 @@ public abstract class Game {
                 victimParticipant.setHunger(victim.getFoodLevel());
                 victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
 
-                if(victim.getNoDamageTicks() < 10) {
-                    participant.hits++;
-                    participant.currentCombo++;
+                if(event.getDamager() instanceof Player) {
+                    if (victim.getNoDamageTicks() < 10) {
+                        participant.hits++;
+                        participant.currentCombo++;
 
-                    if(participant.isComboMessages()) {
-                        switch ((int) participant.getCurrentCombo()) {
-                            case 5:
-                                attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
-                                attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
-                                break;
-                            case 10:
-                                attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
-                                attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
-                                break;
-                            case 20:
-                                attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
-                                attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
-                                break;
+                        if (participant.isComboMessages()) {
+                            switch ((int) participant.getCurrentCombo()) {
+                                case 5:
+                                    attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+                                    attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
+                                    break;
+                                case 10:
+                                    attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
+                                    attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
+                                    break;
+                                case 20:
+                                    attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
+                                    attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
+                                    break;
+                            }
                         }
-                    }
-                } else {
-                    if(event.getDamager() instanceof Player) {
+                    } else {
                         event.setCancelled(true);
                     }
                 }
@@ -314,8 +314,11 @@ public abstract class Game {
         this.getSpectators().put(player.getUniqueId(), new GameSpectator(player.getUniqueId(), player.getName()));
 
         if(!this.getParticipants().containsKey(player.getUniqueId())) {
+
+            sendSpectateStartMessage(player);
+
             String message = "&f" + player.getName() + "&6 has started spectating.";
-            player.sendMessage(ChatColor.GREEN + "You have started spectating.");
+
             if(profile.isStaffMode()) {
                 this.staffAnnounce("&7[Staff] " + message);
             } else {
@@ -434,6 +437,10 @@ public abstract class Game {
 
     public boolean seeEveryone() {
         return false;
+    }
+
+    public void sendSpectateStartMessage(Player player) {
+        player.sendMessage(ChatColor.GREEN + "You have started spectating.");
     }
 
     public <T> void playEffect(Location location, Effect effect, T t) {

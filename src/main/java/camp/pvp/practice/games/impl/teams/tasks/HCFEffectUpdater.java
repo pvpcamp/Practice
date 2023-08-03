@@ -56,6 +56,8 @@ public class HCFEffectUpdater implements Runnable{
                                             if(pe.getType().equals(effect.getType())) {
                                                 if(pe.getAmplifier() > effect.getAmplifier()) {
                                                     apply = false;
+                                                } else if(pe.getType().equals(PotionEffectType.REGENERATION) && pe.getDuration() > 60) {
+                                                    apply = false;
                                                 }
                                             }
                                         }

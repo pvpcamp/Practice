@@ -75,7 +75,7 @@ public class HCFPlayerInteractListener implements Listener {
                                         for (GameParticipant p : participant.getTeam().getAliveParticipants().values()) {
                                             Player teamPlayer = p.getPlayer();
                                             if (teamPlayer.getLocation().distance(player.getLocation()) < 20) {
-                                                p.applyTemporaryEffect(PotionEffectType.REGENERATION, 5, 1);
+                                                p.applyTemporaryEffect(PotionEffectType.REGENERATION, 5, 2);
                                             }
                                         }
                                         participant.getCooldowns().put(PlayerCooldown.Type.ENERGY_REGEN, new PlayerCooldown(PlayerCooldown.Type.ENERGY_REGEN, participant, player));

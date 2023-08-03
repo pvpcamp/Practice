@@ -52,35 +52,33 @@ public abstract class TeamGame extends Game {
                         victimParticipant.archerTag();
                     }
 
-                    participant.setHealth(Math.round(victim.getHealth()));
-                    participant.setMaxHealth(Math.round(victim.getMaxHealth()));
-                    participant.setHunger(victim.getFoodLevel());
-                    participant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
-                    participant.hits++;
-                    participant.currentCombo++;
+                    if(event.getDamager() instanceof Player) {
+                        if (victim.getNoDamageTicks() < 10) {
+                            participant.hits++;
+                            participant.currentCombo++;
 
-                    if(victim.getNoDamageTicks() < 10) {
-                        participant.hits++;
-                        participant.currentCombo++;
+                            participant.setHealth(Math.round(victim.getHealth()));
+                            participant.setMaxHealth(Math.round(victim.getMaxHealth()));
+                            participant.setHunger(victim.getFoodLevel());
+                            participant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
 
-                        if(participant.isComboMessages()) {
-                            switch ((int) participant.getCurrentCombo()) {
-                                case 5:
-                                    attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
-                                    attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
-                                    break;
-                                case 10:
-                                    attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
-                                    attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
-                                    break;
-                                case 20:
-                                    attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
-                                    attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
-                                    break;
+                            if (participant.isComboMessages()) {
+                                switch ((int) participant.getCurrentCombo()) {
+                                    case 5:
+                                        attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+                                        attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
+                                        break;
+                                    case 10:
+                                        attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
+                                        attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
+                                        break;
+                                    case 20:
+                                        attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
+                                        attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
+                                        break;
+                                }
                             }
-                        }
-                    } else {
-                        if(event.getDamager() instanceof Player) {
+                        } else {
                             event.setCancelled(true);
                         }
                     }

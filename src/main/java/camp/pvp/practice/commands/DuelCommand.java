@@ -1,6 +1,6 @@
 package camp.pvp.practice.commands;
 
-import camp.pvp.practice.guis.duel.DuelRequestKitSelectionGui;
+import camp.pvp.practice.guis.games.duel.DuelRequestKitSelectionGui;
 import camp.pvp.practice.profiles.DuelRequest;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
@@ -18,7 +18,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class DuelCommand implements CommandExecutor {
 

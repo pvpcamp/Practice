@@ -9,6 +9,7 @@ import com.lunarclient.bukkitapi.LunarClientAPI;
 import com.lunarclient.bukkitapi.nethandler.client.LCPacketModSettings;
 import com.lunarclient.bukkitapi.nethandler.client.LCPacketServerRule;
 import com.lunarclient.bukkitapi.nethandler.client.obj.ServerRule;
+import io.github.thatkawaiisam.assemble.AssembleBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -30,6 +31,7 @@ public class PlayerJoinLeaveListeners implements Listener {
     @EventHandler
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
         GameProfile profile = plugin.getGameProfileManager().find(event.getUniqueId(), true);
+        profile.setName(event.getName());
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -43,13 +45,6 @@ public class PlayerJoinLeaveListeners implements Listener {
         }
 
         profile.setName(player.getName());
-
-        if(profile.getProfileElo() == null) {
-            profile.setProfileElo(new ProfileELO(profile.getUuid()));
-            profile.getProfileElo().setName(player.getName());
-            plugin.getGameProfileManager().exportElo(profile.getProfileElo(), true);
-        }
-
         profile.getProfileElo().setName(player.getName());
 
         profile.playerUpdate(true);
@@ -57,6 +52,8 @@ public class PlayerJoinLeaveListeners implements Listener {
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
         event.setJoinMessage(null);
+
+        plugin.getAssemble().getBoards().put(player.getUniqueId(), new AssembleBoard(player, plugin.getAssemble()));
 
         Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
             @Override
@@ -105,6 +102,8 @@ public class PlayerJoinLeaveListeners implements Listener {
             plugin.getGameQueueManager().removeFromQueue(player);
 
             event.setQuitMessage(null);
+
+            plugin.getAssemble().getBoards().remove(player.getUniqueId());
 
             Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getGameProfileManager().exportToDatabase(player.getUniqueId(), true, false), 2);
         }

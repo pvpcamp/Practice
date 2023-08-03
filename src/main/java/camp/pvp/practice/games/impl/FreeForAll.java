@@ -38,7 +38,7 @@ public class FreeForAll extends Game {
     @Override
     public void eliminate(Player player, boolean leftGame) {
         super.eliminate(player, leftGame);
-        if(this.getAlive().size() < 2) {
+        if (this.getAlive().size() < 2) {
             this.end();
         }
     }
@@ -109,10 +109,8 @@ public class FreeForAll extends Game {
         if(getArena() == null) {
             List<Arena> list = new ArrayList<>();
             for(Arena a : getPlugin().getArenaManager().getArenas()) {
-                if(a.isEnabled()) {
-                    if(a.getType().equals(Arena.Type.FFA)) {
-                        list.add(a);
-                    }
+                if(a.isEnabled() && kit.getArenaTypes().contains(a.getType())) {
+                    list.add(a);
                 }
             }
 
@@ -161,7 +159,7 @@ public class FreeForAll extends Game {
 
             for(Player p : this.getAllPlayers()) {
                 p.sendMessage(" ");
-                p.sendMessage(Colors.get("&6&lMatch starting in 10 seconds."));
+                p.sendMessage(Colors.get("&6&lMatch starting in 5 seconds."));
                 p.sendMessage(Colors.get(" &7● &6Mode: &fFree for All"));
                 p.sendMessage(Colors.get(" &7● &6Kit: &f" + kit.getColor() + kit.getDisplayName()));
                 p.sendMessage(Colors.get(" &7● &6Map: &f" + Colors.get(getArena().getDisplayName())));
@@ -183,7 +181,7 @@ public class FreeForAll extends Game {
 
             getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
-            this.startingTimer = new StartingTask(this, 10).runTaskTimer(this.getPlugin(), 20, 20);
+            this.startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
 
         } else {
             for(Player p : getAlivePlayers()) {

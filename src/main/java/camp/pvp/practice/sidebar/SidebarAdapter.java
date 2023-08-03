@@ -62,17 +62,24 @@ public class SidebarAdapter implements AssembleAdapter {
             switch(state) {
                 case LOBBY:
                     int online = Bukkit.getOnlinePlayers().size();
-                    lines.add("&6Online: &f" + online);
-                    lines.add("&6In Game: &f" + gameManager.getTotalInGame());
-                    if(profile.isDebugMode()) {
-                        lines.add(" ");
-                        lines.add("&6Debug:");
-                        lines.add(" &6&oVersion: &f" + plugin.getDescription().getVersion());
-                        lines.add(" &6&oLC Players: &f" + plugin.getLunarClientAPI().getPlayersRunningLunarClient().size() + "/" + online);
-                        lines.add(" &6&oBuild mode: &f" + profile.isBuildMode());
-                        lines.add(" &6&oStaff mode: &f" + profile.isStaffMode());
-                        lines.add(" &6&oCPS: &f" + profile.getCps());
+                    int inGame = gameManager.getTotalInGame();
+                    int staffOnline = 0;
+
+                    for(Player p : Bukkit.getOnlinePlayers()) {
+                        if(p.hasPermission("practice.staff")) {
+                            staffOnline++;
+                        }
                     }
+
+                    lines.add("&6Online: &f" + online);
+
+                    if(player.hasPermission("practice.staff")) {
+                        lines.add("&6Staff Online: &f" + staffOnline);
+                        lines.add("&6Staff Mode: &f" + (profile.isStaffMode() ? "Enabled" : "Disabled"));
+                        lines.add("&6Active Games: &f" + plugin.getGameManager().getActiveGames().size());
+                    }
+
+                    lines.add("&6In Game: &f" + inGame);
                     break;
                 case LOBBY_QUEUE:
                     GameQueue queue = gameQueueManager.getQueue(player);
@@ -147,11 +154,7 @@ public class SidebarAdapter implements AssembleAdapter {
 
             lines.add(" ");
 
-            if(profile.isDebugMode()) {
-                lines.add("&7&oniggapvp.com");
-            } else {
-                lines.add("&7&opvp.camp");
-            }
+            lines.add("&7&opvp.camp");
 
             if(showLines) {
                 lines.add("&7&m------------------");

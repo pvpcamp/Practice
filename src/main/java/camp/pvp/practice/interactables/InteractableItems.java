@@ -1,12 +1,14 @@
 package camp.pvp.practice.interactables;
 
 import camp.pvp.practice.interactables.impl.game.StopSpectatingInteract;
+import camp.pvp.practice.interactables.impl.game.TeleporterInteract;
 import camp.pvp.practice.interactables.impl.lobby.HostEventInteract;
 import camp.pvp.practice.interactables.impl.queue.RequeueInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentLeaveInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentStatusInteract;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.profiles.PreviousQueue;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.interactables.impl.lobby.KitEditorInteract;
 import camp.pvp.practice.interactables.impl.party.PartyCreateInteract;
@@ -15,6 +17,7 @@ import camp.pvp.practice.interactables.impl.queue.LeaveQueueInteract;
 import camp.pvp.practice.interactables.impl.queue.QueueInteract;
 import camp.pvp.practice.interactables.impl.party.*;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +27,7 @@ public enum InteractableItems {
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
-    STOP_SPECTATING;
+    STOP_SPECTATING, TELEPORTER;
 
     public InteractableItem getItem() {
         switch(this) {
@@ -37,7 +40,15 @@ public enum InteractableItems {
                         new ItemBuilder(Material.IRON_AXE, "&6Host an Event &7(Right Click)").create(), 1, new HostEventInteract());
             case REQUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.PAPER, "&6Play Again &7(Right Click)").create(), 2, new RequeueInteract()
+                        new ItemBuilder(Material.PAPER, "&6Play Again &7(Right Click)").create(), 2,
+                        new RequeueInteract(),
+                        new ItemUpdater() {
+                            @Override
+                            public void onUpdate(InteractableItem item, GameProfile profile) {
+                                PreviousQueue queue = profile.getPreviousQueue();
+                                item.updateName("&6Queue " + queue.getQueueType().toString() + " " + queue.getKit().getDisplayName() + " &7(Right Click)");
+                            }
+                        }
                 );
             case PARTY_CREATE:
                 return new InteractableItem(
@@ -79,6 +90,9 @@ public enum InteractableItems {
             case STOP_SPECTATING:
                 return new InteractableItem(
                         new ItemBuilder(Material.REDSTONE, "&cStop Spectating &7(Right Click)").create(), 4, new StopSpectatingInteract());
+            case TELEPORTER:
+                return new InteractableItem(
+                        new ItemBuilder(Material.COMPASS, "&6Teleportation Device &7(Right Click)").create(), 8, new TeleporterInteract());
             default:
                 return null;
         }
@@ -124,6 +138,7 @@ public enum InteractableItems {
                 break;
             case SPECTATING:
                 items.add(STOP_SPECTATING);
+                items.add(TELEPORTER);
                 break;
         }
 

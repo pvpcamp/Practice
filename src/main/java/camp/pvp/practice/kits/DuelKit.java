@@ -68,7 +68,7 @@ public enum DuelKit {
     public List<Arena.Type> getArenaTypes() {
         switch(this) {
             case HCF:
-                return Arrays.asList(Arena.Type.DUEL_HCF, Arena.Type.HCF_TEAMFIGHT);
+                return Arrays.asList(Arena.Type.DUEL_HCF);
             case SUMO:
                 return Collections.singletonList(Arena.Type.DUEL_SUMO);
             case BOXING:

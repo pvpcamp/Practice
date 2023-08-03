@@ -242,32 +242,8 @@ public class SettingsGui extends StandardGui {
                             "&aCurrent Setting: &f" + (gameProfile.isStaffMode() ? "Enabled" : "Disabled"));
                 }
             });
-            staffMode.setSlot(33);
+            staffMode.setSlot(35);
             this.addButton(staffMode, false);
-        }
-
-        if(player.hasPermission("practice.staff.debug_mode")) {
-            GuiButton debugMode = new GuiButton(Material.COMMAND, "&c&l&oDebug Mode");
-            debugMode.setAction(new GuiAction() {
-                @Override
-                public void run(Player player, Gui gui) {
-                    gameProfile.setDebugMode(!gameProfile.isDebugMode());
-                    gui.updateGui();
-                }
-            });
-
-            debugMode.setButtonUpdater(new AbstractButtonUpdater() {
-                @Override
-                public void update(GuiButton guiButton, Gui gui) {
-                    guiButton.setLore(
-                            "&7If you see this, you should ",
-                            "&7know what this does.",
-                            " ",
-                            "&aCurrent Setting: &f" + (gameProfile.isDebugMode() ? "Enabled" : "Disabled"));
-                }
-            });
-            debugMode.setSlot(35);
-            this.addButton(debugMode, false);
         }
 
         if(player.hasPermission("practice.staff.build_mode")) {

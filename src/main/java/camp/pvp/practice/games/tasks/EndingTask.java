@@ -5,7 +5,10 @@ import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.GameSpectator;
+import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.profiles.PreviousQueue;
+import camp.pvp.practice.queue.GameQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -28,6 +31,15 @@ public class EndingTask implements Runnable{
             GameProfile profile = game.getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
 
             if(player != null) {
+                if(game instanceof Duel) {
+                    Duel duel = (Duel) game;
+                    GameQueue.Type queueType = duel.getQueueType();
+                    if(queueType.equals(GameQueue.Type.UNRANKED) || queueType.equals(GameQueue.Type.RANKED)) {
+                        PreviousQueue previousQueue = new PreviousQueue(game.getKit(), queueType);
+                        profile.addPreviousQueue(previousQueue);
+                    }
+                }
+
                 if(entry.getValue().isAlive()) {
 
                     for(PlayerCooldown cooldown : participant.getCooldowns().values()) {

@@ -1,11 +1,9 @@
 package camp.pvp.practice.profiles;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.NetworkHelper;
 import camp.pvp.mongo.MongoCollectionResult;
 import camp.pvp.mongo.MongoManager;
 import camp.pvp.mongo.MongoUpdate;
-import camp.pvp.practice.games.Game;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.profiles.tasks.LeaderboardUpdater;
 import com.mongodb.client.MongoCollection;
@@ -55,6 +53,14 @@ public class GameProfileManager {
         if(profile == null) {
             profile = importFromDatabase(uuid, false, store);
 
+            ProfileELO elo = importElo(uuid, false);
+            if(elo == null) {
+                elo = new ProfileELO(uuid);
+                elo.setName(profile.getName());
+                profile.setProfileElo(elo);
+                exportElo(elo, true);
+            }
+
             if(store) {
                 loadedProfiles.put(uuid, profile);
             }
@@ -64,6 +70,17 @@ public class GameProfileManager {
     }
 
     public GameProfile find(String name, boolean store) {
+
+        if(!name.matches("^[a-zA-Z0-9_]{1,16}$")) {
+            return null;
+        }
+
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(player.getName().equalsIgnoreCase(name)) {
+                return getLoadedProfiles().get(player.getUniqueId());
+            }
+        }
+
         final GameProfile[] profile = {null};
         mongoManager.getCollection(false, profilesCollection, new MongoCollectionResult() {
             @Override
@@ -71,7 +88,16 @@ public class GameProfileManager {
                 Document doc = mongoCollection.find(Filters.regex("name", "(?i)" + name)).first();
                 if(doc != null) {
                     GameProfile p = new GameProfile(doc.get("_id", UUID.class));
-                    p.documentImport(doc);
+                    p.importFromDocument(doc);
+
+                    ProfileELO elo = importElo(p.getUuid(), false);
+                    if(elo == null) {
+                        elo = new ProfileELO(p.getUuid());
+                        elo.setName(p.getName());
+                        p.setProfileElo(elo);
+                        exportElo(elo, true);
+                    }
+
                     if(store) {
                         getLoadedProfiles().put(p.getUuid(), p);
                     }
@@ -96,12 +122,14 @@ public class GameProfileManager {
         GameProfile profile = new GameProfile(player.getUniqueId());
 
         profile.setName(player.getName());
-        profile.getProfileElo().setName(player.getName());
 
         MongoUpdate mu = new MongoUpdate(profilesCollection, profile.getUuid());
         mu.setUpdate(profile.export());
 
-        exportElo(profile.getProfileElo(), true);
+
+        ProfileELO profileELO = new ProfileELO(player.getUniqueId());
+        profileELO.setName(player.getName());
+        exportElo(profileELO, true);
 
         mongoManager.massUpdate(false, mu);
         this.loadedProfiles.put(player.getUniqueId(), profile);
@@ -113,8 +141,8 @@ public class GameProfileManager {
         mongoManager.getDocument(async, profilesCollection, uuid, document -> {
             if(document != null) {
                 profile[0] = new GameProfile(uuid);
-                profile[0].documentImport(document);
-                profile[0].setProfileElo(importElo(uuid, false));
+                profile[0].importFromDocument(document);
+                importElo(uuid, async);
 
                 if(store) {
                     loadedProfiles.put(uuid, profile[0]);

@@ -79,10 +79,6 @@ public class GameQueue {
                         duel.join(member2.getPlayer());
 
                         duel.start();
-
-                        Map<UUID, GameProfile> profiles = plugin.getGameProfileManager().getLoadedProfiles();
-                        profiles.get(member1.getUuid()).setPreviousQueue(this);
-                        profiles.get(member2.getUuid()).setPreviousQueue(this);
                     }
                 }, 5, 5);
                 break;
@@ -108,10 +104,6 @@ public class GameQueue {
                                             duel.join(member2.getPlayer());
 
                                             duel.start();
-
-                                            Map<UUID, GameProfile> profiles = plugin.getGameProfileManager().getLoadedProfiles();
-                                            profiles.get(member1.getUuid()).setPreviousQueue(this);
-                                            profiles.get(member2.getUuid()).setPreviousQueue(this);
                                             return;
                                         }
                                     }

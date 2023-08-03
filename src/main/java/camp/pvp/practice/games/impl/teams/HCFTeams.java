@@ -34,7 +34,7 @@ public class HCFTeams extends TeamDuel {
         if(getArena() == null) {
             for(Arena a : getPlugin().getArenaManager().getArenas()) {
                 if(a.isEnabled()) {
-                    if(a.getType().equals(Arena.Type.HCF_TEAMFIGHT) || a.getType().equals(Arena.Type.DUEL_HCF)) {
+                    if(a.getType().equals(Arena.Type.HCF_TEAMFIGHT)) {
                         list.add(a);
                     }
                 }

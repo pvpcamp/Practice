@@ -1,12 +1,10 @@
-package camp.pvp.practice.guis.duel;
+package camp.pvp.practice.guis.games.duel;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.DuelRequest;
-import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.StandardGui;
-import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 
 public class DuelRequestKitSelectionGui extends StandardGui {

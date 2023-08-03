@@ -3,7 +3,7 @@ package camp.pvp.practice.commands;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.impl.events.GameEvent;
-import camp.pvp.practice.guis.events.HostEventGui;
+import camp.pvp.practice.guis.games.events.HostEventGui;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import org.bukkit.ChatColor;

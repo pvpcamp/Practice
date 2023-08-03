@@ -24,6 +24,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -54,11 +55,12 @@ public class GameProfile {
     private Time time;
     private boolean spectatorVisibility, lobbyVisibility, comboMessages, tournamentNotifications, showSidebar,
                     sidebarInGame, sidebarShowDuration, sidebarShowCps, sidebarShowLines, sidebarShowPing,
-                    staffMode, buildMode, debugMode;
+                    staffMode, buildMode;
     private DeathAnimation deathAnimation;
+    private Map<DuelKit, Map<Integer, CustomDuelKit>> customDuelKits;
 
     private Game game;
-    private GameQueue previousQueue;
+    private PreviousQueue previousQueue;
     private Tournament tournament;
     private Map<UUID, DuelRequest> duelRequests;
 
@@ -69,9 +71,10 @@ public class GameProfile {
 
     private DuelKit editingKit;
     private CustomDuelKit editingCustomKit;
-    private Map<DuelKit, Map<Integer, CustomDuelKit>> customDuelKits;
 
     private ProfileELO profileElo;
+
+    private BukkitTask giveItemsTask;
 
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
@@ -95,8 +98,6 @@ public class GameProfile {
         this.sidebarShowDuration = true;
         this.sidebarShowLines = true;
         this.sidebarShowPing = true;
-
-        this.profileElo = new ProfileELO(uuid);
 
         for(DuelKit kit : DuelKit.values()) {
             if(kit.isEditable()) {
@@ -129,14 +130,44 @@ public class GameProfile {
         }
     }
 
+    public void addPreviousQueue(PreviousQueue queue) {
+        this.previousQueue = queue;
+        this.giveItemsTask = Bukkit.getScheduler().runTaskLater(Practice.instance, new Runnable() {
+            @Override
+            public void run() {
+                previousQueue = null;
+                if(getState().equals(State.LOBBY)) {
+                    givePlayerItems();
+                }
+            }
+        }, 20 * 15);
+
+    }
+
     public void givePlayerItems() {
         Player player = getPlayer();
         if(player != null) {
             PlayerUtils.reset(player);
 
+            if (player.hasPermission("practice.lobby.fly")) {
+                switch(getState()) {
+                    case LOBBY_QUEUE:
+                    case LOBBY_PARTY:
+                    case LOBBY_TOURNAMENT:
+                    case LOBBY:
+                        player.setAllowFlight(true);
+                        break;
+                }
+            }
+
             PlayerInventory pi = player.getInventory();
             for(InteractableItems i : InteractableItems.getInteractableItems(this)) {
                 InteractableItem ii = i.getItem();
+
+                if(ii.getItemUpdater() != null) {
+                    ii.getItemUpdater().onUpdate(ii, this);
+                }
+
                 pi.setItem(ii.getSlot(), ii.getItem().clone());
             }
 
@@ -187,6 +218,12 @@ public class GameProfile {
 //            setEditing(null);
 //            setRenaming(null);
 
+            if(!updateLocation) {
+                if(giveItemsTask != null) {
+                    giveItemsTask.cancel();
+                }
+            }
+
             player.setPlayerTime(this.getTime().getTime(), false);
 
             Location location = null;
@@ -197,9 +234,6 @@ public class GameProfile {
                 case LOBBY_PARTY:
                 case LOBBY_TOURNAMENT:
                 case LOBBY:
-                    if (player.hasPermission("practice.lobby.fly")) {
-                        player.setAllowFlight(true);
-                    }
                     location = Practice.instance.getLobbyLocation();
                     check = true;
                     break;
@@ -311,10 +345,8 @@ public class GameProfile {
         return i;
     }
 
-    public void documentImport(Document document) {
+    public void importFromDocument(Document document) {
         this.name = document.getString("name");
-        this.buildMode = document.getBoolean("build_mode");
-        this.debugMode = document.getBoolean("debug_mode");
         this.staffMode = document.getBoolean("staff_mode");
         this.spectatorVisibility = document.getBoolean("spectator_visibility");
         this.lobbyVisibility = document.getBoolean("lobby_visibility");
@@ -356,8 +388,6 @@ public class GameProfile {
         Map<String, Object> values = new HashMap<>();
         values.put("name", name);
         values.put("player_time", time.toString());
-        values.put("build_mode", buildMode);
-        values.put("debug_mode", debugMode);
         values.put("staff_mode", staffMode);
         values.put("spectator_visibility", spectatorVisibility);
         values.put("lobby_visibility", lobbyVisibility);

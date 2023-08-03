@@ -3,6 +3,7 @@ package camp.pvp.practice.utils;
 import camp.pvp.practice.interactables.InteractableItems;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.interactables.InteractableItem;
+import camp.pvp.practice.profiles.GameProfile;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
@@ -42,10 +43,16 @@ public class PlayerUtils {
 
     public static void giveInteractableItems(Player player) {
         PlayerInventory pi = player.getInventory();
+        GameProfile profile = Practice.instance.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
         pi.clear();
         for(InteractableItems i : InteractableItems.getInteractableItems(Practice.instance.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId()))) {
             InteractableItem ii = i.getItem();
+
+            if(ii.getItemUpdater() != null) {
+                ii.getItemUpdater().onUpdate(ii, profile);
+            }
+
             pi.setItem(ii.getSlot(), ii.getItem().clone());
         }
 

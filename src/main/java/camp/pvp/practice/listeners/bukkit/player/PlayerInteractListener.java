@@ -77,7 +77,7 @@ public class PlayerInteractListener implements Listener {
 
             for(InteractableItems i : InteractableItems.getInteractableItems(profile)) {
                 InteractableItem ii = i.getItem();
-                if(ii != null && ii.getItem().isSimilar(item)) {
+                if(ii != null && ii.getSlot() == player.getInventory().getHeldItemSlot()) {
                     ii.getInteract().onInteract(player, profile);
                     event.setCancelled(true);
                     return;

@@ -1,5 +1,7 @@
 package camp.pvp.practice;
 
+import camp.pvp.NetworkHelper;
+import camp.pvp.command.CommandHandler;
 import camp.pvp.practice.arenas.ArenaManager;
 import camp.pvp.practice.cooldowns.CooldownRunnable;
 import camp.pvp.practice.games.GameManager;
@@ -32,9 +34,11 @@ import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -145,6 +149,9 @@ public class Practice extends JavaPlugin {
         new SpectateCommand(this);
         new StatisticsCommand(this);
         new TournamentCommand(this);
+
+        CommandHandler commandHandler = NetworkHelper.getInstance().getCommandHandler();
+        commandHandler.registerCommand(new EloManagerCommand(this));
     }
 
     public void registerListeners() {

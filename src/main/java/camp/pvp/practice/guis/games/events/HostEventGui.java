@@ -1,4 +1,4 @@
-package camp.pvp.practice.guis.events;
+package camp.pvp.practice.guis.games.events;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.impl.events.SumoEvent;

@@ -70,6 +70,20 @@ public class Party {
         }
     }
 
+    public void kick(Player player) {
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+        PartyMember member = members.get(player.getUniqueId());
+
+        profile.setParty(null);
+        if(profile.getState().equals(GameProfile.State.LOBBY)) {
+            profile.playerUpdate(false);
+        }
+
+        this.announce("&3[Party] &f" + player.getName() + " &3has been kicked from the party.");
+
+        this.members.remove(member.getUuid());
+    }
+
     public PartyMember getLeader() {
         for(PartyMember member : members.values()) {
             if(member.isLeader()) {

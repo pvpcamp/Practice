@@ -158,9 +158,23 @@ public class PartyCommand implements CommandExecutor {
                                     } else {
                                         player.sendMessage(ChatColor.RED + "You cannot assign a party leader if you're not in a party or if you're not the leader.");
                                     }
+                                    return true;
+                                case "kick":
+                                    if(profile.getParty() != null && profile.getParty().getLeader().getUuid().equals(profile.getUuid())) {
+                                        party = profile.getParty();
+                                        if(targetProfile.getParty() != null && targetProfile.getParty().equals(party)) {
+                                            party.kick(target);
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "The player you specified is not in the same party as you.");
+                                        }
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "You cannot assign a party leader if you're not in a party or if you're not the leader.");
+                                    }
+                                    return true;
                             }
                         } else {
                             player.sendMessage(ChatColor.RED + "The player you specified was not found.");
+                            return true;
                         }
                 }
             }
