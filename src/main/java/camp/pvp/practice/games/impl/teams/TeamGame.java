@@ -78,8 +78,6 @@ public abstract class TeamGame extends Game {
                                         break;
                                 }
                             }
-                        } else {
-                            event.setCancelled(true);
                         }
                     }
 

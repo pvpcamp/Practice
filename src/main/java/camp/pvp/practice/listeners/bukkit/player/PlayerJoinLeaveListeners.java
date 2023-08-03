@@ -31,7 +31,6 @@ public class PlayerJoinLeaveListeners implements Listener {
     @EventHandler
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
         GameProfile profile = plugin.getGameProfileManager().find(event.getUniqueId(), true);
-        profile.setName(event.getName());
     }
 
     @EventHandler(priority = EventPriority.HIGH)

@@ -176,6 +176,10 @@ public abstract class Game {
                 victim.setHealth(victim.getMaxHealth());
             }
 
+            if(event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) && victim.getNoDamageTicks() > 9) {
+                canDie = false;
+            }
+
             if(participant.isArcherTagged()) {
                 event.setDamage(event.getDamage() * 1.25);
             }
@@ -190,9 +194,9 @@ public abstract class Game {
             }
 
             if(victim.getHealth() - damage < 0) {
+                event.setCancelled(true);
                 if(canDie && getState().equals(State.ACTIVE)) {
                     this.eliminate(victim, false);
-                    event.setCancelled(true);
                     Bukkit.getScheduler().runTaskLater(plugin, () -> victim.setHealth(20), 1);
                 }
             }
@@ -244,8 +248,6 @@ public abstract class Game {
                                     break;
                             }
                         }
-                    } else {
-                        event.setCancelled(true);
                     }
                 }
 
@@ -335,9 +337,10 @@ public abstract class Game {
             player.teleport(location);
         }
 
-        profile.givePlayerItems();
         player.setAllowFlight(true);
         player.setFlying(true);
+
+        profile.givePlayerItems();
     }
 
     public void spectateEnd(Player player) {

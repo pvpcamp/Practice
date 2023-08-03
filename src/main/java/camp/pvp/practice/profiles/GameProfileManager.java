@@ -53,16 +53,18 @@ public class GameProfileManager {
         if(profile == null) {
             profile = importFromDatabase(uuid, false, store);
 
-            ProfileELO elo = importElo(uuid, false);
-            if(elo == null) {
-                elo = new ProfileELO(uuid);
-                elo.setName(profile.getName());
-                profile.setProfileElo(elo);
-                exportElo(elo, true);
-            }
+            if(profile != null) {
+                ProfileELO elo = importElo(uuid, false);
+                if (elo == null) {
+                    elo = new ProfileELO(uuid);
+                    elo.setName(profile.getName());
+                    profile.setProfileElo(elo);
+                    exportElo(elo, true);
+                }
 
-            if(store) {
-                loadedProfiles.put(uuid, profile);
+                if(store) {
+                    loadedProfiles.put(uuid, profile);
+                }
             }
         }
 
