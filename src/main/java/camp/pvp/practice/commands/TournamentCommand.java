@@ -62,12 +62,15 @@ public class TournamentCommand implements CommandExecutor {
                         if(tournament != null && !tournament.getState().equals(Tournament.State.ENDED)) {
                             Tournament.State state = tournament.getState();
                             StringBuilder sb = new StringBuilder();
-                            sb.append("&6&lTournament Status");
+                            sb.append(" ");
+                            sb.append("\n&6&lTournament Status");
                             sb.append("\n&6State: &f" + state.toString());
                             switch(tournament.getState()) {
                                 case NEXT_ROUND_STARTING:
+                                    sb.append("\n&6Time Until: &f" + tournament.getTimer());
                                     sb.append("\n&6Round: &f" + tournament.getCurrentRound());
                                 case STARTING:
+                                    sb.append("\n&6Time Until: &f" + tournament.getTimer());
                                     sb.append("\n&6Players Left: &f" + tournament.getAlive().size());
                                     break;
                                 case IN_GAME:
@@ -89,6 +92,8 @@ public class TournamentCommand implements CommandExecutor {
                                     }
                                     return true;
                             }
+
+                            sb.append("\n ");
 
                             player.sendMessage(Colors.get(sb.toString()));
                         } else {

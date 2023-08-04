@@ -34,6 +34,9 @@ import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
 import lombok.Setter;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.CitizensPlugin;
+import net.citizensnpcs.api.event.CitizensReloadEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -53,8 +56,6 @@ public class Practice extends JavaPlugin {
     private Assemble assemble;
 
     private LunarClientAPI lunarClientAPI;
-
-    private WorldEdit worldEdit;
 
     private Location lobbyLocation;
     private Location kitEditorLocation;
@@ -77,8 +78,6 @@ public class Practice extends JavaPlugin {
         this.entityHider = new EntityHider(this, EntityHider.Policy.BLACKLIST);
 
         this.lunarClientAPI = LunarClientAPI.getInstance();
-
-        this.worldEdit = WorldEdit.getInstance();
 
         this.arenaManager = new ArenaManager(this);
         this.gameManager = new GameManager(this);

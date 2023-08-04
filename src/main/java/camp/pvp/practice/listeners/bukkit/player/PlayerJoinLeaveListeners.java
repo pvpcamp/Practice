@@ -5,13 +5,22 @@ import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.lunarclient.bukkitapi.LunarClientAPI;
 import com.lunarclient.bukkitapi.nethandler.client.LCPacketModSettings;
 import com.lunarclient.bukkitapi.nethandler.client.LCPacketServerRule;
 import com.lunarclient.bukkitapi.nethandler.client.obj.ServerRule;
 import io.github.thatkawaiisam.assemble.AssembleBoard;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -19,6 +28,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerJoinLeaveListeners implements Listener {
 

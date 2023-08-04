@@ -207,6 +207,8 @@ public class GameProfile {
                 ItemStack defaultKit = new ItemBuilder(Material.BOOK, "&aDefault Kit").create();
                 pi.setItem(8, defaultKit);
             }
+
+            player.updateInventory();
         }
     }
 

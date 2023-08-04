@@ -26,6 +26,22 @@ public class Tournament {
 
     public enum State {
         INACTIVE, STARTING, NEXT_ROUND_STARTING, IN_GAME, ENDED;
+
+        @Override
+        public String toString() {
+            switch(this) {
+                case INACTIVE:
+                    return "Inactive";
+                case STARTING:
+                    return "Starting";
+                case NEXT_ROUND_STARTING:
+                    return "Next Round Starting";
+                case IN_GAME:
+                    return "In Game";
+                default:
+                    return "Ended";
+            }
+        }
     }
 
     private Practice plugin;
@@ -227,7 +243,7 @@ public class Tournament {
 
         setState(State.IN_GAME);
 
-        announceAll("&eRound " + currentRound + " has started.");
+        announceAll("&6[Tournament] &eRound " + currentRound + " has started.");
 
         getQueuedGames().clear();
     }
@@ -237,7 +253,7 @@ public class Tournament {
 
         announceAll(
                 " ",
-                "&6Winner: &f" + participant.getName(),
+                "&6[Tournament] &6Winner: &f" + participant.getName(),
                 " ");
 
 
@@ -374,9 +390,8 @@ public class Tournament {
             if(profile != null && profile.isTournamentNotifications()) {
                 String[] strings = new String[]{
                         " ",
-                        Colors.get("&6&lEvent"),
-                        Colors.get(" &7● &6Event: &fTournament"),
-                        Colors.get(" &7● &6Starting In: &f" + timer + " seconds"),
+                        Colors.get("&6&lTournament"),
+                        Colors.get(" &7● &6Starting In: &f" + timer + "s"),
                         Colors.get(" &7● &6Kit: &f" + getDuelKit().getColor() + getDuelKit().getDisplayName()),
                         Colors.get(" &7● &6Players: &f" + getTournamentParticipants().size())
                 };
