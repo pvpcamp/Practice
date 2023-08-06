@@ -125,13 +125,13 @@ public class GameProfileManager {
 
         profile.setName(player.getName());
 
-        MongoUpdate mu = new MongoUpdate(profilesCollection, profile.getUuid());
-        mu.setUpdate(profile.export());
-
-
         ProfileELO profileELO = new ProfileELO(player.getUniqueId());
         profileELO.setName(player.getName());
+        profile.setProfileElo(profileELO);
         exportElo(profileELO, true);
+
+        MongoUpdate mu = new MongoUpdate(profilesCollection, profile.getUuid());
+        mu.setUpdate(profile.export());
 
         mongoManager.massUpdate(false, mu);
         this.loadedProfiles.put(player.getUniqueId(), profile);

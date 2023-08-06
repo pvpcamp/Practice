@@ -22,6 +22,7 @@ import camp.pvp.practice.nametags.NameColorRunnable;
 import camp.pvp.practice.parties.PartyManager;
 import camp.pvp.practice.queue.GameQueueManager;
 import camp.pvp.practice.sidebar.SidebarAdapter;
+import camp.pvp.practice.tasks.ServerRebootTask;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.commands.*;
@@ -67,6 +68,7 @@ public class Practice extends JavaPlugin {
     private PartyManager partyManager;
 
     private BukkitTask cooldownTask, energyTask, nameColorTask;
+    private ServerRebootTask serverRebootTask;
 
     @Override
     public void onEnable() {
@@ -93,6 +95,9 @@ public class Practice extends JavaPlugin {
         cooldownTask = this.getServer().getScheduler().runTaskTimer(this, new CooldownRunnable(this), 2, 2);
         energyTask = this.getServer().getScheduler().runTaskTimer(this, new EnergyRunnable(this), 0, 20);
         nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 0, 20);
+
+        this.serverRebootTask = new ServerRebootTask(this);
+        Bukkit.getScheduler().runTaskTimer(this, serverRebootTask, 20, 20);
 
         if(getConfig().get("locations.lobby") != null) {
             this.lobbyLocation = (Location) getConfig().get("locations.lobby", Location.class);

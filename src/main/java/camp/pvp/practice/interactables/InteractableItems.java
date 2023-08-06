@@ -1,5 +1,6 @@
 package camp.pvp.practice.interactables;
 
+import camp.pvp.practice.games.impl.events.SumoEvent;
 import camp.pvp.practice.interactables.impl.game.StopSpectatingInteract;
 import camp.pvp.practice.interactables.impl.game.TeleporterInteract;
 import camp.pvp.practice.interactables.impl.lobby.HostEventInteract;
@@ -106,7 +107,7 @@ public enum InteractableItems {
                         new ItemBuilder(Material.REDSTONE, "&cStop Spectating &7(Right Click)").create(), 4, new StopSpectatingInteract());
             case TELEPORTER:
                 return new InteractableItem(
-                        new ItemBuilder(Material.COMPASS, "&6Teleportation Device &7(Right Click)").create(), 8, new TeleporterInteract());
+                        new ItemBuilder(Material.WATCH, "&6Teleportation Device &7(Right Click)").create(), 8, new TeleporterInteract());
             default:
                 return null;
         }
@@ -156,7 +157,10 @@ public enum InteractableItems {
                 break;
             case SPECTATING:
                 items.add(STOP_SPECTATING);
-                items.add(TELEPORTER);
+
+                if(!(profile.getGame() instanceof SumoEvent)) {
+                    items.add(TELEPORTER);
+                }
                 break;
         }
 

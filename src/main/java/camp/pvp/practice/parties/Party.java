@@ -3,6 +3,7 @@ package camp.pvp.practice.parties;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
@@ -95,16 +96,25 @@ public class Party {
     }
 
     public void setLeader(PartyMember member) {
+        GameProfileManager gpm = Practice.instance.getGameProfileManager();
         if(getLeader() != null) {
             final PartyMember leader = getLeader();
             leader.setLeader(false);
             leader.getPlayer().sendMessage(ChatColor.GREEN + "You are no longer party leader.");
-            PlayerUtils.giveInteractableItems(leader.getPlayer());
+
+            GameProfile profile = gpm.getLoadedProfiles().get(member.getUuid());
+            if(profile.getState().equals(GameProfile.State.LOBBY_PARTY)) {
+                profile.givePlayerItems();
+            }
         }
 
         member.setLeader(true);
         member.getPlayer().sendMessage(ChatColor.GREEN + "You are the new party leader.");
-        PlayerUtils.giveInteractableItems(member.getPlayer());
+
+        GameProfile profile = gpm.getLoadedProfiles().get(member.getUuid());
+        if(profile.getState().equals(GameProfile.State.LOBBY_PARTY)) {
+            profile.givePlayerItems();
+        }
     }
 
     public PartyGameRequest getPartyGameRequest(UUID uuid) {

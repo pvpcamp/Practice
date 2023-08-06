@@ -292,27 +292,32 @@ public class Duel extends Game {
 
                     if (kit.equals(DuelKit.BOXING)) {
                         show = true;
-                        long difference = self.getHits() - opponent.getHits();
-                        lines.add("&6Hits: &a" + self.getHits() + "&7/&c" + opponent.getHits());
+                        StringBuilder lineBuilder = new StringBuilder();
+                        lineBuilder.append("&6Hits: &f" + self.getHits());
+                        if(opponent != null) {
+                            long difference = self.getHits() - opponent.getHits();
 
-                        if (difference == 0) {
-                            lines.add("&7First to 100.");
-                        } else if (difference > 0) {
-                            lines.add(" &e+" + difference + " Hits");
-                        } else {
-                            lines.add(" &c" + difference + " Hits");
+                            lineBuilder.append(" &7┃ &f" + opponent.getHits());
+
+                            if (difference == 0) {
+                                lineBuilder.append(" &7(±0)");
+                            } else if (difference > 0) {
+                                lineBuilder.append(" &e(+" + difference + ")");
+                            } else {
+                                lineBuilder.append(" &c(" + difference + ")");
+                            }
                         }
 
-                        lines.add(" ");
+                        lines.add(lineBuilder.toString());
                     }
 
                     if(showPing) {
                         show = true;
                         if (opponent == null) {
-                            lines.add("&6Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms");
+                            lines.add("&6Ping: &f" + ping + " ms");
                         } else {
                             enemyPing = PlayerUtils.getPing(opponent.getPlayer());
-                            lines.add("&6Ping: &f" + PlayerUtils.getPing(self.getPlayer()) + " ms &7┃ &f" + PlayerUtils.getPing(opponent.getPlayer()) + " ms");
+                            lines.add("&6Ping: &f" + ping + " ms &7┃ &f" + enemyPing + " ms");
                         }
                     }
 

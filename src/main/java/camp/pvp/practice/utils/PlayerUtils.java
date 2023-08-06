@@ -29,6 +29,7 @@ public class PlayerUtils {
         player.setFireTicks(0);
         player.setSaturation(13);
         player.setItemOnCursor(null);
+        player.closeInventory();
         player.eject();
 
         if(player.getPassenger() != null && player.getPassenger() instanceof Player) {

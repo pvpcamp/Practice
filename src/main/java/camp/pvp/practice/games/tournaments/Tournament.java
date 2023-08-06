@@ -120,7 +120,7 @@ public class Tournament {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         if(participant != null) {
             participant.setEliminated(true);
-            announceAll(player.getName() + "&a has been eliminated. &7(" + this.getAlive().size() + "/" + this.getTournamentParticipants().size() + ")");
+            announceAll("&6[Tournament] " + player.getName() + "&a has been eliminated. &7(" + this.getAlive().size() + "/" + this.getTournamentParticipants().size() + ")");
 
             profile.setTournament(null);
 

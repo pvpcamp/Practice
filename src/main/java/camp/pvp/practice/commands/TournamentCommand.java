@@ -69,6 +69,7 @@ public class TournamentCommand implements CommandExecutor {
                                 case NEXT_ROUND_STARTING:
                                     sb.append("\n&6Time Until: &f" + tournament.getTimer());
                                     sb.append("\n&6Round: &f" + tournament.getCurrentRound());
+                                    break;
                                 case STARTING:
                                     sb.append("\n&6Time Until: &f" + tournament.getTimer());
                                     sb.append("\n&6Players Left: &f" + tournament.getAlive().size());

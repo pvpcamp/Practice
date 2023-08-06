@@ -16,6 +16,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Date;
+
 public class PracticeUtilCommand implements CommandExecutor {
 
     private Practice plugin;
@@ -105,6 +107,10 @@ public class PracticeUtilCommand implements CommandExecutor {
 
                         gui.open(player);
                         return true;
+                    case "schedulereboot":
+                        plugin.getServerRebootTask().setRebootTime(new Date());
+                        player.sendMessage(ChatColor.GREEN + "You have scheduled a server reboot.");
+                        return true;
                 }
             }
 
@@ -115,7 +121,8 @@ public class PracticeUtilCommand implements CommandExecutor {
             sb.append("\n&6/practiceutil reset &7- &fResets your player.");
             sb.append("\n&6/practiceutil staffmodules &7- &fGives you the Lunar Client staff modules.");
             sb.append("\n&6/practiceutil setnpcid <clickable type> <npc id> &7- &fAssign a clickable type to an NPC.");
-            sb.append("\n&6/practiceutil shutdown &7- &fShutdown the server.");
+            sb.append("\n&6/practiceutil shutdown &7- &fShutdown the server immediately.");
+            sb.append("\n&6/practiceutil schedulereboot &7- &fSchedule the daily server restart for right now.");
 
             player.sendMessage(Colors.get(sb.toString()));
         }

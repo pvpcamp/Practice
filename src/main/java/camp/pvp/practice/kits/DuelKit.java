@@ -154,6 +154,7 @@ public enum DuelKit {
             case NO_DEBUFF:
             case BOXING:
             case SOUP:
+            case INVADED:
             case CLASSIC:
                 return true;
             default:
@@ -231,6 +232,15 @@ public enum DuelKit {
             case HCF:
             case BOXING:
                 return false;
+        }
+    }
+
+    public boolean is2v2() {
+        switch(this){
+            case BOXING:
+                return false;
+            default:
+                return true;
         }
     }
 

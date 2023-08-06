@@ -137,7 +137,13 @@ public class PartyCommand implements CommandExecutor {
                                 case "invite":
                                     if (profile.getParty() != null && profile.getParty().getLeader().getUuid().equals(profile.getUuid())) {
                                         if (party == null) {
-                                            PartyInvite invite = new PartyInvite(profile.getParty(), target, player);
+                                            PartyInvite invite = targetProfile.getPartyInvites().get(profile.getUuid());
+                                            if(invite != null && !invite.isExpired()) {
+                                                player.sendMessage(ChatColor.RED + "You already sent this player a party invite.");
+                                                return true;
+                                            }
+
+                                            invite = new PartyInvite(profile.getParty(), target, player);
                                             targetProfile.getPartyInvites().put(player.getUniqueId(), invite);
                                             invite.send();
                                         } else {

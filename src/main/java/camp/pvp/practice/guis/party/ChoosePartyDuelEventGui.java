@@ -31,7 +31,7 @@ public class ChoosePartyDuelEventGui extends StandardGui {
 
                 int x = 0;
                 for(DuelKit kit : DuelKit.values()) {
-                    if(kit.isQueueable()) {
+                    if(kit.isQueueable() && kit.is2v2()) {
                         GuiButton kitButton = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
                         kitButton.setCloseOnClick(true);
 
