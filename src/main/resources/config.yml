@@ -15,3 +15,6 @@ npc_ids:
   ranked: 1
   statistics: 2
   leaderboards: 3
+scoreboard:
+  title: "&6&lPractice &7┃ &fBeta"
+  ip: "&7&opvp.camp"

@@ -233,6 +233,8 @@ public class TeamDuel extends TeamGame {
 
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
+        startLcTeammateUpdater();
+
         this.startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
     }
 
@@ -241,6 +243,8 @@ public class TeamDuel extends TeamGame {
         if(this.getState().equals(State.ENDED)) {
             return;
         }
+
+        stopLcTeammateUpdater();
 
         this.setEnded(new Date());
         this.setState(State.ENDED);

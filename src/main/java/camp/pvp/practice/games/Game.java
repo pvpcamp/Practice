@@ -10,6 +10,10 @@ import camp.pvp.practice.utils.BukkitReflection;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.Practice;
+import com.lunarclient.bukkitapi.LunarClientAPI;
+import com.lunarclient.bukkitapi.cooldown.LunarClientAPICooldown;
+import com.lunarclient.bukkitapi.nethandler.client.LCPacketTeammates;
+import com.lunarclient.bukkitapi.serverrule.LunarClientAPIServerRule;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -131,6 +135,11 @@ public abstract class Game {
                         this.addEntity(i);
                     }
                 }
+            }
+
+            LunarClientAPI lcApi = LunarClientAPI.getInstance();
+            if(lcApi.isRunningLunarClient(player)) {
+                lcApi.sendTeammates(player, new LCPacketTeammates(null, System.currentTimeMillis(), new HashMap<>()));
             }
 
             if(leftGame) {

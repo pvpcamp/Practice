@@ -26,6 +26,8 @@ public class ServerRebootTask implements Runnable{
         calendar.setTime(new Date());
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         calendar.set(Calendar.HOUR_OF_DAY, 3);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
 
         rebootTime = calendar.getTime();
         timeUntilRestart = -1;

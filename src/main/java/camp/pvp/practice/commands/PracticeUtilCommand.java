@@ -115,7 +115,8 @@ public class PracticeUtilCommand implements CommandExecutor {
             }
 
             StringBuilder sb = new StringBuilder();
-            sb.append("&6&l/practiceutil &r&6Help");
+            sb.append("&6&lPractice Utilities");
+            sb.append("\n&6Next Scheduled Restart: &f" + plugin.getServerRebootTask().getRebootTime().toString());
             sb.append("\n&6/practiceutil setlobby &7- &fSets the lobby location.");
             sb.append("\n&6/practiceutil setkiteditor &7- &fSets the kit editor location.");
             sb.append("\n&6/practiceutil reset &7- &fResets your player.");

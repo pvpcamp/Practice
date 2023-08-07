@@ -37,7 +37,7 @@ public class SidebarAdapter implements AssembleAdapter {
 
     @Override
     public String getTitle(Player player) {
-        return "&6&lPractice &7┃ &fBeta";
+        return plugin.getConfig().getString("scoreboard.title");
     }
 
     @Override
@@ -154,7 +154,7 @@ public class SidebarAdapter implements AssembleAdapter {
 
             lines.add(" ");
 
-            lines.add("&7&opvp.camp");
+            lines.add(plugin.getConfig().getString("scoreboard.ip"));
 
             if(showLines) {
                 lines.add("&7&m------------------");

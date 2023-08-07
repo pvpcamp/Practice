@@ -121,6 +121,8 @@ public class HCFTeams extends TeamDuel {
 
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
+        startLcTeammateUpdater();
+
         this.startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
     }
 

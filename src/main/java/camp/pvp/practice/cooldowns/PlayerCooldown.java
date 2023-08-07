@@ -77,17 +77,17 @@ public class PlayerCooldown {
         public LCCooldown getLCCooldown() {
             switch(this) {
                 case ENDER_PEARL:
-                    return new LCCooldown("Pearl Cooldown", this.getDuration(), Material.ENDER_PEARL);
+                    return new LCCooldown("pearl", this.getDuration(), Material.ENDER_PEARL);
                 case ENERGY_JUMP:
-                    return new LCCooldown("Jump Boost Ability", this.getDuration(), Material.FEATHER);
+                    return new LCCooldown("jump", this.getDuration(), Material.FEATHER);
                 case ENERGY_REGEN:
-                    return new LCCooldown("Regeneration Ability", this.getDuration(), Material.GHAST_TEAR);
+                    return new LCCooldown("regen", this.getDuration(), Material.GHAST_TEAR);
                 case ENERGY_RESISTANCE:
-                    return new LCCooldown("Resistance Ability", this.getDuration(), Material.IRON_INGOT);
+                    return new LCCooldown("resistance", this.getDuration(), Material.IRON_INGOT);
                 case ENERGY_STRENGTH:
-                    return new LCCooldown("Strength Ability", this.getDuration(), Material.BLAZE_POWDER);
+                    return new LCCooldown("strength", this.getDuration(), Material.BLAZE_POWDER);
                 case ENERGY_SPEED:
-                    return new LCCooldown("Speed Ability", this.getDuration(), Material.SUGAR);
+                    return new LCCooldown("speed", this.getDuration(), Material.SUGAR);
                 default:
                     return null;
             }
