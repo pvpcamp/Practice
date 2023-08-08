@@ -78,6 +78,7 @@ public class EndingTask implements Runnable{
         Practice.instance.getGameProfileManager().updateGlobalPlayerVisibility();
 
         game.clearEntities();
+        game.getArena().resetBlocks();
 
         // TODO: Replace built blocks from build duel.
 

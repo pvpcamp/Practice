@@ -19,7 +19,7 @@ public class DuelRequestArenaSelectionGui extends PaginatedGui {
     public DuelRequestArenaSelectionGui(Practice plugin, DuelRequest duelRequest) {
         super("Select an Arena", 27);
 
-        List<Arena> arenas = new ArrayList<>(plugin.getArenaManager().getArenas());
+        List<Arena> arenas = new ArrayList<>(plugin.getArenaManager().getOriginalArenas());
         Collections.sort(arenas);
 
         for(Arena arena : arenas) {

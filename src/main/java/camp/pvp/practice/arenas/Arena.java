@@ -1,12 +1,18 @@
 package camp.pvp.practice.arenas;
 
+import camp.pvp.practice.Practice;
 import com.sk89q.worldedit.WorldEdit;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
+@Getter @Setter
 public class Arena implements Comparable<Arena>{
 
     public enum Type {
@@ -26,24 +32,50 @@ public class Arena implements Comparable<Arena>{
         }
     }
 
-    private @Getter @Setter String name, displayName;
-    private @Getter @Setter Arena.Type type;
-    private @Getter @Setter Map<String, ArenaPosition> positions;
-    private @Getter @Setter boolean enabled, inUse, ranked;
+    private String name, displayName;
+    private Arena.Type type;
+    private Map<String, ArenaPosition> positions;
+    private boolean enabled, inUse;
+    private String parent;
+    private int xDifference, zDifference;
 
-    private @Getter @Setter String parent;
-    private @Getter @Setter List<String> copies;
+    private @Getter List<Block> placedBlocks, brokenBlocks;
+    private @Getter BukkitTask replaceTask;
 
     public Arena(String name) {
         this.name = name;
         this.displayName = name;
         this.type = Type.DUEL;
         this.positions = new HashMap<>();
-        this.copies = new ArrayList<>();
+
+        this.placedBlocks = new ArrayList<>();
+        this.brokenBlocks = new ArrayList<>();
     }
 
     public boolean isCopy() {
         return this.getParent() != null;
+    }
+
+    public boolean hasValidPositions() {
+        for(String position : getType().getValidPositions()) {
+            if(getPositions().get(position) == null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void copyPositions(Arena fromArena, int xDifference, int zDifference) {
+        for(ArenaPosition position : fromArena.getPositions().values()) {
+            Location location = position.getLocation();
+            Location newLocation = new Location(location.getWorld(), location.getBlockX() + xDifference, location.getBlockY(), location.getBlockZ() + zDifference);
+            positions.put(position.getPosition(), new ArenaPosition(position.getPosition(), newLocation));
+        }
+    }
+
+    public void resetBlocks() {
+        Practice.instance.getArenaManager().getArenaResetter().addArena(this);
     }
 
     @Override

@@ -58,7 +58,7 @@ public class DuelRequest {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n&6&lNew Duel Request\n");
                 sb.append("\n &7● &6From: &f" + senderPlayer.getName());
-                sb.append("\n &7● &6Kit: &f" + kit.getColor() + kit.getDisplayName());
+                sb.append("\n &7● &6Kit: &f" + kit.getDisplayName());
                 sb.append("\n &7● &6Arena: &f" + (arena == null ? "Random" : arena.getDisplayName()));
                 sb.append("\n");
                 opponentPlayer.sendMessage(Colors.get(sb.toString()));
@@ -81,6 +81,17 @@ public class DuelRequest {
         Player opponentPlayer = opponent.getPlayer();
 
         if(senderPlayer != null && opponentPlayer != null) {
+            if(arena != null) {
+                if (arena.getType().equals(Arena.Type.DUEL_BUILD)) {
+                    for (Arena a : Practice.instance.getArenaManager().getArenaCopies(arena)) {
+                        if (!a.isInUse()) {
+                            arena = a;
+                            break;
+                        }
+                    }
+                }
+            }
+
             Duel duel = new Duel(Practice.instance, UUID.randomUUID());
 
             duel.setQueueType(GameQueue.Type.PRIVATE);

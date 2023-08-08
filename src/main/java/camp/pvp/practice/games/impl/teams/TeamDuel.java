@@ -180,7 +180,7 @@ public class TeamDuel extends TeamGame {
         StringBuilder sb = new StringBuilder();
         sb.append(" ");
         sb.append("\n&6&lTeam duel starting in 5 seconds.");
-        sb.append("\n &7● &6Kit: " + getKit().getColor() + getKit().getDisplayName());
+        sb.append("\n &7● &6Kit: &f" + getKit().getDisplayName());
         sb.append("\n &7● &6Map: &f" + arena.getDisplayName());
 
         ArenaPosition blueSpawn = arena.getPositions().get("spawn1");

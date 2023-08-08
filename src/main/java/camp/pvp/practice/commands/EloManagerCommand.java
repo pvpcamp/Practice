@@ -77,7 +77,7 @@ public class EloManagerCommand {
 
                         profileELO.getRatings().put(kit, elo);
                         plugin.getGameProfileManager().exportElo(profileELO, true);
-                        sender.sendMessage(ChatColor.GREEN + "ELO for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + " for kit " + kit.getColor() + kit.getDisplayName() + ChatColor.GREEN + " has been set to " + elo + ".");
+                        sender.sendMessage(ChatColor.GREEN + "ELO for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + " for kit " + ChatColor.WHITE + kit.getDisplayName() + ChatColor.GREEN + " has been set to " + elo + ".");
                         return;
                     }
                     break;

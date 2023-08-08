@@ -3,6 +3,8 @@ package camp.pvp.practice.commands;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaManager;
 import camp.pvp.practice.arenas.ArenaPosition;
+import camp.pvp.practice.arenas.ArenaCopyTask;
+import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -19,6 +21,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class ArenaCommand implements CommandExecutor {
 
@@ -32,11 +35,14 @@ public class ArenaCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(sender instanceof Player) {
             Player player = (Player) sender;
+            GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+
+            ArenaManager arenaManager = plugin.getArenaManager();
 
             if(args.length > 0) {
 
                 if(args[0].equalsIgnoreCase("list")) {
-                    List<Arena> arenas = new ArrayList<>(plugin.getArenaManager().getArenas());
+                    List<Arena> arenas = new ArrayList<>(plugin.getArenaManager().getOriginalArenas());
                     Collections.sort(arenas);
 
                     TextComponent[] components = new TextComponent[arenas.size() + 1];
@@ -49,7 +55,7 @@ public class ArenaCommand implements CommandExecutor {
                         String name = (a.isEnabled() ? "&e" : "&c") + a.getName();
 
                         String spacer;
-                        if(i + 1 == arenas.size()) {
+                        if (i + 1 == arenas.size()) {
                             spacer = "&7.";
                         } else {
                             spacer = "&7, ";
@@ -58,7 +64,13 @@ public class ArenaCommand implements CommandExecutor {
                         TextComponent component = new TextComponent(Colors.get(name + spacer));
                         ComponentBuilder builder = new ComponentBuilder(Colors.get("&6Arena: &f" + a.getName()));
                         builder.append(Colors.get("\n&6Enabled: &f" + a.isEnabled()));
+                        builder.append(Colors.get("\n&6In Use: &f" + a.isInUse()));
                         builder.append(Colors.get("\n&6Type: &f" + a.getType().name()));
+
+                        int copies = arenaManager.getArenaCopies(a).size();
+                        if(copies > 0) {
+                            builder.append(Colors.get("\n&6Copies: &f" + copies));
+                        }
 
                         component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/arena info " + a.getName()));
                         component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, builder.create()));
@@ -76,12 +88,6 @@ public class ArenaCommand implements CommandExecutor {
                 }
 
                 String arenaName = args[1];
-                if(!arenaName.matches("[a-z]+")) {
-                    player.sendMessage(ChatColor.RED + "Arena names can only contain letters A-Z.");
-                    return true;
-                }
-
-                ArenaManager arenaManager = plugin.getArenaManager();
                 Arena arena = arenaManager.getArenaFromName(args[1]);
 
                 boolean exists = arena != null;
@@ -89,6 +95,11 @@ public class ArenaCommand implements CommandExecutor {
 
                 switch(args[0].toLowerCase()) {
                     case "create":
+                        if(!arenaName.matches("[a-z]+")) {
+                            player.sendMessage(ChatColor.RED + "Arena names can only contain letters A-Z.");
+                            return true;
+                        }
+
                         if(exists) {
                             player.sendMessage(ChatColor.RED + "This arena already exists.");
                             return true;
@@ -183,7 +194,16 @@ public class ArenaCommand implements CommandExecutor {
                         sb.append("\n&6Arena: &f" + Colors.get(arena.getDisplayName()) + ChatColor.GRAY + " (" + arena.getName() + ")");
                         sb.append("\n&6Type: &f" + arena.getType().name());
                         sb.append("\n&6Queueable: &f" + arena.isEnabled());
-                        sb.append("\n&6Available: &f" + !arena.isInUse());
+                        sb.append("\n&6In Use: &f" + !arena.isInUse());
+
+                        int copies = arenaManager.getArenaCopies(arena).size();
+                        if(copies > 0) {
+                            sb.append("\n&6Copies: &f" + copies);
+                        }
+
+                        if(arena.isCopy()) {
+                            sb.append("\n&7&oThis arena is a copy of: &f" + arena.getParent());
+                        }
 
                         List<String> validPositions = arena.getType().getValidPositions();
                         for(String vp : validPositions) {
@@ -206,9 +226,28 @@ public class ArenaCommand implements CommandExecutor {
                         }
 
                         if(args.length > 2) {
-                            arena.setDisplayName(args[2]);
-                            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName()
-                                    + ChatColor.GREEN + " display name has been set to " + Colors.get(arena.getDisplayName()) + ChatColor.GREEN + ".");
+                            sb = new StringBuilder();
+                            for(int i = 2; i < args.length; i++) {
+                                sb.append(args[i]);
+                                if(i + 1 != args.length) {
+                                    sb.append(" ");
+                                }
+                            }
+                            arena.setDisplayName(sb.toString());
+
+                            copies = 0;
+                            for(Arena a : arenaManager.getArenaCopies(arena)) {
+                                a.setDisplayName(sb.toString());
+                                copies++;
+                            }
+
+                            if(copies == 0) {
+                                player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName()
+                                        + ChatColor.GREEN + " now has the display name " + Colors.get(arena.getDisplayName()) + ChatColor.GREEN + ".");
+                            } else {
+                                player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName()
+                                        + ChatColor.GREEN + " and its " + copies + " copies now have the display name " + Colors.get(arena.getDisplayName()) + ChatColor.GREEN + ".");
+                            }
                             return true;
                         }
                         break;
@@ -231,8 +270,22 @@ public class ArenaCommand implements CommandExecutor {
                                 return true;
                             }
 
-                            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName()
-                                    + ChatColor.GREEN + " has been renamed to " + ChatColor.WHITE + args[2].toLowerCase() + ChatColor.GREEN + ".");
+                            copies = 0;
+                            for(Arena a : arenaManager.getArenaCopies(arena)) {
+                                String cn = a.getName().replace(arena.getName() + "_copy_", "");
+                                a.setName(args[2].toLowerCase() + "_copy_" + cn);
+                                a.setParent(args[2].toLowerCase());
+                                copies++;
+                            }
+
+                            if(copies == 0) {
+                                player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName()
+                                        + ChatColor.GREEN + " has been renamed to " + ChatColor.WHITE + args[2].toLowerCase() + ChatColor.GREEN + ".");
+                            } else {
+                                player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName()
+                                        + ChatColor.GREEN + " and its " + copies + " copies have been renamed to " + ChatColor.WHITE + args[2].toLowerCase() + ChatColor.GREEN + ".");
+                            }
+
                             arena.setName(args[2].toLowerCase());
                             return true;
                         }
@@ -302,8 +355,86 @@ public class ArenaCommand implements CommandExecutor {
                         }
                         break;
                     case "copy":
+                        if(args.length > 3) {
+                            if (!exists) {
+                                player.sendMessage(existsMessage);
+                                return true;
+                            }
+
+                            if (!arena.getType().equals(Arena.Type.DUEL_BUILD)) {
+                                player.sendMessage(ChatColor.RED + "Only build arenas can be copied.");
+                                return true;
+                            }
+
+                            if(!arena.hasValidPositions()) {
+                                player.sendMessage(ChatColor.RED + "You cannot copy an arena that has invalid/missing positions.");
+                                return true;
+                            }
+
+                            if(arena.isCopy()) {
+                                player.sendMessage(ChatColor.LIGHT_PURPLE + "You cannot create a copy of a copy, idiot.");
+                                return true;
+                            }
+
+                            int x, z;
+                            try {
+                                x = Integer.parseInt(args[2]);
+                                z = Integer.parseInt(args[3]);
+                            } catch(NumberFormatException ignored) {
+                                player.sendMessage(ChatColor.RED + "You must provide valid X and Z differences.");
+                                return true;
+                            }
+
+                            Arena copyArena = arenaManager.createCopy(arena, x, z);
+
+                            ArenaCopyTask arenaCopyTask = new ArenaCopyTask(plugin, player, profile, arena, copyArena, x, z);
+                            boolean copyable = arenaCopyTask.init();
+
+                            if (copyable) {
+                                arenaCopyTask.runTaskTimer(plugin, 0, 2);
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You cannot paste this arena at this location because there are blocks in the way.");
+                            }
+                            return true;
+                        }
+                        break;
+                    case "copies":
                     case "getcopies":
-                        player.sendMessage(ChatColor.GREEN + "Coming soon!");
+                        if (!exists) {
+                            player.sendMessage(existsMessage);
+                            return true;
+                        }
+
+                        List<Arena> arenaCopies = new ArrayList<>(arenaManager.getArenaCopies(arena));
+
+                        TextComponent[] components = new TextComponent[arenaCopies.size() + 1];
+                        TextComponent title = new TextComponent(Colors.get("&6Copies of arena &f" + arena.getName() + " &7(" + arenaCopies.size() + "&7): &f"));
+                        components[0] = title;
+
+                        for(int i = 0; i < arenaCopies.size(); i++) {
+                            Arena a = arenaCopies.get(i);
+                            String name = (a.isEnabled() ? "&e" : "&c") + (a.isInUse() ? "&o" : "") + a.getName();
+
+                            String spacer;
+                            if (i + 1 == arenaCopies.size()) {
+                                spacer = "&7.";
+                            } else {
+                                spacer = "&7, ";
+                            }
+
+                            TextComponent component = new TextComponent(Colors.get(name + spacer));
+                            ComponentBuilder builder = new ComponentBuilder(Colors.get("&6Arena: &f" + a.getName()));
+                            builder.append(Colors.get("\n&6Enabled: &f" + a.isEnabled()));
+                            builder.append(Colors.get("\n&6In Use: &f" + a.isInUse()));
+                            builder.append(Colors.get("\n&6Type: &f" + a.getType().name()));
+
+                            component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/arena info " + a.getName()));
+                            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, builder.create()));
+
+                            components[i + 1] = component;
+                        }
+
+                        player.spigot().sendMessage(components);
                         return true;
                 }
             }
@@ -328,6 +459,8 @@ public class ArenaCommand implements CommandExecutor {
         help.append("\n&6/arena type <name> [type] &7- &fGets or sets an arena type.");
         help.append("\n&6/arena position <name> <position> &7- &fSets an arena position at your current location.");
         help.append("\n&6/arena teleport <name> <position> &7- &fTeleports you to a specific arena position.");
+        help.append("\n&6/arena copy <name> <x> <z> &7- &fCopies an arena to another location. both X and Z are the amount of blocks away the new arena will be from the copied arena.");
+        help.append("\n&6/arena copies <name> &7- &fReturns the list of copies an arena has.");
 
         return Colors.get(help.toString());
     }

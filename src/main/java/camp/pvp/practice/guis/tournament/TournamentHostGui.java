@@ -15,10 +15,10 @@ public class TournamentHostGui extends StandardGui{
         int slot = 0;
         for(DuelKit kit : DuelKit.values()) {
             if(kit.isTournament()) {
-                GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
+                GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                 button.setLore(
                         "&7Next, select a team size for ",
-                        "&7the " + kit.getColor() + kit.getDisplayName() + " &7tournament."
+                        "&7the &f" + kit.getDisplayName() + " &7tournament."
                 );
 
                 button.setAction(new GuiAction() {

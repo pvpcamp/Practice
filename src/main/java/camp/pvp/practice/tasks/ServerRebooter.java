@@ -2,7 +2,6 @@ package camp.pvp.practice.tasks;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.utils.Colors;
-import camp.pvp.practice.utils.TimeUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -14,12 +13,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Getter @Setter
-public class ServerRebootTask implements Runnable{
+public class ServerRebooter implements Runnable{
 
     private Practice plugin;
     private Date rebootTime;
     private int timeUntilRestart;
-    public ServerRebootTask(Practice plugin) {
+    public ServerRebooter(Practice plugin) {
         this.plugin = plugin;
 
         Calendar calendar = Calendar.getInstance();

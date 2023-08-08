@@ -16,7 +16,7 @@ import java.util.List;
 
 public class QueueGui extends StandardGui {
     public QueueGui(GameQueue.Type queueType, GameProfile profile) {
-        super("&6&l" + queueType.toString() + " Queue", 27);
+        super("&6&l" + queueType.toString() + " Queue", 36);
 
         GameQueueManager gqm = Practice.instance.getGameQueueManager();
         this.setAutoUpdate(true);
@@ -26,7 +26,7 @@ public class QueueGui extends StandardGui {
         for(GameQueue queue : gqm.getGameQueues()) {
             if(queue.getType().equals(queueType)) {
                 DuelKit kit = queue.getDuelKit();
-                GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
+                GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                 button.setButtonUpdater(new AbstractButtonUpdater() {
                     @Override
                     public void update(GuiButton guiButton, Gui gui) {
@@ -43,7 +43,7 @@ public class QueueGui extends StandardGui {
                             lines.add(" ");
                         }
 
-                        lines.add("&7Click to join the " + kit.getColor() + queueType.toString() + " " + kit.getDisplayName() + " &7queue.");
+                        lines.add("&7Click to join the &f" + queueType.toString() + " " + kit.getDisplayName() + " &7queue.");
 
                         guiButton.setLore(lines);
 

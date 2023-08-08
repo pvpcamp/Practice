@@ -52,6 +52,14 @@ public class TimeUtil {
         return fromMinSec(minutes, seconds);
     }
 
+    public static String get(long time) {
+        long duration = System.currentTimeMillis() - time;
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) % 60;
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) % 60;
+
+        return fromMinSec(minutes, seconds);
+    }
+
     public static String fromMinSec(long min, long sec) {
         String m = String.valueOf(min);
         String s = String.valueOf(sec);

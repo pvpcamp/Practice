@@ -40,10 +40,10 @@ public class PartyEventInteract implements ItemInteract {
                     int x = 0;
                     for(DuelKit kit : DuelKit.values()) {
                         if(kit.isFfa()) {
-                            GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
+                            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                             button.setCloseOnClick(true);
                             button.setLore(
-                                    "&7Click to start " + kit.getColor() + kit.getDisplayName() + " &7FFA event!");
+                                    "&7Click to start &f" + kit.getDisplayName() + " &7FFA event!");
                             button.setAction(new GuiAction() {
                                 @Override
                                 public void run(Player player, Gui gui) {
@@ -113,10 +113,10 @@ public class PartyEventInteract implements ItemInteract {
                     int x = 0;
                     for(DuelKit kit : DuelKit.values()) {
                         if(kit.isQueueable() && kit.is2v2()) {
-                            GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
+                            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                             button.setCloseOnClick(true);
                             button.setLore(
-                                    "&7Click to start " + kit.getColor() + kit.getDisplayName() + " &7Split Teams event!");
+                                    "&7Click to start &f" + kit.getDisplayName() + " &7Split Teams event!");
                             button.setAction(new GuiAction() {
                                 @Override
                                 public void run(Player player, Gui gui) {

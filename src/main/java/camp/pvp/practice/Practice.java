@@ -5,9 +5,9 @@ import camp.pvp.command.CommandHandler;
 import camp.pvp.practice.arenas.ArenaManager;
 import camp.pvp.practice.cooldowns.CooldownRunnable;
 import camp.pvp.practice.games.GameManager;
-import camp.pvp.practice.guis.statistics.LeaderboardsGui;
 import camp.pvp.practice.kits.EnergyRunnable;
 import camp.pvp.practice.listeners.bukkit.block.BlockBreakListener;
+import camp.pvp.practice.listeners.bukkit.block.BlockFromToListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockPlaceListener;
 import camp.pvp.practice.listeners.bukkit.entity.*;
 import camp.pvp.practice.listeners.bukkit.inventory.InventoryClickListener;
@@ -22,7 +22,7 @@ import camp.pvp.practice.nametags.NameColorRunnable;
 import camp.pvp.practice.parties.PartyManager;
 import camp.pvp.practice.queue.GameQueueManager;
 import camp.pvp.practice.sidebar.SidebarAdapter;
-import camp.pvp.practice.tasks.ServerRebootTask;
+import camp.pvp.practice.tasks.ServerRebooter;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.commands.*;
@@ -30,19 +30,13 @@ import camp.pvp.practice.listeners.bukkit.player.*;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.lunarclient.bukkitapi.LunarClientAPI;
-import com.sk89q.worldedit.WorldEdit;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
 import lombok.Setter;
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.CitizensPlugin;
-import net.citizensnpcs.api.event.CitizensReloadEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -68,7 +62,7 @@ public class Practice extends JavaPlugin {
     private PartyManager partyManager;
 
     private BukkitTask cooldownTask, energyTask, nameColorTask;
-    private ServerRebootTask serverRebootTask;
+    private ServerRebooter serverRebooter;
 
     @Override
     public void onEnable() {
@@ -96,8 +90,8 @@ public class Practice extends JavaPlugin {
         energyTask = this.getServer().getScheduler().runTaskTimer(this, new EnergyRunnable(this), 0, 20);
         nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 0, 20);
 
-        this.serverRebootTask = new ServerRebootTask(this);
-        Bukkit.getScheduler().runTaskTimer(this, serverRebootTask, 20, 20);
+        this.serverRebooter = new ServerRebooter(this);
+        Bukkit.getScheduler().runTaskTimer(this, serverRebooter, 20, 20);
 
         if(getConfig().get("locations.lobby") != null) {
             this.lobbyLocation = (Location) getConfig().get("locations.lobby", Location.class);
@@ -161,6 +155,7 @@ public class Practice extends JavaPlugin {
     public void registerListeners() {
         // Bukkit
         new BlockBreakListener(this);
+        new BlockFromToListener(this);
         new BlockPlaceListener(this);
 
         new EntityDamageByEntityListener(this);
@@ -173,13 +168,14 @@ public class Practice extends JavaPlugin {
 
         new FoodLevelChangeListener(this);
         new HCFPlayerInteractListener(this);
-//        new PlayerBucketEmptyListener(this);
+        new PlayerBucketEmptyListener(this);
         new PlayerChatListener(this);
         new PlayerCommandPreprocessListener(this);
         new PlayerDeathListener(this);
         new PlayerDropItemListener(this);
         new PlayerInteractEntityListener(this);
         new PlayerInteractListener(this);
+        new PlayerItemConsumeListener(this);
         new PlayerJoinLeaveListeners(this);
         new PlayerMoveListener(this);
         new PlayerPickupItemListener(this);

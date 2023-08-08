@@ -32,10 +32,10 @@ public class ChoosePartyDuelEventGui extends StandardGui {
                 int x = 0;
                 for(DuelKit kit : DuelKit.values()) {
                     if(kit.isQueueable() && kit.is2v2()) {
-                        GuiButton kitButton = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
+                        GuiButton kitButton = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                         kitButton.setCloseOnClick(true);
 
-                        kitButton.setLore("&7Click to invite &6" + party.getLeader().getName() + "'s Party", "&7to a " + kit.getColor() + kit.getDisplayName() + " &7team fight.");
+                        kitButton.setLore("&7Click to invite &6" + party.getLeader().getName() + "'s Party", "&7to a &f" + kit.getDisplayName() + " &7team fight.");
                         kitButton.setAction(new GuiAction() {
                             @Override
                             public void run(Player player, Gui gui) {

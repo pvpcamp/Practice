@@ -11,6 +11,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
@@ -22,12 +23,14 @@ import java.util.Collections;
 import java.util.List;
 
 public enum DuelKit {
-    NO_DEBUFF, CLASSIC, SOUP, HCF, INVADED, BOXING, SUMO;
+    NO_DEBUFF, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, BOXING, SUMO;
 
     public String getDisplayName() {
         switch(this) {
             case NO_DEBUFF:
                 return "No Debuff";
+            case BUILD_UHC:
+                return "Build UHC";
             case HCF:
                 return "HCF";
             case CLASSIC:
@@ -45,26 +48,6 @@ public enum DuelKit {
         }
     }
 
-    public ChatColor getColor() {
-        switch(this) {
-            case NO_DEBUFF:
-                return ChatColor.RED;
-            case HCF:
-                return ChatColor.DARK_RED;
-            case SOUP:
-            case CLASSIC:
-                return ChatColor.LIGHT_PURPLE;
-            case INVADED:
-                return ChatColor.GOLD;
-            case BOXING:
-                return ChatColor.DARK_PURPLE;
-            case SUMO:
-                return ChatColor.GREEN;
-            default:
-                return null;
-        }
-    }
-
     public List<Arena.Type> getArenaTypes() {
         switch(this) {
             case HCF:
@@ -73,6 +56,8 @@ public enum DuelKit {
                 return Collections.singletonList(Arena.Type.DUEL_SUMO);
             case BOXING:
                 return Collections.singletonList(Arena.Type.DUEL_FLAT);
+            case BUILD_UHC:
+                return Collections.singletonList(Arena.Type.DUEL_BUILD);
             default:
                 return Arrays.asList(Arena.Type.DUEL, Arena.Type.DUEL_FLAT);
         }
@@ -94,6 +79,8 @@ public enum DuelKit {
                 return 15;
             case SUMO:
                 return 16;
+            case BUILD_UHC:
+                return 22;
         }
 
         return 0;
@@ -113,6 +100,8 @@ public enum DuelKit {
                 return 15;
             case SUMO:
                 return 16;
+            case BUILD_UHC:
+                return 22;
         }
 
         return 0;
@@ -120,6 +109,8 @@ public enum DuelKit {
 
     public boolean isBuild() {
         switch(this) {
+            case BUILD_UHC:
+                return true;
             default:
                 return false;
         }
@@ -127,16 +118,8 @@ public enum DuelKit {
 
     public boolean isQueueable () {
         switch(this) {
-            case NO_DEBUFF:
-            case HCF:
-            case CLASSIC:
-            case SOUP:
-            case INVADED:
-            case BOXING:
-            case SUMO:
-                return true;
             default:
-                return false;
+                return true;
         }
     }
 
@@ -152,6 +135,7 @@ public enum DuelKit {
     public boolean isTournament() {
         switch(this) {
             case NO_DEBUFF:
+            case BUILD_UHC:
             case BOXING:
             case SOUP:
             case INVADED:
@@ -252,6 +236,9 @@ public enum DuelKit {
                 potion.setSplash(true);
                 item = potion.toItemStack(1);
                 break;
+            case BUILD_UHC:
+                item = new ItemStack(Material.LAVA_BUCKET);
+                break;
             case HCF:
                 item = new ItemStack(Material.FENCE);
                 break;
@@ -327,6 +314,41 @@ public enum DuelKit {
                     }
                 }
 
+                break;
+            case BUILD_UHC:
+                armor[3] = new ItemStack(Material.DIAMOND_HELMET);
+                armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+
+                armor[2] = new ItemStack(Material.DIAMOND_CHESTPLATE);
+                armor[2].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+
+                armor[1] = new ItemStack(Material.DIAMOND_LEGGINGS);
+                armor[1].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+
+                armor[0] = new ItemStack(Material.DIAMOND_BOOTS);
+                armor[0].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+
+                inv[0] = new ItemStack(Material.DIAMOND_SWORD);
+                inv[0].addEnchantment(Enchantment.DAMAGE_ALL, 3);
+                inv[1] = new ItemStack(Material.FISHING_ROD, 1);
+                inv[2] = new ItemStack(Material.BOW);
+                inv[2].addEnchantment(Enchantment.ARROW_DAMAGE, 3);
+                inv[3] = new ItemStack(Material.COOKED_BEEF, 64);
+                inv[4] = new ItemStack(Material.GOLDEN_APPLE, 6);
+                inv[5] = new ItemStack(Material.GOLDEN_APPLE, 3);
+                ItemMeta headMeta = inv[5].getItemMeta();
+                headMeta.setDisplayName(Colors.get("&6Golden Head"));
+                inv[5].setItemMeta(headMeta);
+
+                inv[6] = new ItemStack(Material.DIAMOND_PICKAXE);
+                inv[7] = new ItemStack(Material.DIAMOND_AXE);
+                inv[8] = new ItemStack(Material.WOOD, 64);
+                inv[9] = new ItemStack(Material.ARROW, 20);
+                inv[10] = new ItemStack(Material.COBBLESTONE, 64);
+                inv[11] = new ItemStack(Material.WATER_BUCKET);
+                inv[12] = new ItemStack(Material.WATER_BUCKET);
+                inv[13] = new ItemStack(Material.LAVA_BUCKET);
+                inv[14] = new ItemStack(Material.LAVA_BUCKET);
                 break;
             case HCF:
                 armor[3] = new ItemStack(Material.DIAMOND_HELMET);

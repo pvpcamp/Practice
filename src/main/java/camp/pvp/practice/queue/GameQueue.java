@@ -5,6 +5,7 @@ import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.scheduler.BukkitTask;
@@ -78,6 +79,10 @@ public class GameQueue {
                         duel.join(member1.getPlayer());
                         duel.join(member2.getPlayer());
 
+                        String message = Colors.get("&6&lMATCH FOUND! &r&f" + member1.getName() + " &cvs. &f" + member2.getName());
+                        member1.getPlayer().sendMessage(message);
+                        member2.getPlayer().sendMessage(message);
+
                         duel.start();
                     }
                 }, 5, 5);
@@ -102,6 +107,10 @@ public class GameQueue {
 
                                             duel.join(member1.getPlayer());
                                             duel.join(member2.getPlayer());
+
+                                            String message = Colors.get("&6&lMATCH FOUND! &r&f" + member1.getName() + " &7(" + member1.getElo() + ") &cvs. &f" + member2.getName() + " &7(" + member2.getElo() + " ELO)");
+                                            member1.getPlayer().sendMessage(message);
+                                            member2.getPlayer().sendMessage(message);
 
                                             duel.start();
                                             return;

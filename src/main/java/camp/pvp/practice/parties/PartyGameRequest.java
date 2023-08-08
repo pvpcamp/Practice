@@ -61,7 +61,7 @@ public class PartyGameRequest {
             sb.append("\n &7● &6Game Type: &fHCF Team Fight");
         } else {
             sb.append("\n &7● &6Game Type: &fParty vs Party");
-            sb.append("\n &7● &6Kit: &f" + kit.getColor() + kit.getDisplayName());
+            sb.append("\n &7● &6Kit: &f" + kit.getDisplayName());
         }
         sb.append("\n");
         TextComponent msg = new TextComponent(Colors.get("&6[Click to accept this duel]"));

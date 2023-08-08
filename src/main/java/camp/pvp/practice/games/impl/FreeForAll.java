@@ -161,7 +161,7 @@ public class FreeForAll extends Game {
                 p.sendMessage(" ");
                 p.sendMessage(Colors.get("&6&lMatch starting in 5 seconds."));
                 p.sendMessage(Colors.get(" &7● &6Mode: &fFree for All"));
-                p.sendMessage(Colors.get(" &7● &6Kit: &f" + kit.getColor() + kit.getDisplayName()));
+                p.sendMessage(Colors.get(" &7● &6Kit: &f" + kit.getDisplayName()));
                 p.sendMessage(Colors.get(" &7● &6Map: &f" + Colors.get(getArena().getDisplayName())));
                 p.sendMessage(Colors.get(" &7● &6Participants: &f" + stringBuilder));
                 p.sendMessage(" ");

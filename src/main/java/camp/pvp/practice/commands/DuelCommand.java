@@ -54,7 +54,7 @@ public class DuelCommand implements CommandExecutor {
                                 StandardGui acceptGui = new StandardGui("Accept Duel from " + target.getName() + "?", 27);
 
                                 DuelKit kit = duelRequest.getKit();
-                                GuiButton acceptButton = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName() + " Duel Request");
+                                GuiButton acceptButton = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName() + " Duel Request");
                                 acceptButton.setLore(
                                         "&7Would you like to accept this duel?",
                                         "&6Arena: &f" + (duelRequest.getArena() == null ? "Random" : Colors.get(duelRequest.getArena().getDisplayName())));

@@ -45,7 +45,7 @@ public class LeaderboardsGui extends StandardGui {
                     lines.add(sb.toString());
                 }
 
-                GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
+                GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                 button.setSlot(kit.getRankedSlot());
                 button.setLore(lines);
                 this.addButton(button, false);

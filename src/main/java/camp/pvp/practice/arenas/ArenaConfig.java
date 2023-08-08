@@ -52,13 +52,11 @@ public class ArenaConfig {
         arena.setType(Arena.Type.valueOf(config.getString(path + "type")));
         arena.setDisplayName(config.getString(path + "display_name"));
         arena.setEnabled(config.getBoolean(path + "enabled"));
+        arena.setXDifference(config.getInt(path + "x_difference"));
+        arena.setZDifference(config.getInt(path + "z_difference"));
 
         if(config.isSet(path + "parent")) {
             arena.setParent(config.getString(path + "parent"));
-        }
-
-        if(config.isSet(path + "copies")) {
-            arena.setCopies(config.getStringList("copies"));
         }
 
         for(String s : config.getConfigurationSection(path + "positions").getKeys(false)) {
@@ -67,6 +65,11 @@ public class ArenaConfig {
             ArenaPosition pos = new ArenaPosition(s, (Location) config.get(p, Location.class));
 
             arena.getPositions().put(pos.getPosition(), pos);
+        }
+
+        if(!arena.hasValidPositions()) {
+            arena.setEnabled(false);
+            this.logger.info("Arena '" + arena.getName() + "' does not have all of its valid positions, this must be fixed.");
         }
 
         manager.getArenas().add(arena);
@@ -82,13 +85,11 @@ public class ArenaConfig {
         config.set(path + ".type", arena.getType().toString());
         config.set(path + ".display_name", arena.getDisplayName());
         config.set(path + ".enabled", arena.isEnabled());
+        config.set(path + ".x_difference", arena.getXDifference());
+        config.set(path + ".z_difference", arena.getZDifference());
 
         if(arena.getParent() != null) {
-            config.set(".parent", arena.getParent());
-        }
-
-        if(!arena.getCopies().isEmpty()) {
-            config.set(path + ".copies", arena.getCopies());
+            config.set(path + ".parent", arena.getParent());
         }
 
         for(ArenaPosition position : arena.getPositions().values()) {

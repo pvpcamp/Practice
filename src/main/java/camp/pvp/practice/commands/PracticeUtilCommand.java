@@ -96,7 +96,12 @@ public class PracticeUtilCommand implements CommandExecutor {
                         );
                         yes.setAction((player1, gui1) -> {
                             plugin.shutdown();
-                            Bukkit.getScheduler().runTaskLater(plugin, ()-> plugin.getServer().shutdown(), 20);
+
+                            Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+                                if(plugin.getArenaManager().getArenaResetter().queueSize() == 0) {
+                                    plugin.getServer().shutdown();
+                                }
+                            }, 4, 4);
                         });
                         gui.addButton(yes, false);
 
@@ -108,7 +113,7 @@ public class PracticeUtilCommand implements CommandExecutor {
                         gui.open(player);
                         return true;
                     case "schedulereboot":
-                        plugin.getServerRebootTask().setRebootTime(new Date());
+                        plugin.getServerRebooter().setRebootTime(new Date());
                         player.sendMessage(ChatColor.GREEN + "You have scheduled a server reboot.");
                         return true;
                 }
@@ -116,7 +121,7 @@ public class PracticeUtilCommand implements CommandExecutor {
 
             StringBuilder sb = new StringBuilder();
             sb.append("&6&lPractice Utilities");
-            sb.append("\n&6Next Scheduled Restart: &f" + plugin.getServerRebootTask().getRebootTime().toString());
+            sb.append("\n&6Next Scheduled Restart: &f" + plugin.getServerRebooter().getRebootTime().toString());
             sb.append("\n&6/practiceutil setlobby &7- &fSets the lobby location.");
             sb.append("\n&6/practiceutil setkiteditor &7- &fSets the kit editor location.");
             sb.append("\n&6/practiceutil reset &7- &fResets your player.");

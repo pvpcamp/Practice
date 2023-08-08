@@ -15,6 +15,7 @@ import camp.pvp.practice.queue.GameQueueManager;
 import camp.pvp.practice.queue.GameQueueMember;
 import camp.pvp.practice.utils.TimeUtil;
 import io.github.thatkawaiisam.assemble.AssembleAdapter;
+import org.apache.commons.lang.time.DateUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -89,7 +90,7 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
                     lines.add("&6In Queue:");
-                    lines.add(" &7● " + queue.getDuelKit().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
+                    lines.add(" &7● &6" + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
 
                     if(queue.getType().equals(GameQueue.Type.RANKED)) {
                         lines.add(" &7● &6ELO: &f" + profile.getProfileElo().getRatings().get(queue.getDuelKit()));
@@ -150,6 +151,11 @@ public class SidebarAdapter implements AssembleAdapter {
                     break;
                 default:
                     lines.add("&f&oIn Development.");
+            }
+
+            if(profile.getArenaCopyTask() != null) {
+                lines.add(" ");
+                lines.add("&6&lCopy Task: &f" + TimeUtil.get(profile.getArenaCopyTask().getStarted()));
             }
 
             lines.add(" ");

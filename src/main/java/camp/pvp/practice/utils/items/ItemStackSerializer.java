@@ -6,6 +6,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 
 public class ItemStackSerializer implements JsonSerializer<ItemStack> {
@@ -24,6 +25,11 @@ public class ItemStackSerializer implements JsonSerializer<ItemStack> {
             enchantmentsObject.addProperty(enchantment.getName(), level);
         }
         jsonObject.add("enchantments", enchantmentsObject);
+
+        ItemMeta meta = itemStack.getItemMeta();
+        if(meta.getDisplayName() != null) {
+            jsonObject.addProperty("display_name", meta.getDisplayName());
+        }
 
         return jsonObject;
     }

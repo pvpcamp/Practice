@@ -1,5 +1,6 @@
 package camp.pvp.practice.listeners.bukkit.block;
 
+import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
@@ -28,11 +29,11 @@ public class BlockPlaceListener implements Listener {
             return;
         }
 
-        // TODO: Build games.
-//        if(game != null && game.isBuild()) {
-//
-//        }
-
-        event.setCancelled(true);
+        if(game != null && game.isBuild() && game.getState().equals(Game.State.ACTIVE)) {
+            Arena arena = game.getArena();
+            arena.getPlacedBlocks().add(block);
+        } else {
+            event.setCancelled(true);
+        }
     }
 }

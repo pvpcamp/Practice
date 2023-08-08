@@ -115,6 +115,10 @@ public abstract class Game {
         this.clearEntities();
         this.setEnded(new Date());
         this.setState(State.ENDED);
+
+        if(arena.getPlacedBlocks().size() > 0) {
+            arena.resetBlocks();
+        }
     }
 
     public void eliminate(Player player, boolean leftGame) {

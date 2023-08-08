@@ -43,21 +43,8 @@ public class Duel extends Game {
 
     @Override
     public void start() {
-
-        List<Arena> list = new ArrayList<>();
         if(getArena() == null) {
-            for(Arena a : getPlugin().getArenaManager().getArenas()) {
-                if(a.isEnabled()) {
-                    if(kit.getArenaTypes().contains(a.getType())) {
-                        list.add(a);
-                    }
-                }
-            }
-
-            Collections.shuffle(list);
-            if(!list.isEmpty()) {
-                this.setArena(list.get(0));
-            }
+            arena = getPlugin().getArenaManager().selectRandomArena(getKit());
         }
 
         if(arena == null) {
@@ -68,6 +55,10 @@ public class Duel extends Game {
                 profile.playerUpdate(true);
             }
             return;
+        }
+
+        if(arena.getType().equals(Arena.Type.DUEL_BUILD)) {
+            arena.setInUse(true);
         }
 
         Map<Player, Location> locations = new HashMap<>();
@@ -100,7 +91,7 @@ public class Duel extends Game {
                 p.sendMessage(" ");
                 p.sendMessage(Colors.get("&6&lDuel starting in 3 seconds."));
                 p.sendMessage(Colors.get(" &7● &6Mode: &f" + this.queueType.toString()));
-                p.sendMessage(Colors.get(" &7● &6Kit: &f" + kit.getColor() + kit.getDisplayName()));
+                p.sendMessage(Colors.get(" &7● &6Kit: &f" + kit.getDisplayName()));
                 p.sendMessage(Colors.get(" &7● &6Map: &f" + Colors.get(getArena().getDisplayName())));
                 p.sendMessage(Colors.get(" &7● &6Participants: &f" + stringBuilder));
                 p.sendMessage(" ");

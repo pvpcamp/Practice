@@ -19,7 +19,7 @@ public class StatisticsGui extends StandardGui {
                 List<String> lines = new ArrayList<>();
                 lines.add("&6ELO: &f" + profileELO.getRatings().get(kit));
 
-                GuiButton button = new GuiButton(kit.getIcon(), kit.getColor() + kit.getDisplayName());
+                GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                 button.setSlot(kit.getRankedSlot());
                 button.setLore(lines);
                 this.addButton(button, false);

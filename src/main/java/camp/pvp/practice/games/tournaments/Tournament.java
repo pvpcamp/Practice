@@ -392,7 +392,7 @@ public class Tournament {
                         " ",
                         Colors.get("&6&lTournament"),
                         Colors.get(" &7● &6Starting In: &f" + timer + "s"),
-                        Colors.get(" &7● &6Kit: &f" + getDuelKit().getColor() + getDuelKit().getDisplayName()),
+                        Colors.get(" &7● &6Kit: &f" + getDuelKit().getDisplayName()),
                         Colors.get(" &7● &6Players: &f" + getTournamentParticipants().size())
                 };
 

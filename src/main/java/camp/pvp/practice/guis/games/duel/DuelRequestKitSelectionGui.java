@@ -15,7 +15,7 @@ public class DuelRequestKitSelectionGui extends StandardGui {
         for(DuelKit duelKit : DuelKit.values()) {
             if (duelKit.isQueueable()) {
                 ItemStack item = duelKit.getIcon();
-                GuiButton button = new GuiButton(item, duelKit.getColor() + duelKit.getDisplayName());
+                GuiButton button = new GuiButton(item, "&6" + duelKit.getDisplayName());
 
                 button.setCloseOnClick(true);
                 button.setLore(

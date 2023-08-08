@@ -35,7 +35,7 @@ public class GamesCommand implements CommandExecutor {
                 if(!game.getState().equals(Game.State.INACTIVE)) {
                     TextComponent component = new TextComponent(Colors.get(
                             "&6 ● Game Type: &f" + game.getClass().getSimpleName()
-                                    + "&7, &6Kit: " + game.getKit().getColor() + game.getKit().getDisplayName()
+                                    + "&7, &6Kit: &f" + game.getKit().getDisplayName()
                                     + "&7, &6Arena: &f" + game.getArena().getDisplayName()
                                     + "&7, &6Alive: &f" + game.getAlive().size()
                                     + "&7, &6Spectating: &f" + game.getSpectators().size()

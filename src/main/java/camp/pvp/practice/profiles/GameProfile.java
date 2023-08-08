@@ -1,5 +1,6 @@
 package camp.pvp.practice.profiles;
 
+import camp.pvp.practice.arenas.ArenaCopyTask;
 import camp.pvp.practice.cosmetics.DeathAnimation;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.parties.Party;
@@ -11,7 +12,6 @@ import camp.pvp.practice.kits.CustomDuelKit;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.PartyInvite;
 import camp.pvp.practice.profiles.stats.ProfileELO;
-import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
@@ -76,6 +76,7 @@ public class GameProfile {
     private ProfileELO profileElo;
 
     private BukkitTask giveItemsTask;
+    private ArenaCopyTask arenaCopyTask;
 
     public GameProfile(UUID uuid) {
         this.uuid = uuid;

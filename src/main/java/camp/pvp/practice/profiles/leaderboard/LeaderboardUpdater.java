@@ -28,7 +28,13 @@ public class LeaderboardUpdater implements Runnable{
                         List<LeaderboardEntry> entries = new ArrayList<>();
 
                         mongoCollection.find().sort(new Document("kit_" + kit.name(), -1)).limit(10).forEach(
-                                document -> entries.add(new LeaderboardEntry(document.getString("name"), document.getInteger("kit_" + kit.name())))
+                                document ->  {
+                                    if(document.containsKey("kit_" + kit.name())) {
+                                        String name = document.getString("name");
+                                        int elo = document.getInteger("kit_" + kit.name());
+                                        entries.add(new LeaderboardEntry(name, elo));
+                                    }
+                                }
                         );
 
                         Collections.sort(entries);

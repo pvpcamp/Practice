@@ -29,7 +29,7 @@ public class CustomDuelKit {
     public CustomDuelKit(DuelKit duelKit, int slot, boolean existing) {
         this.duelKit = duelKit;
         this.slot = slot;
-        this.name = duelKit.getColor() + duelKit.getDisplayName() + " Kit " + slot;
+        this.name = "&f" + duelKit.getDisplayName() + " Kit " + slot;
 
         if (existing) {
             items = new ItemStack[36];

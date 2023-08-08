@@ -174,7 +174,7 @@ public class PlayerInteractListener implements Listener {
                             while (x < 6) {
                                 CustomDuelKit cdk = customKits.get(x);
                                 if (cdk == null) {
-                                    GuiButton createButton = new GuiButton(Material.CHEST, editingKit.getColor() + "Create new " + editingKit.getDisplayName() + " kit.");
+                                    GuiButton createButton = new GuiButton(Material.CHEST, "&6Create new " + editingKit.getDisplayName() + " kit.");
                                     createButton.setSlot(1 + x);
                                     createButton.setCloseOnClick(true);
 
@@ -185,7 +185,7 @@ public class PlayerInteractListener implements Listener {
                                             CustomDuelKit cdk = new CustomDuelKit(editingKit, finalX, false);
                                             cdk.setItems(player.getInventory().getContents());
                                             customKits.put(finalX, cdk);
-                                            player.sendMessage(Colors.get("&aYour " + editingKit.getColor() + editingKit.getDisplayName() + "&a has been created and saved as " + cdk.getName() + "&a."));
+                                            player.sendMessage(Colors.get("&aYour &f" + editingKit.getDisplayName() + "&a has been created and saved as " + cdk.getName() + "&a."));
                                         }
                                     });
 
