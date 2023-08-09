@@ -1,6 +1,7 @@
 package camp.pvp.practice.listeners.bukkit.block;
 
 import camp.pvp.practice.arenas.Arena;
+import camp.pvp.practice.arenas.BrokenBlock;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
@@ -35,12 +36,23 @@ public class BlockBreakListener implements Listener {
 
         if(game != null && game.isBuild()) {
             if(game.getCurrentPlayersPlaying().contains(player)) {
-
                 if(game.isInBorder(block.getLocation())) {
                     Arena arena = game.getArena();
                     if (arena.getPlacedBlocks().contains(block)) {
 
                         arena.getPlacedBlocks().remove(block);
+
+                        for (ItemStack item : block.getDrops()) {
+                            Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
+                            game.addEntity(i);
+                        }
+
+                        block.setType(Material.AIR);
+                        return;
+                    } else if(arena.getType().canModifyArena()) {
+                        BrokenBlock brokenBlock = new BrokenBlock(block);
+
+                        arena.getBrokenBlocks().add(brokenBlock);
 
                         for (ItemStack item : block.getDrops()) {
                             Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);

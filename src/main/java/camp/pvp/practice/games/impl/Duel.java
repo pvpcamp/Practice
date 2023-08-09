@@ -2,16 +2,15 @@ package camp.pvp.practice.games.impl;
 
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.PostGameInventory;
 import camp.pvp.practice.games.tasks.EndingTask;
 import camp.pvp.practice.games.tasks.StartingTask;
 import camp.pvp.practice.games.tasks.TeleportFixTask;
+import camp.pvp.practice.loot.LootChest;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
-import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.profiles.stats.ProfileELO;
@@ -28,8 +27,6 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -59,6 +56,12 @@ public class Duel extends Game {
 
         if(arena.getType().equals(Arena.Type.DUEL_BUILD)) {
             arena.setInUse(true);
+        }
+
+        if(arena.getType().isGenerateLoot()) {
+            for(LootChest lootChest : LootChest.getForArenaType(arena.getType())) {
+                lootChest.generateLoot(arena.getPositions().get("corner1").getLocation(), arena.getPositions().get("corner2").getLocation());
+            }
         }
 
         Map<Player, Location> locations = new HashMap<>();
@@ -139,11 +142,7 @@ public class Duel extends Game {
         this.setEnded(new Date());
         this.setState(State.ENDED);
 
-        if(arena.getPlacedBlocks().size() > 0) {
-            arena.resetBlocks();
-        } else {
-            arena.setInUse(false);
-        }
+        arena.resetArena();
 
         if(getStarted() == null) {
             setStarted(new Date());

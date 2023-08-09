@@ -154,6 +154,7 @@ public class Practice extends JavaPlugin {
 
         CommandHandler commandHandler = NetworkHelper.getInstance().getCommandHandler();
         commandHandler.registerCommand(new EloManagerCommand(this));
+        commandHandler.registerCommand(new LootChestCommand(this));
     }
 
     public void registerListeners() {

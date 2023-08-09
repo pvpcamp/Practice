@@ -112,7 +112,7 @@ public class PartyEventInteract implements ItemInteract {
 
                     int x = 0;
                     for(DuelKit kit : DuelKit.values()) {
-                        if(kit.isQueueable() && kit.is2v2()) {
+                        if(kit.isQueueable() && kit.isTeams()) {
                             GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                             button.setCloseOnClick(true);
                             button.setLore(

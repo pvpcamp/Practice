@@ -39,6 +39,10 @@ public class ArenaResetter implements Runnable{
 
                     block.setType(Material.AIR);
                     arena.getPlacedBlocks().remove(block);
+                } else if(arena.getBrokenBlocks().size() > 0) {
+                    BrokenBlock brokenBlock = arena.getBrokenBlocks().get(0);
+                    brokenBlock.replace();
+                    arena.getBrokenBlocks().remove(brokenBlock);
                 }
             }
 

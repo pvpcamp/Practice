@@ -1,12 +1,9 @@
 package camp.pvp.practice.arenas;
 
 import camp.pvp.practice.Practice;
-import com.sk89q.worldedit.WorldEdit;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -40,6 +37,15 @@ public class Arena implements Comparable<Arena>{
                     return false;
             }
         }
+
+        public boolean canModifyArena() {
+            switch(this) {
+                case DUEL_SKYWARS:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 
     private String name, displayName;
@@ -49,7 +55,8 @@ public class Arena implements Comparable<Arena>{
     private String parent;
     private int xDifference, zDifference;
 
-    private @Getter List<Block> placedBlocks, brokenBlocks;
+    private @Getter List<Block> placedBlocks;
+    private @Getter List<BrokenBlock> brokenBlocks;
     private @Getter BukkitTask replaceTask;
 
     public Arena(String name) {
@@ -85,8 +92,11 @@ public class Arena implements Comparable<Arena>{
         }
     }
 
-    public void resetBlocks() {
-        Practice.instance.getArenaManager().getArenaResetter().addArena(this);
+    public void resetArena()
+    {
+        if(getPlacedBlocks().size() > 0 || getBrokenBlocks().size() > 0) {
+            Practice.instance.getArenaManager().getArenaResetter().addArena(this);
+        }
     }
 
     @Override

@@ -4,7 +4,6 @@ import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.kits.DuelKit;
-import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.BukkitReflection;
@@ -12,22 +11,18 @@ import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.Practice;
 import com.lunarclient.bukkitapi.LunarClientAPI;
-import com.lunarclient.bukkitapi.cooldown.LunarClientAPICooldown;
 import com.lunarclient.bukkitapi.nethandler.client.LCPacketTeammates;
-import com.lunarclient.bukkitapi.serverrule.LunarClientAPIServerRule;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -93,6 +88,8 @@ public abstract class Game {
             getEndingTimer().cancel();
         }
 
+        arena.resetArena();
+
         for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
             Player player = Bukkit.getPlayer(entry.getKey());
             GameParticipant participant = entry.getValue();
@@ -116,12 +113,6 @@ public abstract class Game {
         this.clearEntities();
         this.setEnded(new Date());
         this.setState(State.ENDED);
-
-        if(arena.getPlacedBlocks().size() > 0) {
-            arena.resetBlocks();
-        } else {
-            arena.setInUse(false);
-        }
     }
 
     public void eliminate(Player player, boolean leftGame) {

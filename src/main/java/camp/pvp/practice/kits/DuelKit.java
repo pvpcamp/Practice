@@ -4,15 +4,12 @@ import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.games.GameInventory;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -23,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 public enum DuelKit {
-    NO_DEBUFF, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, BOXING, SUMO;
+    NO_DEBUFF, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, BOXING, SUMO;
 
     public String getDisplayName() {
         switch(this) {
@@ -39,6 +36,8 @@ public enum DuelKit {
                 return "Soup";
             case INVADED:
                 return "Invaded";
+            case SKYWARS:
+                return "Skywars";
             case BOXING:
                 return "Boxing";
             case SUMO:
@@ -58,6 +57,8 @@ public enum DuelKit {
                 return Collections.singletonList(Arena.Type.DUEL_FLAT);
             case BUILD_UHC:
                 return Collections.singletonList(Arena.Type.DUEL_BUILD);
+            case SKYWARS:
+                return Collections.singletonList(Arena.Type.DUEL_SKYWARS);
             default:
                 return Arrays.asList(Arena.Type.DUEL, Arena.Type.DUEL_FLAT);
         }
@@ -80,7 +81,9 @@ public enum DuelKit {
             case SUMO:
                 return 16;
             case BUILD_UHC:
-                return 22;
+                return 19;
+            case SKYWARS:
+                return 20;
         }
 
         return 0;
@@ -101,7 +104,9 @@ public enum DuelKit {
             case SUMO:
                 return 16;
             case BUILD_UHC:
-                return 22;
+                return 19;
+            case SKYWARS:
+                return 20;
         }
 
         return 0;
@@ -110,6 +115,7 @@ public enum DuelKit {
     public boolean isBuild() {
         switch(this) {
             case BUILD_UHC:
+            case SKYWARS:
                 return true;
             default:
                 return false;
@@ -134,15 +140,11 @@ public enum DuelKit {
 
     public boolean isTournament() {
         switch(this) {
-            case NO_DEBUFF:
-            case BUILD_UHC:
-            case BOXING:
-            case SOUP:
-            case INVADED:
-            case CLASSIC:
-                return true;
-            default:
+            case HCF:
+            case SUMO:
                 return false;
+            default:
+                return true;
         }
     }
 
@@ -194,6 +196,7 @@ public enum DuelKit {
     public boolean isMoveOnStart() {
         switch(this) {
             case SUMO:
+            case SKYWARS:
                 return false;
             default:
                 return true;
@@ -215,11 +218,12 @@ public enum DuelKit {
                 return true;
             case HCF:
             case BOXING:
+            case SKYWARS:
                 return false;
         }
     }
 
-    public boolean is2v2() {
+    public boolean isTeams() {
         switch(this){
             case BOXING:
                 return false;
@@ -250,6 +254,9 @@ public enum DuelKit {
                 break;
             case INVADED:
                 item = new ItemStack(Material.BLAZE_POWDER);
+                break;
+            case SKYWARS:
+                item = new ItemStack(Material.EYE_OF_ENDER);
                 break;
             case BOXING:
                 item = new ItemStack(Material.DIAMOND_CHESTPLATE);
@@ -349,6 +356,15 @@ public enum DuelKit {
                 inv[12] = new ItemStack(Material.WATER_BUCKET);
                 inv[13] = new ItemStack(Material.LAVA_BUCKET);
                 inv[14] = new ItemStack(Material.LAVA_BUCKET);
+                break;
+            case SKYWARS:
+                armor[3] = new ItemStack(Material.IRON_HELMET);
+                armor[2] = new ItemStack(Material.IRON_CHESTPLATE);
+                armor[1] = new ItemStack(Material.IRON_LEGGINGS);
+                armor[0] = new ItemStack(Material.IRON_BOOTS);
+
+                inv[0] = new ItemStack(Material.IRON_SWORD);
+
                 break;
             case HCF:
                 armor[3] = new ItemStack(Material.DIAMOND_HELMET);
