@@ -24,7 +24,7 @@ public class ArenaManager {
 
         this.arenaConfig = new ArenaConfig(plugin, this);
         this.arenaResetter = new ArenaResetter(this);
-        Bukkit.getScheduler().runTaskTimer(plugin, arenaResetter, 0, 4);
+        Bukkit.getScheduler().runTaskTimer(plugin, arenaResetter, 0, 5);
     }
 
     public Arena getArenaFromName(String name) {
@@ -83,7 +83,7 @@ public class ArenaManager {
         this.arenas.remove(arena);
     }
 
-    public Arena createCopy(Arena arena, int xD, int zD) {
+    public int getNextCopyNumber(Arena arena) {
         int hn = 0;
         for(Arena a : getArenaCopies(arena)) {
             String cn = a.getName().replace(arena.getName() + "_copy_", "");
@@ -99,14 +99,33 @@ public class ArenaManager {
             }
         }
 
-        Arena copy = new Arena(arena.getName() + "_copy_" + (hn + 1));
+        return hn + 1;
+    }
+
+    public Arena createCopy(Arena arena, int xD, int zD) {
+        int hn = getNextCopyNumber(arena);
+
+        Arena copy = new Arena(arena.getName() + "_copy_" + hn);
         copy.setDisplayName(arena.getDisplayName());
         copy.setEnabled(arena.isEnabled());
-        copy.copyPositions(arena, xD, zD);
-        copy.setParent(arena.getName());
-        copy.setType(arena.getType());
         copy.setXDifference(xD);
         copy.setZDifference(zD);
+        copy.copyPositions(arena);
+        copy.setParent(arena.getName());
+        copy.setType(arena.getType());
+
+        return copy;
+    }
+
+    public Arena createCopy(Arena arena, int xD, int zD, int override) {
+        Arena copy = new Arena(arena.getName() + "_copy_" + override);
+        copy.setDisplayName(arena.getDisplayName());
+        copy.setEnabled(arena.isEnabled());
+        copy.setXDifference(xD);
+        copy.setZDifference(zD);
+        copy.copyPositions(arena);
+        copy.setParent(arena.getName());
+        copy.setType(arena.getType());
 
         return copy;
     }
@@ -120,6 +139,12 @@ public class ArenaManager {
         }
 
         return arenas;
+    }
+
+    public void updateArenaCopies(Arena arena) {
+        for(Arena a : getArenaCopies(arena)) {
+            a.copyPositions(arena);
+        }
     }
 
     public void shutdown() {

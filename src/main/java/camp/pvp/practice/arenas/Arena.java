@@ -16,11 +16,12 @@ import java.util.*;
 public class Arena implements Comparable<Arena>{
 
     public enum Type {
-        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_SPLEEF, EVENT_OITC;
+        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_SPLEEF, EVENT_OITC;
 
         public List<String> getValidPositions() {
             switch(this) {
                 case DUEL_BUILD:
+                case DUEL_SKYWARS:
                     return Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
                 case EVENT_SUMO:
                     return Arrays.asList("spawn1", "spawn2", "lobby");
@@ -28,6 +29,15 @@ public class Arena implements Comparable<Arena>{
                     return Arrays.asList("spawn");
                 default:
                     return Arrays.asList("spawn1", "spawn2", "center");
+            }
+        }
+
+        public boolean isGenerateLoot() {
+            switch(this) {
+                case DUEL_SKYWARS:
+                    return true;
+                default:
+                    return false;
             }
         }
     }
@@ -66,10 +76,11 @@ public class Arena implements Comparable<Arena>{
         return true;
     }
 
-    public void copyPositions(Arena fromArena, int xDifference, int zDifference) {
+    public void copyPositions(Arena fromArena) {
         for(ArenaPosition position : fromArena.getPositions().values()) {
             Location location = position.getLocation();
-            Location newLocation = new Location(location.getWorld(), location.getBlockX() + xDifference, location.getBlockY(), location.getBlockZ() + zDifference);
+            Location newLocation = location.clone();
+            newLocation.add(xDifference, 0, zDifference);
             positions.put(position.getPosition(), new ArenaPosition(position.getPosition(), newLocation));
         }
     }

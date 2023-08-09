@@ -1,6 +1,7 @@
 package camp.pvp.practice.games.tasks;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
@@ -26,6 +27,8 @@ public class EndingTask implements Runnable{
 
     @Override
     public void run() {
+        game.clearEntities();
+
         for(Map.Entry<UUID, GameParticipant> entry : game.getParticipants().entrySet()) {
             Player player = Bukkit.getPlayer(entry.getKey());
             GameParticipant participant = entry.getValue();
@@ -76,24 +79,5 @@ public class EndingTask implements Runnable{
         }
 
         Practice.instance.getGameProfileManager().updateGlobalPlayerVisibility();
-
-        game.clearEntities();
-        game.getArena().resetBlocks();
-
-        // TODO: Replace built blocks from build duel.
-
-//            for(Block block : this.getPlacedBlocks()) {
-//                block.setType(Material.AIR);
-//            }
-//
-//            for(BrokenBlock block : this.getBrokenBlocks()) {
-//                Block b = block.getBlock();
-//                b.setType(block.getMaterial());
-//                b.setData(block.getData());
-//            }
-
-//            if(this.getKit().getType().equals(Kit.Type.BUILD)) {
-//                this.getArena().setInUse(false);
-//            }
     }
 }

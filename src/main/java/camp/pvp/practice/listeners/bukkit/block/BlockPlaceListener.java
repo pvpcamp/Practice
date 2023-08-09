@@ -7,6 +7,7 @@ import camp.pvp.practice.games.Game;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
@@ -18,7 +19,7 @@ public class BlockPlaceListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
@@ -30,8 +31,13 @@ public class BlockPlaceListener implements Listener {
         }
 
         if(game != null && game.isBuild() && game.getState().equals(Game.State.ACTIVE)) {
-            Arena arena = game.getArena();
-            arena.getPlacedBlocks().add(block);
+            if(game.getCurrentPlayersPlaying().contains(player)) {
+
+                if(game.isInBorder(block.getLocation())) {
+                    Arena arena = game.getArena();
+                    arena.getPlacedBlocks().add(block);
+                }
+            }
         } else {
             event.setCancelled(true);
         }

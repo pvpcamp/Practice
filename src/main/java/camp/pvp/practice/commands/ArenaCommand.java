@@ -1,9 +1,6 @@
 package camp.pvp.practice.commands;
 
-import camp.pvp.practice.arenas.Arena;
-import camp.pvp.practice.arenas.ArenaManager;
-import camp.pvp.practice.arenas.ArenaPosition;
-import camp.pvp.practice.arenas.ArenaCopyTask;
+import camp.pvp.practice.arenas.*;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
@@ -11,17 +8,17 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ArenaCommand implements CommandExecutor {
 
@@ -194,7 +191,7 @@ public class ArenaCommand implements CommandExecutor {
                         sb.append("\n&6Arena: &f" + Colors.get(arena.getDisplayName()) + ChatColor.GRAY + " (" + arena.getName() + ")");
                         sb.append("\n&6Type: &f" + arena.getType().name());
                         sb.append("\n&6Queueable: &f" + arena.isEnabled());
-                        sb.append("\n&6In Use: &f" + !arena.isInUse());
+                        sb.append("\n&6In Use: &f" + arena.isInUse());
 
                         int copies = arenaManager.getArenaCopies(arena).size();
                         if(copies > 0) {
@@ -298,12 +295,16 @@ public class ArenaCommand implements CommandExecutor {
 
                         if(args.length > 2) {
 
+                            if(arena.isCopy()) {
+                                player.sendMessage(ChatColor.RED + "You cannot set positions for a copied arena, please set positions for the original arena " + arena.getParent() + ".");
+                                return true;
+                            }
+
                             ArenaPosition position = null;
                             Location location = player.getLocation();
                             for (String s : arena.getType().getValidPositions()) {
                                 if (s.equalsIgnoreCase(args[2])) {
                                     position = new ArenaPosition(s, location);
-                                    arena.getPositions().put(s, position);
                                     break;
                                 }
                             }
@@ -331,11 +332,22 @@ public class ArenaCommand implements CommandExecutor {
                                 return true;
                             }
 
-                            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " position "
-                                    + ChatColor.WHITE + position.getPosition() + ChatColor.GREEN + " has been set to your current location.");
+                            copies = arenaManager.getArenaCopies(arena).size();
+
+                            arena.getPositions().put(position.getPosition(), position);
+
+                            if(copies == 0) {
+                                player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " position "
+                                        + ChatColor.WHITE + position.getPosition() + ChatColor.GREEN + " has been set to your current location.");
+                            } else {
+                                arenaManager.updateArenaCopies(arena);
+                                player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " position "
+                                        + ChatColor.WHITE + position.getPosition() + ChatColor.GREEN + " has been set to your current location, this update has affected " + copies + " copies.");
+                            }
                             return true;
                         }
                         break;
+                    case "tp":
                     case "teleport":
                         if(!exists) {
                             player.sendMessage(existsMessage);
@@ -376,25 +388,43 @@ public class ArenaCommand implements CommandExecutor {
                                 return true;
                             }
 
-                            int x, z;
+                            int x, z, times = 1;
                             try {
                                 x = Integer.parseInt(args[2]);
                                 z = Integer.parseInt(args[3]);
+                                if(args.length > 4) {
+                                    times = Integer.parseInt(args[4]);
+                                }
                             } catch(NumberFormatException ignored) {
                                 player.sendMessage(ChatColor.RED + "You must provide valid X and Z differences.");
                                 return true;
                             }
 
-                            Arena copyArena = arenaManager.createCopy(arena, x, z);
+                            Queue<ArenaCopyTask> queue = new LinkedList<>();
+                            int nextCopyNumber = arenaManager.getNextCopyNumber(arena);
 
-                            ArenaCopyTask arenaCopyTask = new ArenaCopyTask(plugin, player, profile, arena, copyArena, x, z);
-                            boolean copyable = arenaCopyTask.init();
+                            for(int i = 0; i < times; i++) {
+                                int nX, nZ;
+                                nX = x * (i + 1);
+                                nZ = z * (i + 1);
+                                Arena copyArena = arenaManager.createCopy(arena, nX, nZ, nextCopyNumber + i);
+                                ArenaCopyTask arenaCopyTask = new ArenaCopyTask(plugin, player, profile, arena, copyArena, nX, nZ);
+                                boolean copyable = arenaCopyTask.init();
 
-                            if (copyable) {
-                                arenaCopyTask.runTaskTimer(plugin, 0, 2);
-                            } else {
-                                player.sendMessage(ChatColor.RED + "You cannot paste this arena at this location because there are blocks in the way.");
+                                if(copyable) {
+                                    queue.add(arenaCopyTask);
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "Arena copy for location difference X " + nX + " and Z "  + nZ + " could not be completed because there are blocks in the way.");
+                                    return true;
+                                }
                             }
+
+                            player.sendMessage(ChatColor.GREEN + "Copying arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " " + times + " times, starting queue.");
+
+                            ArenaCopyQueue acq = new ArenaCopyQueue(plugin, player, queue);
+                            int taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, acq, 0, 5);
+                            acq.setTaskId(taskId);
+
                             return true;
                         }
                         break;
@@ -406,6 +436,7 @@ public class ArenaCommand implements CommandExecutor {
                         }
 
                         List<Arena> arenaCopies = new ArrayList<>(arenaManager.getArenaCopies(arena));
+                        Collections.sort(arenaCopies);
 
                         TextComponent[] components = new TextComponent[arenaCopies.size() + 1];
                         TextComponent title = new TextComponent(Colors.get("&6Copies of arena &f" + arena.getName() + " &7(" + arenaCopies.size() + "&7): &f"));
@@ -459,7 +490,7 @@ public class ArenaCommand implements CommandExecutor {
         help.append("\n&6/arena type <name> [type] &7- &fGets or sets an arena type.");
         help.append("\n&6/arena position <name> <position> &7- &fSets an arena position at your current location.");
         help.append("\n&6/arena teleport <name> <position> &7- &fTeleports you to a specific arena position.");
-        help.append("\n&6/arena copy <name> <x> <z> &7- &fCopies an arena to another location. both X and Z are the amount of blocks away the new arena will be from the copied arena.");
+        help.append("\n&6/arena copy <name> <x> <z> [times] &7- &fCopies an arena to another location. X and Z are blocks away from the original. Times will duplicate x amount of times.");
         help.append("\n&6/arena copies <name> &7- &fReturns the list of copies an arena has.");
 
         return Colors.get(help.toString());

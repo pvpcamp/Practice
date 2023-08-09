@@ -27,8 +27,10 @@ import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.commands.*;
 import camp.pvp.practice.listeners.bukkit.player.*;
+import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
 import com.lunarclient.bukkitapi.LunarClientAPI;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
@@ -36,14 +38,16 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
 @Getter @Setter
 public class Practice extends JavaPlugin {
 
-    public static Practice instance;
+    @Getter public static Practice instance;
 
     private ProtocolManager protocolManager;
     private EntityHider entityHider;
@@ -195,6 +199,14 @@ public class Practice extends JavaPlugin {
     }
 
     public void shutdown() {
+        for(World world : Bukkit.getWorlds()) {
+            for(Entity entity : world.getEntities()) {
+                if(!(entity instanceof Player)) {
+                    entity.remove();
+                }
+            }
+        }
+
         arenaManager.shutdown();
         gameManager.shutdown();
         gameProfileManager.shutdown();

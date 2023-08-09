@@ -1,6 +1,7 @@
 package camp.pvp.practice.games;
 
 import camp.pvp.practice.arenas.Arena;
+import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.kits.HCFKit;
@@ -118,6 +119,8 @@ public abstract class Game {
 
         if(arena.getPlacedBlocks().size() > 0) {
             arena.resetBlocks();
+        } else {
+            arena.setInUse(false);
         }
     }
 
@@ -490,6 +493,72 @@ public abstract class Game {
                 }
             }
         }
+    }
+
+    public void handleBorder(Player player) {
+        ArenaPosition corner1 = arena.getPositions().get("corner1");
+        ArenaPosition corner2 = arena.getPositions().get("corner2");
+
+        if (corner1 != null && corner2 != null) {
+            Location location, c1, c2;
+            location = player.getLocation();
+            c1 = corner1.getLocation();
+            c2 = corner2.getLocation();
+            int x, z, minX, minZ, maxX, maxZ;
+            x = location.getBlockX();
+            z = location.getBlockZ();
+            minX = Math.min(c1.getBlockX(), c2.getBlockX());
+            minZ = Math.min(c1.getBlockZ(), c2.getBlockZ());
+            maxX = Math.max(c1.getBlockX(), c2.getBlockX());
+            maxZ = Math.max(c1.getBlockZ(), c2.getBlockZ());
+
+            boolean reachedBorder = false;
+            if(minX > x) {
+                reachedBorder = true;
+                location.add(1, 0, 0);
+            }
+
+            if(maxX < x) {
+                reachedBorder = true;
+                location.subtract(1, 0, 0);
+            }
+
+            if(minZ > z) {
+                reachedBorder = true;
+                location.add(0, 0, 1);
+            }
+
+            if(maxZ < z) {
+                reachedBorder = true;
+                location.subtract(0, 0, 1);
+            }
+
+            if(reachedBorder) {
+                player.teleport(location);
+                player.sendMessage(ChatColor.RED + "You have reached the border of the arena.");
+            }
+        }
+    }
+
+    public boolean isInBorder(Location location) {
+        ArenaPosition corner1 = arena.getPositions().get("corner1");
+        ArenaPosition corner2 = arena.getPositions().get("corner2");
+
+        if (corner1 != null && corner2 != null) {
+            Location c1, c2;
+            c1 = corner1.getLocation();
+            c2 = corner2.getLocation();
+            int x, z, minX, minZ, maxX, maxZ;
+            x = location.getBlockX();
+            z = location.getBlockZ();
+            minX = Math.min(c1.getBlockX(), c2.getBlockX());
+            minZ = Math.min(c1.getBlockZ(), c2.getBlockZ());
+            maxX = Math.max(c1.getBlockX(), c2.getBlockX());
+            maxZ = Math.max(c1.getBlockZ(), c2.getBlockZ());
+
+            return minX <= x && maxX >= x && minZ <= z && maxZ >= z;
+        }
+        return true;
     }
 
     public void addEntity(Entity entity) {

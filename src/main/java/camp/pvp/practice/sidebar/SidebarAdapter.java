@@ -1,6 +1,7 @@
 package camp.pvp.practice.sidebar;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.arenas.ArenaCopyTask;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameManager;
 import camp.pvp.practice.games.GameTeam;
@@ -154,8 +155,13 @@ public class SidebarAdapter implements AssembleAdapter {
             }
 
             if(profile.getArenaCopyTask() != null) {
+                ArenaCopyTask act = profile.getArenaCopyTask();
                 lines.add(" ");
-                lines.add("&6&lCopy Task: &f" + TimeUtil.get(profile.getArenaCopyTask().getStarted()));
+                lines.add("&6Copying Arena: &f" + act.getArena().getName());
+                lines.add("&6Copy: &f" + act.getNewArena().getName());
+                lines.add("&6Difference: &fX" + act.getXDifference() + " Z" + act.getZDifference());
+                lines.add("&6Blocks Left: &f" + act.getBlocks().size());
+                lines.add("&6Duration: &f" + TimeUtil.get(act.getStarted()));
             }
 
             lines.add(" ");

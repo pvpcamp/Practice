@@ -3,16 +3,16 @@ package camp.pvp.practice.arenas;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.profiles.GameProfile;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@Getter
-public class ArenaCopyTask extends BukkitRunnable {
+@Getter @Setter
+public class ArenaCopyTask implements Runnable {
 
     private final Practice plugin;
     private final Player player;
@@ -20,6 +20,7 @@ public class ArenaCopyTask extends BukkitRunnable {
     private final Arena arena, newArena;
     private final int xDifference;
     private final int zDifference;
+    private int taskId;
     private Location corner1, corner2;
     private World world;
     private long started, ended;
@@ -93,7 +94,6 @@ public class ArenaCopyTask extends BukkitRunnable {
                     }
                 }
             } else {
-                cancel();
                 ended = System.currentTimeMillis();
                 player.sendMessage(ChatColor.GREEN + "Copy task for arena " + ChatColor.WHITE + newArena.getName() + ChatColor.GREEN
                         + " has completed in " + ChatColor.WHITE + (TimeUnit.MILLISECONDS.toSeconds(ended - started) % 60) + " second(s)" + ChatColor.GREEN + ".");

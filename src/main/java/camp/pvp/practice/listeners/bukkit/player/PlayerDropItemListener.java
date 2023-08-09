@@ -3,6 +3,7 @@ package camp.pvp.practice.listeners.bukkit.player;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -33,6 +34,12 @@ public class PlayerDropItemListener implements Listener {
 
             if (item.getItemStack().getType().equals(Material.GLASS_BOTTLE) || item.getItemStack().getType().equals(Material.BOWL)) {
                 item.remove();
+                return;
+            }
+
+            if(player.getInventory().getHeldItemSlot() == 0) {
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "You cannot drop the item in your first slot.");
                 return;
             }
 

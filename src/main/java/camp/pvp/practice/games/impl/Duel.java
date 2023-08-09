@@ -139,6 +139,12 @@ public class Duel extends Game {
         this.setEnded(new Date());
         this.setState(State.ENDED);
 
+        if(arena.getPlacedBlocks().size() > 0) {
+            arena.resetBlocks();
+        } else {
+            arena.setInUse(false);
+        }
+
         if(getStarted() == null) {
             setStarted(new Date());
             getStartingTimer().cancel();

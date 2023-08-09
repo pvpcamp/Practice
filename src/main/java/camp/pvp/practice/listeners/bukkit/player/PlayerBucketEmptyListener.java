@@ -34,19 +34,27 @@ public class PlayerBucketEmptyListener implements Listener {
             return;
         }
 
-        if(game != null && game.isBuild() && game.getState().equals(Game.State.ACTIVE)) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                List<Block> blocks = new ArrayList<>();
-                BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
-                for (BlockFace blockFace : blockFaces) {
-                    Block b = block.getRelative(blockFace, 1);
-                    if (b.isLiquid()) {
-                        blocks.add(b);
-                    }
-                }
+        player.updateInventory();
 
-                game.getArena().getPlacedBlocks().addAll(blocks);
-            }, 1);
+        if(game != null && game.isBuild()) {
+
+            if(game.isInBorder(block.getLocation())) {
+
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    List<Block> blocks = new ArrayList<>();
+                    BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
+                    for (BlockFace blockFace : blockFaces) {
+                        Block b = block.getRelative(blockFace, 1);
+                        if (b.isLiquid()) {
+                            blocks.add(b);
+                        }
+                    }
+
+                    game.getArena().getPlacedBlocks().addAll(blocks);
+                }, 1);
+            } else {
+                event.setCancelled(true);
+            }
         } else {
             event.setCancelled(true);
         }

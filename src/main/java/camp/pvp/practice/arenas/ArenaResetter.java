@@ -1,5 +1,7 @@
 package camp.pvp.practice.arenas;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -27,17 +29,22 @@ public class ArenaResetter implements Runnable{
     public void run() {
         Arena arena = arenas.peek();
         if(arena != null) {
-            for (int i = 0; i < 200; i++) {
+            for (int i = 0; i < 500; i++) {
                 if (arena.getPlacedBlocks().size() > 0) {
                     final Block block = arena.getPlacedBlocks().get(0);
+                    Chunk chunk = block.getChunk();
+                    if(!chunk.isLoaded()) {
+                        chunk.load();
+                    }
+
                     block.setType(Material.AIR);
                     arena.getPlacedBlocks().remove(block);
                 }
+            }
 
-                if (arena.getPlacedBlocks().isEmpty() && arena.getBrokenBlocks().isEmpty()) {
-                    arena.setInUse(false);
-                    arenas.poll();
-                }
+            if (arena.getPlacedBlocks().isEmpty() && arena.getBrokenBlocks().isEmpty()) {
+                arena.setInUse(false);
+                arenas.poll();
             }
         }
     }

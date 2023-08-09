@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -21,7 +22,7 @@ public class BlockBreakListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         GameProfile gameProfile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
@@ -33,20 +34,26 @@ public class BlockBreakListener implements Listener {
         }
 
         if(game != null && game.isBuild()) {
-            Arena arena = game.getArena();
-            if(arena.getPlacedBlocks().contains(block)) {
+            if(game.getCurrentPlayersPlaying().contains(player)) {
 
-                arena.getPlacedBlocks().remove(block);
+                if(game.isInBorder(block.getLocation())) {
+                    Arena arena = game.getArena();
+                    if (arena.getPlacedBlocks().contains(block)) {
 
-                for(ItemStack item : block.getDrops()) {
-                    Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
-                    game.addEntity(i);
+                        arena.getPlacedBlocks().remove(block);
+
+                        for (ItemStack item : block.getDrops()) {
+                            Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
+                            game.addEntity(i);
+                        }
+
+                        block.setType(Material.AIR);
+                        return;
+                    }
                 }
-
-                block.setType(Material.AIR);
-            } else {
-                event.setCancelled(true);
             }
         }
+
+        event.setCancelled(true);
     }
 }

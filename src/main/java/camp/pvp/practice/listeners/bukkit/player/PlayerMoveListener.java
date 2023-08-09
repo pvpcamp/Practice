@@ -34,19 +34,34 @@ public class PlayerMoveListener implements Listener {
             Location to = event.getTo();
 
             if (game != null) {
-                if (event.getTo().getBlock().isLiquid() && game.getCurrentPlayersPlaying().contains(player)) {
-                    if (game.getKit().isDieInWater() && game.getState().equals(Game.State.ACTIVE)) {
-                        GameParticipant participant = game.getParticipants().get(player.getUniqueId());
-                        participant.setLastDamageCause(EntityDamageEvent.DamageCause.DROWNING);
-                        game.eliminate(player, false);
-                    }
-                }
-
-                if (!game.getKit().isMoveOnStart()) {
-                    if (!Arrays.asList(Game.State.ACTIVE, Game.State.ENDED).contains(game.getState()) && game.getCurrentPlayersPlaying().contains(player)) {
-                        if (from.getX() != to.getX() || from.getZ() != to.getZ()) {
-                            player.teleport(from);
+                GameParticipant participant = game.getParticipants().get(player.getUniqueId());
+                if(game.getCurrentPlayersPlaying().contains(player)) {
+                    if (event.getTo().getBlock().isLiquid()) {
+                        if (game.getKit().isDieInWater() && game.getState().equals(Game.State.ACTIVE)) {
+                            participant.setLastDamageCause(EntityDamageEvent.DamageCause.DROWNING);
+                            game.eliminate(player, false);
                         }
+                    }
+
+                    if (!game.getKit().isMoveOnStart()) {
+                        if (!Arrays.asList(Game.State.ACTIVE, Game.State.ENDED).contains(game.getState()) && game.getCurrentPlayersPlaying().contains(player)) {
+                            if (from.getX() != to.getX() || from.getZ() != to.getZ()) {
+                                player.teleport(from);
+                            }
+                        }
+                    }
+
+                    if(event.getTo().getY() < 0) {
+                        if(game.getState().equals(Game.State.ACTIVE)) {
+                            participant.setLastDamageCause(EntityDamageEvent.DamageCause.VOID);
+                            game.eliminate(player, false);
+                        }
+                    }
+
+                    game.handleBorder(player);
+                } else {
+                    if(event.getTo().getY() < 0) {
+                        player.teleport(game.getAllPlayers().get(0));
                     }
                 }
             }
