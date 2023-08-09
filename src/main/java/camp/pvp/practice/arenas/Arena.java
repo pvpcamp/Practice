@@ -56,7 +56,7 @@ public class Arena implements Comparable<Arena>{
     private int xDifference, zDifference;
 
     private @Getter List<Block> placedBlocks;
-    private @Getter List<BrokenBlock> brokenBlocks;
+    private @Getter List<ModifiedBlock> modifiedBlocks;
     private @Getter BukkitTask replaceTask;
 
     public Arena(String name) {
@@ -66,7 +66,7 @@ public class Arena implements Comparable<Arena>{
         this.positions = new HashMap<>();
 
         this.placedBlocks = new ArrayList<>();
-        this.brokenBlocks = new ArrayList<>();
+        this.modifiedBlocks = new ArrayList<>();
     }
 
     public boolean isCopy() {
@@ -94,7 +94,7 @@ public class Arena implements Comparable<Arena>{
 
     public void resetArena()
     {
-        if(getPlacedBlocks().size() > 0 || getBrokenBlocks().size() > 0) {
+        if(getPlacedBlocks().size() > 0 || getModifiedBlocks().size() > 0) {
             Practice.instance.getArenaManager().getArenaResetter().addArena(this);
         }
     }

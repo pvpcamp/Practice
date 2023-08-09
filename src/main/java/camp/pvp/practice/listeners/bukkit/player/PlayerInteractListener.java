@@ -1,5 +1,6 @@
 package camp.pvp.practice.listeners.bukkit.player;
 
+import camp.pvp.practice.arenas.ModifiedBlock;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.impl.teams.HCFTeams;
@@ -84,22 +85,6 @@ public class PlayerInteractListener implements Listener {
                 }
             }
 
-            if(block != null) {
-                BlockState blockState = block.getState();
-                MaterialData data = blockState.getData();
-                if (data instanceof Door) {
-                    event.setCancelled(true);
-                } else if (data instanceof TrapDoor) {
-                    event.setCancelled(true);
-                } else if (data instanceof Gate) {
-                    event.setCancelled(true);
-                } else if(data instanceof Lever) {
-                    event.setCancelled(true);
-                } else if(data instanceof Chest) {
-                    event.setCancelled(true);
-                }
-            }
-
             Game game = profile.getGame();
             if (game != null) {
                 GameParticipant participant = game.getAlive().get(player.getUniqueId());
@@ -135,6 +120,35 @@ public class PlayerInteractListener implements Listener {
                                 participant.setKitApplied(true);
                                 player.updateInventory();
                                 break;
+                        }
+                    }
+
+                    if(block != null) {
+                        if(game.isBuild()) {
+                            ModifiedBlock modifiedBlock = null;
+                            for(ModifiedBlock mb : game.getArena().getModifiedBlocks()) {
+                                if(mb.getLocation().equals(block.getLocation())) {
+                                    modifiedBlock = mb;
+                                }
+                            }
+
+                            if(modifiedBlock == null) {
+                                modifiedBlock = new ModifiedBlock(block);
+                                game.getArena().getModifiedBlocks().add(modifiedBlock);
+                            }
+
+                        } else {
+                            BlockState blockState = block.getState();
+                            MaterialData data = blockState.getData();
+                            if (data instanceof Door) {
+                                event.setCancelled(true);
+                            } else if (data instanceof TrapDoor) {
+                                event.setCancelled(true);
+                            } else if (data instanceof Gate) {
+                                event.setCancelled(true);
+                            } else if (data instanceof Lever) {
+                                event.setCancelled(true);
+                            }
                         }
                     }
                 }
@@ -254,9 +268,9 @@ public class PlayerInteractListener implements Listener {
                             break;
                     }
                 }
-
-                event.setCancelled(true);
             }
+
+            event.setCancelled(true);
         }
     }
 }

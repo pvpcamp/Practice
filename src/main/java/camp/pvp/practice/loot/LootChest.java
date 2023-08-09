@@ -45,17 +45,14 @@ public enum LootChest {
     }
 
     public String getChestName() {
-        return this.name();
-    }
-
-    public List<ItemStack> getItems() {
-        List<ItemStack> items = new ArrayList<>();
         switch(this) {
+            case SKYWARS_MIDDLE:
+                return "Middle Chest";
             case SKYWARS_NORMAL:
-                items.add(new ItemStack(Material.DIAMOND_SWORD));
+                return "Island Chest";
+            default:
+                return "Chest";
         }
-
-        return items;
     }
 
     public void generateLoot(List<Chest> chests) {
@@ -70,8 +67,7 @@ public enum LootChest {
                 int high = getMaxItems();
                 int itemCount = random.nextInt(high - low) + low;
 
-                List<ItemStack> originalItems = getItems();
-                Collections.shuffle(originalItems);
+                List<ItemStack> originalItems = LootCategory.getRandomItems(this);
 
                 Queue<ItemStack> items = new LinkedList<>(originalItems);
 

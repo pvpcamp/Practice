@@ -1,18 +1,20 @@
 package camp.pvp.practice.arenas;
 
+import lombok.Getter;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.material.MaterialData;
 
-public class BrokenBlock {
+public class ModifiedBlock {
 
-    private Material material;
-    private byte data;
-    private Location location;
-    public BrokenBlock(Block block) {
+    private final Material material;
+    private final MaterialData materialData;
+    @Getter private final Location location;
+    public ModifiedBlock(Block block) {
         this.material = block.getType();
-        this.data = block.getData();
+        this.materialData = block.getState().getData();
         this.location = block.getLocation();
     }
 
@@ -25,8 +27,6 @@ public class BrokenBlock {
             chunk.load();
         }
 
-        if(block.getData() != data) {
-            block.setData(data);
-        }
+        block.getState().setData(materialData);
     }
 }
