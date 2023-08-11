@@ -215,7 +215,7 @@ public abstract class Game {
     public void handleHit(Player victim, Player attacker, EntityDamageByEntityEvent event) {
         GameParticipant victimParticipant = this.getCurrentPlaying().get(victim.getUniqueId());
         GameParticipant participant = this.getCurrentPlaying().get(attacker.getUniqueId());
-        if(victimParticipant != null && participant != null) {
+        if(victimParticipant != null && participant != null && getState().equals(State.ACTIVE)) {
             if(victimParticipant.isAlive() && participant.isAlive()) {
 
                 if(participant.getAttacking() != null && !participant.getAttacking().equals(victim.getUniqueId())) {

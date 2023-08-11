@@ -204,7 +204,6 @@ public enum DuelKit {
         switch(this) {
             case SUMO:
             case SKYWARS:
-            case SPLEEF:
                 return false;
             default:
                 return true;

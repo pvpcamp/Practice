@@ -35,12 +35,11 @@ public class PartyEventInteract implements ItemInteract {
             ffaEvent.setAction(new GuiAction() {
                 @Override
                 public void run(Player player, Gui gui) {
-                    StandardGui kitGui = new StandardGui("Choose a Kit", 9);
+                    StandardGui kitGui = new StandardGui("Choose a Kit", 36);
 
-                    int x = 0;
                     for(DuelKit kit : DuelKit.values()) {
+                        GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                         if(kit.isFfa()) {
-                            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                             button.setCloseOnClick(true);
                             button.setLore(
                                     "&7Click to start &f" + kit.getDisplayName() + " &7FFA event!");
@@ -80,11 +79,13 @@ public class PartyEventInteract implements ItemInteract {
                                     }
                                 }
                             });
-
-                            button.setSlot(x);
-                            kitGui.addButton(button, false);
-                            x++;
+                        } else {
+                            button.updateName("&7&o" + kit.getDisplayName());
+                            button.setLore("&cThis kit is disabled for FFA.");
                         }
+
+                        button.setSlot(kit.getGuiSlot());
+                        kitGui.addButton(button, false);
                     }
 
                     kitGui.open(player);
@@ -108,12 +109,11 @@ public class PartyEventInteract implements ItemInteract {
             splitEvent.setAction(new GuiAction() {
                 @Override
                 public void run(Player player, Gui gui) {
-                    StandardGui kitGui = new StandardGui("Choose a Kit", 9);
+                    StandardGui kitGui = new StandardGui("Choose a Kit", 36);
 
-                    int x = 0;
                     for(DuelKit kit : DuelKit.values()) {
+                        GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                         if(kit.isQueueable() && kit.isTeams()) {
-                            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                             button.setCloseOnClick(true);
                             button.setLore(
                                     "&7Click to start &f" + kit.getDisplayName() + " &7Split Teams event!");
@@ -164,11 +164,13 @@ public class PartyEventInteract implements ItemInteract {
                                     }
                                 }
                             });
-
-                            button.setSlot(x);
-                            kitGui.addButton(button, false);
-                            x++;
+                        } else {
+                            button.updateName("&7&o" + kit.getDisplayName());
+                            button.setLore("&cThis kit is disabled for teams.");
                         }
+
+                        button.setSlot(kit.getGuiSlot());
+                        kitGui.addButton(button, false);
                     }
 
                     kitGui.open(player);
