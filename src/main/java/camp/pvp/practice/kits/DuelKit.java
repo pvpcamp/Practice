@@ -364,6 +364,8 @@ public enum DuelKit {
                 armor[0] = new ItemStack(Material.IRON_BOOTS);
 
                 inv[0] = new ItemStack(Material.IRON_SWORD);
+                inv[1] = new ItemStack(Material.IRON_PICKAXE);
+                inv[2] = new ItemStack(Material.IRON_AXE);
 
                 break;
             case HCF:

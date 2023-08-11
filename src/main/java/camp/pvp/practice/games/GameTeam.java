@@ -70,6 +70,6 @@ public class GameTeam {
             return true;
         }
 
-        return getAliveParticipants().size() < 1;
+        return getAliveParticipants().isEmpty();
     }
 }

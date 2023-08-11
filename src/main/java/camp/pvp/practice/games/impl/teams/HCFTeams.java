@@ -54,6 +54,8 @@ public class HCFTeams extends TeamDuel {
             return;
         }
 
+        arena.prepare();
+
         this.setKit(DuelKit.NO_DEBUFF);
 
         for(Party party : this.getParties()) {

@@ -1,5 +1,8 @@
 package camp.pvp.practice.commands;
 
+import camp.pvp.practice.arenas.ArenaBlockUpdater;
+import camp.pvp.practice.arenas.ArenaCopyQueue;
+import camp.pvp.practice.arenas.ArenaDeleter;
 import camp.pvp.practice.listeners.citizens.NPCClickable;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
@@ -48,14 +51,32 @@ public class PracticeUtilCommand implements CommandExecutor {
                     case "reset":
                         profile.playerUpdate(true);
                         return true;
-                    case "staffmodules":
-                        LunarClientAPI lcApi = plugin.getLunarClientAPI();
-                        if(lcApi.isRunningLunarClient(player)) {
-                            lcApi.giveAllStaffModules(player);
-                            player.sendMessage(ChatColor.GREEN + "You have been given the Lunar Client staff modules.");
+                    case "scanner":
+                        player.sendMessage(ChatColor.GREEN + "Starting arena scanner.");
+                        plugin.getArenaManager().scanBlocks();
+                        player.sendMessage(ChatColor.GREEN + "Arena scanner finished.");
+
+                        return true;
+                    case "cancel":
+                        ArenaCopyQueue acq = plugin.getArenaManager().getArenaCopyQueue();
+                        if(!acq.getCopyQueue().isEmpty()) {
+                            final int size = acq.getCopyQueue().size();
+                            Bukkit.getScheduler().cancelTask(acq.getCopyQueue().peek().getTaskId());
+                            acq.getCopyQueue().clear();
+
+                            player.sendMessage(ChatColor.GREEN.toString() + size + " arenas in the copy queue have been cancelled, blocks may still remain.");
                         } else {
-                            player.sendMessage(ChatColor.RED + "You are not running Lunar Client.");
+                            player.sendMessage(ChatColor.GRAY + "Copy queue is empty.");
                         }
+
+                        ArenaBlockUpdater abu = plugin.getArenaManager().getArenaBlockUpdater();
+                        if(abu != null && abu.getEnded() == 0) {
+                            Bukkit.getScheduler().cancelTask(abu.getTaskId());
+                            player.sendMessage(ChatColor.GREEN + "Arena block updater has been cancelled for arena " + ChatColor.WHITE + abu.getArena().getName() + ".");
+                        } else {
+                            player.sendMessage(ChatColor.GRAY + "Arena block updater is not running.");
+                        }
+
                         return true;
                     case "setnpcid":
                         if(args.length > 2) {
@@ -122,13 +143,14 @@ public class PracticeUtilCommand implements CommandExecutor {
             StringBuilder sb = new StringBuilder();
             sb.append("&6&lPractice Utilities");
             sb.append("\n&6Next Scheduled Restart: &f" + plugin.getServerRebooter().getRebootTime().toString());
-            sb.append("\n&6/practiceutil setlobby &7- &fSets the lobby location.");
-            sb.append("\n&6/practiceutil setkiteditor &7- &fSets the kit editor location.");
-            sb.append("\n&6/practiceutil reset &7- &fResets your player.");
-            sb.append("\n&6/practiceutil staffmodules &7- &fGives you the Lunar Client staff modules.");
-            sb.append("\n&6/practiceutil setnpcid <clickable type> <npc id> &7- &fAssign a clickable type to an NPC.");
-            sb.append("\n&6/practiceutil shutdown &7- &fShutdown the server immediately.");
-            sb.append("\n&6/practiceutil schedulereboot &7- &fSchedule the daily server restart for right now.");
+            sb.append("\n&6/" + label + " setlobby &7- &fSets the lobby location.");
+            sb.append("\n&6/" + label + " setkiteditor &7- &fSets the kit editor location.");
+            sb.append("\n&6/" + label + " reset &7- &fResets your player.");
+            sb.append("\n&6/" + label + " scanner &7- &fRescan all arenas for important blocks.");
+            sb.append("\n&6/" + label + " cancel &7- &fCancels all arena copy, update, and delete tasks.");
+            sb.append("\n&6/" + label + " setnpcid <clickable type> <npc id> &7- &fAssign a clickable type to an NPC.");
+            sb.append("\n&6/" + label + " shutdown &7- &fShutdown the server immediately.");
+            sb.append("\n&6/" + label + " schedulereboot &7- &fSchedule the daily server restart for right now.");
 
             player.sendMessage(Colors.get(sb.toString()));
         }

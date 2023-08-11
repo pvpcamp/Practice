@@ -1,23 +1,18 @@
 package camp.pvp.practice.arenas;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.profiles.GameProfile;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Getter @Setter
-public class ArenaCopyTask implements Runnable {
+public class ArenaCopier implements Runnable {
 
     private final Practice plugin;
-    private final Player player;
-    private final GameProfile profile;
-    private final Arena arena, newArena;
+    private final Arena arena, newArena, startFrom;
     private final int xDifference;
     private final int zDifference;
     private int taskId;
@@ -26,15 +21,24 @@ public class ArenaCopyTask implements Runnable {
     private long started, ended;
     private Queue<Block> blocks;
 
-    public ArenaCopyTask(Practice plugin, Player player, GameProfile profile, Arena arena, Arena newArena, int xDifference, int zDifference) {
+//    public ArenaCopier(Practice plugin, Arena arena, Arena newArena, int xDifference, int zDifference) {
+//        this.plugin = plugin;
+//        this.arena = arena;
+//        this.newArena = newArena;
+//        this.xDifference = xDifference;
+//        this.zDifference = zDifference;
+//        this.blocks = new LinkedList<>();
+//        this.startFrom = arena;
+//    }
+
+    public ArenaCopier(Practice plugin, Arena arena, Arena newArena, int xDifference, int zDifference, Arena startFrom) {
         this.plugin = plugin;
-        this.player = player;
-        this.profile = profile;
         this.arena = arena;
         this.newArena = newArena;
         this.xDifference = xDifference;
         this.zDifference = zDifference;
         this.blocks = new LinkedList<>();
+        this.startFrom = startFrom;
     }
 
     public boolean init() {
@@ -59,7 +63,7 @@ public class ArenaCopyTask implements Runnable {
                     if(!block.isEmpty()) {
                         blocks.add(location.getBlock());
 
-                        Location newLocation = new Location(world, x + xDifference, y, z + zDifference);
+                        Location newLocation = new Location(world, x + startFrom.getXDifference() + xDifference, y, z + startFrom.getZDifference() + zDifference);
                         Block newBlock = newLocation.getBlock();
                         if (!newBlock.isEmpty()) {
                             return false;
@@ -76,29 +80,33 @@ public class ArenaCopyTask implements Runnable {
     public void run() {
         if(started == 0) {
             this.started = System.currentTimeMillis();
-            player.sendMessage(ChatColor.GREEN + "Copy task for arena " + ChatColor.WHITE + newArena.getName() + ChatColor.GREEN + " has started. " + ChatColor.GRAY + "(" + blocks.size() + " blocks)");
-            profile.setArenaCopyTask(this);
         }
 
-        for(int i = 0; i < 1000; i++) {
+        for(int i = 0; i < 5000; i++) {
             if(!blocks.isEmpty()) {
                 Block block = blocks.poll();
-                Location newLocation = new Location(block.getWorld(), block.getX() + xDifference, block.getY(), block.getZ() + zDifference);
+                Location newLocation = new Location(block.getWorld(), block.getX() + startFrom.getXDifference() + xDifference, block.getY(), block.getZ() + startFrom.getZDifference() + zDifference);
                 Block newBlock = newLocation.getBlock();
                 if (block.isEmpty()) {
                     i--;
                 } else {
-                    newBlock.setType(block.getType());
-                    if(newBlock.getData() != block.getData()) {
-                        newBlock.setData(block.getData());
+
+                    Chunk chunk = block.getChunk();
+                    if(!chunk.isLoaded()) {
+                        chunk.load();
                     }
+
+                    newBlock.getState().setData(block.getState().getData());
+                    newBlock.getState().setType(block.getState().getType());
+                    newBlock.getState().update();
                 }
             } else {
                 ended = System.currentTimeMillis();
-                player.sendMessage(ChatColor.GREEN + "Copy task for arena " + ChatColor.WHITE + newArena.getName() + ChatColor.GREEN
-                        + " has completed in " + ChatColor.WHITE + (TimeUnit.MILLISECONDS.toSeconds(ended - started) % 60) + " second(s)" + ChatColor.GREEN + ".");
-                profile.setArenaCopyTask(null);
                 plugin.getArenaManager().getArenas().add(newArena);
+
+                if(taskId != 0) {
+                    Bukkit.getScheduler().cancelTask(taskId);
+                }
                 return;
             }
         }

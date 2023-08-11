@@ -171,6 +171,8 @@ public class TeamDuel extends TeamGame {
             return;
         }
 
+        arena.prepare();
+
         for(Party party : this.getParties()) {
             party.setGame(this);
         }

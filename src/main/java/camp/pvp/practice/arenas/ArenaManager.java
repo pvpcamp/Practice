@@ -3,7 +3,11 @@ package camp.pvp.practice.arenas;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -15,6 +19,9 @@ public class ArenaManager {
     private ArenaConfig arenaConfig;
     private @Getter Set<Arena> arenas;
     private @Getter ArenaResetter arenaResetter;
+    private @Getter ArenaCopyQueue arenaCopyQueue;
+    private @Getter @Setter ArenaBlockUpdater arenaBlockUpdater;
+    private @Getter @Setter ArenaDeleter arenaDeleter;
     public ArenaManager(Practice plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
@@ -25,6 +32,11 @@ public class ArenaManager {
         this.arenaConfig = new ArenaConfig(plugin, this);
         this.arenaResetter = new ArenaResetter(this);
         Bukkit.getScheduler().runTaskTimer(plugin, arenaResetter, 0, 5);
+
+        this.arenaCopyQueue = new ArenaCopyQueue(plugin);
+        Bukkit.getScheduler().runTaskTimer(plugin, arenaCopyQueue, 0, 4);
+
+        this.scanBlocks();
     }
 
     public Arena getArenaFromName(String name) {
@@ -79,8 +91,62 @@ public class ArenaManager {
         return arenas;
     }
 
+    public void scanBlocks() {
+        this.logger.info("Scanning arenas for important blocks.");
+
+        int arenas = 0;
+        for(Arena arena : getArenas()) {
+            if(arena.hasValidPositions()) {
+                ArenaPosition corner1 = arena.getPositions().get("corner1");
+                ArenaPosition corner2 = arena.getPositions().get("corner2");
+
+                if(corner1 != null && corner2 != null) {
+
+                    arena.getBeds().clear();
+                    arena.getChests().clear();
+
+                    int minX, minY, minZ, maxX, maxY, maxZ;
+                    Location c1 = corner1.getLocation(), c2 = corner2.getLocation();
+                    minX = Math.min(c1.getBlockX(), c2.getBlockX());
+                    minY = Math.min(c1.getBlockY(), c2.getBlockY());
+                    minZ = Math.min(c1.getBlockZ(), c2.getBlockZ());
+                    maxX = Math.max(c1.getBlockX(), c2.getBlockX());
+                    maxY = Math.max(c1.getBlockY(), c2.getBlockY());
+                    maxZ = Math.max(c1.getBlockZ(), c2.getBlockZ());
+
+                    for (int x = minX; x < maxX; x++) {
+                        for (int y = minY; y < maxY; y++) {
+                            for (int z = minZ; z < maxZ; z++) {
+                                Location location = new Location(c1.getWorld(), x, y, z);
+                                Block block = location.getBlock();
+                                if(!block.isEmpty()) {
+                                    switch(block.getType()) {
+                                        case BED_BLOCK:
+                                            arena.getBeds().add(block.getLocation());
+                                            break;
+                                        case CHEST:
+                                        case TRAPPED_CHEST:
+                                            arena.getChests().add(block.getLocation());
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    arenas++;
+                }
+            }
+        }
+
+        this.logger.info("Arena scanner completed, " + arenas + " arenas have been scanned for blocks.");
+    }
+
     public void deleteArena(Arena arena) {
         this.arenas.remove(arena);
+
+        if(arena.isCopy()) {
+
+        }
     }
 
     public int getNextCopyNumber(Arena arena) {

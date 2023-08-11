@@ -23,19 +23,15 @@ public class EntitySpawnListener implements Listener {
         if(event.getEntity() instanceof Item) {
             Item item = (Item) event.getEntity();
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                for (Game game : plugin.getGameManager().getActiveGames()) {
-                    if(game.getEntities().contains(item)) {
-                        if(item.getItemStack().getType().equals(Material.GLASS_BOTTLE) || item.getItemStack().getType().equals(Material.BOWL)) {
-                            item.remove();
-                        }
-
-                        new BukkitRunnable() {
-                            public void run() {
-                                item.remove();
-                            }
-                        }.runTaskLater(plugin, 500L);
-                    }
+                if(item.getItemStack().getType().equals(Material.GLASS_BOTTLE) || item.getItemStack().getType().equals(Material.BOWL)) {
+                    item.remove();
                 }
+
+                new BukkitRunnable() {
+                    public void run() {
+                        item.remove();
+                    }
+                }.runTaskLater(plugin, 500L);
             }, 1);
         }
     }

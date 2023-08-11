@@ -37,11 +37,11 @@ public class PlayerDropItemListener implements Listener {
                 return;
             }
 
-            if(player.getInventory().getHeldItemSlot() == 0) {
-                event.setCancelled(true);
-                player.sendMessage(ChatColor.RED + "You cannot drop the item in your first slot.");
-                return;
-            }
+//            if(player.getInventory().getHeldItemSlot() == 0) {
+//                event.setCancelled(true);
+//                player.sendMessage(ChatColor.RED + "You cannot drop the item in your first slot.");
+//                return;
+//            }
 
             new BukkitRunnable() {
                 public void run() {

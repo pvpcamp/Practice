@@ -21,12 +21,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
+import org.bukkit.block.Furnace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -124,46 +127,56 @@ public class PlayerInteractListener implements Listener {
                     }
 
                     if(block != null) {
-                        if(game.isBuild()) {
-                            ModifiedBlock modifiedBlock = null;
-                            for(ModifiedBlock mb : game.getArena().getModifiedBlocks()) {
-                                if(mb.getLocation().equals(block.getLocation())) {
-                                    modifiedBlock = mb;
+                        BlockState state = block.getState();
+                        if (game.getState().equals(Game.State.ACTIVE)) {
+                            if(game.getArena().getType().canModifyArena()) {
+//                            ModifiedBlock modifiedBlock = null;
+//                            for(ModifiedBlock mb : game.getArena().getModifiedBlocks()) {
+//                                if(mb.getLocation().equals(block.getLocation())) {
+//                                    modifiedBlock = mb;
+//                                }
+//                            }
+//
+//                            if(modifiedBlock == null) {
+//                                modifiedBlock = new ModifiedBlock(block);
+//                                game.getArena().getModifiedBlocks().add(modifiedBlock);
+//                            }
+                            } else {
+                                if(state instanceof Chest) {
+                                    event.setCancelled(true);
                                 }
                             }
 
-                            if(modifiedBlock == null) {
-                                modifiedBlock = new ModifiedBlock(block);
-                                game.getArena().getModifiedBlocks().add(modifiedBlock);
-                            }
-
-                        } else {
-                            BlockState blockState = block.getState();
-                            MaterialData data = blockState.getData();
-                            if (data instanceof Door) {
+                            if (state instanceof Lever) {
                                 event.setCancelled(true);
-                            } else if (data instanceof TrapDoor) {
+                            } else if (state instanceof Button) {
                                 event.setCancelled(true);
-                            } else if (data instanceof Gate) {
+                            } else if (state instanceof PressurePlate) {
                                 event.setCancelled(true);
-                            } else if (data instanceof Lever) {
+                            } else if (state instanceof Furnace) {
+                                event.setCancelled(true);
+                            } else if (state instanceof Gate) {
+                                event.setCancelled(true);
+                            } else if (state instanceof TrapDoor) {
                                 event.setCancelled(true);
                             }
                         }
                     }
-                }
 
-                switch(player.getItemInHand().getType()) {
-                    case ENDER_PEARL:
-                        PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
-                        if (cooldown != null) {
-                            if (!cooldown.isExpired()) {
-                                player.sendMessage(cooldown.getBlockedMessage());
-                                event.setCancelled(true);
-                                player.updateInventory();
+                    switch(player.getItemInHand().getType()) {
+                        case ENDER_PEARL:
+                            PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
+                            if (cooldown != null) {
+                                if (!cooldown.isExpired()) {
+                                    player.sendMessage(cooldown.getBlockedMessage());
+                                    event.setCancelled(true);
+                                    player.updateInventory();
+                                }
                             }
-                        }
-                        break;
+                            break;
+                    }
+                } else {
+                    event.setCancelled(true);
                 }
             } else if(profile.getState().equals(GameProfile.State.KIT_EDITOR)) {
                 if(block != null) {
@@ -268,9 +281,9 @@ public class PlayerInteractListener implements Listener {
                             break;
                     }
                 }
-            }
 
-            event.setCancelled(true);
+                event.setCancelled(true);
+            }
         }
     }
 }

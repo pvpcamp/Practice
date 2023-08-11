@@ -34,34 +34,57 @@ public class BlockBreakListener implements Listener {
             return;
         }
 
-        if(game != null && game.isBuild()) {
+        if(game != null && game.isBuild() && game.getState().equals(Game.State.ACTIVE)) {
             if(game.getCurrentPlayersPlaying().contains(player)) {
                 if(game.isInBorder(block.getLocation())) {
                     Arena arena = game.getArena();
-                    if (arena.getPlacedBlocks().contains(block)) {
+                    if(arena.getType().canModifyArena()) {
 
-                        arena.getPlacedBlocks().remove(block);
-
-                        for (ItemStack item : block.getDrops()) {
-                            Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
-                            game.addEntity(i);
+                        ModifiedBlock modifiedBlock = null;
+                        for(ModifiedBlock mb : game.getArena().getModifiedBlocks()) {
+                            if(mb.getLocation().equals(block.getLocation())) {
+                                modifiedBlock = mb;
+                            }
                         }
 
-                        block.setType(Material.AIR);
-                        return;
-                    } else if(arena.getType().canModifyArena()) {
-                        ModifiedBlock modifiedBlock = new ModifiedBlock(block);
+                        if(modifiedBlock == null) {
+                            boolean add = true;
+                            for(ModifiedBlock mb : arena.getPlacedBlocks()) {
+                                if(mb.getLocation().equals(block.getLocation())) {
+                                    add = false;
+                                    break;
+                                }
+                            }
 
-                        arena.getModifiedBlocks().add(modifiedBlock);
+                            if(add) {
+                                modifiedBlock = new ModifiedBlock(block);
+                                game.getArena().getModifiedBlocks().add(modifiedBlock);
+                            }
+                        }
+                    } else {
 
-                        for (ItemStack item : block.getDrops()) {
-                            Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
-                            game.addEntity(i);
+                        boolean b = false;
+                        for(ModifiedBlock mb : arena.getPlacedBlocks()) {
+                            if(mb.getLocation().equals(block.getLocation())) {
+                                b = true;
+                                break;
+                            }
                         }
 
-                        block.setType(Material.AIR);
+                        if(!b) {
+                            event.setCancelled(true);
+                        }
                         return;
                     }
+
+                    for (ItemStack item : block.getDrops()) {
+                        Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
+                        game.addEntity(i);
+                    }
+
+                    block.setType(Material.AIR);
+
+                    return;
                 }
             }
         }

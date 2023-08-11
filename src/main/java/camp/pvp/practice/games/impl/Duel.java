@@ -54,15 +54,7 @@ public class Duel extends Game {
             return;
         }
 
-        if(arena.getType().equals(Arena.Type.DUEL_BUILD)) {
-            arena.setInUse(true);
-        }
-
-        if(arena.getType().isGenerateLoot()) {
-            for(LootChest lootChest : LootChest.getForArenaType(arena.getType())) {
-                lootChest.generateLoot(arena.getPositions().get("corner1").getLocation(), arena.getPositions().get("corner2").getLocation());
-            }
-        }
+        arena.prepare();
 
         Map<Player, Location> locations = new HashMap<>();
 
@@ -141,8 +133,6 @@ public class Duel extends Game {
         GameProfileManager gpm = getPlugin().getGameProfileManager();
         this.setEnded(new Date());
         this.setState(State.ENDED);
-
-        arena.resetArena();
 
         if(getStarted() == null) {
             setStarted(new Date());

@@ -1,6 +1,6 @@
 package camp.pvp.practice.profiles;
 
-import camp.pvp.practice.arenas.ArenaCopyTask;
+import camp.pvp.practice.arenas.ArenaCopier;
 import camp.pvp.practice.cosmetics.DeathAnimation;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.parties.Party;
@@ -76,7 +76,7 @@ public class GameProfile {
     private ProfileELO profileElo;
 
     private BukkitTask giveItemsTask;
-    private ArenaCopyTask arenaCopyTask;
+    private ArenaCopier arenaCopier;
 
     public GameProfile(UUID uuid) {
         this.uuid = uuid;

@@ -4,6 +4,10 @@ import camp.pvp.practice.arenas.*;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
+import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.Gui;
+import camp.pvp.utils.guis.GuiAction;
+import camp.pvp.utils.guis.StandardGui;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -11,12 +15,11 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -112,8 +115,46 @@ public class ArenaCommand implements CommandExecutor {
                             return true;
                         }
 
-                        arenaManager.deleteArena(arena);
-                        player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " has been deleted.");
+                        Arena finalArena = arena;
+
+                        if(arena.hasValidPositions() && arena.getType().isBuild()) {
+                            StandardGui gui = new StandardGui("Replace blocks with air?", 27);
+                            gui.setDefaultBackground();
+
+                            GuiButton yes = new GuiButton(Material.GOLD_BLOCK, "&aYes");
+                            yes.setSlot(12);
+                            yes.setCloseOnClick(true);
+                            yes.setLore(
+                                    "&7This will place all blocks for",
+                                    "&7arena with air, as well as removing",
+                                    "&7the arena from storage."
+                            );
+                            yes.setAction((player1, gui1) -> {
+                                ArenaDeleter arenaDeleter = new ArenaDeleter(arenaManager, finalArena);
+                                int task = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, arenaDeleter, 0, 1);
+                                arenaDeleter.setTaskId(task);
+                                plugin.getArenaManager().setArenaDeleter(arenaDeleter);
+                                player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + finalArena.getName() + ChatColor.GREEN + " has been deleted. The blocks for the arena are being deleted now.");
+                            });
+                            gui.addButton(yes, false);
+
+                            GuiButton no = new GuiButton(Material.REDSTONE_BLOCK, "&cNo");
+                            no.setSlot(14);
+                            no.setCloseOnClick(true);
+                            no.setAction(new GuiAction() {
+                                @Override
+                                public void run(Player player, Gui gui) {
+                                    arenaManager.deleteArena(finalArena);
+                                    player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + finalArena.getName() + ChatColor.GREEN + " has been deleted.");
+                                }
+                            });
+                            gui.addButton(no, false);
+
+                            gui.open(player);
+                        } else {
+                            arenaManager.deleteArena(arena);
+                            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " has been deleted.");
+                        }
                         return true;
                     case "toggle":
                         if(!exists) {
@@ -287,6 +328,7 @@ public class ArenaCommand implements CommandExecutor {
                             return true;
                         }
                         break;
+                    case "pos":
                     case "position":
                         if(!exists) {
                             player.sendMessage(existsMessage);
@@ -373,7 +415,7 @@ public class ArenaCommand implements CommandExecutor {
                                 return true;
                             }
 
-                            if (!arena.getType().equals(Arena.Type.DUEL_BUILD)) {
+                            if (!arena.getType().isBuild()) {
                                 player.sendMessage(ChatColor.RED + "Only build arenas can be copied.");
                                 return true;
                             }
@@ -400,30 +442,44 @@ public class ArenaCommand implements CommandExecutor {
                                 return true;
                             }
 
-                            Queue<ArenaCopyTask> queue = new LinkedList<>();
+                            Arena startFrom = null;
+                            if(args.length > 5) {
+                                startFrom = plugin.getArenaManager().getArenaFromName(args[5]);
+                                if(startFrom == null) {
+                                    player.sendMessage(ChatColor.RED + "The start from arena you specified does not exist.");
+                                    return true;
+                                }
+
+                                if(startFrom.getParent() != null && !startFrom.getParent().equals(arena.getName())) {
+                                    player.sendMessage(ChatColor.RED + "The start from arena you specified does not have the parent of the original arena.");
+                                    return true;
+                                }
+                            } else {
+                                startFrom = arena;
+                            }
+
+                            Queue<ArenaCopier> queue = new LinkedList<>();
                             int nextCopyNumber = arenaManager.getNextCopyNumber(arena);
 
                             for(int i = 0; i < times; i++) {
                                 int nX, nZ;
                                 nX = x * (i + 1);
                                 nZ = z * (i + 1);
-                                Arena copyArena = arenaManager.createCopy(arena, nX, nZ, nextCopyNumber + i);
-                                ArenaCopyTask arenaCopyTask = new ArenaCopyTask(plugin, player, profile, arena, copyArena, nX, nZ);
-                                boolean copyable = arenaCopyTask.init();
+                                Arena copyArena = arenaManager.createCopy(arena, nX + startFrom.getXDifference(), nZ + startFrom.getZDifference(), nextCopyNumber + i);
+                                ArenaCopier arenaCopier = new ArenaCopier(plugin, arena, copyArena, nX, nZ, startFrom);
+                                boolean copyable = arenaCopier.init();
 
                                 if(copyable) {
-                                    queue.add(arenaCopyTask);
+                                    queue.add(arenaCopier);
                                 } else {
                                     player.sendMessage(ChatColor.RED + "Arena copy for location difference X " + nX + " and Z "  + nZ + " could not be completed because there are blocks in the way.");
                                     return true;
                                 }
                             }
 
-                            player.sendMessage(ChatColor.GREEN + "Copying arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " " + times + " times, starting queue.");
+                            player.sendMessage(ChatColor.GREEN + "Added arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " " + times + " times to the copy queue, check your sidebar for updates.");
 
-                            ArenaCopyQueue acq = new ArenaCopyQueue(plugin, player, queue);
-                            int taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, acq, 0, 5);
-                            acq.setTaskId(taskId);
+                            arenaManager.getArenaCopyQueue().getCopyQueue().addAll(queue);
 
                             return true;
                         }
@@ -467,6 +523,39 @@ public class ArenaCommand implements CommandExecutor {
 
                         player.spigot().sendMessage(components);
                         return true;
+                    case "update":
+                        if (!exists) {
+                            player.sendMessage(existsMessage);
+                            return true;
+                        }
+
+                        if(arena.isCopy()) {
+                            player.sendMessage(ChatColor.RED + "You cannot update the blocks of a copied arena directly.");
+                            return true;
+                        }
+
+                        if(arenaManager.getArenaCopies(arena).isEmpty()) {
+                            player.sendMessage(ChatColor.RED + "This arena does not have any copies.");
+                            return true;
+                        }
+
+                        for(Arena a : arenaManager.getArenaCopies(arena)) {
+                            a.copyPositions(arena);
+                        }
+
+                        player.sendMessage(ChatColor.GREEN + "All arena positions have been updated.");
+
+                        ArenaBlockUpdater abu = new ArenaBlockUpdater(arenaManager, arena);
+                        if(!abu.getBlocks().isEmpty()) {
+                            player.sendMessage(ChatColor.GREEN + "Attempting to update " + abu.getBlocks().size() + " blocks for arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + ", check your sidebar for updates.");
+                            arenaManager.setArenaBlockUpdater(abu);
+                            int taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, abu, 0, 5);
+                            abu.setTaskId(taskId);
+                        } else {
+                            player.sendMessage(ChatColor.GREEN + "This arena and its copies are already up to date.");
+                        }
+
+                        return true;
                 }
             }
 
@@ -490,8 +579,11 @@ public class ArenaCommand implements CommandExecutor {
         help.append("\n&6/arena type <name> [type] &7- &fGets or sets an arena type.");
         help.append("\n&6/arena position <name> <position> &7- &fSets an arena position at your current location.");
         help.append("\n&6/arena teleport <name> <position> &7- &fTeleports you to a specific arena position.");
-        help.append("\n&6/arena copy <name> <x> <z> [times] &7- &fCopies an arena to another location. X and Z are blocks away from the original. Times will duplicate x amount of times.");
+        help.append("\n&6/arena copy <name> <x> <z> [times] [start_from] &7- &fCopies an arena to another location. X and Z are blocks away from the original." +
+                " Times will duplicate x amount of times." +
+                " Start from will start copying from a specified arena.");
         help.append("\n&6/arena copies <name> &7- &fReturns the list of copies an arena has.");
+        help.append("\n&6/arena update <name> &7- &fUpdates the blocks for all arena copies.");
 
         return Colors.get(help.toString());
     }

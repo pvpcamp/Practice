@@ -130,6 +130,8 @@ public class FreeForAll extends Game {
             return;
         }
 
+        arena.prepare();
+
         for(Party party : this.getParties()) {
             party.setGame(this);
         }

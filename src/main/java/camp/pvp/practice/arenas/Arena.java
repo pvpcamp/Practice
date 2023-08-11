@@ -1,10 +1,12 @@
 package camp.pvp.practice.arenas;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.loot.LootChest;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.material.Bed;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -46,6 +48,16 @@ public class Arena implements Comparable<Arena>{
                     return false;
             }
         }
+
+        public boolean isBuild() {
+            switch(this) {
+                case DUEL_SKYWARS:
+                case DUEL_BUILD:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 
     private String name, displayName;
@@ -55,8 +67,8 @@ public class Arena implements Comparable<Arena>{
     private String parent;
     private int xDifference, zDifference;
 
-    private @Getter List<Block> placedBlocks;
-    private @Getter List<ModifiedBlock> modifiedBlocks;
+    private @Getter List<Location> beds, chests;
+    private @Getter List<ModifiedBlock> placedBlocks, modifiedBlocks;
     private @Getter BukkitTask replaceTask;
 
     public Arena(String name) {
@@ -65,14 +77,22 @@ public class Arena implements Comparable<Arena>{
         this.type = Type.DUEL;
         this.positions = new HashMap<>();
 
+        this.beds = new ArrayList<>();
+        this.chests = new ArrayList<>();
         this.placedBlocks = new ArrayList<>();
         this.modifiedBlocks = new ArrayList<>();
     }
 
+    /**
+     * Returns true if this arena is a copy of another arena.
+     */
     public boolean isCopy() {
         return this.getParent() != null;
     }
 
+    /**
+     * Checks if all required positions for the arena set type exist.
+     */
     public boolean hasValidPositions() {
         for(String position : getType().getValidPositions()) {
             if(getPositions().get(position) == null) {
@@ -83,6 +103,11 @@ public class Arena implements Comparable<Arena>{
         return true;
     }
 
+    /**
+     * Copies positions from the parent arena to this arena, based on X and Z differences.
+     * @param fromArena Parent arena.
+     */
+
     public void copyPositions(Arena fromArena) {
         for(ArenaPosition position : fromArena.getPositions().values()) {
             Location location = position.getLocation();
@@ -92,10 +117,56 @@ public class Arena implements Comparable<Arena>{
         }
     }
 
-    public void resetArena()
-    {
-        if(getPlacedBlocks().size() > 0 || getModifiedBlocks().size() > 0) {
+    /**
+     * Prepares an arena before a match starts. Typically only useful for build enabled arenas.
+     */
+    public void prepare() {
+        if(getType().isBuild()) {
+            setInUse(true);
+        }
+
+        if(getType().isGenerateLoot()) {
+            LootChest.generateLoot(this);
+        }
+
+    }
+
+    /**
+     * Adds the arena to the ArenaResetter queue if any blocks were modified.
+     */
+    public void resetArena() {
+        if(!getPlacedBlocks().isEmpty() || !getModifiedBlocks().isEmpty()) {
             Practice.instance.getArenaManager().getArenaResetter().addArena(this);
+        } else {
+            setInUse(false);
+        }
+    }
+
+    public void addPlacedBlock(ModifiedBlock modifiedBlock) {
+        boolean add = true;
+        for(ModifiedBlock b : placedBlocks) {
+            if(modifiedBlock.getLocation().equals(b.getLocation())) {
+                add = false;
+                break;
+            }
+        }
+
+        if(add) {
+            placedBlocks.add(modifiedBlock);
+        }
+    }
+
+    public void addModifiedBlock(ModifiedBlock modifiedBlock) {
+        boolean add = true;
+        for(ModifiedBlock b : modifiedBlocks) {
+            if(modifiedBlock.getLocation().equals(b.getLocation())) {
+                add = false;
+                break;
+            }
+        }
+
+        if(add) {
+            placedBlocks.add(modifiedBlock);
         }
     }
 

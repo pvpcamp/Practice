@@ -29,7 +29,6 @@ public class PlayerItemConsumeListener implements Listener {
 
         if(name != null && name.contains("Golden Head") && item.getType().equals(Material.GOLDEN_APPLE)) {
             player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 100, 2));
-            player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 1));
         }
     }
 }

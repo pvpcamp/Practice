@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
@@ -41,6 +42,7 @@ public class GameParticipant {
 
     private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
+    private Location respawnLocation;
 
     public GameParticipant(UUID uuid, String name) {
         this.uuid = uuid;

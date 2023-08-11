@@ -1,10 +1,9 @@
 package camp.pvp.practice.sidebar;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.arenas.ArenaCopyTask;
+import camp.pvp.practice.arenas.*;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameManager;
-import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.parties.Party;
@@ -16,13 +15,13 @@ import camp.pvp.practice.queue.GameQueueManager;
 import camp.pvp.practice.queue.GameQueueMember;
 import camp.pvp.practice.utils.TimeUtil;
 import io.github.thatkawaiisam.assemble.AssembleAdapter;
-import org.apache.commons.lang.time.DateUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Queue;
 
 public class SidebarAdapter implements AssembleAdapter {
 
@@ -53,7 +52,8 @@ public class SidebarAdapter implements AssembleAdapter {
                     showCps = profile.isSidebarShowCps(),
                     showDuration = profile.isSidebarShowDuration(),
                     showLines = profile.isSidebarShowLines(),
-                    showPing = profile.isSidebarShowPing();
+                    showPing = profile.isSidebarShowPing(),
+                    staff = player.hasPermission("practice.staff");
 
             if(showLines) {
                 lines.add("&7&m------------------");
@@ -74,14 +74,24 @@ public class SidebarAdapter implements AssembleAdapter {
                     }
 
                     lines.add("&6Online: &f" + online);
+                    lines.add("&6In Game: &f" + inGame);
 
-                    if(player.hasPermission("practice.staff")) {
+                    if(staff) {
                         lines.add("&6Staff Online: &f" + staffOnline);
                         lines.add("&6Staff Mode: &f" + (profile.isStaffMode() ? "Enabled" : "Disabled"));
                         lines.add("&6Active Games: &f" + plugin.getGameManager().getActiveGames().size());
-                    }
 
-                    lines.add("&6In Game: &f" + inGame);
+                        ArenaResetter arenaResetter = plugin.getArenaManager().getArenaResetter();
+                        if(!arenaResetter.getArenas().isEmpty()) {
+                            lines.add(" ");
+
+                            Arena currentArena = arenaResetter.getArenas().peek();
+                            lines.add("&6Arena Resetter:");
+                            lines.add(" &7● &6Arena: &f" + currentArena.getName());
+                            lines.add(" &7● &6Blocks Remaining: &f" + (currentArena.getModifiedBlocks().size() + currentArena.getPlacedBlocks().size()));
+                            lines.add(" &7● &6Arenas Left: &f" + arenaResetter.getArenas().size());
+                        }
+                    }
                     break;
                 case LOBBY_QUEUE:
                     GameQueue queue = gameQueueManager.getQueue(player);
@@ -154,14 +164,47 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&f&oIn Development.");
             }
 
-            if(profile.getArenaCopyTask() != null) {
-                ArenaCopyTask act = profile.getArenaCopyTask();
+            if(profile.getArenaCopier() != null) {
+                ArenaCopier act = profile.getArenaCopier();
                 lines.add(" ");
-                lines.add("&6Copying Arena: &f" + act.getArena().getName());
-                lines.add("&6Copy: &f" + act.getNewArena().getName());
-                lines.add("&6Difference: &fX" + act.getXDifference() + " Z" + act.getZDifference());
-                lines.add("&6Blocks Left: &f" + act.getBlocks().size());
-                lines.add("&6Duration: &f" + TimeUtil.get(act.getStarted()));
+                lines.add("&6&lArenaCopyTask");
+                lines.add(" &7● &6Source: &f" + act.getArena().getName());
+                lines.add(" &7● &6Copy: &f" + act.getNewArena().getName());
+                lines.add(" &7● &6Difference: &fX" + act.getXDifference() + " Z" + act.getZDifference());
+                lines.add(" &7● &6Blocks Left: &f" + act.getBlocks().size());
+                lines.add(" &7● &6Duration: &f" + TimeUtil.get(act.getStarted()));
+            }
+
+            if(staff) {
+                ArenaBlockUpdater abu = plugin.getArenaManager().getArenaBlockUpdater();
+                if(abu != null && abu.getEnded() == 0) {
+                    lines.add(" ");
+                    lines.add("&6&lArenaBlockUpdater");
+                    lines.add(" &7● &6Source: &f" + abu.getArena().getName());
+                    lines.add(" &7● &6Blocks Left: &f" + abu.getBlocks().size());
+                    lines.add(" &7● &6Duration: &f" + TimeUtil.get(abu.getStarted()));
+                }
+
+                ArenaCopyQueue acu = plugin.getArenaManager().getArenaCopyQueue();
+                if(!acu.getCopyQueue().isEmpty()) {
+                    Queue<ArenaCopier> copierQueue = acu.getCopyQueue();
+                    ArenaCopier ac = copierQueue.peek();
+                    lines.add(" ");
+                    lines.add("&6&lArenaCopyQueue &7(" + copierQueue.size() + ")");
+                    lines.add(" &7● &6Source: &f" + ac.getArena().getName());
+                    lines.add(" &7● &6Current: &f" + ac.getNewArena().getName());
+                    lines.add(" &7● &6Blocks Left: &f" + ac.getBlocks().size());
+                    lines.add(" &7● &6Duration: &f" + TimeUtil.get(ac.getStarted()));
+                }
+
+                ArenaDeleter ad = plugin.getArenaManager().getArenaDeleter();
+                if(ad != null && ad.getEnded() == 0) {
+                    lines.add(" ");
+                    lines.add("&6&lArenaDeleter");
+                    lines.add(" &7● &6Source: &f" + ad.getArena().getName());
+                    lines.add(" &7● &6Blocks Left: &f" + ad.getBlocks().size());
+                    lines.add(" &7● &6Duration: &f" + TimeUtil.get(ad.getStarted()));
+                }
             }
 
             lines.add(" ");

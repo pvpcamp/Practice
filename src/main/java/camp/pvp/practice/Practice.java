@@ -7,6 +7,7 @@ import camp.pvp.practice.cooldowns.CooldownRunnable;
 import camp.pvp.practice.games.GameManager;
 import camp.pvp.practice.kits.EnergyRunnable;
 import camp.pvp.practice.listeners.bukkit.block.BlockBreakListener;
+import camp.pvp.practice.listeners.bukkit.block.BlockBurnListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockFromToListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockPlaceListener;
 import camp.pvp.practice.listeners.bukkit.entity.*;
@@ -27,10 +28,8 @@ import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.commands.*;
 import camp.pvp.practice.listeners.bukkit.player.*;
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
 import com.lunarclient.bukkitapi.LunarClientAPI;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
@@ -154,17 +153,19 @@ public class Practice extends JavaPlugin {
 
         CommandHandler commandHandler = NetworkHelper.getInstance().getCommandHandler();
         commandHandler.registerCommand(new EloManagerCommand(this));
-        commandHandler.registerCommand(new LootChestCommand(this));
     }
 
     public void registerListeners() {
         // Bukkit
         new BlockBreakListener(this);
+        new BlockBurnListener(this);
         new BlockFromToListener(this);
         new BlockPlaceListener(this);
 
+        new EntityChangeBlockListener(this);
         new EntityDamageByEntityListener(this);
         new EntityDamageListener(this);
+        new EntityExplodeListener(this);
         new EntityRegainHealthListener(this);
         new EntitySpawnListener(this);
 

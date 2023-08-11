@@ -1,12 +1,15 @@
 package camp.pvp.practice.loot;
 
 import camp.pvp.practice.arenas.Arena;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 
 import java.util.*;
 
@@ -14,7 +17,7 @@ public enum LootChest {
     SKYWARS_NORMAL, SKYWARS_MIDDLE;
 
     public static List<LootChest> getForArenaType(Arena.Type type) {
-        switch(type) {
+        switch (type) {
             case DUEL_SKYWARS:
                 return Arrays.asList(SKYWARS_MIDDLE, SKYWARS_NORMAL);
             default:
@@ -22,99 +25,52 @@ public enum LootChest {
         }
     }
 
-    public int getMaxItems() {
-        switch(this) {
-            case SKYWARS_NORMAL:
-                return 8;
-            case SKYWARS_MIDDLE:
-                return 5;
-            default:
-                return 0;
-        }
-    }
+    public static void generateLoot(Arena arena) {
+        for (LootChest lc : getForArenaType(arena.getType())) {
+            Random random = new Random();
+            for (Location location : arena.getChests()) {
 
-    public int getMinItems() {
-        switch(this) {
-            case SKYWARS_NORMAL:
-                return 4;
-            case SKYWARS_MIDDLE:
-                return 3;
-            default:
-                return 0;
-        }
-    }
+                Block block = location.getBlock();
 
-    public String getChestName() {
-        switch(this) {
-            case SKYWARS_MIDDLE:
-                return "Middle Chest";
-            case SKYWARS_NORMAL:
-                return "Island Chest";
-            default:
-                return "Chest";
-        }
-    }
+                boolean valid = lc.isTrappedChest() ? block.getType().equals(Material.TRAPPED_CHEST) : block.getType().equals(Material.CHEST);
 
-    public void generateLoot(List<Chest> chests) {
-        Random random = new Random();
-        for(Chest chest : chests) {
-            Inventory inventory = chest.getBlockInventory();
-            if (inventory.getName() != null && inventory.getName().equals(this.getChestName())) {
+                if (valid) {
+                    block.getState().update(true, false);
+                    BlockState blockState = block.getState();
+                    if (blockState instanceof Chest) {
+                        Chest chest = (Chest) blockState;
 
-                inventory.clear();
+                        Inventory inventory = chest.getBlockInventory();
+                        inventory.clear();
 
-                int low = getMinItems();
-                int high = getMaxItems();
-                int itemCount = random.nextInt(high - low) + low;
+                        List<ItemStack> originalItems = LootCategory.getRandomItems(lc);
 
-                List<ItemStack> originalItems = LootCategory.getRandomItems(this);
+                        Queue<ItemStack> items = new LinkedList<>(originalItems);
 
-                Queue<ItemStack> items = new LinkedList<>(originalItems);
+                        List<Integer> usedSlots = new ArrayList<>();
+                        while (!items.isEmpty()) {
+                            int slot = random.nextInt(27);
+                            if (usedSlots.contains(slot)) {
+                                while (usedSlots.contains(slot)) {
+                                    slot = random.nextInt(27);
+                                }
+                            }
 
-                List<Integer> usedSlots = new ArrayList<>();
-                for (int i = 0; i < itemCount; i++) {
-                    int slot = random.nextInt(27);
-                    if (usedSlots.contains(slot)) {
-                        while (usedSlots.contains(slot)) {
-                            slot = random.nextInt(27);
+                            usedSlots.add(slot);
+                            inventory.setItem(slot, items.poll());
                         }
                     }
-
-                    usedSlots.add(slot);
-
-                    if(!items.isEmpty()) {
-                        inventory.setItem(slot, items.poll());
-                    } else {
-                        break;
-                    }
                 }
             }
         }
     }
 
-    public void generateLoot(Location corner1, Location corner2) {
-        List<Chest> chests = new ArrayList<>();
-
-        int minX, minY, minZ, maxX, maxY, maxZ;
-        minX = Math.min(corner1.getBlockX(), corner2.getBlockX());
-        minY = Math.min(corner1.getBlockY(), corner2.getBlockY());
-        minZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
-        maxX = Math.max(corner1.getBlockX(), corner2.getBlockX());
-        maxY = Math.max(corner1.getBlockY(), corner2.getBlockY());
-        maxZ = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
-
-        for (int x = minX; x < maxX; x++) {
-            for (int y = minY; y < maxY; y++) {
-                for (int z = minZ; z < maxZ; z++) {
-                    Location location = new Location(corner1.getWorld(), x, y, z);
-                    Block block = location.getBlock();
-                    if(!block.isEmpty() && block instanceof Chest) {
-                        chests.add((Chest) block);
-                    }
-                }
-            }
+    public boolean isTrappedChest() {
+        switch(this) {
+            case SKYWARS_MIDDLE:
+                return true;
+            default:
+                return false;
         }
-
-        generateLoot(chests);
     }
 }
