@@ -67,7 +67,7 @@ public class Arena implements Comparable<Arena>{
     private String parent;
     private int xDifference, zDifference;
 
-    private @Getter List<Location> beds, chests;
+    private @Getter List<Location> beds, blocks, chests;
     private @Getter List<ModifiedBlock> placedBlocks, modifiedBlocks;
     private @Getter BukkitTask replaceTask;
 
@@ -78,6 +78,7 @@ public class Arena implements Comparable<Arena>{
         this.positions = new HashMap<>();
 
         this.beds = new ArrayList<>();
+        this.blocks = new ArrayList<>();
         this.chests = new ArrayList<>();
         this.placedBlocks = new ArrayList<>();
         this.modifiedBlocks = new ArrayList<>();
@@ -142,32 +143,48 @@ public class Arena implements Comparable<Arena>{
         }
     }
 
-    public void addPlacedBlock(ModifiedBlock modifiedBlock) {
-        boolean add = true;
-        for(ModifiedBlock b : placedBlocks) {
-            if(modifiedBlock.getLocation().equals(b.getLocation())) {
-                add = false;
-                break;
+    public void addBlock(Block block) {
+        Location location = block.getLocation();
+        ModifiedBlock modifiedBlock = null;
+        if(isOriginalBlock(location)) {
+            for(ModifiedBlock mb : getModifiedBlocks()) {
+                if(mb.getLocation().equals(location)) {
+                    modifiedBlock = mb;
+                    break;
+                }
+            }
+
+            if(modifiedBlock == null) {
+                getModifiedBlocks().add(new ModifiedBlock(block));
             }
         }
 
-        if(add) {
-            placedBlocks.add(modifiedBlock);
+        if(isPlacedBlock(location)) {
+            for(ModifiedBlock mb : getPlacedBlocks()) {
+                if(mb.getLocation().equals(location)) {
+                    modifiedBlock = mb;
+                    break;
+                }
+            }
+
+            if(modifiedBlock == null) {
+                getPlacedBlocks().add(new ModifiedBlock(location));
+            }
         }
     }
 
-    public void addModifiedBlock(ModifiedBlock modifiedBlock) {
-        boolean add = true;
-        for(ModifiedBlock b : modifiedBlocks) {
-            if(modifiedBlock.getLocation().equals(b.getLocation())) {
-                add = false;
-                break;
+    public boolean isPlacedBlock(Location location) {
+        for(ModifiedBlock mb : getPlacedBlocks()) {
+            if(mb.getLocation().equals(location)) {
+                return true;
             }
         }
 
-        if(add) {
-            placedBlocks.add(modifiedBlock);
-        }
+        return false;
+    }
+
+    public boolean isOriginalBlock(Location location) {
+        return blocks.contains(location);
     }
 
     @Override

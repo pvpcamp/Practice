@@ -127,6 +127,8 @@ public class ArenaManager {
                                         case CHEST:
                                         case TRAPPED_CHEST:
                                             arena.getChests().add(block.getLocation());
+                                        default:
+                                            arena.getBlocks().add(location);
                                     }
                                 }
                             }

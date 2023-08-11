@@ -5,6 +5,7 @@ import camp.pvp.practice.arenas.ModifiedBlock;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
@@ -28,6 +29,7 @@ public class BlockBreakListener implements Listener {
         Player player = event.getPlayer();
         GameProfile gameProfile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         Block block = event.getBlock();
+        Location location = block.getLocation();
         Game game = gameProfile.getGame();
 
         if(gameProfile.isBuildMode()) {
@@ -36,45 +38,16 @@ public class BlockBreakListener implements Listener {
 
         if(game != null && game.isBuild() && game.getState().equals(Game.State.ACTIVE)) {
             if(game.getCurrentPlayersPlaying().contains(player)) {
-                if(game.isInBorder(block.getLocation())) {
+                if(game.isInBorder(location)) {
                     Arena arena = game.getArena();
                     if(arena.getType().canModifyArena()) {
-
-                        ModifiedBlock modifiedBlock = null;
-                        for(ModifiedBlock mb : game.getArena().getModifiedBlocks()) {
-                            if(mb.getLocation().equals(block.getLocation())) {
-                                modifiedBlock = mb;
-                            }
-                        }
-
-                        if(modifiedBlock == null) {
-                            boolean add = true;
-                            for(ModifiedBlock mb : arena.getPlacedBlocks()) {
-                                if(mb.getLocation().equals(block.getLocation())) {
-                                    add = false;
-                                    break;
-                                }
-                            }
-
-                            if(add) {
-                                modifiedBlock = new ModifiedBlock(block);
-                                game.getArena().getModifiedBlocks().add(modifiedBlock);
-                            }
-                        }
+                        arena.addBlock(block);
                     } else {
-
-                        boolean b = false;
-                        for(ModifiedBlock mb : arena.getPlacedBlocks()) {
-                            if(mb.getLocation().equals(block.getLocation())) {
-                                b = true;
-                                break;
-                            }
+                        if(arena.isOriginalBlock(location)) {
+                            return;
+                        } else {
+                            arena.addBlock(block);
                         }
-
-                        if(!b) {
-                            event.setCancelled(true);
-                        }
-                        return;
                     }
 
                     for (ItemStack item : block.getDrops()) {
