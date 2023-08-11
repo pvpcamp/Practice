@@ -3,18 +3,16 @@ package camp.pvp.practice.games.impl.teams;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
-import camp.pvp.practice.games.GameInventory;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.GameTeam;
-import camp.pvp.practice.games.impl.teams.TeamDuel;
 import camp.pvp.practice.games.tasks.StartingTask;
+import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.Party;
-import camp.pvp.practice.parties.PartyMember;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
-import org.apache.commons.lang.time.DateUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -125,6 +123,7 @@ public class HCFTeams extends TeamDuel {
 
         startLcTeammateUpdater();
 
+        Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
         this.startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
     }
 

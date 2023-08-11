@@ -31,7 +31,7 @@ public class ArenaManager {
 
         this.arenaConfig = new ArenaConfig(plugin, this);
         this.arenaResetter = new ArenaResetter(this);
-        Bukkit.getScheduler().runTaskTimer(plugin, arenaResetter, 0, 5);
+        Bukkit.getScheduler().runTaskTimer(plugin, arenaResetter, 0, 10);
 
         this.arenaCopyQueue = new ArenaCopyQueue(plugin);
         Bukkit.getScheduler().runTaskTimer(plugin, arenaCopyQueue, 0, 4);
@@ -104,6 +104,7 @@ public class ArenaManager {
 
                     arena.getBeds().clear();
                     arena.getChests().clear();
+                    arena.getBlocks().clear();
 
                     int minX, minY, minZ, maxX, maxY, maxZ;
                     Location c1 = corner1.getLocation(), c2 = corner2.getLocation();

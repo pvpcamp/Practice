@@ -96,6 +96,16 @@ public class GameQueueManager {
         return null;
     }
 
+    public GameQueue getQueue(DuelKit kit, GameQueue.Type queueType) {
+        for(GameQueue q : getGameQueues()) {
+            if(q.getDuelKit().equals(kit) && q.getType().equals(queueType)) {
+                return q;
+            }
+        }
+
+        return null;
+    }
+
     public int getTotalInQueue() {
         int i = 0;
         for(GameQueue q : gameQueues) {

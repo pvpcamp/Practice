@@ -1,15 +1,17 @@
 package camp.pvp.practice.games.tasks;
 
+import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
+import camp.pvp.practice.profiles.GameProfile;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public class TeleportFixTask implements Runnable{
+public class TeleportFix implements Runnable{
 
     private Game game;
-    public TeleportFixTask(Game game) {
+    public TeleportFix(Game game) {
         this.game = game;
     }
 
@@ -17,6 +19,7 @@ public class TeleportFixTask implements Runnable{
     public void run() {
         if(game.getState().equals(Game.State.STARTING)) {
             for(Player player : game.getCurrentPlayersPlaying()) {
+
                 Location location = player.getLocation();
                 Block block = location.getBlock();
                 if(location.getBlock() != null) {

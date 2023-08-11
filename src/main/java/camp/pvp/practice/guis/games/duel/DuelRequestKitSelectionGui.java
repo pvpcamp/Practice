@@ -9,9 +9,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class DuelRequestKitSelectionGui extends StandardGui {
     public DuelRequestKitSelectionGui(Practice plugin, DuelRequest duelRequest) {
-        super("Duel " + duelRequest.getOpponent().getName(), 9);
+        super("Duel " + duelRequest.getOpponent().getName(), 36);
 
-        int x = 0;
         for(DuelKit duelKit : DuelKit.values()) {
             if (duelKit.isQueueable()) {
                 ItemStack item = duelKit.getIcon();
@@ -19,7 +18,7 @@ public class DuelRequestKitSelectionGui extends StandardGui {
 
                 button.setCloseOnClick(true);
                 button.setLore(
-                        "&7Click to duel &6" + duelRequest.getOpponent().getName() + "&7!"
+                        "&7Click to duel &6" + duelRequest.getOpponent().getName() + "&7."
                 );
 
                 button.setAction((pl, igui) -> {
@@ -31,9 +30,8 @@ public class DuelRequestKitSelectionGui extends StandardGui {
                     }
                 });
 
-                button.setSlot(x);
+                button.setSlot(duelKit.getGuiSlot());
                 this.addButton(button, false);
-                x++;
             }
         }
     }

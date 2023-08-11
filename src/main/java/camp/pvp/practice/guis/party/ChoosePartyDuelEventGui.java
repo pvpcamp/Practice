@@ -27,9 +27,8 @@ public class ChoosePartyDuelEventGui extends StandardGui {
         teamFight.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
-                StandardGui kitGui = new StandardGui("&6&lChoose a Kit", 9);
+                StandardGui kitGui = new StandardGui("&6&lChoose a Kit", 36);
 
-                int x = 0;
                 for(DuelKit kit : DuelKit.values()) {
                     if(kit.isQueueable() && kit.isTeams()) {
                         GuiButton kitButton = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
@@ -49,9 +48,8 @@ public class ChoosePartyDuelEventGui extends StandardGui {
                             }
                         });
 
-                        kitButton.setSlot(x);
+                        kitButton.setSlot(kit.getGuiSlot());
                         kitGui.addButton(kitButton, false);
-                        x++;
                     }
                 }
 

@@ -29,7 +29,7 @@ public class GameProfileManager {
     private @Getter MongoManager mongoManager;
     private @Getter String profilesCollection, eloCollection;
 
-    private BukkitTask leaderboardUpdaterTask;
+    private BukkitTask leaderboardUpdaterTask, playerVisibilityUpdaterTask;
     private @Getter LeaderboardUpdater leaderboardUpdater;
     public GameProfileManager(Practice plugin) {
         this.plugin = plugin;
@@ -44,6 +44,7 @@ public class GameProfileManager {
 
         this.leaderboardUpdater = new LeaderboardUpdater(this);
         this.leaderboardUpdaterTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, leaderboardUpdater, 0, 2400);
+        this.playerVisibilityUpdaterTask = Bukkit.getScheduler().runTaskTimer(plugin, new PlayerVisibilityUpdater(this), 0, 1);
 
         this.logger.info("Started GameProfileManager.");
     }

@@ -1,6 +1,9 @@
 package camp.pvp.practice.listeners.bukkit.entity;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.games.Game;
+import camp.pvp.practice.profiles.GameProfile;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -15,16 +18,15 @@ public class EntityRegainHealthListener implements Listener {
 
     @EventHandler
     public void onEntityRegainHealth(EntityRegainHealthEvent event) {
-        // TODO: Hardcore kits. (classic, builduhc, etc.)
-//        if(event.getEntity() instanceof Player) {
-//            Player player = (Player) event.getEntity();
-//            Profile profile = module.getProfileManager().get(player.getUniqueId());
-//            if(event.getRegainReason().equals(EntityRegainHealthEvent.RegainReason.SATIATED) && profile.getOccupation() != null) {
-//                Occupation occupation = profile.getOccupation();
-//                if(occupation.getKit() != null && !occupation.getKit().isRegen()) {
-//                    event.setCancelled(true);
-//                }
-//            }
-//        }
+        if(event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+            if(event.getRegainReason().equals(EntityRegainHealthEvent.RegainReason.SATIATED) && profile.getGame() != null) {
+                Game game = profile.getGame();
+                if(game.getKit() != null && !game.getKit().isRegen()) {
+                    event.setCancelled(true);
+                }
+            }
+        }
     }
 }

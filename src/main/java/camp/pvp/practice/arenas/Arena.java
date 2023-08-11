@@ -4,7 +4,9 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.loot.LootChest;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.material.Bed;
 import org.bukkit.scheduler.BukkitTask;
@@ -15,12 +17,13 @@ import java.util.*;
 public class Arena implements Comparable<Arena>{
 
     public enum Type {
-        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_SPLEEF, EVENT_OITC;
+        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_OITC;
 
         public List<String> getValidPositions() {
             switch(this) {
                 case DUEL_BUILD:
                 case DUEL_SKYWARS:
+                case SPLEEF:
                     return Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
                 case EVENT_SUMO:
                     return Arrays.asList("spawn1", "spawn2", "lobby");
@@ -43,9 +46,19 @@ public class Arena implements Comparable<Arena>{
         public boolean canModifyArena() {
             switch(this) {
                 case DUEL_SKYWARS:
+                case SPLEEF:
                     return true;
                 default:
                     return false;
+            }
+        }
+
+        public List<Material> getSpecificBlocks() {
+            switch(this) {
+                case SPLEEF:
+                    return Collections.singletonList(Material.SNOW_BLOCK);
+                default:
+                    return null;
             }
         }
 
@@ -53,6 +66,7 @@ public class Arena implements Comparable<Arena>{
             switch(this) {
                 case DUEL_SKYWARS:
                 case DUEL_BUILD:
+                case SPLEEF:
                     return true;
                 default:
                     return false;
@@ -157,20 +171,13 @@ public class Arena implements Comparable<Arena>{
             if(modifiedBlock == null) {
                 getModifiedBlocks().add(new ModifiedBlock(block));
             }
+        } else {
+            getPlacedBlocks().add(new ModifiedBlock(location));
         }
+    }
 
-        if(isPlacedBlock(location)) {
-            for(ModifiedBlock mb : getPlacedBlocks()) {
-                if(mb.getLocation().equals(location)) {
-                    modifiedBlock = mb;
-                    break;
-                }
-            }
-
-            if(modifiedBlock == null) {
-                getPlacedBlocks().add(new ModifiedBlock(location));
-            }
-        }
+    public boolean isValidBlock(Location location) {
+        return getBlocks().contains(location);
     }
 
     public boolean isPlacedBlock(Location location) {

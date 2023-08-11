@@ -37,28 +37,12 @@ public class BlockPlaceListener implements Listener {
 
                 if(block.getType().equals(Material.TNT)) {
                     TNTPrimed tntPrimed = (TNTPrimed) block.getWorld().spawnEntity(block.getLocation(), EntityType.PRIMED_TNT);
-                    tntPrimed.setFuseTicks(20);
+                    tntPrimed.setFuseTicks(40);
 
                     block.setType(Material.AIR);
                     game.addEntity(tntPrimed);
                 } else {
-                    if(event.getBlockReplacedState().getType().equals(Material.AIR)) {
-                        arena.addPlacedBlock(new ModifiedBlock(event.getBlockReplacedState(), block.getLocation()));
-                    } else {
-                        boolean placed = true;
-                        for(ModifiedBlock mb : arena.getModifiedBlocks()) {
-                            if(mb.getLocation().equals(block.getLocation())) {
-                                placed = false;
-                                break;
-                            }
-                        }
-
-                        if(placed) {
-                            arena.addPlacedBlock(new ModifiedBlock(block.getLocation()));
-                        } else {
-                            arena.addModifiedBlock(new ModifiedBlock(event.getBlockReplacedState(), block.getLocation()));
-                        }
-                    }
+                    arena.addBlock(block);
                 }
             }
         } else {

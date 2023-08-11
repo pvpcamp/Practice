@@ -2,15 +2,14 @@ package camp.pvp.practice.games.impl;
 
 import camp.pvp.practice.games.tasks.EndingTask;
 import camp.pvp.practice.games.tasks.StartingTask;
+import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
-import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.PostGameInventory;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.utils.Colors;
@@ -23,9 +22,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -183,6 +180,7 @@ public class FreeForAll extends Game {
 
             getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
+            Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
             this.startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
 
         } else {

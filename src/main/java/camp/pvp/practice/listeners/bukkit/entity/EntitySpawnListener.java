@@ -31,7 +31,7 @@ public class EntitySpawnListener implements Listener {
                     public void run() {
                         item.remove();
                     }
-                }.runTaskLater(plugin, 500L);
+                }.runTaskLater(plugin, 1200L);
             }, 1);
         }
     }

@@ -79,7 +79,7 @@ public class CustomDuelKit {
         PlayerInventory pi = player.getInventory();
         GameInventory gi = duelKit.getGameInventory();
 
-        PlayerUtils.reset(player);
+        PlayerUtils.reset(player, false);
 
         for(PotionEffect effect : gi.getPotionEffects()) {
             player.addPotionEffect(effect);

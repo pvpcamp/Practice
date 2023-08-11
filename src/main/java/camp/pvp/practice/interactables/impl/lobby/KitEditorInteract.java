@@ -12,14 +12,13 @@ import org.bukkit.entity.Player;
 public class KitEditorInteract implements ItemInteract {
     @Override
     public void onInteract(Player player, GameProfile gameProfile) {
-        StandardGui gui = new StandardGui("Edit a Kit", 9);
+        StandardGui gui = new StandardGui("Edit a Kit", 36);
 
-        int x = 0;
         for(DuelKit kit : DuelKit.values()) {
+            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
+            button.setSlot(kit.getGuiSlot());
             if(kit.isEditable()) {
-                GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                 button.setLore("&7Click to edit &f" + kit.getDisplayName() + "&7.");
-                button.setSlot(x);
 
                 button.setAction(new GuiAction() {
                     @Override
@@ -32,8 +31,12 @@ public class KitEditorInteract implements ItemInteract {
                 });
 
                 gui.addButton(button, false);
-                x++;
+            } else {
+                button.updateName("&7&o" + kit.getDisplayName());
+                button.setLore("&cYou cannot edit this kit.");
             }
+
+            gui.addButton(button, false);
         }
 
         gui.open(player);

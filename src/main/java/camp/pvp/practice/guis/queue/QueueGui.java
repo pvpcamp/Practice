@@ -9,7 +9,6 @@ import camp.pvp.utils.buttons.AbstractButtonUpdater;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.StandardGui;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +22,15 @@ public class QueueGui extends StandardGui {
 
         this.setDefaultBackground();
 
-        for(GameQueue queue : gqm.getGameQueues()) {
-            if(queue.getType().equals(queueType)) {
-                DuelKit kit = queue.getDuelKit();
-                GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
+        for(DuelKit kit : DuelKit.values()) {
+            GameQueue queue = gqm.getQueue(kit, queueType);
+            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
+            if(queue != null) {
+
+                if(kit.isNew()) {
+                    button.updateName("&6" + kit.getDisplayName() + " &e&l(NEW)");
+                }
+
                 button.setButtonUpdater(new AbstractButtonUpdater() {
                     @Override
                     public void update(GuiButton guiButton, Gui gui) {
@@ -38,7 +42,7 @@ public class QueueGui extends StandardGui {
                         lines.add("&6In Queue: &f" + queue.getQueueMembers().size());
                         lines.add(" ");
 
-                        if(queueType.equals(GameQueue.Type.RANKED)) {
+                        if (queueType.equals(GameQueue.Type.RANKED)) {
                             lines.add("&6Your ELO: &f" + profile.getProfileElo().getRatings().get(kit));
                             lines.add(" ");
                         }
@@ -56,14 +60,14 @@ public class QueueGui extends StandardGui {
                     gqm.addToQueue(p, queue);
                 });
                 button.setCloseOnClick(true);
-
-                if(queueType.equals(GameQueue.Type.RANKED)) {
-                    button.setSlot(kit.getRankedSlot());
-                } else {
-                    button.setSlot(kit.getUnrankedSlot());
-                }
-                this.addButton(button, false);
+            } else {
+                button.updateName("&7&o" + kit.getDisplayName());
+                button.setLore("&cThis queue is unavailable.");
             }
+
+            button.setSlot(kit.getGuiSlot());
+
+            this.addButton(button, false);
         }
     }
 }

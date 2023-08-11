@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class LeaderboardsGui extends StandardGui {
     public LeaderboardsGui() {
-        super("&6&lELO Leaderboards", 27);
+        super("&6&lELO Leaderboards", 36);
 
         this.setDefaultBackground();
 
@@ -31,13 +31,13 @@ public class LeaderboardsGui extends StandardGui {
                             sb.append(" &6&l● #1: &r&6");
                             break;
                         case 1:
-                            sb.append(" &a&l● #2: &r&a");
+                            sb.append(" &a● #2: &r&a");
                             break;
                         case 2:
-                            sb.append(" &e&l● #3: &r&e");
+                            sb.append(" &e● #3: &r&e");
                             break;
                         default:
-                            sb.append(" &e● #" + (i + 1) + ": ");
+                            sb.append(" &7● #" + (i + 1) + ": ");
                             break;
                     }
 
@@ -46,8 +46,13 @@ public class LeaderboardsGui extends StandardGui {
                 }
 
                 GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
-                button.setSlot(kit.getRankedSlot());
+                button.setSlot(kit.getGuiSlot());
                 button.setLore(lines);
+                this.addButton(button, false);
+            } else {
+                GuiButton button = new GuiButton(kit.getIcon(), "&7&o" + kit.getDisplayName());
+                button.setSlot(kit.getGuiSlot());
+                button.setLore("&cThis kit is not part of ranked matchmaking.");
                 this.addButton(button, false);
             }
         }

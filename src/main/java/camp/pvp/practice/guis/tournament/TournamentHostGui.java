@@ -10,12 +10,11 @@ import org.bukkit.entity.Player;
 
 public class TournamentHostGui extends StandardGui{
     public TournamentHostGui(Practice plugin) {
-        super("Host a Tournament", 9);
+        super("Host a Tournament", 36);
 
-        int slot = 0;
         for(DuelKit kit : DuelKit.values()) {
+            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
             if(kit.isTournament()) {
-                GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                 button.setLore(
                         "&7Next, select a team size for ",
                         "&7the &f" + kit.getDisplayName() + " &7tournament."
@@ -28,12 +27,13 @@ public class TournamentHostGui extends StandardGui{
                         teamSizeGUI.open(player);
                     }
                 });
-
-                button.setSlot(slot);
-                this.addButton(button, false);
-
-                slot++;
+            } else {
+                button.updateName("&7&o" + kit.getDisplayName());
+                button.setLore("&cYou cannot host a tournament with this kit.");
             }
+
+            button.setSlot(kit.getGuiSlot());
+            this.addButton(button, false);
         }
     }
 }

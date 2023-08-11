@@ -266,7 +266,7 @@ public class SumoEvent extends GameEvent {
         GameParticipant participant = super.join(player);
 
         player.teleport(getArena().getPositions().get("lobby").getLocation());
-        PlayerUtils.reset(player);
+        PlayerUtils.reset(player, true);
 
         this.announce("&6[Event] &f" + player.getName() + "&a joined the event.");
 

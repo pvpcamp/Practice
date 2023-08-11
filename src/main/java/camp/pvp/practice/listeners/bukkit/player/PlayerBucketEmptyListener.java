@@ -41,26 +41,23 @@ public class PlayerBucketEmptyListener implements Listener {
         player.updateInventory();
 
         if(game != null && game.isBuild()) {
-            if(game.isInBorder(block.getLocation())) {
-
-                BlockState bs = event.getBlockClicked().getState();
-
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
-                    for (BlockFace blockFace : blockFaces) {
-                        Block b = block.getRelative(blockFace, 1);
-                        if (b.isLiquid()) {
-                            game.getArena().addPlacedBlock(new ModifiedBlock(b.getLocation()));
-                        } else {
-                            game.getArena().getModifiedBlocks().add(new ModifiedBlock(b, block.getLocation()));
-                        }
-                    }
-                }, 1);
-            } else {
-                event.setCancelled(true);
+            if(game.getCurrentPlayersPlaying().contains(player)) {
+                BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
+                for (BlockFace blockFace : blockFaces) {
+                    Block b = block.getRelative(blockFace, 1);
+                    game.getArena().addBlock(b);
+                }
+//
+//                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+//                    BlockFace[] blockFaces = {BlockFace.SELF, BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
+//                    for (BlockFace blockFace : blockFaces) {
+//                        Block b = block.getRelative(blockFace, 1);
+//                        game.getArena().addBlock(b);
+//                    }
+//                }, 1);
+                return;
             }
-        } else {
-            event.setCancelled(true);
         }
+        event.setCancelled(true);
     }
 }

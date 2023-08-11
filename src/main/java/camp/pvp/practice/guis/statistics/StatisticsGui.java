@@ -10,7 +10,7 @@ import java.util.List;
 
 public class StatisticsGui extends StandardGui {
     public StatisticsGui(ProfileELO profileELO) {
-        super("&6&l" + profileELO.getName() + " Statistics", 27);
+        super("&6&l" + profileELO.getName() + " Statistics", 36);
 
         this.setDefaultBackground();
 
@@ -20,8 +20,13 @@ public class StatisticsGui extends StandardGui {
                 lines.add("&6ELO: &f" + profileELO.getRatings().get(kit));
 
                 GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
-                button.setSlot(kit.getRankedSlot());
+                button.setSlot(kit.getGuiSlot());
                 button.setLore(lines);
+                this.addButton(button, false);
+            } else {
+                GuiButton button = new GuiButton(kit.getIcon(), "&7&o" + kit.getDisplayName());
+                button.setSlot(kit.getGuiSlot());
+                button.setLore("&cThis kit is not part of ranked matchmaking.");
                 this.addButton(button, false);
             }
         }

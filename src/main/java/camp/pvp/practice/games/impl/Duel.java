@@ -5,11 +5,9 @@ import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.PostGameInventory;
 import camp.pvp.practice.games.tasks.EndingTask;
 import camp.pvp.practice.games.tasks.StartingTask;
-import camp.pvp.practice.games.tasks.TeleportFixTask;
-import camp.pvp.practice.loot.LootChest;
+import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfileManager;
@@ -116,7 +114,7 @@ public class Duel extends Game {
 
             getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
-            new TeleportFixTask(this).run();
+            Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
             this.startingTimer = new StartingTask(this, 3).runTaskTimer(this.getPlugin(), 20, 20);
         } else {
             for(Player p : getAlivePlayers()) {

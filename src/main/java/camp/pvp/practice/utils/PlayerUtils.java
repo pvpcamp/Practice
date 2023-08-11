@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class PlayerUtils {
 
-    public static void reset(Player player) {
+    public static void reset(Player player, boolean allowFlight) {
         player.setFoodLevel(20);
         player.setMaxHealth(20);
         player.setHealth(20);
@@ -22,8 +22,6 @@ public class PlayerUtils {
         player.setExp(0);
         player.getInventory().clear();
         player.getInventory().setArmorContents(null);
-        player.setAllowFlight(false);
-        player.setFlying(false);
         player.setWalkSpeed(0.2F);
         player.setFlySpeed(0.1F);
         player.setFireTicks(0);
@@ -40,6 +38,9 @@ public class PlayerUtils {
         for(PotionEffect effect : player.getActivePotionEffects()){
             player.removePotionEffect(effect.getType());
         }
+
+        player.setAllowFlight(allowFlight);
+        player.setFlying(allowFlight);
     }
 
     public static void giveInteractableItems(Player player) {

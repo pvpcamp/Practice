@@ -192,7 +192,7 @@ public enum HCFKit {
         PlayerInventory pi = player.getInventory();
         GameInventory gi = this.getGameInventory();
 
-        PlayerUtils.reset(player);
+        PlayerUtils.reset(player, false);
 
         applyEffects(player);
 

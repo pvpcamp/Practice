@@ -40,10 +40,19 @@ public class BlockBreakListener implements Listener {
             if(game.getCurrentPlayersPlaying().contains(player)) {
                 if(game.isInBorder(location)) {
                     Arena arena = game.getArena();
-                    if(arena.getType().canModifyArena()) {
+                    Arena.Type type = arena.getType();
+                    if(type.canModifyArena()) {
+                        if(type.getSpecificBlocks() != null) {
+                            if(!type.getSpecificBlocks().contains(block.getType())) {
+                                event.setCancelled(true);
+                                return;
+                            }
+                        }
+
                         arena.addBlock(block);
                     } else {
                         if(arena.isOriginalBlock(location)) {
+                            event.setCancelled(true);
                             return;
                         } else {
                             arena.addBlock(block);

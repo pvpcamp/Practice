@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 public enum DuelKit {
-    NO_DEBUFF, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, BOXING, SUMO;
+    NO_DEBUFF, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, BOXING, SUMO;
 
     public String getDisplayName() {
         switch(this) {
@@ -38,6 +38,8 @@ public enum DuelKit {
                 return "Invaded";
             case SKYWARS:
                 return "Skywars";
+            case SPLEEF:
+                return "Spleef";
             case BOXING:
                 return "Boxing";
             case SUMO:
@@ -59,12 +61,14 @@ public enum DuelKit {
                 return Collections.singletonList(Arena.Type.DUEL_BUILD);
             case SKYWARS:
                 return Collections.singletonList(Arena.Type.DUEL_SKYWARS);
+            case SPLEEF:
+                return Collections.singletonList(Arena.Type.SPLEEF);
             default:
                 return Arrays.asList(Arena.Type.DUEL, Arena.Type.DUEL_FLAT);
         }
     }
 
-    public int getUnrankedSlot() {
+    public int getGuiSlot() {
         switch(this) {
             case NO_DEBUFF:
                 return 10;
@@ -84,41 +88,41 @@ public enum DuelKit {
                 return 19;
             case SKYWARS:
                 return 20;
+            case SPLEEF:
+                return 21;
         }
 
         return 0;
     }
 
-    public int getRankedSlot() {
+    public boolean isNew() {
         switch(this) {
-            case NO_DEBUFF:
-                return 10;
-            case CLASSIC:
-                return 11;
-            case SOUP:
-                return 12;
-            case INVADED:
-                return 13;
-            case BOXING:
-                return 15;
-            case SUMO:
-                return 16;
             case BUILD_UHC:
-                return 19;
             case SKYWARS:
-                return 20;
+            case SPLEEF:
+                return true;
+            default:
+                return false;
         }
-
-        return 0;
     }
 
     public boolean isBuild() {
         switch(this) {
             case BUILD_UHC:
             case SKYWARS:
+            case SPLEEF:
                 return true;
             default:
                 return false;
+        }
+    }
+
+    public boolean isRegen() {
+        switch(this) {
+            case BUILD_UHC:
+                return false;
+            default:
+                return true;
         }
     }
 
@@ -151,6 +155,7 @@ public enum DuelKit {
     public boolean isEditable() {
         switch(this) {
             case SUMO:
+            case SPLEEF:
                 return false;
             default:
                 return true;
@@ -177,6 +182,7 @@ public enum DuelKit {
             case BOXING:
             case SUMO:
             case INVADED:
+            case SPLEEF:
                 return false;
             default:
                 return true;
@@ -187,6 +193,7 @@ public enum DuelKit {
         switch(this) {
             case BOXING:
             case SUMO:
+            case SPLEEF:
                 return false;
             default:
                 return true;
@@ -197,6 +204,7 @@ public enum DuelKit {
         switch(this) {
             case SUMO:
             case SKYWARS:
+            case SPLEEF:
                 return false;
             default:
                 return true;
@@ -206,6 +214,7 @@ public enum DuelKit {
     public boolean isDieInWater() {
         switch(this) {
             case SUMO:
+            case SPLEEF:
                 return true;
             default:
                 return false;
@@ -257,6 +266,9 @@ public enum DuelKit {
                 break;
             case SKYWARS:
                 item = new ItemStack(Material.EYE_OF_ENDER);
+                break;
+            case SPLEEF:
+                item = new ItemStack(Material.SNOW_BALL);
                 break;
             case BOXING:
                 item = new ItemStack(Material.DIAMOND_CHESTPLATE);
@@ -501,6 +513,12 @@ public enum DuelKit {
 
                 inventory.getPotionEffects().add(new PotionEffect(PotionEffectType.SPEED, 99999, 1));
                 break;
+            case SPLEEF:
+                inv[0] = new ItemStack(Material.DIAMOND_SPADE);
+                inv[0].addEnchantment(Enchantment.DIG_SPEED, 5);
+                inv[0].addEnchantment(Enchantment.DURABILITY, 3);
+
+                break;
             default:
                 break;
 
@@ -513,7 +531,7 @@ public enum DuelKit {
         PlayerInventory pi = player.getInventory();
         GameInventory gi = this.getGameInventory();
 
-        PlayerUtils.reset(player);
+        PlayerUtils.reset(player, false);
 
         for(PotionEffect effect : gi.getPotionEffects()) {
             player.addPotionEffect(effect);

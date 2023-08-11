@@ -96,6 +96,7 @@ public class ArenaCopier implements Runnable {
                         chunk.load();
                     }
 
+                    newBlock.setType(block.getType());
                     newBlock.getState().setData(block.getState().getData());
                     newBlock.getState().setType(block.getState().getType());
                     newBlock.getState().update();

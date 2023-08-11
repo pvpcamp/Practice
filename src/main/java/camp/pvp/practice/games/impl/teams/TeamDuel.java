@@ -3,16 +3,14 @@ package camp.pvp.practice.games.impl.teams;
 import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.EndingTask;
 import camp.pvp.practice.games.tasks.StartingTask;
+import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.PostGameInventory;
-import camp.pvp.practice.games.impl.teams.TeamGame;
-import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
@@ -22,9 +20,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -237,6 +233,7 @@ public class TeamDuel extends TeamGame {
 
         startLcTeammateUpdater();
 
+        Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
         this.startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
     }
 

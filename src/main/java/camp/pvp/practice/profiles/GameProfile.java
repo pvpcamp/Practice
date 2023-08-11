@@ -78,6 +78,8 @@ public class GameProfile {
     private BukkitTask giveItemsTask;
     private ArenaCopier arenaCopier;
 
+    private Set<UUID> hiddenPlayers;
+
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
 
@@ -88,6 +90,8 @@ public class GameProfile {
         this.clicks = new ArrayList<>();
 
         this.customDuelKits = new HashMap<>();
+
+        this.hiddenPlayers = new HashSet<>();
 
         this.time = Time.DAY;
         this.lobbyVisibility = true;
@@ -148,18 +152,20 @@ public class GameProfile {
     public void givePlayerItems() {
         Player player = getPlayer();
         if(player != null) {
-            PlayerUtils.reset(player);
 
+            boolean flying = false;
             if (player.hasPermission("practice.lobby.fly")) {
                 switch(getState()) {
                     case LOBBY_QUEUE:
                     case LOBBY_PARTY:
                     case LOBBY_TOURNAMENT:
                     case LOBBY:
-                        player.setAllowFlight(true);
+                        flying = true;
                         break;
                 }
             }
+
+            PlayerUtils.reset(player, flying);
 
             PlayerInventory pi = player.getInventory();
             for(InteractableItems i : InteractableItems.getInteractableItems(this)) {
@@ -256,7 +262,6 @@ public class GameProfile {
                 }
             }
         }
-
     }
 
     public void updatePlayerVisibility() {
@@ -267,18 +272,18 @@ public class GameProfile {
                 if(game.seeEveryone()) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         if(game.getAllPlayers().contains(p)) {
-                            player.showPlayer(p);
+                            getHiddenPlayers().remove(p.getUniqueId());
                         } else {
-                            player.hidePlayer(p);
+                            getHiddenPlayers().add(p.getUniqueId());
                         }
                     }
                 } else {
                     if(game.getCurrentPlayersPlaying().contains(player)) {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             if(!game.getCurrentPlayersPlaying().contains(p)) {
-                                player.hidePlayer(p);
+                                getHiddenPlayers().add(p.getUniqueId());
                             } else {
-                                player.showPlayer(p);
+                                getHiddenPlayers().remove(p.getUniqueId());
                             }
                         }
                     } else {
@@ -287,27 +292,20 @@ public class GameProfile {
                             GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
                             boolean spectating = game.getSpectators().containsKey(p.getUniqueId());
                             boolean playing = game.getCurrentPlayersPlaying().contains(p);
-                            boolean hide = false;
                             if(playing) {
-
+                                getHiddenPlayers().remove(p.getUniqueId());
                             } else {
                                 if(spectating) {
                                     if (seeSpectators) {
                                         if (profile.isStaffMode() && !player.hasPermission("practice.staff")) {
-                                            hide = true;
+                                            getHiddenPlayers().add(p.getUniqueId());
                                         }
                                     } else {
-                                        hide = true;
+                                        getHiddenPlayers().add(p.getUniqueId());
                                     }
                                 } else {
-                                    hide = true;
+                                    getHiddenPlayers().add(p.getUniqueId());
                                 }
-                            }
-
-                            if(hide) {
-                                player.hidePlayer(p);
-                            } else {
-                                player.showPlayer(p);
                             }
                         }
                     }
@@ -316,12 +314,12 @@ public class GameProfile {
                 for(Player p : Bukkit.getOnlinePlayers()) {
                     GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
                     if((profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) || !this.isLobbyVisibility() || this.getState().equals(State.KIT_EDITOR)) {
-                        player.hidePlayer(p);
+                        getHiddenPlayers().add(p.getUniqueId());
                     } else {
                         if(profile.isStaffMode() && !player.hasPermission("practice.staff")) {
-                            player.hidePlayer(p);
+                            getHiddenPlayers().add(p.getUniqueId());
                         } else {
-                            player.showPlayer(p);
+                            getHiddenPlayers().remove(p.getUniqueId());
                         }
                     }
                 }
