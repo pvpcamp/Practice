@@ -92,7 +92,7 @@ public class ArenaManager {
     }
 
     public void scanBlocks() {
-        this.logger.info("Scanning arenas for important blocks.");
+        this.logger.info("Scanning arenas for all blocks.");
 
         int arenas = 0;
         for(Arena arena : getArenas()) {

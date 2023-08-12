@@ -52,6 +52,7 @@ public class ArenaBlockUpdater implements Runnable{
 
                         Location l = new Location(world, xDif + x, y, zDif + z);
                         Block b = l.getBlock();
+
                         if(!b.getType().equals(block.getType())) {
                             blocks.add(new ModifiedBlock(block, l));
                         }

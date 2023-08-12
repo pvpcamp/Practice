@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 
 import java.util.*;
 
@@ -97,9 +98,10 @@ public class ArenaCopier implements Runnable {
                     }
 
                     newBlock.setType(block.getType());
-                    newBlock.getState().setData(block.getState().getData());
-                    newBlock.getState().setType(block.getState().getType());
-                    newBlock.getState().update();
+
+                    BlockState state = newBlock.getState();
+                    state.setType(block.getState().getType());
+                    state.setData(block.getState().getData());
                 }
             } else {
                 ended = System.currentTimeMillis();

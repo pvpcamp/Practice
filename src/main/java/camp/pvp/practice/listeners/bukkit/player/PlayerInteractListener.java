@@ -1,5 +1,6 @@
 package camp.pvp.practice.listeners.bukkit.player;
 
+import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ModifiedBlock;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.GameParticipant;
@@ -62,7 +63,7 @@ public class PlayerInteractListener implements Listener {
             return;
         }
         if(event.getAction().equals(Action.PHYSICAL)){
-            Material mat = event.getClickedBlock().getType();
+            Material mat = block.getType();
             if(mat == Material.STONE_PLATE || mat == Material.WOOD_PLATE || mat == Material.IRON_PLATE || mat == Material.GOLD_PLATE) {
                 event.setCancelled(true);
                 event.setUseInteractedBlock(Event.Result.DENY);
@@ -126,54 +127,32 @@ public class PlayerInteractListener implements Listener {
                         }
                     }
 
-                    if(block != null) {
-                        BlockState state = block.getState();
-                        if (game.getState().equals(Game.State.ACTIVE)) {
-                            if(game.getArena().getType().canModifyArena()) {
-//                            ModifiedBlock modifiedBlock = null;
-//                            for(ModifiedBlock mb : game.getArena().getModifiedBlocks()) {
-//                                if(mb.getLocation().equals(block.getLocation())) {
-//                                    modifiedBlock = mb;
-//                                }
-//                            }
-//
-//                            if(modifiedBlock == null) {
-//                                modifiedBlock = new ModifiedBlock(block);
-//                                game.getArena().getModifiedBlocks().add(modifiedBlock);
-//                            }
-                            } else {
-                                if(state instanceof Chest) {
-                                    event.setCancelled(true);
+                    if(game.getKit().isIssueCooldowns()) {
+                        switch (player.getItemInHand().getType()) {
+                            case ENDER_PEARL:
+                                PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
+                                if (cooldown != null) {
+                                    if (!cooldown.isExpired()) {
+                                        player.sendMessage(cooldown.getBlockedMessage());
+                                        event.setCancelled(true);
+                                        player.updateInventory();
+                                    }
                                 }
-                            }
-
-                            if (state instanceof Lever) {
-                                event.setCancelled(true);
-                            } else if (state instanceof Button) {
-                                event.setCancelled(true);
-                            } else if (state instanceof PressurePlate) {
-                                event.setCancelled(true);
-                            } else if (state instanceof Furnace) {
-                                event.setCancelled(true);
-                            } else if (state instanceof Gate) {
-                                event.setCancelled(true);
-                            } else if (state instanceof TrapDoor) {
-                                event.setCancelled(true);
-                            }
+                                break;
                         }
                     }
 
-                    switch(player.getItemInHand().getType()) {
-                        case ENDER_PEARL:
-                            PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
-                            if (cooldown != null) {
-                                if (!cooldown.isExpired()) {
-                                    player.sendMessage(cooldown.getBlockedMessage());
-                                    event.setCancelled(true);
-                                    player.updateInventory();
+                    if(block != null) {
+                        if (game.getState().equals(Game.State.ACTIVE)) {
+                            if(game.getArena().getType().canModifyArena()) {
+                                if(isLogged(block) && game.getArena().getBlocks().contains(block.getLocation())) {
+                                    game.getArena().addBlock(block);
                                 }
                             }
-                            break;
+
+                            event.setCancelled(isCancelled(block, game.getArena()));
+                            return;
+                        }
                     }
                 } else {
                     event.setCancelled(true);
@@ -283,7 +262,49 @@ public class PlayerInteractListener implements Listener {
                 }
 
                 event.setCancelled(true);
+            } else {
+                event.setCancelled(true);
             }
         }
+    }
+
+    public boolean isCancelled(Block block, Arena arena) {
+
+        BlockState state = block.getState();
+
+        if(arena != null && arena.getType().canModifyArena()) {
+            return false;
+        } else {
+            if (state instanceof Chest) {
+                return true;
+            } else if (state instanceof Lever) {
+                return true;
+            } else if (state instanceof Button) {
+                return true;
+            } else if (state instanceof PressurePlate) {
+                return true;
+            } else if (state instanceof Furnace) {
+                return true;
+            } else if (state instanceof Gate) {
+                return true;
+            } else return state instanceof TrapDoor;
+        }
+    }
+
+    public boolean isLogged(Block block) {
+
+        BlockState state = block.getState();
+
+        if (state instanceof Lever) {
+            return true;
+        } else if (state instanceof Button) {
+            return true;
+        } else if (state instanceof PressurePlate) {
+            return true;
+        } else if (state instanceof Furnace) {
+            return true;
+        } else if (state instanceof Gate) {
+            return true;
+        } else return state instanceof TrapDoor;
     }
 }

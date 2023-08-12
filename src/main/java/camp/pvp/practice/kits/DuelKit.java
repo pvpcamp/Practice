@@ -4,6 +4,7 @@ import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.games.GameInventory;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -20,32 +21,18 @@ import java.util.Collections;
 import java.util.List;
 
 public enum DuelKit {
-    NO_DEBUFF, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, BOXING, SUMO;
+    NO_DEBUFF, CLASSIC, SOUP, HCF, INVADED, BOXING, SUMO, BUILD_UHC, SKYWARS, SPLEEF, STRATEGY;
 
     public String getDisplayName() {
         switch(this) {
-            case NO_DEBUFF:
-                return "No Debuff";
             case BUILD_UHC:
                 return "Build UHC";
             case HCF:
                 return "HCF";
-            case CLASSIC:
-                return "Classic";
-            case SOUP:
-                return "Soup";
-            case INVADED:
-                return "Invaded";
-            case SKYWARS:
-                return "Skywars";
-            case SPLEEF:
-                return "Spleef";
-            case BOXING:
-                return "Boxing";
-            case SUMO:
-                return "Sumo";
             default:
-                return null;
+                String name = this.name();
+                name = name.replace("_", " ");
+                return WordUtils.capitalizeFully(name);
         }
     }
 
@@ -58,6 +45,7 @@ public enum DuelKit {
             case BOXING:
                 return Collections.singletonList(Arena.Type.DUEL_FLAT);
             case BUILD_UHC:
+            case STRATEGY:
                 return Collections.singletonList(Arena.Type.DUEL_BUILD);
             case SKYWARS:
                 return Collections.singletonList(Arena.Type.DUEL_SKYWARS);
@@ -90,6 +78,8 @@ public enum DuelKit {
                 return 20;
             case SPLEEF:
                 return 21;
+            case STRATEGY:
+                return 22;
         }
 
         return 0;
@@ -100,6 +90,7 @@ public enum DuelKit {
             case BUILD_UHC:
             case SKYWARS:
             case SPLEEF:
+            case STRATEGY:
                 return true;
             default:
                 return false;
@@ -111,6 +102,7 @@ public enum DuelKit {
             case BUILD_UHC:
             case SKYWARS:
             case SPLEEF:
+            case STRATEGY:
                 return true;
             default:
                 return false;
@@ -240,6 +232,16 @@ public enum DuelKit {
         }
     }
 
+    public boolean isIssueCooldowns() {
+        switch(this){
+            case SKYWARS:
+            case STRATEGY:
+                return false;
+            default:
+                return true;
+        }
+    }
+
     public ItemStack getIcon() {
         ItemStack item = null;
         switch(this) {
@@ -274,6 +276,9 @@ public enum DuelKit {
                 break;
             case SUMO:
                 item = new ItemStack(Material.LEASH);
+                break;
+            case STRATEGY:
+                item = new ItemStack(Material.WEB);
                 break;
         }
 
@@ -516,6 +521,60 @@ public enum DuelKit {
                 inv[0] = new ItemStack(Material.DIAMOND_SPADE);
                 inv[0].addEnchantment(Enchantment.DIG_SPEED, 5);
                 inv[0].addEnchantment(Enchantment.DURABILITY, 3);
+
+                break;
+            case STRATEGY:
+                armor[3] = new ItemStack(Material.DIAMOND_HELMET);
+                armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
+                armor[3].addEnchantment(Enchantment.DURABILITY, 3);
+
+                armor[2] = new ItemStack(Material.DIAMOND_CHESTPLATE);
+                armor[2].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
+                armor[2].addEnchantment(Enchantment.DURABILITY, 3);
+
+                armor[1] = new ItemStack(Material.DIAMOND_LEGGINGS);
+                armor[1].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
+                armor[1].addEnchantment(Enchantment.DURABILITY, 3);
+
+                armor[0] = new ItemStack(Material.DIAMOND_BOOTS);
+                armor[0].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
+                armor[0].addEnchantment(Enchantment.DURABILITY, 3);
+
+                inv[0] = new ItemStack(Material.DIAMOND_AXE);
+                inv[0].addEnchantment(Enchantment.DAMAGE_ALL, 3);
+                inv[0].addEnchantment(Enchantment.DURABILITY, 3);
+
+                inv[1] = new ItemStack(Material.FISHING_ROD);
+                inv[1].addEnchantment(Enchantment.DURABILITY, 3);
+
+                inv[2] = new ItemStack(Material.BOW);
+                inv[2].addEnchantment(Enchantment.ARROW_DAMAGE, 2);
+                inv[2].addEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
+
+                inv[3] = new ItemStack(Material.WOOD, 64);
+                inv[4] = new ItemStack(Material.ENDER_PEARL, 2);
+
+                Potion slowness = new Potion(PotionType.SLOWNESS, 1);
+                slowness.setSplash(true);
+
+                inv[5] = slowness.toItemStack(1);
+
+                inv[6] = new ItemStack(Material.WEB, 64);
+                inv[7] = new ItemStack(Material.GOLDEN_APPLE, 8);
+
+                inv[9] = new ItemStack(Material.SNOW_BALL, 16);
+                inv[10] = new ItemStack(Material.LAVA_BUCKET);
+                inv[11] = new ItemStack(Material.LAVA_BUCKET);
+                inv[12] = new ItemStack(Material.WATER_BUCKET);
+                inv[13] = new ItemStack(Material.WATER_BUCKET);
+                inv[14] = new ItemStack(Material.ARROW, 16);
+
+                speed = new Potion(PotionType.SPEED, 2);
+
+                inv[8] = speed.toItemStack(1);
+                inv[17] = speed.toItemStack(1);
+                inv[26] = speed.toItemStack(1);
+                inv[35] = speed.toItemStack(1);
 
                 break;
             default:
