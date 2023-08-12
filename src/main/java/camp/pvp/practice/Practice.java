@@ -108,6 +108,10 @@ public class Practice extends JavaPlugin {
             entity.remove();
         }
 
+        for(World world : Bukkit.getWorlds()) {
+            world.setAutoSave(false);
+        }
+
         registerCommands();
         registerListeners();
     }
@@ -162,7 +166,6 @@ public class Practice extends JavaPlugin {
         new BlockFromToListener(this);
         new BlockPlaceListener(this);
 
-        new EntityChangeBlockListener(this);
         new EntityDamageByEntityListener(this);
         new EntityDamageListener(this);
         new EntityExplodeListener(this);
@@ -212,5 +215,6 @@ public class Practice extends JavaPlugin {
         arenaManager.shutdown();
         gameManager.shutdown();
         gameProfileManager.shutdown();
+        this.getServer().shutdown();
     }
 }

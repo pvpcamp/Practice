@@ -1,13 +1,13 @@
 package camp.pvp.practice.listeners.bukkit.block;
 
 import camp.pvp.practice.arenas.Arena;
-import camp.pvp.practice.arenas.ModifiedBlock;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -49,13 +49,10 @@ public class BlockBreakListener implements Listener {
                             }
                         }
 
-                        arena.addBlock(block);
                     } else {
                         if(arena.isOriginalBlock(location)) {
                             event.setCancelled(true);
                             return;
-                        } else {
-                            arena.addBlock(block);
                         }
                     }
 

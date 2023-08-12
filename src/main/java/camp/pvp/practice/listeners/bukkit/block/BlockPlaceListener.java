@@ -1,11 +1,9 @@
 package camp.pvp.practice.listeners.bukkit.block;
 
 import camp.pvp.practice.arenas.Arena;
-import camp.pvp.practice.arenas.ModifiedBlock;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;

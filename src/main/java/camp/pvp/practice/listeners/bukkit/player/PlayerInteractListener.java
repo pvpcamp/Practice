@@ -1,10 +1,8 @@
 package camp.pvp.practice.listeners.bukkit.player;
 
 import camp.pvp.practice.arenas.Arena;
-import camp.pvp.practice.arenas.ModifiedBlock;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.games.impl.teams.HCFTeams;
 import camp.pvp.practice.interactables.InteractableItem;
 import camp.pvp.practice.interactables.InteractableItems;
 import camp.pvp.practice.profiles.GameProfile;
@@ -30,13 +28,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.*;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Map;
 
@@ -144,14 +139,7 @@ public class PlayerInteractListener implements Listener {
 
                     if(block != null) {
                         if (game.getState().equals(Game.State.ACTIVE)) {
-                            if(game.getArena().getType().canModifyArena()) {
-                                if(isLogged(block) && game.getArena().getBlocks().contains(block.getLocation())) {
-                                    game.getArena().addBlock(block);
-                                }
-                            }
-
                             event.setCancelled(isCancelled(block, game.getArena()));
-                            return;
                         }
                     }
                 } else {
@@ -289,22 +277,5 @@ public class PlayerInteractListener implements Listener {
                 return true;
             } else return state instanceof TrapDoor;
         }
-    }
-
-    public boolean isLogged(Block block) {
-
-        BlockState state = block.getState();
-
-        if (state instanceof Lever) {
-            return true;
-        } else if (state instanceof Button) {
-            return true;
-        } else if (state instanceof PressurePlate) {
-            return true;
-        } else if (state instanceof Furnace) {
-            return true;
-        } else if (state instanceof Gate) {
-            return true;
-        } else return state instanceof TrapDoor;
     }
 }

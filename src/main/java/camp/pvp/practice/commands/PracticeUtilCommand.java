@@ -52,9 +52,8 @@ public class PracticeUtilCommand implements CommandExecutor {
                         profile.playerUpdate(true);
                         return true;
                     case "scanner":
-                        player.sendMessage(ChatColor.GREEN + "Starting arena scanner.");
+                        player.sendMessage(ChatColor.GREEN + "Starting arena scanner, check console for updates.");
                         plugin.getArenaManager().scanBlocks();
-                        player.sendMessage(ChatColor.GREEN + "Arena scanner finished.");
 
                         return true;
                     case "cancel":
@@ -117,12 +116,6 @@ public class PracticeUtilCommand implements CommandExecutor {
                         );
                         yes.setAction((player1, gui1) -> {
                             plugin.shutdown();
-
-                            Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-                                if(plugin.getArenaManager().getArenaResetter().queueSize() == 0) {
-                                    plugin.getServer().shutdown();
-                                }
-                            }, 4, 4);
                         });
                         gui.addButton(yes, false);
 

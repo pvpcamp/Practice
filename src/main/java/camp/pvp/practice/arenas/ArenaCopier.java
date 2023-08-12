@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.material.Directional;
 
 import java.util.*;
 
@@ -91,7 +92,6 @@ public class ArenaCopier implements Runnable {
                 if (block.isEmpty()) {
                     i--;
                 } else {
-
                     Chunk chunk = block.getChunk();
                     if(!chunk.isLoaded()) {
                         chunk.load();
@@ -99,9 +99,12 @@ public class ArenaCopier implements Runnable {
 
                     newBlock.setType(block.getType());
 
-                    BlockState state = newBlock.getState();
-                    state.setType(block.getState().getType());
-                    state.setData(block.getState().getData());
+                    BlockState oldState = block.getState();
+                    BlockState newState = newBlock.getState();
+
+                    newState.setType(oldState.getType());
+                    newState.setData(oldState.getData());
+                    newState.update(true);
                 }
             } else {
                 ended = System.currentTimeMillis();

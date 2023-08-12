@@ -1,6 +1,7 @@
 package camp.pvp.practice.listeners.bukkit.player;
 
 import camp.pvp.practice.Practice;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,6 +18,7 @@ public class PlayerBucketFillListener implements Listener {
     @EventHandler
     public void onPlayerBucketFill(PlayerBucketFillEvent event) {
         Player player = event.getPlayer();
-        player.updateInventory();
+
+        Bukkit.getScheduler().runTaskLater(plugin, player::updateInventory, 1);
     }
 }

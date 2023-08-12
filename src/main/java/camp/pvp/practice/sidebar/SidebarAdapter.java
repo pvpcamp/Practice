@@ -80,17 +80,6 @@ public class SidebarAdapter implements AssembleAdapter {
                         lines.add("&6Staff Online: &f" + staffOnline);
                         lines.add("&6Staff Mode: &f" + (profile.isStaffMode() ? "Enabled" : "Disabled"));
                         lines.add("&6Active Games: &f" + plugin.getGameManager().getActiveGames().size());
-
-                        ArenaResetter arenaResetter = plugin.getArenaManager().getArenaResetter();
-                        if(!arenaResetter.getArenas().isEmpty()) {
-                            lines.add(" ");
-
-                            Arena currentArena = arenaResetter.getArenas().peek();
-                            lines.add("&6Arena Resetter:");
-                            lines.add(" &7● &6Arena: &f" + currentArena.getName());
-                            lines.add(" &7● &6Blocks Remaining: &f" + (currentArena.getModifiedBlocks().size() + currentArena.getPlacedBlocks().size()));
-                            lines.add(" &7● &6Arenas Left: &f" + arenaResetter.getArenas().size());
-                        }
                     }
                     break;
                 case LOBBY_QUEUE:

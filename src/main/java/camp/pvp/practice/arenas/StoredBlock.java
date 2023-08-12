@@ -1,43 +1,32 @@
 package camp.pvp.practice.arenas;
 
-import com.sk89q.worldedit.internal.annotation.Direction;
 import lombok.Getter;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.material.Directional;
 
-public class ModifiedBlock {
+public class StoredBlock {
 
     private Material type;
     private BlockState blockState;
-    private Directional directional;
     @Getter private final Location location;
-    public ModifiedBlock(Block block) {
+    public StoredBlock(Block block) {
         this.type = block.getType();
         this.blockState = block.getState();
         this.location = block.getLocation();
-
-        if(blockState instanceof Directional) {
-            directional = (Directional) blockState;
-        }
     }
 
-    public ModifiedBlock(Location location) {
+    public StoredBlock(Location location) {
         this.type = Material.AIR;
         this.location = location;
     }
 
-    public ModifiedBlock(Block block, Location location) {
+    public StoredBlock(Block block, Location location) {
         this.type = block.getType();
         this.blockState = block.getState();
         this.location = location;
-
-        if(blockState instanceof Directional) {
-            directional = (Directional) blockState;
-        }
     }
 
     public void replace() {
@@ -48,18 +37,16 @@ public class ModifiedBlock {
             chunk.load();
         }
 
-        if(blockState != null) {
+        if(blockState != null && block.getState().getData() != blockState.getData()) {
+
+            block.setType(Material.AIR);
+
             block.setType(blockState.getType());
 
             BlockState bs = block.getState();
             bs.setType(blockState.getType());
             bs.setData(blockState.getData());
-            bs.update(true);
-
-            if(directional != null) {
-                Directional newDir = (Directional) bs;
-                newDir.setFacingDirection(directional.getFacing());
-            }
+            bs.update(true, false);
         } else {
             block.setType(type);
         }

@@ -4,11 +4,8 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.loot.LootChest;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.material.Bed;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -72,6 +69,17 @@ public class Arena implements Comparable<Arena>{
                     return false;
             }
         }
+
+        public boolean isUnloadChunks() {
+            switch(this) {
+                case DUEL_SKYWARS:
+                case DUEL_BUILD:
+                case SPLEEF:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 
     private String name, displayName;
@@ -82,8 +90,7 @@ public class Arena implements Comparable<Arena>{
     private int xDifference, zDifference;
 
     private @Getter List<Location> beds, blocks, chests;
-    private @Getter List<ModifiedBlock> placedBlocks, modifiedBlocks;
-    private @Getter BukkitTask replaceTask;
+    private @Getter Set<Chunk> chunks;
 
     public Arena(String name) {
         this.name = name;
@@ -94,8 +101,7 @@ public class Arena implements Comparable<Arena>{
         this.beds = new ArrayList<>();
         this.blocks = new ArrayList<>();
         this.chests = new ArrayList<>();
-        this.placedBlocks = new ArrayList<>();
-        this.modifiedBlocks = new ArrayList<>();
+        this.chunks = new HashSet<>();
     }
 
     /**
@@ -138,6 +144,15 @@ public class Arena implements Comparable<Arena>{
     public void prepare() {
         if(getType().isBuild()) {
             setInUse(true);
+
+            for(Chunk chunk : chunks) {
+                if(!chunk.isLoaded()) {
+                    chunk.load();
+                    Bukkit.getScheduler().runTaskLater(Practice.getInstance(), ()-> {
+                        chunk.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
+                    }, 2);
+                }
+            }
         }
 
         if(getType().isGenerateLoot()) {
@@ -146,48 +161,20 @@ public class Arena implements Comparable<Arena>{
 
     }
 
-    /**
-     * Adds the arena to the ArenaResetter queue if any blocks were modified.
-     */
     public void resetArena() {
-        if(!getPlacedBlocks().isEmpty() || !getModifiedBlocks().isEmpty()) {
-            Practice.instance.getArenaManager().getArenaResetter().addArena(this);
-        } else {
-            setInUse(false);
+        if(getType().isUnloadChunks()) {
+            for (Chunk chunk : chunks) {
+                if (chunk.isLoaded()) {
+                    chunk.unload(false);
+                }
+            }
         }
+
+        setInUse(false);
     }
 
     public void addBlock(Block block) {
-        Location location = block.getLocation();
-        ModifiedBlock modifiedBlock = null;
-        if(isOriginalBlock(location)) {
-            for(ModifiedBlock mb : getModifiedBlocks()) {
-                if(mb.getLocation().equals(location)) {
-                    modifiedBlock = mb;
-                    break;
-                }
-            }
 
-            if(modifiedBlock == null) {
-                getModifiedBlocks().add(new ModifiedBlock(block));
-            }
-        } else {
-            getPlacedBlocks().add(new ModifiedBlock(location));
-        }
-    }
-
-    public boolean isValidBlock(Location location) {
-        return getBlocks().contains(location);
-    }
-
-    public boolean isPlacedBlock(Location location) {
-        for(ModifiedBlock mb : getPlacedBlocks()) {
-            if(mb.getLocation().equals(location)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public boolean isOriginalBlock(Location location) {

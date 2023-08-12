@@ -15,7 +15,7 @@ import java.util.Set;
 public class ArenaBlockUpdater implements Runnable{
 
     private Arena arena;
-    private Queue<ModifiedBlock> blocks;
+    private Queue<StoredBlock> blocks;
     private long started, ended;
     private int taskId;
 
@@ -54,7 +54,7 @@ public class ArenaBlockUpdater implements Runnable{
                         Block b = l.getBlock();
 
                         if(!b.getType().equals(block.getType())) {
-                            blocks.add(new ModifiedBlock(block, l));
+                            blocks.add(new StoredBlock(block, l));
                         }
                     }
                 }
@@ -71,7 +71,7 @@ public class ArenaBlockUpdater implements Runnable{
 
         for(int i = 0; i < 2000; i++) {
             if(!blocks.isEmpty()) {
-                ModifiedBlock block = blocks.poll();
+                StoredBlock block = blocks.poll();
                 block.replace();
             } else {
                 ended = System.currentTimeMillis();

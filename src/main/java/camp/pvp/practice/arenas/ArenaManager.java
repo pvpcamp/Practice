@@ -18,7 +18,6 @@ public class ArenaManager {
     private Logger logger;
     private ArenaConfig arenaConfig;
     private @Getter Set<Arena> arenas;
-    private @Getter ArenaResetter arenaResetter;
     private @Getter ArenaCopyQueue arenaCopyQueue;
     private @Getter @Setter ArenaBlockUpdater arenaBlockUpdater;
     private @Getter @Setter ArenaDeleter arenaDeleter;
@@ -30,8 +29,6 @@ public class ArenaManager {
         this.logger.info("Starting ArenaManager...");
 
         this.arenaConfig = new ArenaConfig(plugin, this);
-        this.arenaResetter = new ArenaResetter(this);
-        Bukkit.getScheduler().runTaskTimer(plugin, arenaResetter, 0, 10);
 
         this.arenaCopyQueue = new ArenaCopyQueue(plugin);
         Bukkit.getScheduler().runTaskTimer(plugin, arenaCopyQueue, 0, 4);
@@ -92,7 +89,7 @@ public class ArenaManager {
     }
 
     public void scanBlocks() {
-        this.logger.info("Scanning arenas for all blocks.");
+        this.logger.info("Scanning arenas for all blocks asynchronously.");
 
         int arenas = 0;
         for(Arena arena : getArenas()) {
@@ -132,16 +129,19 @@ public class ArenaManager {
                                             arena.getBlocks().add(location);
                                     }
                                 }
+
+                                arena.getChunks().add(location.getChunk());
                             }
                         }
                     }
 
                     arenas++;
+                    this.logger.info("Arena scanner found " + arena.getBlocks().size() + " blocks for arena " + arena.getName() + ".");
                 }
             }
         }
 
-        this.logger.info("Arena scanner completed, " + arenas + " arenas have been scanned for blocks.");
+        this.logger.info("Arena scanner has finished scanning " + arenas + " arenas.");
     }
 
     public void deleteArena(Arena arena) {
