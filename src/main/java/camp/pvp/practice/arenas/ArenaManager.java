@@ -21,6 +21,7 @@ public class ArenaManager {
     private @Getter ArenaCopyQueue arenaCopyQueue;
     private @Getter @Setter ArenaBlockUpdater arenaBlockUpdater;
     private @Getter @Setter ArenaDeleter arenaDeleter;
+    private @Getter ArenaResetter arenaResetter;
     public ArenaManager(Practice plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
@@ -32,6 +33,9 @@ public class ArenaManager {
 
         this.arenaCopyQueue = new ArenaCopyQueue(plugin);
         Bukkit.getScheduler().runTaskTimer(plugin, arenaCopyQueue, 0, 4);
+
+        this.arenaResetter = new ArenaResetter(plugin);
+        Bukkit.getScheduler().runTaskTimer(plugin, arenaResetter, 0, 4);
 
         this.scanBlocks();
     }

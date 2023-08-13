@@ -2,10 +2,15 @@ package camp.pvp.practice.arenas;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.loot.LootChest;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -91,6 +96,7 @@ public class Arena implements Comparable<Arena>{
 
     private @Getter List<Location> beds, blocks, chests;
     private @Getter Set<Chunk> chunks;
+    private @Getter Queue<Chunk> chunkQueue;
 
     public Arena(String name) {
         this.name = name;
@@ -102,6 +108,7 @@ public class Arena implements Comparable<Arena>{
         this.blocks = new ArrayList<>();
         this.chests = new ArrayList<>();
         this.chunks = new HashSet<>();
+        this.chunkQueue = new LinkedList<>();
     }
 
     /**
@@ -144,15 +151,6 @@ public class Arena implements Comparable<Arena>{
     public void prepare() {
         if(getType().isBuild()) {
             setInUse(true);
-
-            for(Chunk chunk : chunks) {
-                if(!chunk.isLoaded()) {
-                    chunk.load();
-                    Bukkit.getScheduler().runTaskLater(Practice.getInstance(), ()-> {
-                        chunk.getWorld().refreshChunk(chunk.getX(), chunk.getZ());
-                    }, 2);
-                }
-            }
         }
 
         if(getType().isGenerateLoot()) {
@@ -166,6 +164,7 @@ public class Arena implements Comparable<Arena>{
             for (Chunk chunk : chunks) {
                 if (chunk.isLoaded()) {
                     chunk.unload(false);
+                    chunk.load();
                 }
             }
         }

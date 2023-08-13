@@ -56,9 +56,13 @@ public class BlockBreakListener implements Listener {
                         }
                     }
 
-                    for (ItemStack item : block.getDrops()) {
-                        Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
-                        game.addEntity(i);
+                    if(block.getType().equals(Material.SNOW_BLOCK)) {
+                        player.getInventory().addItem(new ItemStack(Material.SNOW_BALL));
+                    } else {
+                        for (ItemStack item : block.getDrops()) {
+                            Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
+                            game.addEntity(i);
+                        }
                     }
 
                     block.setType(Material.AIR);

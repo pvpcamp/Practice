@@ -34,8 +34,6 @@ public class EndingTask implements Runnable{
             GameParticipant participant = entry.getValue();
             GameProfile profile = game.getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
 
-            game.getArena().resetArena();
-
             if(player != null) {
                 if(game instanceof Duel) {
                     Duel duel = (Duel) game;
@@ -81,5 +79,7 @@ public class EndingTask implements Runnable{
         }
 
         Practice.instance.getGameProfileManager().updateGlobalPlayerVisibility();
+
+        game.getArena().resetArena();
     }
 }
