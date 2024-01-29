@@ -11,11 +11,15 @@ import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.PreviousQueue;
 import camp.pvp.practice.profiles.Rematch;
 import camp.pvp.practice.queue.GameQueue;
+import com.lunarclient.apollo.Apollo;
+import com.lunarclient.apollo.module.cooldown.CooldownModule;
+import com.lunarclient.apollo.player.ApolloPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class EndingTask implements Runnable{
@@ -65,6 +69,15 @@ public class EndingTask implements Runnable{
 
                     for(PlayerCooldown cooldown : participant.getCooldowns().values()) {
                         cooldown.remove();
+                    }
+
+                    if(Apollo.getPlayerManager().hasSupport(player.getUniqueId())) {
+
+                        CooldownModule cooldownModule = Apollo.getModuleManager().getModule(CooldownModule.class);
+
+                        Optional<ApolloPlayer> apolloPlayer = Apollo.getPlayerManager().getPlayer(player.getUniqueId());
+                        apolloPlayer.ifPresent(cooldownModule::resetCooldowns);
+
                     }
 
                     profile.setGame(null);

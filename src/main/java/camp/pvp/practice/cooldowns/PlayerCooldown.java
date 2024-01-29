@@ -85,7 +85,7 @@ public class PlayerCooldown {
                     return Cooldown.builder()
                             .name("pearl")
                             .icon(ItemStackIcon.builder()
-                                    .itemId(Material.ENDER_PEARL.getId())
+                                    .itemName("ENDER_PEARL")
                                     .build())
                             .duration(Duration.ofSeconds(this.getDuration()))
                             .build();
@@ -93,7 +93,7 @@ public class PlayerCooldown {
                     return Cooldown.builder()
                             .name("jump")
                             .icon(ItemStackIcon.builder()
-                                    .itemId(Material.FEATHER.getId())
+                                    .itemName("FEATHER")
                                     .build())
                             .duration(Duration.ofSeconds(this.getDuration()))
                             .build();
@@ -101,7 +101,7 @@ public class PlayerCooldown {
                     return Cooldown.builder()
                             .name("regen")
                             .icon(ItemStackIcon.builder()
-                                    .itemId(Material.GHAST_TEAR.getId())
+                                    .itemName("GHAST_TEAR")
                                     .build())
                             .duration(Duration.ofSeconds(this.getDuration()))
                             .build();
@@ -109,7 +109,7 @@ public class PlayerCooldown {
                     return Cooldown.builder()
                             .name("resistance")
                             .icon(ItemStackIcon.builder()
-                                    .itemId(Material.IRON_INGOT.getId())
+                                    .itemName("IRON_INGOT")
                                     .build())
                             .duration(Duration.ofSeconds(this.getDuration()))
                             .build();
@@ -117,7 +117,7 @@ public class PlayerCooldown {
                     return Cooldown.builder()
                             .name("strength")
                             .icon(ItemStackIcon.builder()
-                                    .itemId(Material.BLAZE_POWDER.getId())
+                                    .itemName("BLAZE_POWDER")
                                     .build())
                             .duration(Duration.ofSeconds(this.getDuration()))
                             .build();
@@ -125,7 +125,7 @@ public class PlayerCooldown {
                     return Cooldown.builder()
                             .name("speed")
                             .icon(ItemStackIcon.builder()
-                                    .itemId(Material.SUGAR.getId())
+                                    .itemName("SUGAR")
                                     .build())
                             .duration(Duration.ofSeconds(this.getDuration()))
                             .build();
@@ -151,6 +151,10 @@ public class PlayerCooldown {
         calendar.add(Calendar.SECOND, type.getDuration());
         this.issued = calendar.getTime();
 
+        issueLunarCooldown();
+    }
+
+    public void issueLunarCooldown() {
         if(Apollo.getPlayerManager().hasSupport(player.getUniqueId())) {
 
             CooldownModule cooldownModule = Apollo.getModuleManager().getModule(CooldownModule.class);

@@ -150,9 +150,7 @@ public class Practice extends JavaPlugin {
         new StatisticsCommand(this);
         new TournamentCommand(this);
         new WhereAmICommand(this);
-
-        CommandHandler commandHandler = NetworkHelper.getInstance().getCommandHandler();
-        commandHandler.registerCommand(new EloManagerCommand(this));
+        new EloManagerCommand(this);
     }
 
     public void registerListeners() {

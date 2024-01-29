@@ -228,7 +228,7 @@ public abstract class Game {
                 victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
 
                 if(event.getDamager() instanceof Player) {
-                    if (victim.getNoDamageTicks() <= 10) {
+                    if (victim.getNoDamageTicks() == 0) {
                         participant.hits++;
                         participant.currentCombo++;
 
