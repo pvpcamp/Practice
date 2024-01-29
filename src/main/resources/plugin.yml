@@ -20,6 +20,8 @@ commands:
     permission: practice.staff.build_mode
   duel:
     description: Duel another player or team.
+  elomanager:
+    description: Manage the ELO of a player.
   event:
     description: Join, leave, or host event.
   games:
