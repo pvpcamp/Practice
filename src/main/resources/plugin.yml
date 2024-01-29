@@ -1,6 +1,6 @@
 main: camp.pvp.practice.Practice
 name: Practice
-version: ${plugin.desc}
+version: ${git.branch}-${git.commit.id.abbrev}
 author: leuo
 depend:
   - Citizens
