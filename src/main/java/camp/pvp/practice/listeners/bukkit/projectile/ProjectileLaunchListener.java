@@ -50,6 +50,7 @@ public class ProjectileLaunchListener implements Listener {
                         if (cooldown != null && !cooldown.isExpired()) {
 
                             event.setCancelled(true);
+                            player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
 
                         } else {
 

@@ -32,7 +32,30 @@ import java.util.*;
 public class GameProfile {
 
     public enum State {
-        LOBBY, LOBBY_QUEUE, LOBBY_PARTY, LOBBY_TOURNAMENT, KIT_EDITOR, IN_GAME, SPECTATING
+        LOBBY, LOBBY_QUEUE, LOBBY_PARTY, LOBBY_TOURNAMENT, KIT_EDITOR, IN_GAME, SPECTATING;
+
+
+        @Override
+        public String toString() {
+            switch(this) {
+                case LOBBY:
+                    return "Lobby";
+                case LOBBY_QUEUE:
+                    return "Lobby (In Queue)";
+                case LOBBY_PARTY:
+                    return "Lobby (In Party)";
+                case LOBBY_TOURNAMENT:
+                    return "Lobby (In Tournament)";
+                case KIT_EDITOR:
+                    return "Kit Editor";
+                case IN_GAME:
+                    return "Playing";
+                case SPECTATING:
+                    return "Spectating";
+                default:
+                    return null;
+            }
+        }
     }
 
     public enum Time {

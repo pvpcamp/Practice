@@ -93,7 +93,10 @@ public class ArenaManager {
     }
 
     public void scanBlocks() {
-        this.logger.info("Scanning arenas for all blocks asynchronously.");
+        String m = "Scanning arenas for all blocks asynchronously.";
+
+        this.logger.info(m);
+        Bukkit.broadcast("&4&l[Arena Scanner] &c" + m, "practice.staff");
 
         int arenas = 0;
         for(Arena arena : getArenas()) {
@@ -140,12 +143,17 @@ public class ArenaManager {
                     }
 
                     arenas++;
-                    this.logger.info("Arena scanner found " + arena.getBlocks().size() + " blocks for arena " + arena.getName() + ".");
+
+                    m = "Arena scanner found " + arena.getBlocks().size() + " blocks for arena " + arena.getName() + ".";
+                    this.logger.info(m);
+                    Bukkit.broadcast("&4&l[Arena Scanner] &c" + m, "practice.staff");
                 }
             }
         }
 
-        this.logger.info("Arena scanner has finished scanning " + arenas + " arenas.");
+        m = "Arena scanner has finished scanning " + arenas + " arenas.";
+        this.logger.info(m);
+        Bukkit.broadcast("&4&l[Arena Scanner] &c" + m, "practice.staff");
     }
 
     public void deleteArena(Arena arena) {

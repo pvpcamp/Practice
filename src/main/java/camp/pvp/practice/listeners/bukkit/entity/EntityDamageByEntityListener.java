@@ -63,7 +63,6 @@ public class EntityDamageByEntityListener implements Listener {
             Game game = attackerProfile.getGame();
 
             if(game != null && playerProfile.getGame() != null) {
-                player.sendMessage(event.getFinalDamage() + " damage, " + player.isBlocking());
                 game.handleHit(player, attacker, event);
             } else {
                 if(attacker.getPassenger() != null && attacker.getPassenger().equals(player)) {

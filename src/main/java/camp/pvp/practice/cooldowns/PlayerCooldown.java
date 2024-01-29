@@ -2,15 +2,20 @@ package camp.pvp.practice.cooldowns;
 
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.utils.Colors;
-import com.lunarclient.bukkitapi.LunarClientAPI;
-import com.lunarclient.bukkitapi.cooldown.LCCooldown;
+import com.lunarclient.apollo.Apollo;
+import com.lunarclient.apollo.common.icon.ItemStackIcon;
+import com.lunarclient.apollo.module.cooldown.Cooldown;
+import com.lunarclient.apollo.module.cooldown.CooldownModule;
+import com.lunarclient.apollo.player.ApolloPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Getter @Setter
@@ -74,20 +79,56 @@ public class PlayerCooldown {
             }
         }
 
-        public LCCooldown getLCCooldown() {
+        public Cooldown getApolloCooldown() {
             switch(this) {
                 case ENDER_PEARL:
-                    return new LCCooldown("pearl", this.getDuration(), Material.ENDER_PEARL);
+                    return Cooldown.builder()
+                            .name("pearl")
+                            .icon(ItemStackIcon.builder()
+                                    .itemId(Material.ENDER_PEARL.getId())
+                                    .build())
+                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .build();
                 case ENERGY_JUMP:
-                    return new LCCooldown("jump", this.getDuration(), Material.FEATHER);
+                    return Cooldown.builder()
+                            .name("jump")
+                            .icon(ItemStackIcon.builder()
+                                    .itemId(Material.FEATHER.getId())
+                                    .build())
+                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .build();
                 case ENERGY_REGEN:
-                    return new LCCooldown("regen", this.getDuration(), Material.GHAST_TEAR);
+                    return Cooldown.builder()
+                            .name("regen")
+                            .icon(ItemStackIcon.builder()
+                                    .itemId(Material.GHAST_TEAR.getId())
+                                    .build())
+                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .build();
                 case ENERGY_RESISTANCE:
-                    return new LCCooldown("resistance", this.getDuration(), Material.IRON_INGOT);
+                    return Cooldown.builder()
+                            .name("resistance")
+                            .icon(ItemStackIcon.builder()
+                                    .itemId(Material.IRON_INGOT.getId())
+                                    .build())
+                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .build();
                 case ENERGY_STRENGTH:
-                    return new LCCooldown("strength", this.getDuration(), Material.BLAZE_POWDER);
+                    return Cooldown.builder()
+                            .name("strength")
+                            .icon(ItemStackIcon.builder()
+                                    .itemId(Material.BLAZE_POWDER.getId())
+                                    .build())
+                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .build();
                 case ENERGY_SPEED:
-                    return new LCCooldown("speed", this.getDuration(), Material.SUGAR);
+                    return Cooldown.builder()
+                            .name("speed")
+                            .icon(ItemStackIcon.builder()
+                                    .itemId(Material.SUGAR.getId())
+                                    .build())
+                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .build();
                 default:
                     return null;
             }
@@ -110,10 +151,14 @@ public class PlayerCooldown {
         calendar.add(Calendar.SECOND, type.getDuration());
         this.issued = calendar.getTime();
 
-        LunarClientAPI lcApi = LunarClientAPI.getInstance();
+        if(Apollo.getPlayerManager().hasSupport(player.getUniqueId())) {
 
-        if(lcApi.isRunningLunarClient(player)) {
-            LunarClientAPI.getInstance().sendPacket(player, type.getLCCooldown().getPacket());
+            CooldownModule cooldownModule = Apollo.getModuleManager().getModule(CooldownModule.class);
+
+            Optional<ApolloPlayer> apolloPlayer = Apollo.getPlayerManager().getPlayer(player.getUniqueId());
+            apolloPlayer.ifPresent(p -> {
+                cooldownModule.displayCooldown(p, type.getApolloCooldown());
+            });
         }
     }
 

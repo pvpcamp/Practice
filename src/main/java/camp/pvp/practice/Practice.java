@@ -30,7 +30,6 @@ import camp.pvp.practice.commands.*;
 import camp.pvp.practice.listeners.bukkit.player.*;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.lunarclient.bukkitapi.LunarClientAPI;
 import io.github.thatkawaiisam.assemble.Assemble;
 import io.github.thatkawaiisam.assemble.AssembleStyle;
 import lombok.Getter;
@@ -53,8 +52,6 @@ public class Practice extends JavaPlugin {
 
     private Assemble assemble;
 
-    private LunarClientAPI lunarClientAPI;
-
     private Location lobbyLocation;
     private Location kitEditorLocation;
 
@@ -75,8 +72,6 @@ public class Practice extends JavaPlugin {
 
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.entityHider = new EntityHider(this, EntityHider.Policy.BLACKLIST);
-
-        this.lunarClientAPI = LunarClientAPI.getInstance();
 
         this.arenaManager = new ArenaManager(this);
         this.gameManager = new GameManager(this);
@@ -154,6 +149,7 @@ public class Practice extends JavaPlugin {
         new SpectateCommand(this);
         new StatisticsCommand(this);
         new TournamentCommand(this);
+        new WhereAmICommand(this);
 
         CommandHandler commandHandler = NetworkHelper.getInstance().getCommandHandler();
         commandHandler.registerCommand(new EloManagerCommand(this));

@@ -2,14 +2,13 @@ package camp.pvp.practice.commands;
 
 import camp.pvp.practice.arenas.ArenaBlockUpdater;
 import camp.pvp.practice.arenas.ArenaCopyQueue;
-import camp.pvp.practice.arenas.ArenaDeleter;
 import camp.pvp.practice.listeners.citizens.NPCClickable;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.StandardGui;
-import com.lunarclient.bukkitapi.LunarClientAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -50,6 +49,21 @@ public class PracticeUtilCommand implements CommandExecutor {
                         return true;
                     case "reset":
                         profile.playerUpdate(true);
+                        return true;
+                    case "debug":
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("&6&lPractice Debug");
+                        sb.append("\n&6Version: &f" + plugin.getDescription().getVersion());
+                        sb.append("\n\n&6In Game: &f" + plugin.getGameManager().getTotalInGame());
+                        sb.append(" &7- &6In Queue: &f" + plugin.getGameQueueManager().getTotalInQueue());
+                        sb.append(" &7- &6Active Games: &f" + plugin.getGameManager().getActiveGames().size());
+                        sb.append("\n\n&6Queues:");
+
+                        for(GameQueue gameQueue : plugin.getGameQueueManager().getGameQueues()) {
+                            sb.append("\n&6" + gameQueue.getDuelKit().name() + " &7(" + gameQueue.getType().toString() + ")&6: &f" + gameQueue.getQueueMembers().size() + " in queue, " + gameQueue.getPlaying() + " playing.");
+                        }
+
+                        player.sendMessage(Colors.get(sb.toString()));
                         return true;
                     case "scanner":
                         player.sendMessage(ChatColor.GREEN + "Starting arena scanner, check console for updates.");
@@ -136,14 +150,15 @@ public class PracticeUtilCommand implements CommandExecutor {
             StringBuilder sb = new StringBuilder();
             sb.append("&6&lPractice Utilities");
             sb.append("\n&6Next Scheduled Restart: &f" + plugin.getServerRebooter().getRebootTime().toString());
-            sb.append("\n&6/" + label + " setlobby &7- &fSets the lobby location.");
-            sb.append("\n&6/" + label + " setkiteditor &7- &fSets the kit editor location.");
+            sb.append("\n&6/" + label + " cancel &7- &fCancels all arena copy, update, and delete tasks.");
+            sb.append("\n&6/" + label + " debug &7- &fShows a bunch of useful information.");
             sb.append("\n&6/" + label + " reset &7- &fResets your player.");
             sb.append("\n&6/" + label + " scanner &7- &fRescan all arenas for important blocks.");
-            sb.append("\n&6/" + label + " cancel &7- &fCancels all arena copy, update, and delete tasks.");
+            sb.append("\n&6/" + label + " schedulereboot &7- &fSchedule the daily server restart for right now.");
+            sb.append("\n&6/" + label + " setkiteditor &7- &fSets the kit editor location.");
+            sb.append("\n&6/" + label + " setlobby &7- &fSets the lobby location.");
             sb.append("\n&6/" + label + " setnpcid <clickable type> <npc id> &7- &fAssign a clickable type to an NPC.");
             sb.append("\n&6/" + label + " shutdown &7- &fShutdown the server immediately.");
-            sb.append("\n&6/" + label + " schedulereboot &7- &fSchedule the daily server restart for right now.");
 
             player.sendMessage(Colors.get(sb.toString()));
         }

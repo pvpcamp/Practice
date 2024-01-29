@@ -7,7 +7,7 @@ depend:
   - Gooey2
   - NetworkHelper
   - ProtocolLib
-  - LunarClient-API
+  - Apollo-Bukkit
 
 commands:
   accept:
@@ -55,3 +55,6 @@ commands:
     description: View the statistics of yourself or another player.
   tournament:
     description: Join, leave, or host a tournament.
+  whereami:
+    description: Shows debug information about your player.
+    permission: practice.commands.whereami

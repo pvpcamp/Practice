@@ -1,28 +1,25 @@
 package camp.pvp.practice.commands;
 
-import camp.pvp.command.framework.Command;
-import camp.pvp.command.framework.CommandArgs;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.utils.Colors;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class EloManagerCommand {
+public class EloManagerCommand implements CommandExecutor {
 
     private Practice plugin;
     public EloManagerCommand(Practice plugin) {
         this.plugin = plugin;
+        plugin.getServer().getPluginCommand("elomanager").setExecutor(this);
     }
 
-    @Command(name = "elomanager",
-            permission = "practice.commands.elomanager",
-            description = "Manage player ELO.")
-    public void setElo(CommandArgs commandArgs) {
-        String[] args = commandArgs.getArgs();
-        CommandSender sender = commandArgs.getSender();
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         if(args.length > 0) {
             switch(args[0].toLowerCase()) {
@@ -31,7 +28,7 @@ public class EloManagerCommand {
                         GameProfile profile = plugin.getGameProfileManager().find(args[1], false);
                         if(profile == null) {
                             sender.sendMessage(ChatColor.RED + "The player you specified has never joined the network.");
-                            return;
+                            return true;
                         }
 
                         ProfileELO elo = new ProfileELO(profile.getUuid());
@@ -39,7 +36,7 @@ public class EloManagerCommand {
                         profile.setProfileElo(elo);
                         plugin.getGameProfileManager().exportElo(profile.getProfileElo(), true);
                         sender.sendMessage(ChatColor.GREEN + "ELO has been reset for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + ".");
-                        return;
+                        return true;
                     }
                     break;
                 case "ladder":
@@ -47,7 +44,7 @@ public class EloManagerCommand {
                         GameProfile profile = plugin.getGameProfileManager().find(args[1], false);
                         if(profile == null) {
                             sender.sendMessage(ChatColor.RED + "The player you specified has never joined the network.");
-                            return;
+                            return true;
                         }
 
                         DuelKit kit = null;
@@ -59,7 +56,7 @@ public class EloManagerCommand {
 
                         if(kit == null) {
                             sender.sendMessage(ChatColor.RED + "The kit you specified does not exist.");
-                            return;
+                            return true;
                         }
 
                         int elo;
@@ -67,7 +64,7 @@ public class EloManagerCommand {
                             elo = Integer.parseInt(args[3]);
                         } catch (NumberFormatException ignored) {
                             sender.sendMessage(ChatColor.RED + "Invalid ELO.");
-                            return;
+                            return true;
                         }
 
                         ProfileELO profileELO = profile.getProfileElo();
@@ -78,7 +75,7 @@ public class EloManagerCommand {
                         profileELO.getRatings().put(kit, elo);
                         plugin.getGameProfileManager().exportElo(profileELO, true);
                         sender.sendMessage(ChatColor.GREEN + "ELO for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + " for kit " + ChatColor.WHITE + kit.getDisplayName() + ChatColor.GREEN + " has been set to " + elo + ".");
-                        return;
+                        return true;
                     }
                     break;
             }
@@ -90,5 +87,7 @@ public class EloManagerCommand {
         help.append("\n&6/elomanager ladder <player> <kit> <elo> &7- &fSets ELO for player for specified kit.");
 
         sender.sendMessage(Colors.get(help.toString()));
+
+        return true;
     }
 }

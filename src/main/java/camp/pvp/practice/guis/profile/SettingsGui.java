@@ -8,8 +8,6 @@ import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
-import com.lunarclient.bukkitapi.LunarClientAPI;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 

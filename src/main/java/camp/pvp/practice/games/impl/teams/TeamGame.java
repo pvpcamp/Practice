@@ -6,10 +6,6 @@ import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.utils.Colors;
-import com.lunarclient.bukkitapi.LCPacketWrapper;
-import com.lunarclient.bukkitapi.LunarClientAPI;
-import com.lunarclient.bukkitapi.nethandler.client.LCPacketServerUpdate;
-import com.lunarclient.bukkitapi.nethandler.client.LCPacketTeammates;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -25,29 +21,10 @@ import java.util.*;
 public abstract class TeamGame extends Game {
 
     private @Getter GameTeam blue, red;
-    private @Getter BukkitTask lcTeammateUpdater;
     protected TeamGame(Practice plugin, UUID uuid) {
         super(plugin, uuid);
         this.blue = new GameTeam(GameTeam.Color.BLUE, this);
         this.red = new GameTeam(GameTeam.Color.RED, this);
-    }
-
-    public void startLcTeammateUpdater() {
-        Bukkit.getScheduler().runTaskTimer(getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-                if(getState().equals(State.ACTIVE)) {
-                    updateLcTeamLocations(blue);
-                    updateLcTeamLocations(red);
-                }
-            }
-        }, 0, 20);
-    }
-
-    public void stopLcTeammateUpdater() {
-        if(lcTeammateUpdater != null) {
-            lcTeammateUpdater.cancel();
-        }
     }
 
     @Override
@@ -121,28 +98,29 @@ public abstract class TeamGame extends Game {
         }
     }
 
-    public void updateLcTeamLocations(GameTeam team) {
-        Map<UUID, Map<String, Double>> playerLocations = new HashMap<>();
-        Set<Player> players = new HashSet<>();
-
-        for(GameParticipant participant : team.getAliveParticipants().values()) {
-            Player player = participant.getPlayer();
-            Location location = player.getLocation();
-            Map<String, Double> locations = new HashMap<>();
-            locations.put("x", location.getX());
-            locations.put("y", location.getY());
-            locations.put("z", location.getZ());
-            playerLocations.put(participant.getUuid(), locations);
-            players.add(player);
-        }
-
-        LCPacketTeammates lcPacketTeammates = new LCPacketTeammates(null, System.currentTimeMillis(), playerLocations);
-        LunarClientAPI lcApi = LunarClientAPI.getInstance();
-
-        for(Player player : players) {
-            if(lcApi.isRunningLunarClient(player)) {
-                lcApi.sendPacket(player, lcPacketTeammates);
-            }
-        }
-    }
+    // TODO: Reimplement Lunar Client teams.
+//    public void updateLcTeamLocations(GameTeam team) {
+//        Map<UUID, Map<String, Double>> playerLocations = new HashMap<>();
+//        Set<Player> players = new HashSet<>();
+//
+//        for(GameParticipant participant : team.getAliveParticipants().values()) {
+//            Player player = participant.getPlayer();
+//            Location location = player.getLocation();
+//            Map<String, Double> locations = new HashMap<>();
+//            locations.put("x", location.getX());
+//            locations.put("y", location.getY());
+//            locations.put("z", location.getZ());
+//            playerLocations.put(participant.getUuid(), locations);
+//            players.add(player);
+//        }
+//
+//        LCPacketTeammates lcPacketTeammates = new LCPacketTeammates(null, System.currentTimeMillis(), playerLocations);
+//        LunarClientAPI lcApi = LunarClientAPI.getInstance();
+//
+//        for(Player player : players) {
+//            if(lcApi.isRunningLunarClient(player)) {
+//                lcApi.sendPacket(player, lcPacketTeammates);
+//            }
+//        }
+//    }
 }
