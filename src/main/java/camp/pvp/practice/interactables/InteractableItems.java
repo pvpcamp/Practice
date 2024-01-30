@@ -1,11 +1,16 @@
 package camp.pvp.practice.interactables;
 
+import camp.pvp.practice.Practice;
+import camp.pvp.practice.games.Game;
+import camp.pvp.practice.games.GameManager;
+import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.impl.events.SumoEvent;
-import camp.pvp.practice.interactables.impl.game.StopSpectatingInteract;
-import camp.pvp.practice.interactables.impl.game.TeleporterInteract;
-import camp.pvp.practice.interactables.impl.lobby.HostEventInteract;
+import camp.pvp.practice.games.tournaments.Tournament;
+import camp.pvp.practice.interactables.impl.game.*;
+import camp.pvp.practice.interactables.impl.lobby.EventInteract;
 import camp.pvp.practice.interactables.impl.lobby.RematchInteract;
 import camp.pvp.practice.interactables.impl.queue.RequeueInteract;
+import camp.pvp.practice.interactables.impl.tournaments.TournamentJoinInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentLeaveInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentStatusInteract;
 import camp.pvp.practice.parties.Party;
@@ -20,94 +25,132 @@ import camp.pvp.practice.interactables.impl.queue.LeaveQueueInteract;
 import camp.pvp.practice.interactables.impl.queue.QueueInteract;
 import camp.pvp.practice.interactables.impl.party.*;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public enum InteractableItems {
-    QUEUE, HOST_EVENT, REQUEUE, REMATCH, PARTY_CREATE, KIT_EDITOR, SETTINGS,
+    QUEUE, EVENT, REQUEUE, REMATCH, PARTY_CREATE, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
-    STOP_SPECTATING, TELEPORTER;
+    SHOW_SPECTATORS, STOP_SPECTATING, TELEPORTER, SPECTATOR_VISIBLE_TO_PLAYERS, SPECTATE_RANDOM;
 
     public InteractableItem getItem() {
         switch(this) {
             // LOBBY
             case QUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.DIAMOND_SWORD, "&6Join a Queue &7(Right Click)").create(), 0, new QueueInteract());
-            case HOST_EVENT:
-                return new InteractableItem(
-                        new ItemBuilder(Material.IRON_AXE, "&6Host an Event &7(Right Click)").create(), 1, new HostEventInteract());
+                        new ItemBuilder(Material.DIAMOND_SWORD, "&6Join a Queue").create(), 0, new QueueInteract());
+            case EVENT:
+                GameManager gm = Practice.getInstance().getGameManager();
+                if(gm.isEventRunning()) {
+                    if(gm.getTournament() != null && gm.getTournament().getState().equals(Tournament.State.STARTING)) {
+                        return new InteractableItem(
+                                new ItemBuilder(Material.DIAMOND, "&6Join Current Tournament").create(), 1, new TournamentJoinInteract());
+                    }
+
+                    if(gm.getActiveEvent() != null) {
+                        return new InteractableItem(
+                                new ItemBuilder(Material.EMERALD, "&6Join Current Event").create(), 1, new EventInteract());
+                    }
+                } else {
+                    return new InteractableItem(
+                            new ItemBuilder(Material.IRON_AXE, "&6Host an Event").create(), 1, new EventInteract());
+                }
             case REQUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.PAPER, "&6Play Again &7(Right Click)").create(), 3,
+                        new ItemBuilder(Material.PAPER, "&6Play Again").create(), 3,
                         new RequeueInteract(),
                         new ItemUpdater() {
                             @Override
                             public void onUpdate(InteractableItem item, GameProfile profile) {
                                 PreviousQueue queue = profile.getPreviousQueue();
-                                item.updateName("&6Queue " + queue.getQueueType().toString() + " " + queue.getKit().getDisplayName() + " &7(Right Click)");
+                                item.updateName("&6Queue " + queue.getQueueType().toString() + " " + queue.getKit().getDisplayName());
                             }
                         }
                 );
             case REMATCH:
                 return new InteractableItem(
-                        new ItemBuilder(Material.BLAZE_POWDER, "&6Rematch &7(Right Click)").create(), 2,
+                        new ItemBuilder(Material.BLAZE_POWDER, "&6Rematch").create(), 2,
                         new RematchInteract(),
                         new ItemUpdater() {
                             @Override
                             public void onUpdate(InteractableItem item, GameProfile profile) {
                                 Rematch rematch = profile.getRematch();
-                                item.updateName("&6Rematch " + rematch.getName() + " &7(Right Click)");
+                                item.updateName("&dRematch &f" + rematch.getName());
                             }
                         }
                 );
             case PARTY_CREATE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.NETHER_STAR, "&6Create a Party &7(Right Click)").create(), 4, new PartyCreateInteract());
+                        new ItemBuilder(Material.NETHER_STAR, "&6Create a Party").create(), 4, new PartyCreateInteract());
             case KIT_EDITOR:
                 return new InteractableItem(
-                        new ItemBuilder(Material.BOOK, "&6Edit Your Kits &7(Right Click)").create(), 7, new KitEditorInteract());
+                        new ItemBuilder(Material.BOOK, "&6Edit Your Kits").create(), 7, new KitEditorInteract());
             case SETTINGS:
                 return new InteractableItem(
-                        new ItemBuilder(Material.ANVIL, "&6Settings &7(Right Click)").create(), 8, new SettingsInteract());
+                        new ItemBuilder(Material.ANVIL, "&6Settings").create(), 8, new SettingsInteract());
             // LOBBY_QUEUE
             case LEAVE_QUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.REDSTONE, "&cLeave Queue &7(Right Click)").create(), 0, new LeaveQueueInteract());
+                        new ItemBuilder(Material.REDSTONE, "&cLeave Queue").create(), 0, new LeaveQueueInteract());
             // LOBBY_PARTY
             case PARTY_EVENT:
                 return new InteractableItem(
-                        new ItemBuilder(Material.GOLD_SWORD, "&6Start a Party Event &7(Right Click)").create(), 1, new PartyEventInteract());
+                        new ItemBuilder(Material.GOLD_SWORD, "&6Start a Party Event").create(), 1, new PartyEventInteract());
             case PARTY_SPECTATE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.COMPASS, "&6Spectate Party Game &7(Right Click)").create(), 1, new PartySpectateInteract());
+                        new ItemBuilder(Material.COMPASS, "&6Spectate Party Game").create(), 1, new PartySpectateInteract());
             case PARTY_KIT:
                 return new InteractableItem(
-                        new ItemBuilder(Material.CHEST, "&6Customize HCF Kits &7(Right Click)").create(), 0, new PartyKitInteract());
+                        new ItemBuilder(Material.CHEST, "&6Customize HCF Kits").create(), 0, new PartyKitInteract());
             case PARTY_LEAVE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.REDSTONE, "&6Leave Party &7(Right Click)").create(), 4, new PartyLeaveInteract());
+                        new ItemBuilder(Material.REDSTONE, "&6Leave Party").create(), 4, new PartyLeaveInteract());
             case PARTY_SETTINGS:
                 return new InteractableItem(
-                        new ItemBuilder(Material.PAPER, "&6Party Settings &7(Right Click)").create(), 7, new PartySettingsInteract());
+                        new ItemBuilder(Material.PAPER, "&6Party Settings").create(), 7, new PartySettingsInteract());
             // LOBBY_TOURNAMENT
             case TOURNAMENT_STATUS:
                 return new InteractableItem(
-                        new ItemBuilder(Material.DIAMOND, "&6Tournament Status &7(Right Click)").create(), 0, new TournamentStatusInteract());
+                        new ItemBuilder(Material.DIAMOND, "&6Tournament Status").create(), 0, new TournamentStatusInteract());
             case TOURNAMENT_LEAVE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.NETHER_STAR, "&6Leave Tournament &7(Right Click)").create(), 4, new TournamentLeaveInteract());
+                        new ItemBuilder(Material.NETHER_STAR, "&6Leave Tournament").create(), 4, new TournamentLeaveInteract());
             // SPECTATING
+            case SHOW_SPECTATORS:
+                return new InteractableItem(
+                        new ItemBuilder(Material.INK_SACK, "&aShow/Hide Other Spectators").create(), 0, new ShowSpectatorsInteract(),
+                        new ItemUpdater() {
+                            @Override
+                            public void onUpdate(InteractableItem item, GameProfile profile) {
+                                item.getItem().setDurability((short) (profile.isSpectatorVisibility() ? 10 : 8));
+                                item.updateName(!profile.isSpectatorVisibility() ? "&aSpectator Visibility &e(Enabled)" : "&aSpectator Visibility &c(Disabled)");
+                            }
+                        });
             case STOP_SPECTATING:
                 return new InteractableItem(
-                        new ItemBuilder(Material.REDSTONE, "&cStop Spectating &7(Right Click)").create(), 4, new StopSpectatingInteract());
+                        new ItemBuilder(Material.BED, "&cStop Spectating").create(), 4, new StopSpectatingInteract());
             case TELEPORTER:
                 return new InteractableItem(
-                        new ItemBuilder(Material.WATCH, "&6Teleportation Device &7(Right Click)").create(), 8, new TeleporterInteract());
+                        new ItemBuilder(Material.WATCH, "&6Teleportation Device").create(), 8, new TeleporterInteract());
+            // Staff Spectator Utilities
+            case SPECTATOR_VISIBLE_TO_PLAYERS:
+                return new InteractableItem(
+                        new ItemBuilder(Material.STICK, "&aShow/Hide Self To Players").create(), 6, new VisibleToPlayersInteract(),
+                        new ItemUpdater() {
+                            @Override
+                            public void onUpdate(InteractableItem item, GameProfile profile) {
+                                Game game = profile.getGame();
+                                GameSpectator spectator = game.getSpectators().get(profile.getUuid());
+                                item.getItem().setType(spectator.isVisibleToPlayers() ? Material.BLAZE_ROD : Material.STICK);
+                                item.updateName(!spectator.isVisibleToPlayers() ? "&dInvisible to Players" : "&e&lVisible to Players");
+                            }
+                        });
+            case SPECTATE_RANDOM:
+                return new InteractableItem(
+                        new ItemBuilder(Material.BLAZE_POWDER, "&5Spectate Random Game").create(), 7, new SpectateRandomInteract());
             default:
                 return null;
         }
@@ -118,7 +161,7 @@ public enum InteractableItems {
         switch(profile.getState()) {
             case LOBBY:
                 items.add(QUEUE);
-                items.add(HOST_EVENT);
+                items.add(EVENT);
 
                 if(profile.getRematch() != null) {
                     items.add(REMATCH);
@@ -160,6 +203,12 @@ public enum InteractableItems {
 
                 if(!(profile.getGame() instanceof SumoEvent)) {
                     items.add(TELEPORTER);
+                    items.add(SHOW_SPECTATORS);
+                }
+
+                if(profile.getPlayer().hasPermission("practice.staff")) {
+                    items.add(SPECTATOR_VISIBLE_TO_PLAYERS);
+                    items.add(SPECTATE_RANDOM);
                 }
                 break;
         }

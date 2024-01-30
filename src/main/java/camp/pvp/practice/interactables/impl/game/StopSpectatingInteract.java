@@ -9,6 +9,6 @@ public class StopSpectatingInteract implements ItemInteract {
     @Override
     public void onInteract(Player player, GameProfile gameProfile) {
         Game game = gameProfile.getGame();
-        game.spectateEnd(player);
+        game.spectateEnd(player, true);
     }
 }

@@ -145,6 +145,8 @@ public class Tournament {
 
         setState(State.STARTING);
 
+        getPlugin().getGameProfileManager().refreshLobbyItems();
+
         timer = 60;
         startingTimer = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
             @Override
@@ -263,9 +265,17 @@ public class Tournament {
             profile.setTournament(null);
         }
 
+        for(TournamentMatch match : getQueuedGames()) {
+            match.getGame().setState(Game.State.ENDED);
+        }
+
+        getQueuedGames().clear();
+
         plugin.getGameManager().setTournament(null);
 
         setState(State.ENDED);
+
+        plugin.getGameProfileManager().refreshLobbyItems();
     }
 
     public void forceEnd() {
@@ -290,6 +300,8 @@ public class Tournament {
         announce("&4This tournament has been forcefully ended.");
 
         this.setState(State.ENDED);
+
+        plugin.getGameProfileManager().refreshLobbyItems();
     }
 
     public List<String> getScoreboard(GameProfile profile) {

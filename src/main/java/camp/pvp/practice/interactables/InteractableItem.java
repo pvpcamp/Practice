@@ -3,6 +3,7 @@ package camp.pvp.practice.interactables;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 

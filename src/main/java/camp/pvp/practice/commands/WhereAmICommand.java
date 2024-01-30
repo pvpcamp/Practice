@@ -30,7 +30,7 @@ public class WhereAmICommand implements CommandExecutor {
             Game game = profile.getGame();
 
             if(game != null) {
-                sb.append("\n&6Arena: &f" + game.getArena().getDisplayName() + " &7(" + game.getArena().getName());
+                sb.append("\n&6Arena: &f" + game.getArena().getDisplayName() + " &7(" + game.getArena().getName() + ")");
                 sb.append("\n&6Currently playing: &f" + game.getCurrentPlaying().containsKey(player.getUniqueId()));
             } else {
                 sb.append("\n&6&oYou are not currently in game.");

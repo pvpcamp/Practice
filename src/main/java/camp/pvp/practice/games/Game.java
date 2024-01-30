@@ -105,12 +105,14 @@ public abstract class Game {
 
         for(GameSpectator spectator : new ArrayList<>(this.getSpectators().values())) {
             Player player = Bukkit.getPlayer(spectator.getUuid());
-            this.spectateEnd(player);
+            this.spectateEnd(player, true);
         }
 
         this.clearEntities();
         this.setEnded(new Date());
         this.setState(State.ENDED);
+
+        plugin.getGameProfileManager().refreshLobbyItems();
     }
 
     public void eliminate(Player player, boolean leftGame) {
@@ -343,7 +345,7 @@ public abstract class Game {
         player.setFlying(true);
     }
 
-    public void spectateEnd(Player player) {
+    public void spectateEnd(Player player, boolean updateLocation) {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
         if(!this.getState().equals(State.ENDED)) {
@@ -360,7 +362,7 @@ public abstract class Game {
         this.getSpectators().remove(player.getUniqueId());
 
         profile.setGame(null);
-        profile.playerUpdate(true);
+        profile.playerUpdate(updateLocation);
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
         updateEntities();
@@ -370,7 +372,7 @@ public abstract class Game {
         if(getAlive().containsKey(player.getUniqueId())) {
             eliminate(player, true);
         } else {
-            spectateEnd(player);
+            spectateEnd(player, true);
         }
     }
 

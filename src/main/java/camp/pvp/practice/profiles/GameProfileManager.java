@@ -121,6 +121,17 @@ public class GameProfileManager {
         }
     }
 
+    public void refreshLobbyItems() {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            GameProfile profile = getLoadedProfiles().get(player.getUniqueId());
+            if(profile != null) {
+                if(profile.getState().equals(GameProfile.State.LOBBY)) {
+                    profile.givePlayerItems(false);
+                }
+            }
+        }
+    }
+
     public GameProfile create(Player player) {
         GameProfile profile = new GameProfile(player.getUniqueId());
 

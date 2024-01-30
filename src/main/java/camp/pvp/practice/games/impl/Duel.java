@@ -342,22 +342,25 @@ public class Duel extends Game {
                 showDuration = profile.isSidebarShowDuration(),
                 showPing = profile.isSidebarShowPing();
 
-        lines.add("&6Players:");
+        if(!getState().equals(State.ENDED)) {
 
-        for(GameParticipant participant : getParticipants().values()) {
-            if(participant.isAlive()) {
-                Player player = participant.getPlayer();
-                if(kit.equals(DuelKit.BOXING)) {
-                    lines.add(" &f" + participant.getName() + " &7(" + participant.getHits() + ")");
-                } else {
-                    if (!queueType.equals(GameQueue.Type.RANKED)) {
-                        lines.add(" &f" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
+            lines.add("&6Players:");
+
+            for (GameParticipant participant : getParticipants().values()) {
+                if (participant.isAlive()) {
+                    Player player = participant.getPlayer();
+                    if (kit.equals(DuelKit.BOXING)) {
+                        lines.add(" &f" + participant.getName() + " &7(" + participant.getHits() + ")");
                     } else {
-                        lines.add(" &f" + participant.getName() + "&c ❤");
+                        if (!queueType.equals(GameQueue.Type.RANKED)) {
+                            lines.add(" &f" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
+                        } else {
+                            lines.add(" &f" + participant.getName() + "&c ❤");
+                        }
                     }
+                } else {
+                    lines.add(" &4X &c&m" + participant.getName());
                 }
-            } else {
-                lines.add(" &4X &c&m" + participant.getName());
             }
         }
 
@@ -378,8 +381,11 @@ public class Duel extends Game {
                 }
                 break;
             case ENDED:
+                if(getAlivePlayers().size() == 1) {
+                    lines.add("&6Winner: &f" + getAlivePlayers().get(0).getName());
+                }
+
                 if(showDuration) {
-                    lines.add(" ");
                     lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
                 }
                 break;

@@ -88,7 +88,7 @@ public class EndingTask implements Runnable{
 
         for(GameSpectator spectator : new ArrayList<>(game.getSpectators().values())) {
             Player player = Bukkit.getPlayer(spectator.getUuid());
-            game.spectateEnd(player);
+            game.spectateEnd(player, true);
         }
 
         Practice.instance.getGameProfileManager().updateGlobalPlayerVisibility();

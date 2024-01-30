@@ -5,6 +5,7 @@ import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
+import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.PostGameInventory;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfile;
@@ -49,8 +50,11 @@ public class SumoEvent extends GameEvent {
                 this.setArena(list.get(0));
             } else {
                 this.forceEnd();
+                return;
             }
         }
+
+        getPlugin().getGameProfileManager().refreshLobbyItems();
 
         this.setState(State.STARTING);
 
@@ -108,6 +112,7 @@ public class SumoEvent extends GameEvent {
         }
 
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
+        getPlugin().getGameProfileManager().refreshLobbyItems();
     }
 
     public void nextRound() {
@@ -263,16 +268,23 @@ public class SumoEvent extends GameEvent {
 
     @Override
     public GameParticipant join(Player player) {
-        GameParticipant participant = super.join(player);
 
-        player.teleport(getArena().getPositions().get("lobby").getLocation());
-        PlayerUtils.reset(player, true);
+        if (state.equals(State.STARTING)) {
+            GameParticipant participant = super.join(player);
 
-        this.announce("&6[Event] &f" + player.getName() + "&a joined the event.");
+            player.teleport(getArena().getPositions().get("lobby").getLocation());
+            PlayerUtils.reset(player, true);
 
-        getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
+            this.announce("&6[Event] &f" + player.getName() + "&a joined the event.");
 
-        return participant;
+            getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
+
+            return participant;
+        } else {
+            spectateStart(player);
+        }
+
+        return null;
     }
 
     @Override

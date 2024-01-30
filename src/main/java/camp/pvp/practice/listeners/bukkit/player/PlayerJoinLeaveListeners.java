@@ -73,14 +73,7 @@ public class PlayerJoinLeaveListeners implements Listener {
             Game game = profile.getGame();
 
             if (game != null) {
-                switch (profile.getState()) {
-                    case SPECTATING:
-                        game.spectateEnd(player);
-                        break;
-                    case IN_GAME:
-                        game.eliminate(player, true);
-                        break;
-                }
+                game.leave(player);
             }
 
             if (profile.getParty() != null) {

@@ -173,6 +173,10 @@ public class GameProfile {
     }
 
     public void givePlayerItems() {
+        givePlayerItems(true);
+    }
+
+    public void givePlayerItems(boolean update) {
         Player player = getPlayer();
         if(player != null) {
 
@@ -188,7 +192,30 @@ public class GameProfile {
                 }
             }
 
-            PlayerUtils.reset(player, flying);
+            // Update is only used for when the player is in the lobby and their items need to be updated.
+            // This is why the player is not fully reset or their slot updated.
+            if(update) {
+                int slot = 0;
+                switch (this.getState()) {
+                    case LOBBY_TOURNAMENT:
+                        slot = 1;
+                        break;
+                    case LOBBY:
+                    case LOBBY_PARTY:
+                        slot = 2;
+                        break;
+                    case SPECTATING:
+                    case IN_GAME:
+                    case LOBBY_QUEUE:
+                        slot = 0;
+                        break;
+                }
+
+                player.getInventory().setHeldItemSlot(slot);
+                PlayerUtils.reset(player, flying);
+            } else {
+                player.getInventory().clear();
+            }
 
             PlayerInventory pi = player.getInventory();
             for(InteractableItems i : InteractableItems.getInteractableItems(this)) {
@@ -201,26 +228,9 @@ public class GameProfile {
                 pi.setItem(ii.getSlot(), ii.getItem().clone());
             }
 
-            int slot = 0;
-            switch(this.getState()) {
-                case LOBBY_TOURNAMENT:
-                    slot = 1;
-                    break;
-                case LOBBY:
-                case LOBBY_PARTY:
-                    slot = 2;
-                    break;
-                case SPECTATING:
-                case IN_GAME:
-                case LOBBY_QUEUE:
-                    slot = 0;
-                    break;
-            }
-
-            player.getInventory().setHeldItemSlot(slot);
-
             if(game != null && game.getAlive().get(this.getUuid()) != null) {
                 DuelKit kit = game.getKit();
+
                 Map<Integer, CustomDuelKit> customKits = getCustomDuelKits().get(kit);
                 if(customKits == null || customKits.isEmpty()) {
                     game.getParticipants().get(uuid).setKitApplied(true);
@@ -290,13 +300,14 @@ public class GameProfile {
     public void updatePlayerVisibility() {
         Player player = getPlayer();
         GameProfileManager gpm = Practice.instance.getGameProfileManager();
+
+        getHiddenPlayers().clear();
+
         if(player != null) {
             if(game != null) {
                 if(game.seeEveryone()) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
-                        if(game.getAllPlayers().contains(p)) {
-                            getHiddenPlayers().remove(p.getUniqueId());
-                        } else {
+                        if(!game.getAllPlayers().contains(p)) {
                             getHiddenPlayers().add(p.getUniqueId());
                         }
                     }
@@ -304,9 +315,9 @@ public class GameProfile {
                     if(game.getCurrentPlayersPlaying().contains(player)) {
                         for (Player p : Bukkit.getOnlinePlayers()) {
                             if(!game.getCurrentPlayersPlaying().contains(p)) {
-                                getHiddenPlayers().add(p.getUniqueId());
-                            } else {
-                                getHiddenPlayers().remove(p.getUniqueId());
+                                if (game.getSpectators().get(p.getUniqueId()) == null || !game.getSpectators().get(p.getUniqueId()).isVisibleToPlayers()) {
+                                    getHiddenPlayers().add(p.getUniqueId());
+                                }
                             }
                         }
                     } else {
@@ -315,10 +326,8 @@ public class GameProfile {
                             GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
                             boolean spectating = game.getSpectators().containsKey(p.getUniqueId());
                             boolean playing = game.getCurrentPlayersPlaying().contains(p);
-                            if(playing) {
-                                getHiddenPlayers().remove(p.getUniqueId());
-                            } else {
-                                if(spectating) {
+                            if(!playing) {
+                                if (spectating) {
                                     if (seeSpectators) {
                                         if (profile.isStaffMode() && !player.hasPermission("practice.staff")) {
                                             getHiddenPlayers().add(p.getUniqueId());
@@ -341,12 +350,23 @@ public class GameProfile {
                     } else {
                         if(profile.isStaffMode() && !player.hasPermission("practice.staff")) {
                             getHiddenPlayers().add(p.getUniqueId());
-                        } else {
-                            getHiddenPlayers().remove(p.getUniqueId());
                         }
                     }
                 }
             }
+        }
+    }
+
+    public boolean isInLobby() {
+        State state = getState();
+        switch (state) {
+            case LOBBY_QUEUE:
+            case LOBBY_PARTY:
+            case LOBBY_TOURNAMENT:
+            case LOBBY:
+                return true;
+            default:
+                return false;
         }
     }
 
