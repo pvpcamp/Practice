@@ -21,10 +21,12 @@ commands:
   duel:
     description: Duel another player or team.
   elomanager:
+    permission: practice.staff.elo
     description: Manage the ELO of a player.
   event:
     description: Join, leave, or host event.
   gamedebug:
+    permission: practice.commands.gamedebug
     description: Miscellaneous game debugging utilities.
   games:
     permission: practice.commands.games

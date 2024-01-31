@@ -122,35 +122,29 @@ public enum InteractableItems {
             case SHOW_SPECTATORS:
                 return new InteractableItem(
                         new ItemBuilder(Material.INK_SACK, "&aShow/Hide Other Spectators").create(), 0, new ShowSpectatorsInteract(),
-                        new ItemUpdater() {
-                            @Override
-                            public void onUpdate(InteractableItem item, GameProfile profile) {
-                                item.getItem().setDurability((short) (profile.isSpectatorVisibility() ? 10 : 8));
-                                item.updateName(!profile.isSpectatorVisibility() ? "&aSpectator Visibility &e(Enabled)" : "&aSpectator Visibility &c(Disabled)");
-                            }
+                        (item, profile) -> {
+                            item.getItem().setDurability((short) (profile.isSpectatorVisibility() ? 10 : 8));
+                            item.updateName(profile.isSpectatorVisibility() ? "&aSpectator Visibility &e(Enabled)" : "&aSpectator Visibility &c(Disabled)");
                         });
             case STOP_SPECTATING:
                 return new InteractableItem(
                         new ItemBuilder(Material.BED, "&cStop Spectating").create(), 4, new StopSpectatingInteract());
             case TELEPORTER:
                 return new InteractableItem(
-                        new ItemBuilder(Material.WATCH, "&6Teleportation Device").create(), 8, new TeleporterInteract());
+                        new ItemBuilder(Material.WATCH, "&eTeleportation Device").create(), 8, new TeleporterInteract());
             // Staff Spectator Utilities
             case SPECTATOR_VISIBLE_TO_PLAYERS:
                 return new InteractableItem(
                         new ItemBuilder(Material.STICK, "&aShow/Hide Self To Players").create(), 6, new VisibleToPlayersInteract(),
-                        new ItemUpdater() {
-                            @Override
-                            public void onUpdate(InteractableItem item, GameProfile profile) {
-                                Game game = profile.getGame();
-                                GameSpectator spectator = game.getSpectators().get(profile.getUuid());
-                                item.getItem().setType(spectator.isVisibleToPlayers() ? Material.BLAZE_ROD : Material.STICK);
-                                item.updateName(!spectator.isVisibleToPlayers() ? "&dInvisible to Players" : "&e&lVisible to Players");
-                            }
+                        (item, profile) -> {
+                            Game game = profile.getGame();
+                            GameSpectator spectator = game.getSpectators().get(profile.getUuid());
+                            item.getItem().setType(spectator.isVisibleToPlayers() ? Material.BLAZE_ROD : Material.STICK);
+                            item.updateName(!spectator.isVisibleToPlayers() ? "&7Invisible to Players" : "&e&lVisible to Players");
                         });
             case SPECTATE_RANDOM:
                 return new InteractableItem(
-                        new ItemBuilder(Material.BLAZE_POWDER, "&5Spectate Random Game").create(), 7, new SpectateRandomInteract());
+                        new ItemBuilder(Material.BLAZE_POWDER, "&6Spectate Random Game").create(), 7, new SpectateRandomInteract());
             default:
                 return null;
         }
