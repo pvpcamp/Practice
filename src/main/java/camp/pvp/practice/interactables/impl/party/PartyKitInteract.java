@@ -31,7 +31,7 @@ public class PartyKitInteract implements ItemInteract {
                 meta.setOwner(m.getName());
                 skullItem.setItemMeta(meta);
 
-                GuiButton button = new GuiButton(skullItem, "&6" + m.getName());
+                GuiButton button = new GuiButton(skullItem, "&6&l" + m.getName());
                 button.setAction(new GuiAction() {
                     @Override
                     public void run(Player player, Gui gui) {

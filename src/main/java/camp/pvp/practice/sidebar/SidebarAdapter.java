@@ -48,11 +48,8 @@ public class SidebarAdapter implements AssembleAdapter {
         GameProfile profile = gameProfileManager.getLoadedProfiles().get(player.getUniqueId());
         if(profile != null && profile.isShowSidebar()) {
             GameProfile.State state = profile.getState();
-            boolean showInGame = profile.isSidebarInGame(),
-                    showCps = profile.isSidebarShowCps(),
-                    showDuration = profile.isSidebarShowDuration(),
+            boolean showDuration = profile.isSidebarShowDuration(),
                     showLines = profile.isSidebarShowLines(),
-                    showPing = profile.isSidebarShowPing(),
                     staff = player.hasPermission("practice.staff");
 
             if(showLines) {
@@ -81,6 +78,7 @@ public class SidebarAdapter implements AssembleAdapter {
                         lines.add("&6Staff Mode: &f" + (profile.isStaffMode() ? "Enabled" : "Disabled"));
                         lines.add("&6Active Games: &f" + plugin.getGameManager().getActiveGames().size());
                     }
+
                     break;
                 case LOBBY_QUEUE:
                     GameQueue queue = gameQueueManager.getQueue(player);
@@ -139,9 +137,6 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.addAll(game.getSpectatorScoreboard(profile));
                     break;
                 case KIT_EDITOR:
-                    lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
-                    lines.add("&6In Game: &f" + gameManager.getTotalInGame());
-                    lines.add(" ");
                     lines.add("&6Editing Kit:");
                     lines.add(" &f" + profile.getEditingKit().getDisplayName());
                     lines.add(" ");

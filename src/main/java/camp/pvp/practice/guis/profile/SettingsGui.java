@@ -11,6 +11,9 @@ import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SettingsGui extends StandardGui {
     public SettingsGui(GameProfile gameProfile) {
         super("&6Settings", 36);
@@ -18,7 +21,7 @@ public class SettingsGui extends StandardGui {
 
         setDefaultBorder();
 
-        GuiButton spectatorVisibility = new GuiButton(Material.REDSTONE_TORCH_ON, "&6Spectator Visibility");
+        GuiButton spectatorVisibility = new GuiButton(Material.REDSTONE_TORCH_ON, "&6&lSpectator Visibility");
         spectatorVisibility.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -41,7 +44,7 @@ public class SettingsGui extends StandardGui {
         spectatorVisibility.setSlot(10);
         this.addButton(spectatorVisibility, false);
 
-        GuiButton lobbyVisibility = new GuiButton(Material.EYE_OF_ENDER, "&eLobby Visibility");
+        GuiButton lobbyVisibility = new GuiButton(Material.EYE_OF_ENDER, "&e&lLobby Visibility");
         lobbyVisibility.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -64,7 +67,7 @@ public class SettingsGui extends StandardGui {
         lobbyVisibility.setSlot(11);
         this.addButton(lobbyVisibility, false);
 
-        GuiButton comboMessages = new GuiButton(Material.EXP_BOTTLE, "&3Combo Messages and Sounds");
+        GuiButton comboMessages = new GuiButton(Material.EXP_BOTTLE, "&3&lCombo Messages and Sounds");
         comboMessages.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -86,7 +89,7 @@ public class SettingsGui extends StandardGui {
         comboMessages.setSlot(12);
         this.addButton(comboMessages, false);
 
-        GuiButton tournamentMessages = new GuiButton(Material.DIAMOND_SWORD, "&4Tournament Notifications");
+        GuiButton tournamentMessages = new GuiButton(Material.DIAMOND_SWORD, "&4&lTournament Notifications");
         tournamentMessages.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -109,7 +112,7 @@ public class SettingsGui extends StandardGui {
         tournamentMessages.setSlot(13);
         this.addButton(tournamentMessages, false);
 
-        GuiButton playerTime = new GuiButton(Material.WATCH, "&5Player Time");
+        GuiButton playerTime = new GuiButton(Material.WATCH, "&5&lPlayer Time");
         playerTime.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -140,7 +143,7 @@ public class SettingsGui extends StandardGui {
         playerTime.setSlot(14);
         this.addButton(playerTime, false);
 
-        GuiButton deathAnimation = new GuiButton(gameProfile.getDeathAnimation().getIcon().getType(), "&4Death Animation");
+        GuiButton deathAnimation = new GuiButton(gameProfile.getDeathAnimation().getIcon().getType(), "&4&lDeath Animation");
         deathAnimation.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -163,19 +166,23 @@ public class SettingsGui extends StandardGui {
             public void update(GuiButton guiButton, Gui gui) {
                 DeathAnimation da = gameProfile.getDeathAnimation();
                 guiButton.setType(da.getIcon().getType());
-                guiButton.setLore(
-                        "&7What would you like your",
-                        "&7death animation to be?",
-                        " ",
-                        (da.equals(DeathAnimation.DEFAULT) ? "&6&l" : "&8") +" ● Default",
-                        (da.equals(DeathAnimation.BLOOD) ? "&6&l" : "&8") +" ● Blood",
-                        (da.equals(DeathAnimation.EXPLOSION) ? "&6&l" : "&8") +" ● Explosion");
+
+                List<String> lore = new ArrayList<>();
+                lore.add("&7What would you like your");
+                lore.add("&7death animation to be?");
+                lore.add(" ");
+
+                for(DeathAnimation deathAnimation : DeathAnimation.values()) {
+                    lore.add((da.equals(deathAnimation) ? "&6&l" : "&8") +" ● " + deathAnimation);
+                }
+
+                guiButton.setLore(lore);
             }
         });
         deathAnimation.setSlot(15);
         this.addButton(deathAnimation, false);
 
-        GuiButton sidebarVisibility = new GuiButton(Material.EMPTY_MAP, "&aSidebar Visibility");
+        GuiButton sidebarVisibility = new GuiButton(Material.EMPTY_MAP, "&a&lSidebar Visibility");
         sidebarVisibility.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -196,7 +203,7 @@ public class SettingsGui extends StandardGui {
         sidebarVisibility.setSlot(16);
         this.addButton(sidebarVisibility, false);
 
-        GuiButton sidebarSettings = new GuiButton(Material.BOAT, "&dSidebar Settings");
+        GuiButton sidebarSettings = new GuiButton(Material.BOAT, "&d&lSidebar Settings");
         sidebarSettings.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -245,7 +252,7 @@ public class SettingsGui extends StandardGui {
         }
 
         if(player.hasPermission("practice.staff.build_mode")) {
-            GuiButton buildMode = new GuiButton(Material.GRASS, "&b&lBuild Mode");
+            GuiButton buildMode = new GuiButton(Material.GRASS, "&b&l&oBuild Mode");
             buildMode.setAction(new GuiAction() {
                 @Override
                 public void run(Player player, Gui gui) {

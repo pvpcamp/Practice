@@ -12,9 +12,10 @@ import org.bukkit.entity.Player;
 public class SidebarSettingsGui extends StandardGui {
     public SidebarSettingsGui(GameProfile profile) {
         super("&6Sidebar Settings", 27);
-        this.setDefaultBackground();
 
-        GuiButton visibilityInGame = new GuiButton(Material.DIAMOND_SWORD, "&aVisible In Game");
+        setDefaultBorder();
+
+        GuiButton visibilityInGame = new GuiButton(Material.DIAMOND_SWORD, "&a&lVisible In Game");
         visibilityInGame.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -36,7 +37,7 @@ public class SidebarSettingsGui extends StandardGui {
         visibilityInGame.setSlot(11);
         this.addButton(visibilityInGame, false);
 
-        GuiButton sidebarShowDuration = new GuiButton(Material.WATCH, "&aShow Game Duration");
+        GuiButton sidebarShowDuration = new GuiButton(Material.WATCH, "&a&lShow Game Duration");
         sidebarShowDuration.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -58,7 +59,7 @@ public class SidebarSettingsGui extends StandardGui {
         sidebarShowDuration.setSlot(12);
         this.addButton(sidebarShowDuration, false);
 
-        GuiButton sidebarShowCps = new GuiButton(Material.LEASH, "&aShow CPS");
+        GuiButton sidebarShowCps = new GuiButton(Material.LEASH, "&a&lShow CPS");
         sidebarShowCps.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -80,7 +81,7 @@ public class SidebarSettingsGui extends StandardGui {
         sidebarShowCps.setSlot(13);
         this.addButton(sidebarShowCps, false);
 
-        GuiButton sidebarShowLines = new GuiButton(Material.EMPTY_MAP, "&aShow Lines");
+        GuiButton sidebarShowLines = new GuiButton(Material.EMPTY_MAP, "&a&lShow Lines");
         sidebarShowLines.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {
@@ -102,7 +103,7 @@ public class SidebarSettingsGui extends StandardGui {
         sidebarShowLines.setSlot(14);
         this.addButton(sidebarShowLines, false);
 
-        GuiButton sidebarShowPing = new GuiButton(Material.BEACON, "&aShow Ping");
+        GuiButton sidebarShowPing = new GuiButton(Material.BEACON, "&a&lShow Ping");
         sidebarShowPing.setAction(new GuiAction() {
             @Override
             public void run(Player player, Gui gui) {

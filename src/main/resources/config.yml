@@ -16,5 +16,5 @@ npc_ids:
   statistics: 2
   leaderboards: 3
 scoreboard:
-  title: "&6&lPractice &7┃ &fBeta"
+  title: "&6Practice"
   ip: "&7&opvp.camp"

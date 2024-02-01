@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum DeathAnimation {
-    DEFAULT, BLOOD, EXPLOSION;
+    DEFAULT, BLOOD, EXPLOSION, ENDERMAN;
 
     public String toString() {
         switch(this) {
@@ -20,8 +20,10 @@ public enum DeathAnimation {
                 return "Blood";
             case EXPLOSION:
                 return "Explosion";
+            case ENDERMAN:
+                return "Enderman";
             default:
-                return "Default";
+                return "Default (Lightning)";
         }
     }
 
@@ -31,6 +33,8 @@ public enum DeathAnimation {
                 return new ItemStack(Material.REDSTONE_BLOCK);
             case EXPLOSION:
                 return new ItemStack(Material.SULPHUR);
+            case ENDERMAN:
+                return new ItemStack(Material.ENDER_PEARL);
             default:
                 return new ItemStack(Material.BLAZE_ROD);
         }
@@ -90,6 +94,15 @@ public enum DeathAnimation {
                 game.playSound(location, Sound.HURT_FLESH, 1F, 1F);
                 game.playSound(location, Sound.EXPLODE, 1F, 1F);
 
+                break;
+            case ENDERMAN:
+                l = new Location(world, location.getX(), location.getY() + 1, location.getZ());
+                if(velocity) {
+                    victim.setVelocity(new Vector(0, 0.5, 0));
+                }
+
+                game.playEffect(l, Effect.ENDER_SIGNAL, null);
+                game.playSound(location, Sound.ENDERMAN_HIT, 1F, 1F);
                 break;
             default:
                 l = new Location(world, location.getX(), location.getY() + 0.5, location.getZ());

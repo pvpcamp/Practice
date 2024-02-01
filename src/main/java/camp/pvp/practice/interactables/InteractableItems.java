@@ -121,7 +121,7 @@ public enum InteractableItems {
             // SPECTATING
             case SHOW_SPECTATORS:
                 return new InteractableItem(
-                        new ItemBuilder(Material.INK_SACK, "&aShow/Hide Other Spectators").create(), 0, new ShowSpectatorsInteract(),
+                        new ItemBuilder(Material.INK_SACK, "&aShow/Hide Other Spectators").create(), 3, new ShowSpectatorsInteract(),
                         (item, profile) -> {
                             item.getItem().setDurability((short) (profile.isSpectatorVisibility() ? 10 : 8));
                             item.updateName(profile.isSpectatorVisibility() ? "&aSpectator Visibility &e(Enabled)" : "&aSpectator Visibility &c(Disabled)");
@@ -131,11 +131,11 @@ public enum InteractableItems {
                         new ItemBuilder(Material.BED, "&cStop Spectating").create(), 4, new StopSpectatingInteract());
             case TELEPORTER:
                 return new InteractableItem(
-                        new ItemBuilder(Material.WATCH, "&eTeleportation Device").create(), 8, new TeleporterInteract());
+                        new ItemBuilder(Material.WATCH, "&eTeleportation Device").create(), 5, new TeleporterInteract());
             // Staff Spectator Utilities
             case SPECTATOR_VISIBLE_TO_PLAYERS:
                 return new InteractableItem(
-                        new ItemBuilder(Material.STICK, "&aShow/Hide Self To Players").create(), 6, new VisibleToPlayersInteract(),
+                        new ItemBuilder(Material.STICK, "&aShow/Hide Self To Players").create(), 7, new VisibleToPlayersInteract(),
                         (item, profile) -> {
                             Game game = profile.getGame();
                             GameSpectator spectator = game.getSpectators().get(profile.getUuid());
@@ -144,7 +144,7 @@ public enum InteractableItems {
                         });
             case SPECTATE_RANDOM:
                 return new InteractableItem(
-                        new ItemBuilder(Material.BLAZE_POWDER, "&6Spectate Random Game").create(), 7, new SpectateRandomInteract());
+                        new ItemBuilder(Material.BLAZE_POWDER, "&6Spectate Random Game").create(), 8, new SpectateRandomInteract());
             default:
                 return null;
         }

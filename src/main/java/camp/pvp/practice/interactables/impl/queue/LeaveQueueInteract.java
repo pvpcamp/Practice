@@ -8,6 +8,6 @@ import org.bukkit.entity.Player;
 public class LeaveQueueInteract implements ItemInteract {
     @Override
     public void onInteract(Player player, GameProfile gameProfile) {
-        Practice.instance.getGameQueueManager().removeFromQueue(player);
+        Practice.getInstance().getGameQueueManager().removeFromQueue(player);
     }
 }

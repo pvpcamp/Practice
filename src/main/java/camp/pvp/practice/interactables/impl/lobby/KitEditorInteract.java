@@ -23,7 +23,7 @@ public class KitEditorInteract implements ItemInteract {
         for(DuelKit kit : DuelKit.values()) {
             if(!kit.isEditable()) continue;
 
-            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
+            GuiButton button = new GuiButton(kit.getIcon(), "&6&l" + kit.getDisplayName());
             button.setLore("&7Click to edit &f" + kit.getDisplayName() + "&7.");
 
             button.setAction(new GuiAction() {

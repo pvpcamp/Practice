@@ -145,14 +145,9 @@ public abstract class Game {
 
             Location location = player.getLocation();
 
-            if(participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
-                GameProfile attackerProfile = plugin.getGameProfileManager().getLoadedProfiles().get(participant.getAttacker());
-                if(attackerProfile != null) {
-                    attackerProfile.getDeathAnimation().playAnimation(this, player, location, true);
-                }
-            } else {
-                profile.getDeathAnimation().playAnimation(this, player, location, false);
-            }
+            boolean velocity = participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK);
+
+            profile.getDeathAnimation().playAnimation(this, player, location, velocity);
         }
     }
 
