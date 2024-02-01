@@ -214,15 +214,9 @@ public class Arena implements Comparable<Arena>{
                     chunk.unload(false);
                 }
             }
-
-            scanArena();
         }
 
         setInUse(false);
-    }
-
-    public void addBlock(Block block) {
-
     }
 
     public boolean isOriginalBlock(Location location) {

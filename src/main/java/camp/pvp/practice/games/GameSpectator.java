@@ -2,6 +2,7 @@ package camp.pvp.practice.games;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -18,5 +19,9 @@ public class GameSpectator {
         this.uuid = uuid;
         this.name = name;
         visibleToPlayers = false;
+    }
+
+    public Player getPlayer() {
+        return Bukkit.getPlayer(uuid);
     }
 }

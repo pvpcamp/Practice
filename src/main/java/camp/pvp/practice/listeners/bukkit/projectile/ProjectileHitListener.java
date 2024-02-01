@@ -24,29 +24,28 @@ public class ProjectileHitListener implements Listener {
 
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
-        if(event.getEntity().getShooter() instanceof Player) {
-            Player player = (Player) event.getEntity().getShooter();
-            GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-            Game game = profile.getGame();
+        if(!(event.getEntity().getShooter() instanceof Player)) return;
 
-            if(game != null) {
-                game.addEntity(event.getEntity());
-            }
+        Player player = (Player) event.getEntity().getShooter();
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+        Game game = profile.getGame();
 
-            PacketListener particleListener = new PacketAdapter(plugin, PacketType.Play.Server.NAMED_SOUND_EFFECT) {
-                @Override
-                public void onPacketSending(PacketEvent event) {
-                    PacketContainer packet = event.getPacket();
-                    Player p = event.getPlayer();
-                    String sound = packet.getStrings().read(0);
-                    if(sound.equalsIgnoreCase("random.bowhit")) {
-                        event.setCancelled(!p.canSee(player));
-                    }
+        if(game != null) game.addEntity(event.getEntity());
+
+        PacketListener particleListener = new PacketAdapter(plugin, PacketType.Play.Server.NAMED_SOUND_EFFECT) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
+                PacketContainer packet = event.getPacket();
+                Player p = event.getPlayer();
+                String sound = packet.getStrings().read(0);
+                if(sound.equalsIgnoreCase("random.bowhit")) {
+                    event.setCancelled(!p.canSee(player));
                 }
-            };
+            }
+        };
 
-            plugin.getProtocolManager().addPacketListener(particleListener);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getProtocolManager().removePacketListener(particleListener), 2L);
-        }
+        plugin.getProtocolManager().addPacketListener(particleListener);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,
+                () -> plugin.getProtocolManager().removePacketListener(particleListener), 2L);
     }
 }

@@ -35,23 +35,23 @@ public abstract class Game {
     private final Practice plugin;
     private EntityHider entityHider;
 
-    public final UUID uuid;
-    public Map<UUID, GameParticipant> participants;
-    public Map<UUID, GameSpectator> spectators;
+    private final UUID uuid;
+    private Map<UUID, GameParticipant> participants;
+    private Map<UUID, GameSpectator> spectators;
 
     private List<Party> parties;
     private Tournament tournament;
 
-    public State state;
-    public Arena arena;
-    public DuelKit kit;
+    private State state;
+    private Arena arena;
+    private DuelKit kit;
 
     public int round, timer;
-    public Date created, started, ended;
+    private Date created, started, ended;
 
-    public BukkitTask startingTimer, endingTimer;
+    private BukkitTask startingTimer, endingTimer;
 
-    public List<Entity> entities;
+    private List<Entity> entities;
 
     protected Game(Practice plugin, UUID uuid) {
         this.plugin = plugin;
@@ -88,7 +88,7 @@ public abstract class Game {
 
         arena.resetArena();
 
-        for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
+        for(Map.Entry<UUID, GameParticipant> entry : getParticipants().entrySet()) {
             Player player = Bukkit.getPlayer(entry.getKey());
             GameParticipant participant = entry.getValue();
             GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
@@ -103,14 +103,13 @@ public abstract class Game {
             }
         }
 
-        for(GameSpectator spectator : new ArrayList<>(this.getSpectators().values())) {
-            Player player = Bukkit.getPlayer(spectator.getUuid());
-            this.spectateEnd(player, true);
+        for(GameSpectator spectator : new ArrayList<>(getSpectators().values())) {
+            spectateEnd(spectator.getPlayer(), true);
         }
 
-        this.clearEntities();
-        this.setEnded(new Date());
-        this.setState(State.ENDED);
+        clearEntities();
+        setEnded(new Date());
+        setState(State.ENDED);
 
         plugin.getGameProfileManager().refreshLobbyItems();
     }
@@ -315,18 +314,18 @@ public abstract class Game {
             profile.getGame().leave(player);
         }
 
-        this.getSpectators().put(player.getUniqueId(), new GameSpectator(player.getUniqueId(), player.getName()));
+        spectators.put(player.getUniqueId(), new GameSpectator(player.getUniqueId(), player.getName()));
 
-        if(!this.getParticipants().containsKey(player.getUniqueId())) {
+        if(!participants.containsKey(player.getUniqueId())) {
 
             sendSpectateStartMessage(player);
 
             String message = "&f" + player.getName() + "&6 has started spectating.";
 
             if(profile.isStaffMode()) {
-                this.staffAnnounce("&7[Staff] " + message);
+                staffAnnounce("&7[Staff] " + message);
             } else {
-                this.announce(message);
+                announce(message);
             }
         }
 
@@ -348,8 +347,8 @@ public abstract class Game {
     public void spectateEnd(Player player, boolean updateLocation) {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
-        if(!this.getState().equals(State.ENDED)) {
-            if (!this.getParticipants().containsKey(player.getUniqueId())) {
+        if(!state.equals(State.ENDED)) {
+            if (!participants.containsKey(player.getUniqueId())) {
                 String message = "&f" + player.getName() + "&6 has stopped spectating.";
                 if (profile.isStaffMode()) {
                     this.staffAnnounce("&7[Staff] " + message);

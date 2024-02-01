@@ -23,6 +23,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -47,8 +48,8 @@ public class FreeForAll extends Game {
 
         switch(getState()) {
             case STARTING:
-                lines.add("&6Kit: &f" + kit.getDisplayName());
-                lines.add("&6Arena: &f" + arena.getDisplayName());
+                lines.add("&6Kit: &f" + getKit().getDisplayName());
+                lines.add("&6Arena: &f" + getArena().getDisplayName());
                 lines.add("&6Players: &f" + this.getAlive().size());
                 break;
             case ACTIVE:
@@ -87,8 +88,8 @@ public class FreeForAll extends Game {
 
         switch(getState()) {
             case STARTING:
-                lines.add("&6Kit: &f" + kit.getDisplayName());
-                lines.add("&6Arena: &f" + arena.getDisplayName());
+                lines.add("&6Kit: &f" + getKit().getDisplayName());
+                lines.add("&6Arena: &f" + getArena().getDisplayName());
                 break;
             case ACTIVE:
                 lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
@@ -106,7 +107,7 @@ public class FreeForAll extends Game {
         if(getArena() == null) {
             List<Arena> list = new ArrayList<>();
             for(Arena a : getPlugin().getArenaManager().getArenas()) {
-                if(a.isEnabled() && kit.getArenaTypes().contains(a.getType())) {
+                if(a.isEnabled() && getKit().getArenaTypes().contains(a.getType())) {
                     list.add(a);
                 }
             }
@@ -117,7 +118,7 @@ public class FreeForAll extends Game {
             }
         }
 
-        if(arena == null) {
+        if(getArena() == null) {
             for(Player p : getAlivePlayers()) {
                 GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
                 p.sendMessage(ChatColor.RED + "There are no arenas currently available for the ladder selected. Please notify a staff member.");
@@ -126,6 +127,8 @@ public class FreeForAll extends Game {
             }
             return;
         }
+
+        Arena arena = getArena();
 
         arena.prepare();
 
@@ -160,7 +163,7 @@ public class FreeForAll extends Game {
                 p.sendMessage(" ");
                 p.sendMessage(Colors.get("&6&lMatch starting in 5 seconds."));
                 p.sendMessage(Colors.get(" &7● &6Mode: &fFree for All"));
-                p.sendMessage(Colors.get(" &7● &6Kit: &f" + kit.getDisplayName()));
+                p.sendMessage(Colors.get(" &7● &6Kit: &f" + getKit().getDisplayName()));
                 p.sendMessage(Colors.get(" &7● &6Map: &f" + Colors.get(getArena().getDisplayName())));
                 p.sendMessage(Colors.get(" &7● &6Participants: &f" + stringBuilder));
                 p.sendMessage(" ");
@@ -174,14 +177,15 @@ public class FreeForAll extends Game {
                 if (p != null) {
                     p.teleport(spawn.getLocation());
 
-                    getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey()).givePlayerItems();
+                    participant.getProfile().givePlayerItems();
                 }
             }
 
             getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
             Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
-            this.startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
+            BukkitTask startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
+            setStartingTimer(startingTimer);
 
         } else {
             for(Player p : getAlivePlayers()) {
@@ -264,6 +268,7 @@ public class FreeForAll extends Game {
             player.sendMessage(" ");
         }
 
-        this.endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), new EndingTask(this), 100);
+        BukkitTask endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), new EndingTask(this), 100);
+        setEndingTimer(endingTimer);
     }
 }

@@ -40,7 +40,6 @@ public class PlayerUtils {
         }
 
         player.setAllowFlight(allowFlight);
-        player.setFlying(allowFlight);
     }
 
     public static void giveInteractableItems(Player player) {

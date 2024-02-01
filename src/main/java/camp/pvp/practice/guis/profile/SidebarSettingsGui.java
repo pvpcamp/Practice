@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 public class SidebarSettingsGui extends StandardGui {
     public SidebarSettingsGui(GameProfile profile) {
-        super("&6&lSidebar Settings", 27);
+        super("&6Sidebar Settings", 27);
         this.setDefaultBackground();
 
         GuiButton visibilityInGame = new GuiButton(Material.DIAMOND_SWORD, "&aVisible In Game");

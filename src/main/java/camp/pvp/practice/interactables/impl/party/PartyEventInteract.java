@@ -1,6 +1,8 @@
 package camp.pvp.practice.interactables.impl.party;
 
+import camp.pvp.practice.guis.party.FFAKitGui;
 import camp.pvp.practice.guis.party.FindPartyGui;
+import camp.pvp.practice.guis.party.SplitKitGui;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
@@ -31,62 +33,11 @@ public class PartyEventInteract implements ItemInteract {
         if(party.getLeader().getUuid().equals(player.getUniqueId())) {
             StandardGui gui = new StandardGui("Choose an Event", 9);
 
-            GuiButton ffaEvent = new GuiButton(Material.GOLD_AXE, "&6Free For All");
+            GuiButton ffaEvent = new GuiButton(Material.GOLD_AXE, "&6&lFree For All");
             ffaEvent.setAction(new GuiAction() {
                 @Override
                 public void run(Player player, Gui gui) {
-                    StandardGui kitGui = new StandardGui("Choose a Kit", 36);
-
-                    for(DuelKit kit : DuelKit.values()) {
-                        GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
-                        if(kit.isFfa()) {
-                            button.setCloseOnClick(true);
-                            button.setLore(
-                                    "&7Click to start &f" + kit.getDisplayName() + " &7FFA event!");
-                            button.setAction(new GuiAction() {
-                                @Override
-                                public void run(Player player, Gui gui) {
-                                    Practice plugin = Practice.instance;
-
-                                    List<PartyMember> members = new ArrayList<>(), kickedMembers = new ArrayList<>();
-                                    GameProfileManager gpm = plugin.getGameProfileManager();
-                                    for (PartyMember member : party.getMembers().values()) {
-                                        if (gpm.getLoadedProfiles().get(member.getUuid()).getGame() == null) {
-                                            members.add(member);
-                                        } else {
-                                            kickedMembers.add(member);
-                                        }
-                                    }
-
-                                    if (members.size() > 1) {
-                                        FreeForAll ffa = new FreeForAll(plugin, UUID.randomUUID());
-                                        for (PartyMember member : kickedMembers) {
-                                            Player p = member.getPlayer();
-                                            p.sendMessage(ChatColor.RED + "You have been kicked from the party since you were not able to play in the event.");
-                                            party.leave(member.getPlayer());
-                                        }
-
-                                        for (PartyMember member : members) {
-                                            ffa.join(member.getPlayer());
-                                        }
-
-                                        ffa.getParties().add(party);
-                                        ffa.setKit(kit);
-
-                                        ffa.start();
-                                    } else {
-                                        player.sendMessage(ChatColor.RED + "You do not have enough players in your party to participate in this event.");
-                                    }
-                                }
-                            });
-                        } else {
-                            button.updateName("&7&o" + kit.getDisplayName());
-                            button.setLore("&cThis kit is disabled for FFA.");
-                        }
-
-                        button.setSlot(kit.getGuiSlot());
-                        kitGui.addButton(button, false);
-                    }
+                    StandardGui kitGui = new FFAKitGui(gameProfile, party);
 
                     kitGui.open(player);
                 }
@@ -95,7 +46,7 @@ public class PartyEventInteract implements ItemInteract {
             ffaEvent.setSlot(2);
             gui.addButton(ffaEvent, false);
 
-            GuiButton duelOtherParties = new GuiButton(Material.NAME_TAG, "&6Duel Other Parties");
+            GuiButton duelOtherParties = new GuiButton(Material.NAME_TAG, "&6&lDuel Other Parties");
             duelOtherParties.setAction(new GuiAction() {
                 @Override
                 public void run(Player player, Gui gui) {
@@ -105,73 +56,11 @@ public class PartyEventInteract implements ItemInteract {
             duelOtherParties.setSlot(4);
             gui.addButton(duelOtherParties, false);
 
-            GuiButton splitEvent = new GuiButton(Material.IRON_SWORD, "&6Split Teams");
+            GuiButton splitEvent = new GuiButton(Material.IRON_SWORD, "&6&lSplit Teams");
             splitEvent.setAction(new GuiAction() {
                 @Override
                 public void run(Player player, Gui gui) {
-                    StandardGui kitGui = new StandardGui("Choose a Kit", 36);
-
-                    for(DuelKit kit : DuelKit.values()) {
-                        GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
-                        if(kit.isQueueable() && kit.isTeams()) {
-                            button.setCloseOnClick(true);
-                            button.setLore(
-                                    "&7Click to start &f" + kit.getDisplayName() + " &7Split Teams event!");
-                            button.setAction(new GuiAction() {
-                                @Override
-                                public void run(Player player, Gui gui) {
-                                    Practice plugin = Practice.instance;
-
-                                    List<PartyMember> members = new ArrayList<>(), kickedMembers = new ArrayList<>();
-                                    GameProfileManager gpm = plugin.getGameProfileManager();
-                                    for (PartyMember member : party.getMembers().values()) {
-                                        if (gpm.getLoadedProfiles().get(member.getUuid()).getGame() == null) {
-                                            members.add(member);
-                                        } else {
-                                            kickedMembers.add(member);
-                                        }
-                                    }
-
-                                    if (members.size() > 1) {
-                                        TeamDuel teamDuel = new TeamDuel(plugin, UUID.randomUUID());
-                                        for (PartyMember member : kickedMembers) {
-                                            Player p = member.getPlayer();
-                                            p.sendMessage(ChatColor.RED + "You have been kicked from the party since you were not able to play in the event.");
-                                            party.leave(member.getPlayer());
-                                        }
-
-                                        List<PartyMember> shuffledMembers = new ArrayList<>(members);
-                                        Collections.shuffle(shuffledMembers);
-
-                                        int x = 0;
-                                        for (PartyMember member : shuffledMembers) {
-                                            GameParticipant p = teamDuel.join(member.getPlayer());
-
-                                            if(x % 2 == 0) {
-                                                p.setTeam(teamDuel.getBlue());
-                                            } else {
-                                                p.setTeam(teamDuel.getRed());
-                                            }
-                                            x++;
-                                        }
-
-                                        teamDuel.setKit(kit);
-                                        teamDuel.getParties().add(party);
-
-                                        teamDuel.start();
-                                    } else {
-                                        player.sendMessage(ChatColor.RED + "You do not have enough players in your party to participate in this event.");
-                                    }
-                                }
-                            });
-                        } else {
-                            button.updateName("&7&o" + kit.getDisplayName());
-                            button.setLore("&cThis kit is disabled for teams.");
-                        }
-
-                        button.setSlot(kit.getGuiSlot());
-                        kitGui.addButton(button, false);
-                    }
+                    StandardGui kitGui = new SplitKitGui(gameProfile, party);
 
                     kitGui.open(player);
                 }

@@ -3,32 +3,26 @@ package camp.pvp.practice.guis.statistics;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.utils.buttons.GuiButton;
-import camp.pvp.utils.guis.StandardGui;
+import camp.pvp.utils.guis.ArrangedGui;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class StatisticsGui extends StandardGui {
+public class StatisticsGui extends ArrangedGui {
     public StatisticsGui(ProfileELO profileELO) {
-        super("&6&l" + profileELO.getName() + " Statistics", 36);
+        super("&6" + profileELO.getName() + " Statistics");
 
-        this.setDefaultBackground();
+        setDefaultBorder();
 
         for(DuelKit kit : DuelKit.values()) {
-            if(kit.isQueueable() && kit.isRanked()) {
-                List<String> lines = new ArrayList<>();
-                lines.add("&6ELO: &f" + profileELO.getRatings().get(kit));
+            if(!kit.isQueueable()) continue;
+            if(!kit.isRanked()) continue;
 
-                GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
-                button.setSlot(kit.getGuiSlot());
-                button.setLore(lines);
-                this.addButton(button, false);
-            } else {
-                GuiButton button = new GuiButton(kit.getIcon(), "&7&o" + kit.getDisplayName());
-                button.setSlot(kit.getGuiSlot());
-                button.setLore("&cThis kit is not part of ranked matchmaking.");
-                this.addButton(button, false);
-            }
+            List<String> lines = new ArrayList<>();
+            lines.add("&6ELO: &f" + profileELO.getRatings().get(kit));
+
+            GuiButton button = new GuiButton(kit.getIcon(), "&6&l" + kit.getDisplayName());
+            button.setLore(lines);
+            getButtons().add(button);
         }
     }
 }

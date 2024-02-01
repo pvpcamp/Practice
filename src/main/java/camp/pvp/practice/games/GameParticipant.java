@@ -1,8 +1,10 @@
 package camp.pvp.practice.games;
 
+import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
+import camp.pvp.practice.profiles.GameProfile;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -38,10 +40,11 @@ public class GameParticipant {
     public long health, maxHealth, hunger,
             hits, currentCombo, longestCombo,
             thrownPotions, missedPotions;
+    private int spawnNumber; // Used for Bed Fight.
 
     private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
-    private Location respawnLocation;
+    private Location spawnLocation;
 
     public GameParticipant(UUID uuid, String name) {
         this.uuid = uuid;
@@ -56,6 +59,10 @@ public class GameParticipant {
 
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
+    }
+
+    public GameProfile getProfile() {
+        return Practice.getInstance().getGameProfileManager().getLoadedProfiles().get(uuid);
     }
 
     public void archerTag() {
@@ -82,8 +89,8 @@ public class GameParticipant {
     }
 
     public void eliminate() {
-        this.alive = false;
-        this.currentlyPlaying = false;
+        alive = false;
+        currentlyPlaying = false;
     }
 
     public void applyTemporaryEffect(PotionEffectType type, int duration, int strength) {
@@ -94,7 +101,7 @@ public class GameParticipant {
             }
         }
 
-        this.previousHcfKit = appliedHcfKit;
+        previousHcfKit = appliedHcfKit;
 
         getPlayer().addPotionEffect(new PotionEffect(type, duration * 20, strength));
 

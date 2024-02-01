@@ -17,10 +17,9 @@ public class GameInventory {
     private ItemStack[] armor, inventory;
     private List<PotionEffect> potionEffects;
 
-
     public GameInventory() {
         armor = new ItemStack[4];
         inventory = new ItemStack[36];
-        this.potionEffects = new ArrayList<>();
+        potionEffects = new ArrayList<>();
     }
 }

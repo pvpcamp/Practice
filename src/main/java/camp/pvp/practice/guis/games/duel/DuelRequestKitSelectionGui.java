@@ -4,35 +4,50 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.DuelRequest;
 import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.ArrangedGui;
 import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.inventory.ItemStack;
 
-public class DuelRequestKitSelectionGui extends StandardGui {
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+public class DuelRequestKitSelectionGui extends ArrangedGui {
     public DuelRequestKitSelectionGui(Practice plugin, DuelRequest duelRequest) {
-        super("Duel " + duelRequest.getOpponent().getName(), 36);
+        super("&6Duel " + duelRequest.getOpponent().getName());
 
         for(DuelKit duelKit : DuelKit.values()) {
-            if (duelKit.isQueueable()) {
-                ItemStack item = duelKit.getIcon();
-                GuiButton button = new GuiButton(item, "&6" + duelKit.getDisplayName());
+            if(!duelKit.isQueueable()) continue;
 
-                button.setCloseOnClick(true);
+            ItemStack item = duelKit.getIcon();
+            GuiButton button = new GuiButton(item, "&6&l" + duelKit.getDisplayName());
+
+            boolean hasPermission = duelRequest.getSender().getPlayer().hasPermission("practice.duel_requests.map_selection");
+
+            button.setCloseOnClick(true);
+
+            if(hasPermission) {
+                button.setLore(
+                        "&7Next, please select a map for" +
+                        "&7your duel against &6" + duelRequest.getOpponent().getName() + "&7."
+                );
+            } else {
                 button.setLore(
                         "&7Click to duel &6" + duelRequest.getOpponent().getName() + "&7."
                 );
-
-                button.setAction((pl, igui) -> {
-                    duelRequest.setKit(duelKit);
-                    if(pl.hasPermission("practice.duel_requests.map_selection")) {
-                        new DuelRequestArenaSelectionGui(plugin, duelRequest).open(pl);
-                    } else {
-                        duelRequest.send();
-                    }
-                });
-
-                button.setSlot(duelKit.getGuiSlot());
-                this.addButton(button, false);
             }
+
+            button.setAction((pl, igui) -> {
+                duelRequest.setKit(duelKit);
+                if(hasPermission) {
+                    new DuelRequestArenaSelectionGui(plugin, duelRequest).open(pl);
+                } else {
+                    duelRequest.send();
+                }
+            });
+
+            getButtons().add(button);
         }
     }
 }

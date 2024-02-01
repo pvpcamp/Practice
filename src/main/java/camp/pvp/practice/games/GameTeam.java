@@ -4,6 +4,7 @@ import camp.pvp.practice.games.impl.teams.TeamGame;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,8 @@ public class GameTeam {
 
     private final Color color;
     private final TeamGame game;
-    private boolean eliminated;
+    private boolean respawn, eliminated;
+    private Location spawnLocation;
 
     public GameTeam(Color color, TeamGame game) {
         this.color = color;

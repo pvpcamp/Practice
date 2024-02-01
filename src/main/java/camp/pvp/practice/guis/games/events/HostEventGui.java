@@ -18,7 +18,7 @@ import java.util.UUID;
 public class HostEventGui extends StandardGui {
 
     public HostEventGui(Player player) {
-        super("&6&lHost an Event", 27);
+        super("&6Host an Event", 27);
 
         this.setDefaultBackground();
 

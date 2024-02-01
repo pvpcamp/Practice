@@ -16,7 +16,7 @@ public class SettingsGui extends StandardGui {
         super("&6Settings", 36);
         Player player = gameProfile.getPlayer();
 
-        this.setDefaultBackground();
+        setDefaultBorder();
 
         GuiButton spectatorVisibility = new GuiButton(Material.REDSTONE_TORCH_ON, "&6Spectator Visibility");
         spectatorVisibility.setAction(new GuiAction() {

@@ -48,7 +48,6 @@ public class ChoosePartyDuelEventGui extends StandardGui {
                             }
                         });
 
-                        kitButton.setSlot(kit.getGuiSlot());
                         kitGui.addButton(kitButton, false);
                     }
                 }

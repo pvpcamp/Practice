@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +43,7 @@ public class HCFTeams extends TeamDuel {
             this.setArena(list.get(0));
         }
 
-        if(arena == null) {
+        if(getArena() == null) {
             for(Player p : getAlivePlayers()) {
                 GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
                 p.sendMessage(ChatColor.RED + "There are no arenas currently available for the ladder selected. Please notify a staff member.");
@@ -51,6 +52,8 @@ public class HCFTeams extends TeamDuel {
             }
             return;
         }
+
+        Arena arena = getArena();
 
         arena.prepare();
 
@@ -70,10 +73,10 @@ public class HCFTeams extends TeamDuel {
         ArenaPosition blueSpawn = arena.getPositions().get("spawn1");
         List<GameParticipant> blueParticipants = new ArrayList<>(getBlue().getParticipants().values());
         sb.append("\n &7● &9Blue Team: &f");
+
         int blueCount = 0;
-        while (blueCount != getBlue().getParticipants().size()) {
-            GameParticipant participant = blueParticipants.get(0);
-            GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(participant.getUuid());
+
+        for(GameParticipant participant : getBlue().getParticipants().values()) {
             Player player = participant.getPlayer();
             sb.append(ChatColor.WHITE + participant.getName());
 
@@ -94,10 +97,10 @@ public class HCFTeams extends TeamDuel {
         ArenaPosition redSpawn = arena.getPositions().get("spawn2");
         List<GameParticipant> redParticipants = new ArrayList<>(getRed().getParticipants().values());
         sb.append("\n &7● &cRed Team: &f");
+
         int redCount = 0;
-        while (redCount != getRed().getParticipants().size()) {
-            GameParticipant participant = redParticipants.get(0);
-            GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(participant.getUuid());
+
+        for(GameParticipant participant : getRed().getParticipants().values()) {
             Player player = participant.getPlayer();
             sb.append(ChatColor.WHITE + participant.getName());
 
@@ -122,7 +125,8 @@ public class HCFTeams extends TeamDuel {
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
         Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
-        this.startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
+        BukkitTask startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
+        setStartingTimer(startingTimer);
     }
 
     @Override
@@ -147,7 +151,7 @@ public class HCFTeams extends TeamDuel {
 
         switch(getState()) {
             case STARTING:
-                lines.add("&6Arena: &f" + arena.getDisplayName());
+                lines.add("&6Arena: &f" + getArena().getDisplayName());
                 lines.add("");
                 lines.add("&9Blue Team " + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? "(You)" : "") + ": &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
                 lines.add("&cRed Team " + (friendlyTeam.getColor().equals(GameTeam.Color.RED) ? "(You)" : "") + ": &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
@@ -232,8 +236,8 @@ public class HCFTeams extends TeamDuel {
 
         switch(getState()) {
             case STARTING:
-                lines.add("&6Kit: &f" + kit.getDisplayName());
-                lines.add("&6Arena: &f" + arena.getDisplayName());
+                lines.add("&6Kit: &f" + getKit().getDisplayName());
+                lines.add("&6Arena: &f" + getArena().getDisplayName());
                 lines.add(" ");
                 lines.add("&9Blue Team: &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
                 lines.add("&cRed Team: &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());

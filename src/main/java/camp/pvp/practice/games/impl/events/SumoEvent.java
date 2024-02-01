@@ -60,13 +60,13 @@ public class SumoEvent extends GameEvent {
 
         timer = 60;
         List<Integer> times = Arrays.asList(120, 105, 90, 75, 60, 45, 30, 15, 5);
-        this.startingTimer = Bukkit.getScheduler().runTaskTimer(getPlugin(), new Runnable() {
+        BukkitTask startingTimer = Bukkit.getScheduler().runTaskTimer(getPlugin(), new Runnable() {
             @Override
             public void run() {
                 if(timer == 0) {
                     nextRound();
 
-                    startingTimer.cancel();
+                    getStartingTimer().cancel();
                 } else {
                     if(times.contains(timer)) {
                         joinMessage();
@@ -76,6 +76,8 @@ public class SumoEvent extends GameEvent {
                 }
             }
         }, 0, 20);
+
+        setStartingTimer(startingTimer);
     }
 
     @Override
@@ -121,7 +123,7 @@ public class SumoEvent extends GameEvent {
             return;
         }
 
-        if(!state.equals(State.NEXT_ROUND_STARTING)) {
+        if(!getState().equals(State.NEXT_ROUND_STARTING)) {
             setState(State.NEXT_ROUND_STARTING);
 
             List<GameParticipant> participants = new ArrayList<>(getAlive().values());
@@ -132,7 +134,7 @@ public class SumoEvent extends GameEvent {
             GameParticipant player1 = participants.get(0);
             GameParticipant player2 = participants.get(1);
 
-            ArenaPosition spawn1 = arena.getPositions().get("spawn1"), spawn2 = arena.getPositions().get("spawn2");
+            ArenaPosition spawn1 = getArena().getPositions().get("spawn1"), spawn2 = getArena().getPositions().get("spawn2");
 
             Player p1 = player1.getPlayer();
             Player p2 = player2.getPlayer();
@@ -187,17 +189,15 @@ public class SumoEvent extends GameEvent {
     }
 
     public void endRound() {
-        if (this.roundStartingTask != null) {
-            this.roundStartingTask.cancel();
-        }
+        if (this.roundStartingTask != null) this.roundStartingTask.cancel();
 
-        for (Player p : getCurrentPlayersPlaying()) {
-            p.teleport(arena.getPositions().get("lobby").getLocation());
-        }
 
-        for(GameParticipant part : getCurrentPlaying().values()) {
+        for (Player p : getCurrentPlayersPlaying())
+            p.teleport(getArena().getPositions().get("lobby").getLocation());
+
+
+        for(GameParticipant part : getCurrentPlaying().values())
             part.setCurrentlyPlaying(false);
-        }
 
         setState(State.ROUND_ENDED);
 
@@ -228,7 +228,7 @@ public class SumoEvent extends GameEvent {
         if(participant != null) {
             switch(this.getState()) {
                 case STARTING:
-                    participants.remove(participant.getUuid());
+                    getParticipants().remove(participant.getUuid());
                     profile.setGame(null);
                     profile.playerUpdate(true);
                     getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
@@ -269,7 +269,7 @@ public class SumoEvent extends GameEvent {
     @Override
     public GameParticipant join(Player player) {
 
-        if (state.equals(State.STARTING)) {
+        if (getState().equals(State.STARTING)) {
             GameParticipant participant = super.join(player);
 
             player.teleport(getArena().getPositions().get("lobby").getLocation());

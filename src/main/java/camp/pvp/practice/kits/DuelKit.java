@@ -2,6 +2,7 @@ package camp.pvp.practice.kits;
 
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.games.GameInventory;
+import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import org.apache.commons.lang.WordUtils;
@@ -18,10 +19,11 @@ import org.bukkit.potion.PotionType;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public enum DuelKit {
-    NO_DEBUFF, CLASSIC, SOUP, HCF, INVADED, BOXING, SUMO, BUILD_UHC, SKYWARS, SPLEEF, STRATEGY;
+    NO_DEBUFF, BOXING, BED_FIGHT, SUMO, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, STRATEGY;
 
     public String getDisplayName() {
         switch(this) {
@@ -51,49 +53,10 @@ public enum DuelKit {
                 return Collections.singletonList(Arena.Type.DUEL_SKYWARS);
             case SPLEEF:
                 return Collections.singletonList(Arena.Type.SPLEEF);
+            case BED_FIGHT:
+                return Collections.singletonList(Arena.Type.DUEL_BED_FIGHT);
             default:
                 return Arrays.asList(Arena.Type.DUEL, Arena.Type.DUEL_FLAT);
-        }
-    }
-
-    public int getGuiSlot() {
-        switch(this) {
-            case NO_DEBUFF:
-                return 10;
-            case HCF:
-                return 11;
-            case CLASSIC:
-                return 12;
-            case SOUP:
-                return 13;
-            case INVADED:
-                return 14;
-            case BOXING:
-                return 15;
-            case SUMO:
-                return 16;
-            case BUILD_UHC:
-                return 19;
-            case SKYWARS:
-                return 20;
-            case SPLEEF:
-                return 21;
-            case STRATEGY:
-                return 22;
-        }
-
-        return 0;
-    }
-
-    public boolean isNew() {
-        switch(this) {
-            case BUILD_UHC:
-            case SKYWARS:
-            case SPLEEF:
-            case STRATEGY:
-                return true;
-            default:
-                return false;
         }
     }
 
@@ -111,6 +74,7 @@ public enum DuelKit {
 
     public boolean isRegen() {
         switch(this) {
+            case BED_FIGHT:
             case BUILD_UHC:
                 return false;
             default:
@@ -146,6 +110,7 @@ public enum DuelKit {
 
     public boolean isEditable() {
         switch(this) {
+            case BED_FIGHT:
             case SUMO:
             case SPLEEF:
                 return false;
@@ -175,6 +140,7 @@ public enum DuelKit {
             case SUMO:
             case INVADED:
             case SPLEEF:
+            case BED_FIGHT:
                 return false;
             default:
                 return true;
@@ -194,6 +160,7 @@ public enum DuelKit {
 
     public boolean isMoveOnStart() {
         switch(this) {
+            case BED_FIGHT:
             case SUMO:
             case SKYWARS:
                 return false;
@@ -279,6 +246,9 @@ public enum DuelKit {
                 break;
             case STRATEGY:
                 item = new ItemStack(Material.WEB);
+                break;
+            case BED_FIGHT:
+                item = new ItemStack(Material.BED);
                 break;
         }
 
@@ -577,6 +547,7 @@ public enum DuelKit {
                 inv[35] = speed.toItemStack(1);
 
                 break;
+            case BED_FIGHT:
             default:
                 break;
 
@@ -593,6 +564,25 @@ public enum DuelKit {
 
         for(PotionEffect effect : gi.getPotionEffects()) {
             player.addPotionEffect(effect);
+        }
+
+        pi.setArmorContents(gi.getArmor());
+        pi.setContents(gi.getInventory());
+        player.updateInventory();
+    }
+
+    public void apply(GameParticipant participant) {
+        Player player = participant.getPlayer();
+        PlayerInventory pi = player.getInventory();
+        GameInventory gi = this.getGameInventory();
+
+        PlayerUtils.reset(player, false);
+
+        for(PotionEffect effect : gi.getPotionEffects()) {
+            player.addPotionEffect(effect);
+        }
+
+        if(this.equals(BED_FIGHT)) {
         }
 
         pi.setArmorContents(gi.getArmor());
