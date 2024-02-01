@@ -101,53 +101,9 @@ public class ArenaManager {
         int arenas = 0;
         for(Arena arena : getArenas()) {
             if(arena.hasValidPositions()) {
-                ArenaPosition corner1 = arena.getPositions().get("corner1");
-                ArenaPosition corner2 = arena.getPositions().get("corner2");
+                arena.scanArena();
 
-                if(corner1 != null && corner2 != null) {
-
-                    arena.getBeds().clear();
-                    arena.getChests().clear();
-                    arena.getBlocks().clear();
-
-                    int minX, minY, minZ, maxX, maxY, maxZ;
-                    Location c1 = corner1.getLocation(), c2 = corner2.getLocation();
-                    minX = Math.min(c1.getBlockX(), c2.getBlockX());
-                    minY = Math.min(c1.getBlockY(), c2.getBlockY());
-                    minZ = Math.min(c1.getBlockZ(), c2.getBlockZ());
-                    maxX = Math.max(c1.getBlockX(), c2.getBlockX());
-                    maxY = Math.max(c1.getBlockY(), c2.getBlockY());
-                    maxZ = Math.max(c1.getBlockZ(), c2.getBlockZ());
-
-                    for (int x = minX; x < maxX; x++) {
-                        for (int y = minY; y < maxY; y++) {
-                            for (int z = minZ; z < maxZ; z++) {
-                                Location location = new Location(c1.getWorld(), x, y, z);
-                                Block block = location.getBlock();
-                                if(!block.isEmpty()) {
-                                    switch(block.getType()) {
-                                        case BED_BLOCK:
-                                            arena.getBeds().add(block.getLocation());
-                                            break;
-                                        case CHEST:
-                                        case TRAPPED_CHEST:
-                                            arena.getChests().add(block.getLocation());
-                                        default:
-                                            arena.getBlocks().add(location);
-                                    }
-                                }
-
-                                arena.getChunks().add(location.getChunk());
-                            }
-                        }
-                    }
-
-                    arenas++;
-
-                    m = "Arena scanner found " + arena.getBlocks().size() + " blocks for arena " + arena.getName() + ".";
-                    this.logger.info(m);
-                    Bukkit.broadcast("&4&l[Arena Scanner] &c" + m, "practice.staff");
-                }
+                arenas++;
             }
         }
 

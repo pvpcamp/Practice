@@ -106,6 +106,7 @@ public class Duel extends Game {
                 if (p != null) {
                     locations.put(p, location);
                     p.teleport(locations.get(p));
+                    participant.setRespawnLocation(location);
 
                     getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey()).givePlayerItems();
                 }

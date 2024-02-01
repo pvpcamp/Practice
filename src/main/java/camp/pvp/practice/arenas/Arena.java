@@ -19,10 +19,12 @@ import java.util.*;
 public class Arena implements Comparable<Arena>{
 
     public enum Type {
-        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_OITC;
+        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, DUEL_BED_FIGHT, DUEL_BRIDGE, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_OITC;
 
         public List<String> getValidPositions() {
             switch(this) {
+                case DUEL_BED_FIGHT:
+                    return Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluecorner1", "bluecorner2", "redcorner1", "redcorner2");
                 case DUEL_BUILD:
                 case DUEL_SKYWARS:
                 case SPLEEF:
@@ -159,14 +161,61 @@ public class Arena implements Comparable<Arena>{
 
     }
 
+    public void scanArena() {
+
+        ArenaPosition corner1 = getPositions().get("corner1");
+        ArenaPosition corner2 = getPositions().get("corner2");
+
+        if(corner1 != null && corner2 != null) {
+
+            getBeds().clear();
+            getChests().clear();
+            getBlocks().clear();
+            getChunks().clear();
+
+            int minX, minY, minZ, maxX, maxY, maxZ;
+            Location c1 = corner1.getLocation(), c2 = corner2.getLocation();
+            minX = Math.min(c1.getBlockX(), c2.getBlockX());
+            minY = Math.min(c1.getBlockY(), c2.getBlockY());
+            minZ = Math.min(c1.getBlockZ(), c2.getBlockZ());
+            maxX = Math.max(c1.getBlockX(), c2.getBlockX());
+            maxY = Math.max(c1.getBlockY(), c2.getBlockY());
+            maxZ = Math.max(c1.getBlockZ(), c2.getBlockZ());
+
+            for (int x = minX; x < maxX; x++) {
+                for (int y = minY; y < maxY; y++) {
+                    for (int z = minZ; z < maxZ; z++) {
+                        Location location = new Location(c1.getWorld(), x, y, z);
+                        Block block = location.getBlock();
+                        if(!block.isEmpty()) {
+                            switch(block.getType()) {
+                                case BED_BLOCK:
+                                    getBeds().add(block.getLocation());
+                                    break;
+                                case CHEST:
+                                case TRAPPED_CHEST:
+                                    getChests().add(block.getLocation());
+                                default:
+                                    getBlocks().add(location);
+                            }
+                        }
+
+                        getChunks().add(location.getChunk());
+                    }
+                }
+            }
+        }
+    }
+
     public void resetArena() {
         if(getType().isUnloadChunks()) {
             for (Chunk chunk : chunks) {
                 if (chunk.isLoaded()) {
                     chunk.unload(false);
-                    chunk.load();
                 }
             }
+
+            scanArena();
         }
 
         setInUse(false);

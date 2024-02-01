@@ -21,7 +21,7 @@ public class GameParticipant {
     private final UUID uuid;
     private final String name;
     private GameTeam team;
-    private boolean alive, currentlyPlaying, kitApplied, comboMessages;
+    private boolean alive, respawn, currentlyPlaying, kitApplied, comboMessages;
 
     // HCFTEAMS ONLY
     private HCFKit appliedHcfKit;
