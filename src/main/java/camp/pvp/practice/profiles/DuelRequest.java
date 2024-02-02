@@ -84,7 +84,7 @@ public class DuelRequest {
             if(arena != null) {
                 if (arena.getType().equals(Arena.Type.DUEL_BUILD)) {
                     for (Arena a : Practice.instance.getArenaManager().getArenaCopies(arena)) {
-                        if (!a.isInUse()) {
+                        if (!a.isInUse() && a.isEnabled()) {
                             arena = a;
                             break;
                         }

@@ -86,8 +86,6 @@ public abstract class Game {
             getEndingTimer().cancel();
         }
 
-        arena.resetArena();
-
         for(Map.Entry<UUID, GameParticipant> entry : getParticipants().entrySet()) {
             Player player = Bukkit.getPlayer(entry.getKey());
             GameParticipant participant = entry.getValue();
@@ -110,6 +108,8 @@ public abstract class Game {
         clearEntities();
         setEnded(new Date());
         setState(State.ENDED);
+
+        arena.resetArena(false);
 
         plugin.getGameProfileManager().refreshLobbyItems();
     }
