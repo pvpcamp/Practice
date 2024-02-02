@@ -17,6 +17,7 @@ import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -63,6 +64,24 @@ public class PlayerInteractListener implements Listener {
                 event.setCancelled(true);
                 event.setUseInteractedBlock(Event.Result.DENY);
             }
+            return;
+        }
+
+        if(profile.isBuildMode() && item.getType().equals(Material.GOLD_AXE)) {
+
+            if(block == null || block.getType().equals(Material.AIR)) {
+                Location location = player.getLocation();
+                profile.setSelectedLocation(location);
+                player.sendMessage(ChatColor.GREEN + "Updated arena position selection to your current location. "
+                        + ChatColor.GRAY + "(" + location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ() + ")");
+            } else {
+
+                profile.setSelectedLocation(block.getLocation());
+
+                player.sendMessage(ChatColor.GREEN + "Updated arena position selection. " + ChatColor.GRAY + "(" + block.getX() + ", " + block.getY() + ", " + block.getZ() + ")");
+
+            }
+            event.setCancelled(true);
             return;
         }
 

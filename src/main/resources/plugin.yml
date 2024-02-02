@@ -15,6 +15,10 @@ commands:
   arena:
     permission: practice.commands.arena
     description: Arena configuration utility.
+  arenaposition:
+    aliases: [apos, aposition, ap]
+    permission: practice.commands.arenaposition
+    description: Select a position for an arena at your current location.
   build:
     description: Toggles build mode for staff.
     permission: practice.staff.build_mode

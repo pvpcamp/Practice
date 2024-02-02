@@ -20,7 +20,7 @@ public class Arena implements Comparable<Arena>{
         public List<String> getValidPositions() {
             switch(this) {
                 case DUEL_BED_FIGHT:
-                    return Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluecorner1", "bluecorner2", "redcorner1", "redcorner2");
+                    return Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluebed", "redbed");
                 case DUEL_BUILD:
                 case DUEL_SKYWARS:
                 case SPLEEF:

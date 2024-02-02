@@ -89,6 +89,7 @@ public class GameProfile {
     private Map<UUID, DuelRequest> duelRequests;
 
     private List<Date> clicks;
+    private Location selectedLocation;
 
     private Party party;
     private Map<UUID, PartyInvite> partyInvites;

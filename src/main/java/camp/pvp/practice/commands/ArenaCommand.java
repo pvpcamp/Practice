@@ -343,7 +343,13 @@ public class ArenaCommand implements CommandExecutor {
                             }
 
                             ArenaPosition position = null;
-                            Location location = player.getLocation();
+                            Location location = profile.getSelectedLocation();
+
+                            if(location == null) {
+                                player.sendMessage(ChatColor.RED + "You must select a location first. Use /arenaposition or right click with a Golden Axe.");
+                                return true;
+                            }
+
                             for (String s : arena.getType().getValidPositions()) {
                                 if (s.equalsIgnoreCase(args[2])) {
                                     position = new ArenaPosition(s, location);
