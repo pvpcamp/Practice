@@ -109,7 +109,7 @@ public abstract class Game {
         setEnded(new Date());
         setState(State.ENDED);
 
-        arena.resetArena();
+        arena.resetArena(false);
 
         plugin.getGameProfileManager().refreshLobbyItems();
     }

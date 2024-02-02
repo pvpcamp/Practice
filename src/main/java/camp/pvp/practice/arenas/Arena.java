@@ -202,7 +202,12 @@ public class Arena implements Comparable<Arena>{
         }
     }
 
-    public void resetArena() {
+    /***
+     * Resets the arena, unloading chunks if necessary.
+     * @param delay Whether to delay the reset. Delay should always be used unless
+     *              the arena is being reset due to a server shutdown.
+     */
+    public void resetArena(boolean delay) {
         if(!getType().isUnloadChunks()) return; // We don't need to reset the arena if we don't need to unload chunks.
 
         Bukkit.getScheduler().runTaskLater(Practice.getInstance(), ()-> {
@@ -221,7 +226,7 @@ public class Arena implements Comparable<Arena>{
             }
 
             setInUse(false);
-        }, 5L);
+        }, delay ? 5L : 0L);
     }
 
     public boolean isOriginalBlock(Location location) {
