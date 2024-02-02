@@ -54,6 +54,8 @@ public class ArenaConfig {
         arena.setEnabled(config.getBoolean(path + "enabled"));
         arena.setXDifference(config.getInt(path + "x_difference"));
         arena.setZDifference(config.getInt(path + "z_difference"));
+        arena.setVoidLevel(config.getInt(path + "void_level", 0));
+        arena.setBuildLimit(config.getInt(path + "build_limit", 256));
 
         if(config.isSet(path + "parent")) {
             arena.setParent(config.getString(path + "parent"));
@@ -87,6 +89,8 @@ public class ArenaConfig {
         config.set(path + ".enabled", arena.isEnabled());
         config.set(path + ".x_difference", arena.getXDifference());
         config.set(path + ".z_difference", arena.getZDifference());
+        config.set(path + ".void_level", arena.getVoidLevel());
+        config.set(path + ".build_limit", arena.getBuildLimit());
 
         if(arena.getParent() != null) {
             config.set(path + ".parent", arena.getParent());

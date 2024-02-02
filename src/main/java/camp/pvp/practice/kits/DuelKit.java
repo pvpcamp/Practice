@@ -6,12 +6,14 @@ import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -64,12 +66,17 @@ public enum DuelKit {
         switch(this) {
             case BUILD_UHC:
             case SKYWARS:
+            case BED_FIGHT:
             case SPLEEF:
             case STRATEGY:
                 return true;
             default:
                 return false;
         }
+    }
+
+    public boolean isRespawn() {
+        return this.equals(BED_FIGHT);
     }
 
     public boolean isRegen() {
@@ -548,6 +555,33 @@ public enum DuelKit {
 
                 break;
             case BED_FIGHT:
+                armor[3] = new ItemStack(Material.LEATHER_HELMET);
+                LeatherArmorMeta helmetMeta = (LeatherArmorMeta) armor[3].getItemMeta();
+                helmetMeta.setColor(Color.WHITE);
+
+                armor[2] = new ItemStack(Material.LEATHER_CHESTPLATE);
+                LeatherArmorMeta chestplateMeta = (LeatherArmorMeta) armor[2].getItemMeta();
+                chestplateMeta.setColor(Color.WHITE);
+
+                armor[1] = new ItemStack(Material.LEATHER_LEGGINGS);
+                LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) armor[1].getItemMeta();
+                leggingsMeta.setColor(Color.WHITE);
+
+                armor[0] = new ItemStack(Material.LEATHER_BOOTS);
+                LeatherArmorMeta bootsMeta = (LeatherArmorMeta) armor[0].getItemMeta();
+                bootsMeta.setColor(Color.WHITE);
+
+                inv[0] = new ItemStack(Material.WOOD_SWORD);
+
+                inv[1] = new ItemStack(Material.WOOD_PICKAXE);
+                inv[1].addEnchantment(Enchantment.DIG_SPEED, 1);
+
+                inv[2] = new ItemStack(Material.WOOD_AXE);
+                inv[2].addEnchantment(Enchantment.DIG_SPEED, 1);
+
+                inv[3] = new ItemStack(Material.SHEARS);
+                inv[4] = new ItemStack(Material.WOOL, 64);
+                break;
             default:
                 break;
 

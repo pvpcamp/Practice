@@ -1,6 +1,9 @@
 package camp.pvp.practice.games;
 
 import camp.pvp.practice.arenas.ArenaPosition;
+import camp.pvp.practice.games.tasks.RespawnTask;
+import camp.pvp.practice.kits.CustomDuelKit;
+import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
@@ -14,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -23,7 +27,7 @@ public class GameParticipant {
     private final UUID uuid;
     private final String name;
     private GameTeam team;
-    private boolean alive, respawn, currentlyPlaying, kitApplied, comboMessages;
+    private boolean alive, respawn, invincible, currentlyPlaying, kitApplied, comboMessages;
 
     // HCFTEAMS ONLY
     private HCFKit appliedHcfKit;
@@ -45,6 +49,10 @@ public class GameParticipant {
     private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
     private Location spawnLocation;
+    private DuelKit duelKit;
+    private CustomDuelKit appliedCustomKit;
+
+    private BukkitTask respawnTask;
 
     public GameParticipant(UUID uuid, String name) {
         this.uuid = uuid;
@@ -52,6 +60,8 @@ public class GameParticipant {
         this.alive = true;
         this.previousEffects = new ArrayList<>();
         this.cooldowns = new HashMap<>();
+
+        this.currentlyPlaying = true;
 
         this.appliedHcfKit = null;
         this.energy = 0;
@@ -90,7 +100,19 @@ public class GameParticipant {
 
     public void eliminate() {
         alive = false;
-        currentlyPlaying = false;
+        invincible = true;
+
+        if(!respawn) {
+            currentlyPlaying = false;
+
+            if(respawnTask != null) respawnTask.cancel();
+        }
+    }
+
+    public void respawn() {
+        BukkitTask respawnTask = Bukkit.getScheduler().runTaskTimer(Practice.getInstance(),
+                new RespawnTask(this, getPlayer()), 0L, 20L);
+        setRespawnTask(respawnTask);
     }
 
     public void applyTemporaryEffect(PotionEffectType type, int duration, int strength) {

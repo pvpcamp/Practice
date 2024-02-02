@@ -10,6 +10,7 @@ import camp.pvp.practice.utils.BukkitReflection;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -18,9 +19,13 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Bed;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -114,40 +119,60 @@ public abstract class Game {
         plugin.getGameProfileManager().refreshLobbyItems();
     }
 
+    private void killRespawn(Player player, GameParticipant participant) {
+        PlayerUtils.reset(player, true);
+
+        announce("&f" + player.getName() + "&a was killed" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
+
+        PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true, false);
+        player.addPotionEffect(invisibility);
+
+        participant.respawn();
+    }
+
     public void eliminate(Player player, boolean leftGame) {
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-        if(participant != null && !this.getState().equals(State.ENDED)) {
-            participant.eliminate();
-            participant.clearCooldowns();
 
-            PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
-            participant.setPostGameInventory(pgi);
-            getPlugin().getGameManager().getPostGameInventories().put(pgi.getUuid(), pgi);
+        if(participant == null || !participant.isAlive()) return;
 
-            if(getAlive().size() > 1) {
-                for (ItemStack item : player.getInventory()) {
-                    if (item != null && !item.getType().equals(Material.AIR)) {
-                        Item i = player.getWorld().dropItem(player.getLocation(), item);
-                        this.addEntity(i);
-                    }
+        if(this.getState().equals(State.ENDED)) return;
+
+        participant.eliminate();
+        participant.clearCooldowns();
+
+        plugin.getGameProfileManager().updateGlobalPlayerVisibility();
+
+        Location location = player.getLocation();
+
+        boolean velocity = participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK);
+
+        profile.getDeathAnimation().playAnimation(this, player, location, velocity);
+
+        if(participant.isRespawn() && !leftGame) {
+            killRespawn(player, participant);
+            return;
+        }
+
+        PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
+        participant.setPostGameInventory(pgi);
+        getPlugin().getGameManager().getPostGameInventories().put(pgi.getUuid(), pgi);
+
+        if(getAlive().size() > 1) {
+            for (ItemStack item : player.getInventory()) {
+                if (item != null && !item.getType().equals(Material.AIR)) {
+                    Item i = player.getWorld().dropItem(player.getLocation(), item);
+                    this.addEntity(i);
                 }
             }
+        }
 
-            if(leftGame) {
-                Game.this.announce("&f" + player.getName() + "&a disconnected.");
-            } else {
-                Game.this.spectateStart(player);
-                Game.this.announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
-            }
-
-            plugin.getGameProfileManager().updateGlobalPlayerVisibility();
-
-            Location location = player.getLocation();
-
-            boolean velocity = participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK);
-
-            profile.getDeathAnimation().playAnimation(this, player, location, velocity);
+        if(leftGame) {
+            participant.setCurrentlyPlaying(false);
+            announce("&f" + player.getName() + "&a disconnected.");
+        } else {
+            spectateStart(player);
+            announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
         }
     }
 
@@ -157,6 +182,11 @@ public abstract class Game {
         if(this.getState().equals(State.ACTIVE)) {
             double damage = event.getFinalDamage();
             boolean canDie = true;
+
+            if(participant.isInvincible()) {
+                event.setCancelled(true);
+                return;
+            }
 
             if(event.getCause().equals(EntityDamageEvent.DamageCause.FIRE) || event.getCause().equals(EntityDamageEvent.DamageCause.LAVA) || event.getCause().equals(EntityDamageEvent.DamageCause.FIRE_TICK)) {
                 damage += 1;
@@ -281,6 +311,11 @@ public abstract class Game {
 
         GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
         participant.setComboMessages(profile.isComboMessages());
+        participant.setDuelKit(kit);
+
+        if(kit.isRespawn()) {
+            participant.setRespawn(true);
+        }
 
         profile.updatePlayerVisibility();
 
@@ -370,12 +405,90 @@ public abstract class Game {
         }
     }
 
+    public void handleBlockBreak(Player player, Block block, BlockBreakEvent event) {
+
+        Arena.Type type = arena.getType();
+        Location location = block.getLocation();
+        final Material material = block.getType();
+
+        if(type.canModifyArena()) {
+            if(type.getSpecificBlocks() != null) {
+                if(!type.getSpecificBlocks().contains(block.getType())) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        } else {
+            if(arena.isOriginalBlock(location)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if(block.getType().equals(Material.SNOW_BLOCK)) {
+            player.getInventory().addItem(new ItemStack(Material.SNOW_BALL));
+        } else {
+
+            if(!block.getType().equals(Material.BED_BLOCK)) {
+                for (ItemStack item : block.getDrops()) {
+                    Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
+                    addEntity(i);
+                }
+            }
+        }
+
+        if(arena.getBuildLimit() < block.getLocation().getBlockY()) {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED + "You have reached the build limit.");
+            return;
+        }
+
+        block.setType(Material.AIR);
+
+        if(!arena.getType().equals(Arena.Type.DUEL_BED_FIGHT)) return;
+
+        if(!material.equals(Material.BED_BLOCK)) return;
+
+        List<GameParticipant> allParticipants = new ArrayList<>(getParticipants().values());
+
+        GameParticipant participant = null;
+        ChatColor color = null;
+        ArenaPosition bedPosition = null;
+
+        for(int x = block.getX() - 2; x < block.getX() + 2; x++) {
+            for(int z = block.getZ() - 2; z < block.getZ() + 2; z++) {
+                for(ArenaPosition arenaPosition : arena.getPositions().values()) {
+                    if(arenaPosition.getPosition().contains("bed") &&
+                            arenaPosition.getLocation().equals(new Location(block.getWorld(), x, block.getY(), z))) bedPosition = arenaPosition;
+                }
+            }
+        }
+
+        if(bedPosition == null) return;
+
+        if(bedPosition.getPosition().equalsIgnoreCase("bluebed")) {
+            participant = allParticipants.get(0);
+            color = ChatColor.BLUE;
+        }
+
+        if(bedPosition.getPosition().equalsIgnoreCase("redbed")) {
+            participant = allParticipants.get(1);
+            color = ChatColor.RED;
+        }
+
+        if(participant != null) {
+            participant.setRespawn(false);
+            this.announce(color + "&l!!! BED DESTROYED !!!");
+            this.announce("&f" + participant.getName() + "'s " + color + "bed has been destroyed by &f" + player.getName() + color + "!");
+        }
+    }
+
     public boolean isBuild() {
         return kit.isBuild();
     }
 
     public List<Player> getAllPlayers() {
-        List<Player> players = new ArrayList<>(getAlivePlayers());
+        List<Player> players = new ArrayList<>(getCurrentPlayersPlaying());
         players.addAll(getSpectatorsPlayers());
         return players;
     }
@@ -402,7 +515,14 @@ public abstract class Game {
     }
 
     public Map<UUID, GameParticipant> getCurrentPlaying() {
-        return this.getAlive();
+        Map<UUID, GameParticipant> playing = new HashMap<>();
+
+        for(Map.Entry<UUID, GameParticipant> entry : participants.entrySet()) {
+            if(entry.getValue().isCurrentlyPlaying()) {
+                playing.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return playing;
     }
 
     public List<Player> getCurrentPlayersPlaying() {

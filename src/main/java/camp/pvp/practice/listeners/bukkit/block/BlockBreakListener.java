@@ -41,31 +41,8 @@ public class BlockBreakListener implements Listener {
                 if(game.isInBorder(location)) {
                     Arena arena = game.getArena();
                     Arena.Type type = arena.getType();
-                    if(type.canModifyArena()) {
-                        if(type.getSpecificBlocks() != null) {
-                            if(!type.getSpecificBlocks().contains(block.getType())) {
-                                event.setCancelled(true);
-                                return;
-                            }
-                        }
 
-                    } else {
-                        if(arena.isOriginalBlock(location)) {
-                            event.setCancelled(true);
-                            return;
-                        }
-                    }
-
-                    if(block.getType().equals(Material.SNOW_BLOCK)) {
-                        player.getInventory().addItem(new ItemStack(Material.SNOW_BALL));
-                    } else {
-                        for (ItemStack item : block.getDrops()) {
-                            Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
-                            game.addEntity(i);
-                        }
-                    }
-
-                    block.setType(Material.AIR);
+                    game.handleBlockBreak(player, block, event);
 
                     return;
                 }

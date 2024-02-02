@@ -51,7 +51,7 @@ public class PlayerMoveListener implements Listener {
                         }
                     }
 
-                    if(event.getTo().getY() < 0) {
+                    if(event.getTo().getY() < 0 || event.getTo().getY() < game.getArena().getVoidLevel()) {
                         if(game.getState().equals(Game.State.ACTIVE)) {
                             participant.setLastDamageCause(EntityDamageEvent.DamageCause.VOID);
                             game.eliminate(player, false);

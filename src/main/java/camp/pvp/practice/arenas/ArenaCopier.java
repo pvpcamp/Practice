@@ -62,6 +62,7 @@ public class ArenaCopier implements Runnable {
                 for (int z = minZ; z < maxZ; z++) {
                     Location location = new Location(world, x, y, z);
                     Block block = location.getBlock();
+
                     if(!block.isEmpty()) {
                         blocks.add(location.getBlock());
 

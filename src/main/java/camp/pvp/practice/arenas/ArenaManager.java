@@ -141,6 +141,8 @@ public class ArenaManager {
         copy.setEnabled(arena.isEnabled());
         copy.setXDifference(xD);
         copy.setZDifference(zD);
+        copy.setBuildLimit(arena.getBuildLimit());
+        copy.setVoidLevel(arena.getVoidLevel());
         copy.copyPositions(arena);
         copy.setParent(arena.getName());
         copy.setType(arena.getType());
@@ -154,6 +156,8 @@ public class ArenaManager {
         copy.setEnabled(arena.isEnabled());
         copy.setXDifference(xD);
         copy.setZDifference(zD);
+        copy.setBuildLimit(arena.getBuildLimit());
+        copy.setVoidLevel(arena.getVoidLevel());
         copy.copyPositions(arena);
         copy.setParent(arena.getName());
         copy.setType(arena.getType());

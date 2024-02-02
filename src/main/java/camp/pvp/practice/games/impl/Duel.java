@@ -243,7 +243,7 @@ public class Duel extends Game {
             getTournament().eliminate(player);
         }
 
-        if(getAlive().size() < 2) {
+        if(getCurrentPlaying().size() < 2) {
             end();
         }
     }

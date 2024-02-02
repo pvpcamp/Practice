@@ -66,6 +66,7 @@ public class Arena implements Comparable<Arena>{
             switch(this) {
                 case DUEL_SKYWARS:
                 case DUEL_BUILD:
+                case DUEL_BED_FIGHT:
                 case SPLEEF:
                     return true;
                 default:
@@ -77,6 +78,7 @@ public class Arena implements Comparable<Arena>{
             switch(this) {
                 case DUEL_SKYWARS:
                 case DUEL_BUILD:
+                case DUEL_BED_FIGHT:
                 case SPLEEF:
                     return true;
                 default:
@@ -90,7 +92,7 @@ public class Arena implements Comparable<Arena>{
     private Map<String, ArenaPosition> positions;
     private boolean enabled, inUse;
     private String parent;
-    private int xDifference, zDifference;
+    private int xDifference, zDifference, buildLimit, voidLevel;
 
     private @Getter List<Location> beds, blocks, chests;
     private @Getter Set<Chunk> chunks;
@@ -107,6 +109,9 @@ public class Arena implements Comparable<Arena>{
         this.chests = new ArrayList<>();
         this.chunks = new HashSet<>();
         this.chunkQueue = new LinkedList<>();
+
+        this.buildLimit = 256;
+        this.voidLevel = 0;
     }
 
     /**
@@ -141,6 +146,9 @@ public class Arena implements Comparable<Arena>{
             newLocation.add(xDifference, 0, zDifference);
             positions.put(position.getPosition(), new ArenaPosition(position.getPosition(), newLocation));
         }
+
+        setBuildLimit(fromArena.getBuildLimit());
+        setVoidLevel(fromArena.getVoidLevel());
     }
 
     /**
@@ -230,6 +238,31 @@ public class Arena implements Comparable<Arena>{
     }
 
     public boolean isOriginalBlock(Location location) {
+
+        if(!type.equals(Type.DUEL_BED_FIGHT)) return blocks.contains(location);
+
+        List<Material> bedMaterials = Arrays.asList(Material.BED_BLOCK, Material.ENDER_STONE, Material.WOOD);
+
+        if(!bedMaterials.contains(location.getBlock().getType())) return blocks.contains(location);
+
+        for(ArenaPosition position : positions.values()) {
+            if(position.getPosition().equalsIgnoreCase("bluebed") || position.getPosition().equalsIgnoreCase("redbed")) {
+                Location l = position.getLocation();
+
+                for(int x = l.getBlockX() - 3; x < l.getBlockX() + 3; x++) {
+                    for(int y = l.getBlockY(); y < l.getBlockY() + 2; y++) {
+                        for(int z = l.getBlockZ() - 3; z < l.getBlockZ() + 3; z++) {
+                            Location blockLocation = new Location(l.getWorld(), x, y, z);
+                            Block block = blockLocation.getBlock();
+                            if(block.equals(location.getBlock())) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return blocks.contains(location);
     }
 
