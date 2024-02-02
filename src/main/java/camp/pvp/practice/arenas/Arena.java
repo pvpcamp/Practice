@@ -2,16 +2,12 @@ package camp.pvp.practice.arenas;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.loot.LootChest;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -158,7 +154,6 @@ public class Arena implements Comparable<Arena>{
         if(getType().isGenerateLoot()) {
             LootChest.generateLoot(this);
         }
-
     }
 
     public void scanArena() {
@@ -208,15 +203,25 @@ public class Arena implements Comparable<Arena>{
     }
 
     public void resetArena() {
-        if(getType().isUnloadChunks()) {
-            for (Chunk chunk : chunks) {
-                if (chunk.isLoaded()) {
+        if(!getType().isUnloadChunks()) return; // We don't need to reset the arena if we don't need to unload chunks.
+
+        Bukkit.getScheduler().runTaskLater(Practice.getInstance(), ()-> {
+            if(getType().isUnloadChunks()) {
+                for(Chunk chunk : getChunks()) {
+
+                    for(Entity entity : chunk.getEntities()) {
+                        if(!(entity instanceof Player)) continue;
+
+                        Player player = (Player) entity;
+                        player.kickPlayer(ChatColor.RED + "You were kicked because the arena you were in was reset.");
+                    }
+
                     chunk.unload(false);
                 }
             }
-        }
 
-        setInUse(false);
+            setInUse(false);
+        }, 5L);
     }
 
     public boolean isOriginalBlock(Location location) {
