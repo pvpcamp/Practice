@@ -21,23 +21,19 @@ public class ArenaManager {
     private @Getter ArenaCopyQueue arenaCopyQueue;
     private @Getter @Setter ArenaBlockUpdater arenaBlockUpdater;
     private @Getter @Setter ArenaDeleter arenaDeleter;
-    private @Getter ArenaResetter arenaResetter;
     public ArenaManager(Practice plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
         this.arenas = new HashSet<>();
 
-        this.logger.info("Starting ArenaManager...");
+        logger.info("Starting ArenaManager...");
 
-        this.arenaConfig = new ArenaConfig(plugin, this);
+        arenaConfig = new ArenaConfig(plugin, this);
 
-        this.arenaCopyQueue = new ArenaCopyQueue(plugin);
+        arenaCopyQueue = new ArenaCopyQueue(plugin);
         Bukkit.getScheduler().runTaskTimer(plugin, arenaCopyQueue, 0, 4);
 
-        this.arenaResetter = new ArenaResetter(plugin);
-        Bukkit.getScheduler().runTaskTimer(plugin, arenaResetter, 0, 4);
-
-        this.scanBlocks();
+        scanBlocks();
     }
 
     public Arena getArenaFromName(String name) {
@@ -93,10 +89,9 @@ public class ArenaManager {
     }
 
     public void scanBlocks() {
-        String m = "Scanning arenas for all blocks asynchronously.";
+        String m = "Scanning arenas for all blocks.";
 
         this.logger.info(m);
-        Bukkit.broadcast("&4&l[Arena Scanner] &c" + m, "practice.staff");
 
         int arenas = 0;
         for(Arena arena : getArenas()) {
@@ -109,14 +104,13 @@ public class ArenaManager {
 
         m = "Arena scanner has finished scanning " + arenas + " arenas.";
         this.logger.info(m);
-        Bukkit.broadcast("&4&l[Arena Scanner] &c" + m, "practice.staff");
     }
 
     public void deleteArena(Arena arena) {
         this.arenas.remove(arena);
 
         if(arena.isCopy()) {
-
+            setArenaDeleter(new ArenaDeleter(this, arena));
         }
     }
 
