@@ -218,7 +218,7 @@ public class Arena implements Comparable<Arena>{
      * @param delay Whether to delay the reset. Delay should always be used unless
      *              the arena is being reset due to a server shutdown.
      */
-    public void resetArena(boolean delay) {
+    public void resetArena() {
         if(!getType().isUnloadChunks()) return; // We don't need to reset the arena if we don't need to unload chunks.
 
         Bukkit.getScheduler().runTask(Practice.getInstance(), ()-> {

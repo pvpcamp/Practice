@@ -328,6 +328,7 @@ public class ArenaCommand implements CommandExecutor {
                             return true;
                         }
                         break;
+                    case "setpos":
                     case "pos":
                     case "position":
                         if(!exists) {
@@ -386,11 +387,11 @@ public class ArenaCommand implements CommandExecutor {
 
                             if(copies == 0) {
                                 player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " position "
-                                        + ChatColor.WHITE + position.getPosition() + ChatColor.GREEN + " has been set to your current location.");
+                                        + ChatColor.WHITE + position.getPosition() + ChatColor.GREEN + " has been set to your selected location.");
                             } else {
                                 arenaManager.updateArenaCopies(arena);
                                 player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " position "
-                                        + ChatColor.WHITE + position.getPosition() + ChatColor.GREEN + " has been set to your current location, this update has affected " + copies + " copies.");
+                                        + ChatColor.WHITE + position.getPosition() + ChatColor.GREEN + " has been set to your selected location, this update has affected " + copies + " copies.");
                             }
                             return true;
                         }

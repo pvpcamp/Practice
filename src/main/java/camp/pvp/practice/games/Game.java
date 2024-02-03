@@ -116,7 +116,7 @@ public abstract class Game {
         setEnded(new Date());
         setState(State.ENDED);
 
-        arena.resetArena(false);
+        arena.resetArena();
 
         plugin.getGameProfileManager().refreshLobbyItems();
     }
@@ -190,6 +190,13 @@ public abstract class Game {
                 return;
             }
 
+            int currentTick = plugin.getTickNumberCounter().getCurrentTick();
+
+            if(participant.getLastInvalidHitTick() == currentTick && participant.getLastValidHitTick() != currentTick && event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+                event.setCancelled(true);
+                return;
+            }
+
             if(event.getCause().equals(EntityDamageEvent.DamageCause.FIRE) || event.getCause().equals(EntityDamageEvent.DamageCause.LAVA) || event.getCause().equals(EntityDamageEvent.DamageCause.FIRE_TICK)) {
                 damage += 1;
             }
@@ -239,69 +246,79 @@ public abstract class Game {
     }
 
     public void handleHit(Player victim, Player attacker, EntityDamageByEntityEvent event) {
-        GameParticipant victimParticipant = this.getCurrentPlaying().get(victim.getUniqueId());
         GameParticipant participant = this.getCurrentPlaying().get(attacker.getUniqueId());
-        if(victimParticipant != null && participant != null && getState().equals(State.ACTIVE)) {
-            if(victimParticipant.isAlive() && participant.isAlive()) {
+        GameParticipant victimParticipant = this.getCurrentPlaying().get(victim.getUniqueId());
 
-                if(participant.getAttacking() != null && !participant.getAttacking().equals(victim.getUniqueId())) {
-                    participant.setCurrentCombo(0);
-                }
+        int currentTick = plugin.getTickNumberCounter().getCurrentTick();
 
-                participant.setHealth(Math.round(attacker.getHealth()));
-                participant.setMaxHealth(Math.round(attacker.getMaxHealth()));
-                participant.setHunger(attacker.getFoodLevel());
-                participant.setAttacking(victim.getUniqueId());
-
-                victimParticipant.setAttacker(attacker.getUniqueId());
-
-                victimParticipant.setHealth(Math.round(victim.getHealth()));
-                victimParticipant.setMaxHealth(Math.round(victim.getMaxHealth()));
-                victimParticipant.setHunger(victim.getFoodLevel());
-                victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
-
-                if(event.getDamager() instanceof Player) {
-                    if (victim.getNoDamageTicks() == 0) {
-                        participant.hits++;
-                        participant.currentCombo++;
-
-                        if (participant.isComboMessages()) {
-                            switch ((int) participant.getCurrentCombo()) {
-                                case 5:
-                                    attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
-                                    attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
-                                    break;
-                                case 10:
-                                    attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
-                                    attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
-                                    break;
-                                case 20:
-                                    attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
-                                    attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                if(kit != null) {
-                    if (!kit.isTakeDamage()) {
-                        event.setDamage(0);
-                        victim.setHealth(victim.getMaxHealth());
-                        if (kit.equals(DuelKit.BOXING) && participant.getHits() > 99) {
-                            this.eliminate(victim, false);
-                        }
-                    }
-                }
-
-                if (participant.currentCombo > participant.longestCombo) {
-                    participant.longestCombo = participant.currentCombo;
-                }
-            } else {
-                event.setCancelled(true);
-            }
-        } else {
+        if(participant == null || victimParticipant == null) {
             event.setCancelled(true);
+            return;
+        }
+
+        if(!getState().equals(State.ACTIVE)) event.setCancelled(true);
+
+        if(!participant.isAlive() || !victimParticipant.isAlive()) event.setCancelled(true);
+
+        if(victim.getNoDamageTicks() > 0) event.setCancelled(true);
+
+        if(event.isCancelled()) {
+            victimParticipant.setLastInvalidHitTick(currentTick);
+            return;
+        }
+
+        if(participant.getAttacking() != null && !participant.getAttacking().equals(victim.getUniqueId())) {
+            participant.setCurrentCombo(0);
+        }
+
+        participant.setHealth(Math.round(attacker.getHealth()));
+        participant.setMaxHealth(Math.round(attacker.getMaxHealth()));
+        participant.setHunger(attacker.getFoodLevel());
+        participant.setAttacking(victim.getUniqueId());
+
+        victimParticipant.setLastValidHitTick(currentTick);
+        victimParticipant.setAttacker(attacker.getUniqueId());
+        victimParticipant.setHealth(Math.round(victim.getHealth()));
+        victimParticipant.setMaxHealth(Math.round(victim.getMaxHealth()));
+        victimParticipant.setHunger(victim.getFoodLevel());
+        victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
+
+        if(event.getDamager() instanceof Player) {
+            if (victim.getNoDamageTicks() == 0) {
+                participant.hits++;
+                participant.currentCombo++;
+
+                if (participant.isComboMessages()) {
+                    switch ((int) participant.getCurrentCombo()) {
+                        case 5:
+                            attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+                            attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
+                            break;
+                        case 10:
+                            attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
+                            attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
+                            break;
+                        case 20:
+                            attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
+                            attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
+                            break;
+                    }
+                }
+            }
+        }
+
+        if(kit != null) {
+            if (!kit.isTakeDamage()) {
+                event.setDamage(0);
+                victim.setHealth(victim.getMaxHealth());
+                if (kit.equals(DuelKit.BOXING) && participant.getHits() > 99) {
+                    this.eliminate(victim, false);
+                }
+            }
+        }
+
+        if (participant.currentCombo > participant.longestCombo) {
+            participant.longestCombo = participant.currentCombo;
         }
     }
 

@@ -41,6 +41,7 @@ public class GameParticipant {
 
     private UUID attacker, attacking;
     private EntityDamageEvent.DamageCause lastDamageCause;
+    private long lastInvalidHitTick, lastValidHitTick;
 
     public long health, maxHealth, hunger,
             hits, currentCombo, longestCombo,

@@ -30,6 +30,9 @@ public class RespawnTask extends BukkitRunnable {
             player.teleport(participant.getSpawnLocation());
             participant.setAlive(true);
 
+            participant.setLastDamageCause(null);
+            participant.setAttacker(null);
+
             Practice.getInstance().getGameProfileManager().updateGlobalPlayerVisibility();
 
             Bukkit.getScheduler().runTaskLater(Practice.getInstance(), () -> {

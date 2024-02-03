@@ -316,7 +316,7 @@ public class GameProfile {
                 } else {
                     if(game.getCurrentPlayersPlaying().contains(player)) {
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            if(!game.getCurrentPlayersPlaying().contains(p)) {
+                            if(!game.getAlivePlayers().contains(p)) {
                                 if (game.getSpectators().get(p.getUniqueId()) == null || !game.getSpectators().get(p.getUniqueId()).isVisibleToPlayers()) {
                                     getHiddenPlayers().add(p.getUniqueId());
                                 }
