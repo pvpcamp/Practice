@@ -10,6 +10,9 @@ import camp.pvp.practice.utils.BukkitReflection;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.utils.PlayerUtils;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.PacketContainer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -18,9 +21,13 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Bed;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -109,45 +116,65 @@ public abstract class Game {
         setEnded(new Date());
         setState(State.ENDED);
 
-        arena.resetArena(false);
+        arena.resetArena();
 
         plugin.getGameProfileManager().refreshLobbyItems();
+    }
+
+    private void killRespawn(Player player, GameParticipant participant) {
+        PlayerUtils.reset(player, true);
+
+        announce("&f" + player.getName() + "&a was killed" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
+
+        PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true, false);
+        player.addPotionEffect(invisibility);
+
+        participant.respawn();
     }
 
     public void eliminate(Player player, boolean leftGame) {
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-        if(participant != null && !this.getState().equals(State.ENDED)) {
-            participant.eliminate();
-            participant.clearCooldowns();
 
-            PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
-            participant.setPostGameInventory(pgi);
-            getPlugin().getGameManager().getPostGameInventories().put(pgi.getUuid(), pgi);
+        if(participant == null || !participant.isAlive()) return;
 
-            if(getAlive().size() > 1) {
-                for (ItemStack item : player.getInventory()) {
-                    if (item != null && !item.getType().equals(Material.AIR)) {
-                        Item i = player.getWorld().dropItem(player.getLocation(), item);
-                        this.addEntity(i);
-                    }
+        if(this.getState().equals(State.ENDED)) return;
+
+        participant.eliminate();
+        participant.clearCooldowns();
+
+        plugin.getGameProfileManager().updateGlobalPlayerVisibility();
+
+        Location location = player.getLocation();
+
+        boolean velocity = participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK);
+
+        profile.getDeathAnimation().playAnimation(this, player, location, velocity);
+
+        if(participant.isRespawn() && !leftGame) {
+            killRespawn(player, participant);
+            return;
+        }
+
+        PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
+        participant.setPostGameInventory(pgi);
+        getPlugin().getGameManager().getPostGameInventories().put(pgi.getUuid(), pgi);
+
+        if(getAlive().size() > 1) {
+            for (ItemStack item : player.getInventory()) {
+                if (item != null && !item.getType().equals(Material.AIR)) {
+                    Item i = player.getWorld().dropItem(player.getLocation(), item);
+                    this.addEntity(i);
                 }
             }
+        }
 
-            if(leftGame) {
-                Game.this.announce("&f" + player.getName() + "&a disconnected.");
-            } else {
-                Game.this.spectateStart(player);
-                Game.this.announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
-            }
-
-            plugin.getGameProfileManager().updateGlobalPlayerVisibility();
-
-            Location location = player.getLocation();
-
-            boolean velocity = participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK);
-
-            profile.getDeathAnimation().playAnimation(this, player, location, velocity);
+        if(leftGame) {
+            participant.setCurrentlyPlaying(false);
+            announce("&f" + player.getName() + "&a disconnected.");
+        } else {
+            spectateStart(player);
+            announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
         }
     }
 
@@ -158,8 +185,25 @@ public abstract class Game {
             double damage = event.getFinalDamage();
             boolean canDie = true;
 
+            if(participant.isInvincible()) {
+                event.setCancelled(true);
+                return;
+            }
+
+            int currentTick = plugin.getTickNumberCounter().getCurrentTick();
+
+            if(participant.getLastInvalidHitTick() == currentTick && participant.getLastValidHitTick() != currentTick && event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+                event.setCancelled(true);
+                return;
+            }
+
             if(event.getCause().equals(EntityDamageEvent.DamageCause.FIRE) || event.getCause().equals(EntityDamageEvent.DamageCause.LAVA) || event.getCause().equals(EntityDamageEvent.DamageCause.FIRE_TICK)) {
                 damage += 1;
+            }
+
+            if(!kit.isFallDamage() && event.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
+                event.setCancelled(true);
+                canDie = false;
             }
 
             if(kit != null && !kit.isTakeDamage()) {
@@ -202,69 +246,79 @@ public abstract class Game {
     }
 
     public void handleHit(Player victim, Player attacker, EntityDamageByEntityEvent event) {
-        GameParticipant victimParticipant = this.getCurrentPlaying().get(victim.getUniqueId());
         GameParticipant participant = this.getCurrentPlaying().get(attacker.getUniqueId());
-        if(victimParticipant != null && participant != null && getState().equals(State.ACTIVE)) {
-            if(victimParticipant.isAlive() && participant.isAlive()) {
+        GameParticipant victimParticipant = this.getCurrentPlaying().get(victim.getUniqueId());
 
-                if(participant.getAttacking() != null && !participant.getAttacking().equals(victim.getUniqueId())) {
-                    participant.setCurrentCombo(0);
-                }
+        int currentTick = plugin.getTickNumberCounter().getCurrentTick();
 
-                participant.setHealth(Math.round(attacker.getHealth()));
-                participant.setMaxHealth(Math.round(attacker.getMaxHealth()));
-                participant.setHunger(attacker.getFoodLevel());
-                participant.setAttacking(victim.getUniqueId());
-
-                victimParticipant.setAttacker(attacker.getUniqueId());
-
-                victimParticipant.setHealth(Math.round(victim.getHealth()));
-                victimParticipant.setMaxHealth(Math.round(victim.getMaxHealth()));
-                victimParticipant.setHunger(victim.getFoodLevel());
-                victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
-
-                if(event.getDamager() instanceof Player) {
-                    if (victim.getNoDamageTicks() == 0) {
-                        participant.hits++;
-                        participant.currentCombo++;
-
-                        if (participant.isComboMessages()) {
-                            switch ((int) participant.getCurrentCombo()) {
-                                case 5:
-                                    attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
-                                    attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
-                                    break;
-                                case 10:
-                                    attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
-                                    attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
-                                    break;
-                                case 20:
-                                    attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
-                                    attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                if(kit != null) {
-                    if (!kit.isTakeDamage()) {
-                        event.setDamage(0);
-                        victim.setHealth(victim.getMaxHealth());
-                        if (kit.equals(DuelKit.BOXING) && participant.getHits() > 99) {
-                            this.eliminate(victim, false);
-                        }
-                    }
-                }
-
-                if (participant.currentCombo > participant.longestCombo) {
-                    participant.longestCombo = participant.currentCombo;
-                }
-            } else {
-                event.setCancelled(true);
-            }
-        } else {
+        if(participant == null || victimParticipant == null) {
             event.setCancelled(true);
+            return;
+        }
+
+        if(!getState().equals(State.ACTIVE)) event.setCancelled(true);
+
+        if(!participant.isAlive() || !victimParticipant.isAlive()) event.setCancelled(true);
+
+        if(victim.getNoDamageTicks() > 0) event.setCancelled(true);
+
+        if(event.isCancelled()) {
+            victimParticipant.setLastInvalidHitTick(currentTick);
+            return;
+        }
+
+        if(participant.getAttacking() != null && !participant.getAttacking().equals(victim.getUniqueId())) {
+            participant.setCurrentCombo(0);
+        }
+
+        participant.setHealth(Math.round(attacker.getHealth()));
+        participant.setMaxHealth(Math.round(attacker.getMaxHealth()));
+        participant.setHunger(attacker.getFoodLevel());
+        participant.setAttacking(victim.getUniqueId());
+
+        victimParticipant.setLastValidHitTick(currentTick);
+        victimParticipant.setAttacker(attacker.getUniqueId());
+        victimParticipant.setHealth(Math.round(victim.getHealth()));
+        victimParticipant.setMaxHealth(Math.round(victim.getMaxHealth()));
+        victimParticipant.setHunger(victim.getFoodLevel());
+        victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
+
+        if(event.getDamager() instanceof Player) {
+            if (victim.getNoDamageTicks() == 0) {
+                participant.hits++;
+                participant.currentCombo++;
+
+                if (participant.isComboMessages()) {
+                    switch ((int) participant.getCurrentCombo()) {
+                        case 5:
+                            attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+                            attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
+                            break;
+                        case 10:
+                            attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
+                            attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
+                            break;
+                        case 20:
+                            attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
+                            attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
+                            break;
+                    }
+                }
+            }
+        }
+
+        if(kit != null) {
+            if (!kit.isTakeDamage()) {
+                event.setDamage(0);
+                victim.setHealth(victim.getMaxHealth());
+                if (kit.equals(DuelKit.BOXING) && participant.getHits() > 99) {
+                    this.eliminate(victim, false);
+                }
+            }
+        }
+
+        if (participant.currentCombo > participant.longestCombo) {
+            participant.longestCombo = participant.currentCombo;
         }
     }
 
@@ -280,7 +334,13 @@ public abstract class Game {
         plugin.getGameQueueManager().removeFromQueue(player);
 
         GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
+        participant.setGame(this);
         participant.setComboMessages(profile.isComboMessages());
+        participant.setDuelKit(kit);
+
+        if(kit.isRespawn()) {
+            participant.setRespawn(true);
+        }
 
         profile.updatePlayerVisibility();
 
@@ -370,12 +430,92 @@ public abstract class Game {
         }
     }
 
+    public void handleBlockBreak(Player player, Block block, BlockBreakEvent event) {
+
+        Arena.Type type = arena.getType();
+        Location location = block.getLocation();
+        final Material material = block.getType();
+
+        if(type.canModifyArena()) {
+            if(type.getSpecificBlocks() != null) {
+                if(!type.getSpecificBlocks().contains(block.getType())) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        } else {
+            if(arena.isOriginalBlock(location)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if(block.getType().equals(Material.SNOW_BLOCK)) {
+            player.getInventory().addItem(new ItemStack(Material.SNOW_BALL));
+        } else {
+            for (ItemStack item : block.getDrops()) {
+                Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
+                addEntity(i);
+            }
+        }
+
+        if(arena.getBuildLimit() < block.getLocation().getBlockY()) {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.RED + "You have reached the build limit.");
+            return;
+        }
+
+        block.setType(Material.AIR);
+
+        if(!arena.getType().equals(Arena.Type.DUEL_BED_FIGHT)) return;
+
+        if(!material.equals(Material.BED_BLOCK)) return;
+
+        List<GameParticipant> allParticipants = new ArrayList<>(getParticipants().values());
+
+        GameParticipant participant = null;
+        ChatColor color = null;
+        ArenaPosition bedPosition = null;
+
+        for(int x = block.getX() - 2; x < block.getX() + 2; x++) {
+            for(int z = block.getZ() - 2; z < block.getZ() + 2; z++) {
+                for(ArenaPosition arenaPosition : arena.getPositions().values()) {
+                    if(arenaPosition.getPosition().contains("bed") &&
+                            arenaPosition.getLocation().equals(new Location(block.getWorld(), x, block.getY(), z))) bedPosition = arenaPosition;
+                }
+            }
+        }
+
+        if(bedPosition == null) return;
+
+        if(bedPosition.getPosition().equalsIgnoreCase("bluebed")) {
+            participant = allParticipants.get(0);
+            color = ChatColor.BLUE;
+        }
+
+        if(bedPosition.getPosition().equalsIgnoreCase("redbed")) {
+            participant = allParticipants.get(1);
+            color = ChatColor.RED;
+        }
+
+        if(participant != null) {
+            participant.setRespawn(false);
+            announceAll(
+                    " ",
+                    color + "&l!!! " + color.name() + " BED DESTROYED !!!",
+                    "&f" + participant.getName() + "'s " + color + "bed has been destroyed by &f" + player.getName() + color + "!",
+                    " ");
+
+            playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 1F);
+        }
+    }
+
     public boolean isBuild() {
         return kit.isBuild();
     }
 
     public List<Player> getAllPlayers() {
-        List<Player> players = new ArrayList<>(getAlivePlayers());
+        List<Player> players = new ArrayList<>(getCurrentPlayersPlaying());
         players.addAll(getSpectatorsPlayers());
         return players;
     }
@@ -402,7 +542,14 @@ public abstract class Game {
     }
 
     public Map<UUID, GameParticipant> getCurrentPlaying() {
-        return this.getAlive();
+        Map<UUID, GameParticipant> playing = new HashMap<>();
+
+        for(Map.Entry<UUID, GameParticipant> entry : participants.entrySet()) {
+            if(entry.getValue().isCurrentlyPlaying()) {
+                playing.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return playing;
     }
 
     public List<Player> getCurrentPlayersPlaying() {
@@ -450,7 +597,7 @@ public abstract class Game {
 
     public void playSound(Location location, Sound sound, float v1, float v2) {
         for(Player player : getAllPlayers()) {
-            player.playSound(location, sound, v1, v2);
+            player.playSound(location == null ? player.getLocation() : location, sound, v1, v2);
         }
     }
 

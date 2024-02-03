@@ -93,6 +93,6 @@ public class EndingTask implements Runnable{
 
         Practice.instance.getGameProfileManager().updateGlobalPlayerVisibility();
 
-        game.getArena().resetArena(true);
+        game.getArena().resetArena();
     }
 }

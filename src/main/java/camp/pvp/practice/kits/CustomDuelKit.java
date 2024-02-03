@@ -1,6 +1,8 @@
 package camp.pvp.practice.kits;
 
 import camp.pvp.practice.games.GameInventory;
+import camp.pvp.practice.games.GameParticipant;
+import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.items.ItemStackDeserializer;
 import camp.pvp.practice.utils.items.ItemStackSerializer;
@@ -9,10 +11,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 
 import java.util.HashMap;
@@ -87,6 +91,66 @@ public class CustomDuelKit {
 
         pi.setArmorContents(gi.getArmor());
         pi.setContents(this.items);
+        player.updateInventory();
+    }
+
+    public void apply(GameParticipant participant) {
+        Player player = participant.getPlayer();
+        PlayerInventory pi = player.getInventory();
+        GameInventory gi = duelKit.getGameInventory();
+
+        PlayerUtils.reset(player, false);
+
+        for(PotionEffect effect : gi.getPotionEffects()) {
+            player.addPotionEffect(effect);
+        }
+
+        pi.setArmorContents(gi.getArmor());
+        pi.setContents(this.items);
+
+        participant.setKitApplied(true);
+
+        if(duelKit.equals(DuelKit.BED_FIGHT)) {
+            ItemStack[] armor = pi.getArmorContents();
+            GameTeam.Color color = participant.getTeamColor();
+
+            LeatherArmorMeta helmetMeta = (LeatherArmorMeta) armor[3].getItemMeta();
+            LeatherArmorMeta chestplateMeta = (LeatherArmorMeta) armor[2].getItemMeta();
+            LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) armor[1].getItemMeta();
+            LeatherArmorMeta bootsMeta = (LeatherArmorMeta) armor[0].getItemMeta();
+
+            if(color.equals(GameTeam.Color.BLUE)) {
+                helmetMeta.setColor(Color.BLUE);
+                chestplateMeta.setColor(Color.BLUE);
+                leggingsMeta.setColor(Color.BLUE);
+                bootsMeta.setColor(Color.BLUE);
+
+                for(ItemStack item : pi.getContents()) {
+                    if(item == null) continue;
+                    if(!item.getType().equals(Material.WOOL)) continue;
+
+                    item.setDurability((short) 11);
+                }
+            } else {
+                helmetMeta.setColor(Color.RED);
+                chestplateMeta.setColor(Color.RED);
+                leggingsMeta.setColor(Color.RED);
+                bootsMeta.setColor(Color.RED);
+
+                for(ItemStack item : pi.getContents()) {
+                    if(item == null) continue;
+                    if(!item.getType().equals(Material.WOOL)) continue;
+
+                    item.setDurability((short) 14);
+                }
+            }
+
+            armor[3].setItemMeta(helmetMeta);
+            armor[2].setItemMeta(chestplateMeta);
+            armor[1].setItemMeta(leggingsMeta);
+            armor[0].setItemMeta(bootsMeta);
+        }
+
         player.updateInventory();
     }
 }

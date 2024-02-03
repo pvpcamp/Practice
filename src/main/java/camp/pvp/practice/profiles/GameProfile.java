@@ -2,6 +2,7 @@ package camp.pvp.practice.profiles;
 
 import camp.pvp.practice.arenas.ArenaCopier;
 import camp.pvp.practice.cosmetics.DeathAnimation;
+import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.Practice;
@@ -142,7 +143,7 @@ public class GameProfile {
 
     public State getState() {
         if(game != null) {
-            if(game.getAlive().get(this.uuid) != null) {
+            if(game.getCurrentPlaying().get(this.uuid) != null) {
                 return State.IN_GAME;
             } else {
                 return State.SPECTATING;
@@ -234,8 +235,8 @@ public class GameProfile {
 
                 Map<Integer, CustomDuelKit> customKits = getCustomDuelKits().get(kit);
                 if(customKits == null || customKits.isEmpty()) {
-                    game.getParticipants().get(uuid).setKitApplied(true);
-                    kit.apply(player);
+                    GameParticipant participant = game.getParticipants().get(uuid);
+                    kit.apply(participant);
                     return;
                 }
 
@@ -315,7 +316,7 @@ public class GameProfile {
                 } else {
                     if(game.getCurrentPlayersPlaying().contains(player)) {
                         for (Player p : Bukkit.getOnlinePlayers()) {
-                            if(!game.getCurrentPlayersPlaying().contains(p)) {
+                            if(!game.getAlivePlayers().contains(p)) {
                                 if (game.getSpectators().get(p.getUniqueId()) == null || !game.getSpectators().get(p.getUniqueId()).isVisibleToPlayers()) {
                                     getHiddenPlayers().add(p.getUniqueId());
                                 }

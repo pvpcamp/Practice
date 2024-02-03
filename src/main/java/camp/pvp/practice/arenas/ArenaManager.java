@@ -50,13 +50,14 @@ public class ArenaManager {
         List<Arena> arenas = new ArrayList<>();
         if(kit.isBuild()) {
             for(Arena a : getOriginalArenas()) {
-                if(a.isEnabled()) {
-                    if (kit.getArenaTypes().contains(a.getType())) {
-                        for (Arena copy : getArenaCopies(a)) {
-                            if (copy.isEnabled() && !copy.isInUse()) {
-                                arenas.add(copy);
-                            }
-                        }
+
+                if(!a.isEnabled()) continue;
+
+                if(!kit.getArenaTypes().contains(a.getType())) continue;
+
+                for (Arena copy : getArenaCopies(a)) {
+                    if (copy.isEnabled() && !copy.isInUse()) {
+                        arenas.add(copy);
                     }
                 }
             }
@@ -141,6 +142,8 @@ public class ArenaManager {
         copy.setEnabled(arena.isEnabled());
         copy.setXDifference(xD);
         copy.setZDifference(zD);
+        copy.setBuildLimit(arena.getBuildLimit());
+        copy.setVoidLevel(arena.getVoidLevel());
         copy.copyPositions(arena);
         copy.setParent(arena.getName());
         copy.setType(arena.getType());
@@ -154,6 +157,8 @@ public class ArenaManager {
         copy.setEnabled(arena.isEnabled());
         copy.setXDifference(xD);
         copy.setZDifference(zD);
+        copy.setBuildLimit(arena.getBuildLimit());
+        copy.setVoidLevel(arena.getVoidLevel());
         copy.copyPositions(arena);
         copy.setParent(arena.getName());
         copy.setType(arena.getType());

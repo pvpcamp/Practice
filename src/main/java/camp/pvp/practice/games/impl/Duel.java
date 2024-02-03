@@ -144,7 +144,7 @@ public class Duel extends Game {
             getStartingTimer().cancel();
         }
         
-        for(GameParticipant participant : getAlive().values()) {
+        for(GameParticipant participant : getCurrentPlaying().values()) {
             Player player = participant.getPlayer();
             PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
             participant.setPostGameInventory(pgi);
@@ -158,7 +158,7 @@ public class Duel extends Game {
         for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
             GameParticipant participant = entry.getValue();
 
-            boolean alive = participant.isAlive();
+            boolean alive = participant.isCurrentlyPlaying();
             if(alive) {
                 winnerParticipant = participant;
                 winnerProfile = gpm.getLoadedProfiles().get(entry.getKey());
@@ -243,7 +243,7 @@ public class Duel extends Game {
             getTournament().eliminate(player);
         }
 
-        if(getAlive().size() < 2) {
+        if(getCurrentPlaying().size() < 2) {
             end();
         }
     }
@@ -251,7 +251,7 @@ public class Duel extends Game {
     @Override
     public List<String> getScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
-        GameParticipant self = getAlive().get(profile.getUuid());
+        GameParticipant self = getParticipants().get(profile.getUuid());
         GameParticipant opponent = null;
 
         boolean showInGame = profile.isSidebarInGame(),
@@ -279,9 +279,14 @@ public class Duel extends Game {
 
                     boolean show = false;
 
-                    if(showDuration) {
-                        show = true;
-                        lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
+                    if(getKit().equals(DuelKit.BED_FIGHT)) {
+                        List<GameParticipant> pList = new ArrayList<>(getCurrentPlaying().values());
+                        GameParticipant blue = pList.get(0);
+                        GameParticipant red = pList.get(1);
+
+                        lines.add("&9B &fBlue: &9" + (blue.isRespawn() ? "✓" : "X") + " " + (blue.equals(self) ? "&7YOU" : ""));
+                        lines.add("&cR &fRed: &c" + (red.isRespawn() ? "✓" : "X") + " " + (red.equals(self) ? "&7YOU" : ""));
+                        lines.add(" ");
                     }
 
                     if (getKit().equals(DuelKit.BOXING)) {
@@ -303,6 +308,11 @@ public class Duel extends Game {
                         }
 
                         lines.add(lineBuilder.toString());
+                    }
+
+                    if(showDuration) {
+                        show = true;
+                        lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
                     }
 
                     if(showPing) {
@@ -354,22 +364,32 @@ public class Duel extends Game {
 
         if(!getState().equals(State.ENDED)) {
 
+            if(getKit().equals(DuelKit.BED_FIGHT)) {
+                List<GameParticipant> pList = new ArrayList<>(getCurrentPlaying().values());
+                GameParticipant blue = pList.get(0);
+                GameParticipant red = pList.get(1);
+
+                lines.add("&9B &fBlue: &9" + (blue.isRespawn() ? "✓" : "X"));
+                lines.add("&cR &fRed: &c" + (red.isRespawn() ? "✓" : "X"));
+                lines.add(" ");
+            }
+
             lines.add("&6Players:");
 
             for (GameParticipant participant : getParticipants().values()) {
                 if (participant.isAlive()) {
                     Player player = participant.getPlayer();
                     if (getKit().equals(DuelKit.BOXING)) {
-                        lines.add(" &f" + participant.getName() + " &7(" + participant.getHits() + ")");
+                        lines.add("&7> &f" + participant.getName() + " &7(" + participant.getHits() + ")");
                     } else {
                         if (!queueType.equals(GameQueue.Type.RANKED)) {
-                            lines.add(" &f" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
+                            lines.add("&7> &f" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
                         } else {
-                            lines.add(" &f" + participant.getName() + "&c ❤");
+                            lines.add("&7> &f" + participant.getName() + "&c ❤");
                         }
                     }
                 } else {
-                    lines.add(" &4X &c&m" + participant.getName());
+                    lines.add("&4> &c&m" + participant.getName());
                 }
             }
         }

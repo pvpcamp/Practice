@@ -67,7 +67,7 @@ public class PlayerInteractListener implements Listener {
             return;
         }
 
-        if(profile.isBuildMode() && item.getType().equals(Material.GOLD_AXE)) {
+        if(profile.isBuildMode() && item != null && item.getType().equals(Material.GOLD_AXE)) {
 
             if(block == null || block.getType().equals(Material.AIR)) {
                 Location location = player.getLocation();
@@ -105,7 +105,7 @@ public class PlayerInteractListener implements Listener {
 
             Game game = profile.getGame();
             if (game != null) {
-                GameParticipant participant = game.getAlive().get(player.getUniqueId());
+                GameParticipant participant = game.getCurrentPlaying().get(player.getUniqueId());
                 if(participant != null) {
                     if(participant.isKitApplied()) {
 
@@ -128,14 +128,13 @@ public class PlayerInteractListener implements Listener {
                                 int slot = player.getInventory().getHeldItemSlot() + 1;
                                 CustomDuelKit cdk = profile.getCustomDuelKits().get(kit).get(slot);
                                 if(cdk != null) {
-                                    cdk.apply(player);
-                                    participant.setKitApplied(true);
+                                    cdk.apply(participant);
+                                    participant.setAppliedCustomKit(cdk);
                                     player.updateInventory();
                                 }
                                 break;
                             case BOOK:
-                                kit.apply(player);
-                                participant.setKitApplied(true);
+                                kit.apply(participant);
                                 player.updateInventory();
                                 break;
                         }

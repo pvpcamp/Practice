@@ -82,17 +82,19 @@ public class DuelRequest {
 
         if(senderPlayer != null && opponentPlayer != null) {
             if(arena != null) {
-                if (arena.getType().equals(Arena.Type.DUEL_BUILD)) {
-                    for (Arena a : Practice.instance.getArenaManager().getArenaCopies(arena)) {
+                if (arena.getType().isBuild()) {
+                    for (Arena a : Practice.getInstance().getArenaManager().getArenaCopies(arena)) {
                         if (!a.isInUse() && a.isEnabled()) {
                             arena = a;
                             break;
                         }
                     }
+
+                    if(!arena.isCopy()) arena = null;
                 }
             }
 
-            Duel duel = new Duel(Practice.instance, UUID.randomUUID());
+            Duel duel = new Duel(Practice.getInstance(), UUID.randomUUID());
 
             duel.setQueueType(GameQueue.Type.PRIVATE);
             duel.setKit(kit);

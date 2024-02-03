@@ -3,15 +3,18 @@ package camp.pvp.practice.kits;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.games.GameInventory;
 import camp.pvp.practice.games.GameParticipant;
+import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -64,6 +67,7 @@ public enum DuelKit {
         switch(this) {
             case BUILD_UHC:
             case SKYWARS:
+            case BED_FIGHT:
             case SPLEEF:
             case STRATEGY:
                 return true;
@@ -72,9 +76,12 @@ public enum DuelKit {
         }
     }
 
+    public boolean isRespawn() {
+        return this.equals(BED_FIGHT);
+    }
+
     public boolean isRegen() {
         switch(this) {
-            case BED_FIGHT:
             case BUILD_UHC:
                 return false;
             default:
@@ -83,19 +90,11 @@ public enum DuelKit {
     }
 
     public boolean isQueueable () {
-        switch(this) {
-            default:
-                return true;
-        }
+        return true;
     }
 
     public boolean isRanked() {
-        switch(this) {
-            case HCF:
-                return false;
-            default:
-                return true;
-        }
+        return !this.equals(HCF);
     }
 
     public boolean isTournament() {
@@ -110,7 +109,6 @@ public enum DuelKit {
 
     public boolean isEditable() {
         switch(this) {
-            case BED_FIGHT:
             case SUMO:
             case SPLEEF:
                 return false;
@@ -207,6 +205,10 @@ public enum DuelKit {
             default:
                 return true;
         }
+    }
+
+    public boolean isFallDamage() {
+        return !this.equals(BED_FIGHT);
     }
 
     public ItemStack getIcon() {
@@ -548,6 +550,25 @@ public enum DuelKit {
 
                 break;
             case BED_FIGHT:
+                armor[3] = new ItemStack(Material.LEATHER_HELMET);
+
+                armor[2] = new ItemStack(Material.LEATHER_CHESTPLATE);
+
+                armor[1] = new ItemStack(Material.LEATHER_LEGGINGS);
+
+                armor[0] = new ItemStack(Material.LEATHER_BOOTS);
+
+                inv[0] = new ItemStack(Material.WOOD_SWORD);
+
+                inv[1] = new ItemStack(Material.WOOD_PICKAXE);
+                inv[1].addEnchantment(Enchantment.DIG_SPEED, 1);
+
+                inv[2] = new ItemStack(Material.WOOD_AXE);
+                inv[2].addEnchantment(Enchantment.DIG_SPEED, 1);
+
+                inv[3] = new ItemStack(Material.SHEARS);
+                inv[4] = new ItemStack(Material.WOOL, 64);
+                break;
             default:
                 break;
 
@@ -582,11 +603,52 @@ public enum DuelKit {
             player.addPotionEffect(effect);
         }
 
-        if(this.equals(BED_FIGHT)) {
-        }
-
         pi.setArmorContents(gi.getArmor());
         pi.setContents(gi.getInventory());
+
+        participant.setKitApplied(true);
+
+        if(this.equals(BED_FIGHT)) {
+            ItemStack[] armor = pi.getArmorContents();
+            GameTeam.Color color = participant.getTeamColor();
+
+            LeatherArmorMeta helmetMeta = (LeatherArmorMeta) armor[3].getItemMeta();
+            LeatherArmorMeta chestplateMeta = (LeatherArmorMeta) armor[2].getItemMeta();
+            LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) armor[1].getItemMeta();
+            LeatherArmorMeta bootsMeta = (LeatherArmorMeta) armor[0].getItemMeta();
+
+            if(color.equals(GameTeam.Color.BLUE)) {
+                helmetMeta.setColor(Color.BLUE);
+                chestplateMeta.setColor(Color.BLUE);
+                leggingsMeta.setColor(Color.BLUE);
+                bootsMeta.setColor(Color.BLUE);
+
+                for(ItemStack item : pi.getContents()) {
+                    if(item == null) continue;
+                    if(!item.getType().equals(Material.WOOL)) continue;
+
+                    item.setDurability((short) 11);
+                }
+            } else {
+                helmetMeta.setColor(Color.RED);
+                chestplateMeta.setColor(Color.RED);
+                leggingsMeta.setColor(Color.RED);
+                bootsMeta.setColor(Color.RED);
+
+                for(ItemStack item : pi.getContents()) {
+                    if(item == null) continue;
+                    if(!item.getType().equals(Material.WOOL)) continue;
+
+                    item.setDurability((short) 14);
+                }
+            }
+
+            armor[3].setItemMeta(helmetMeta);
+            armor[2].setItemMeta(chestplateMeta);
+            armor[1].setItemMeta(leggingsMeta);
+            armor[0].setItemMeta(bootsMeta);
+        }
+
         player.updateInventory();
     }
 }
