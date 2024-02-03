@@ -395,6 +395,49 @@ public class ArenaCommand implements CommandExecutor {
                             return true;
                         }
                         break;
+                    case "buildlimit":
+                    case "bl":
+                    case "limit":
+                        if(!exists) {
+                            player.sendMessage(existsMessage);
+                            return true;
+                        }
+
+                        if(args.length > 2) {
+                            int limit;
+                            try {
+                                limit = Integer.parseInt(args[2]);
+                            } catch(NumberFormatException ignored) {
+                                player.sendMessage(ChatColor.RED + "You must provide a valid number for the build limit.");
+                                return true;
+                            }
+
+                            arena.setBuildLimit(limit);
+                            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " build limit has been set to " + ChatColor.WHITE + limit + ChatColor.GREEN + ".");
+                            return true;
+                        }
+                        break;
+                    case "voidlevel":
+                    case "void":
+                        if(!exists) {
+                            player.sendMessage(existsMessage);
+                            return true;
+                        }
+
+                        if(args.length > 2) {
+                            int level;
+                            try {
+                                level = Integer.parseInt(args[2]);
+                            } catch(NumberFormatException ignored) {
+                                player.sendMessage(ChatColor.RED + "You must provide a valid number for the void level.");
+                                return true;
+                            }
+
+                            arena.setVoidLevel(level);
+                            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " void level has been set to " + ChatColor.WHITE + level + ChatColor.GREEN + ".");
+                            return true;
+                        }
+                        break;
                     case "tp":
                     case "teleport":
                         if(!exists) {
@@ -583,7 +626,9 @@ public class ArenaCommand implements CommandExecutor {
         help.append("\n&6/arena displayname <name> <display name> &7- &fSets an arena's display name.");
         help.append("\n&6/arena rename <name> <new name> &7- &fRenames an arena.");
         help.append("\n&6/arena type <name> [type] &7- &fGets or sets an arena type.");
-        help.append("\n&6/arena position <name> <position> &7- &fSets an arena position at your current location.");
+        help.append("\n&6/arena position <name> <position> &7- &fSets an arena position at your selected location.");
+        help.append("\n&6/arena buildlimit <name> <limit> &7- &fSets the build limit for an arena.");
+        help.append("\n&6/arena voidlevel <name> <level> &7- &fSets the void level for an arena.");
         help.append("\n&6/arena teleport <name> <position> &7- &fTeleports you to a specific arena position.");
         help.append("\n&6/arena copy <name> <x> <z> [times] [start_from] &7- &fCopies an arena to another location. X and Z are blocks away from the original." +
                 " Times will duplicate x amount of times." +

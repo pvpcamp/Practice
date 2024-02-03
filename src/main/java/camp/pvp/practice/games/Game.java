@@ -11,6 +11,8 @@ import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.utils.PlayerUtils;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.PacketContainer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -192,6 +194,11 @@ public abstract class Game {
                 damage += 1;
             }
 
+            if(!kit.isFallDamage() && event.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
+                event.setCancelled(true);
+                canDie = false;
+            }
+
             if(kit != null && !kit.isTakeDamage()) {
                 if(event.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
                     event.setCancelled(true);
@@ -310,6 +317,7 @@ public abstract class Game {
         plugin.getGameQueueManager().removeFromQueue(player);
 
         GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
+        participant.setGame(this);
         participant.setComboMessages(profile.isComboMessages());
         participant.setDuelKit(kit);
 
@@ -428,12 +436,9 @@ public abstract class Game {
         if(block.getType().equals(Material.SNOW_BLOCK)) {
             player.getInventory().addItem(new ItemStack(Material.SNOW_BALL));
         } else {
-
-            if(!block.getType().equals(Material.BED_BLOCK)) {
-                for (ItemStack item : block.getDrops()) {
-                    Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
-                    addEntity(i);
-                }
+            for (ItemStack item : block.getDrops()) {
+                Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
+                addEntity(i);
             }
         }
 
@@ -478,8 +483,13 @@ public abstract class Game {
 
         if(participant != null) {
             participant.setRespawn(false);
-            this.announce(color + "&l!!! BED DESTROYED !!!");
-            this.announce("&f" + participant.getName() + "'s " + color + "bed has been destroyed by &f" + player.getName() + color + "!");
+            announceAll(
+                    " ",
+                    color + "&l!!! " + color.name() + " BED DESTROYED !!!",
+                    "&f" + participant.getName() + "'s " + color + "bed has been destroyed by &f" + player.getName() + color + "!",
+                    " ");
+
+            playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 1F);
         }
     }
 
@@ -570,7 +580,7 @@ public abstract class Game {
 
     public void playSound(Location location, Sound sound, float v1, float v2) {
         for(Player player : getAllPlayers()) {
-            player.playSound(location, sound, v1, v2);
+            player.playSound(location == null ? player.getLocation() : location, sound, v1, v2);
         }
     }
 

@@ -26,6 +26,7 @@ public class GameParticipant {
 
     private final UUID uuid;
     private final String name;
+    private Game game;
     private GameTeam team;
     private boolean alive, respawn, invincible, currentlyPlaying, kitApplied, comboMessages;
 
@@ -146,6 +147,25 @@ public class GameParticipant {
                 }
             }
             getPreviousEffects().clear();
+        }
+    }
+
+    public GameTeam.Color getTeamColor() {
+        if(team != null) return team.getColor();
+
+        List<GameParticipant> participants = new ArrayList<>(game.getParticipants().values());
+        int x = 0;
+        for(GameParticipant p : participants) {
+            if(p.getUuid().equals(uuid)) {
+                break;
+            }
+            x++;
+        }
+
+        if(x == 0) {
+            return GameTeam.Color.BLUE;
+        } else {
+            return GameTeam.Color.RED;
         }
     }
 }

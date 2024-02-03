@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -92,11 +90,11 @@ public class Arena implements Comparable<Arena>{
     private Map<String, ArenaPosition> positions;
     private boolean enabled, inUse;
     private String parent;
+    private Set<ChunkSnapshot> beforeSnapshots, afterSnapshots;
     private int xDifference, zDifference, buildLimit, voidLevel;
 
     private @Getter List<Location> beds, blocks, chests;
     private @Getter Set<Chunk> chunks;
-    private @Getter Queue<Chunk> chunkQueue;
 
     public Arena(String name) {
         this.name = name;
@@ -108,7 +106,8 @@ public class Arena implements Comparable<Arena>{
         this.blocks = new ArrayList<>();
         this.chests = new ArrayList<>();
         this.chunks = new HashSet<>();
-        this.chunkQueue = new LinkedList<>();
+        this.beforeSnapshots = new HashSet<>();
+        this.afterSnapshots = new HashSet<>();
 
         this.buildLimit = 256;
         this.voidLevel = 0;
@@ -207,6 +206,10 @@ public class Arena implements Comparable<Arena>{
                     }
                 }
             }
+
+            for(Chunk chunk : getChunks()) {
+                beforeSnapshots.add(chunk.getChunkSnapshot());
+            }
         }
     }
 
@@ -218,23 +221,45 @@ public class Arena implements Comparable<Arena>{
     public void resetArena(boolean delay) {
         if(!getType().isUnloadChunks()) return; // We don't need to reset the arena if we don't need to unload chunks.
 
-        Bukkit.getScheduler().runTaskLater(Practice.getInstance(), ()-> {
-            if(getType().isUnloadChunks()) {
-                for(Chunk chunk : getChunks()) {
+        Bukkit.getScheduler().runTask(Practice.getInstance(), ()-> {
+            for(Chunk chunk : getChunks()) {
+                afterSnapshots.add(chunk.getChunkSnapshot());
+            }
 
-                    for(Entity entity : chunk.getEntities()) {
-                        if(!(entity instanceof Player)) continue;
+            for(ChunkSnapshot snapshot : afterSnapshots) {
 
-                        Player player = (Player) entity;
-                        player.kickPlayer(ChatColor.RED + "You were kicked because the arena you were in was reset.");
+                ChunkSnapshot beforeSnapshot = null;
+                for(ChunkSnapshot before : beforeSnapshots) {
+                    if(before.getX() == snapshot.getX() && before.getZ() == snapshot.getZ()) {
+                        beforeSnapshot = before;
+                        break;
                     }
+                }
 
-                    chunk.unload(false);
+                if(beforeSnapshot == null) continue;
+
+                for(int x = 0; x < 16; x++) {
+                    for(int z = 0; z < 16; z++) {
+                        for(int y = 0; y < 256; y++) {
+                            int type = beforeSnapshot.getBlockTypeId(x, y, z);
+                            int data = beforeSnapshot.getBlockData(x, y, z);
+                            boolean blockChanged = snapshot.getBlockTypeId(x, y, z) != type;
+                            if(!blockChanged) {
+                                blockChanged = snapshot.getBlockData(x, y, z) != data;
+                            }
+
+                            if(blockChanged) {
+                                Location location = new Location(Bukkit.getWorld(snapshot.getWorldName()), snapshot.getX() * 16 + x, y, snapshot.getZ() * 16 + z);
+                                RestoreBlock block = new RestoreBlock(location, type, data);
+                                block.restore();
+                            }
+                        }
+                    }
                 }
             }
 
-            setInUse(false);
-        }, delay ? 5L : 0L);
+            inUse = false;
+        });
     }
 
     public boolean isOriginalBlock(Location location) {
@@ -250,7 +275,7 @@ public class Arena implements Comparable<Arena>{
                 Location l = position.getLocation();
 
                 for(int x = l.getBlockX() - 3; x < l.getBlockX() + 3; x++) {
-                    for(int y = l.getBlockY(); y < l.getBlockY() + 2; y++) {
+                    for(int y = l.getBlockY(); y < l.getBlockY() + 3; y++) {
                         for(int z = l.getBlockZ() - 3; z < l.getBlockZ() + 3; z++) {
                             Location blockLocation = new Location(l.getWorld(), x, y, z);
                             Block block = blockLocation.getBlock();

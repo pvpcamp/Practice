@@ -23,7 +23,9 @@ public class EntitySpawnListener implements Listener {
         if(event.getEntity() instanceof Item) {
             Item item = (Item) event.getEntity();
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if(item.getItemStack().getType().equals(Material.GLASS_BOTTLE) || item.getItemStack().getType().equals(Material.BOWL)) {
+                if(item.getItemStack().getType().equals(Material.GLASS_BOTTLE)
+                        || item.getItemStack().getType().equals(Material.BOWL)
+                        || item.getItemStack().getType().equals(Material.BED)) {
                     item.remove();
                 }
 

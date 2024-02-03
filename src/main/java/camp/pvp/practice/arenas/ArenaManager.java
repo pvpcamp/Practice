@@ -50,13 +50,14 @@ public class ArenaManager {
         List<Arena> arenas = new ArrayList<>();
         if(kit.isBuild()) {
             for(Arena a : getOriginalArenas()) {
-                if(a.isEnabled()) {
-                    if (kit.getArenaTypes().contains(a.getType())) {
-                        for (Arena copy : getArenaCopies(a)) {
-                            if (copy.isEnabled() && !copy.isInUse()) {
-                                arenas.add(copy);
-                            }
-                        }
+
+                if(!a.isEnabled()) continue;
+
+                if(!kit.getArenaTypes().contains(a.getType())) continue;
+
+                for (Arena copy : getArenaCopies(a)) {
+                    if (copy.isEnabled() && !copy.isInUse()) {
+                        arenas.add(copy);
                     }
                 }
             }

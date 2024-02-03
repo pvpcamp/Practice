@@ -22,9 +22,9 @@ public class RespawnTask extends BukkitRunnable {
     public void run() {
         if(time == 0) {
             if(participant.getAppliedCustomKit() != null) {
-                participant.getAppliedCustomKit().apply(player);
+                participant.getAppliedCustomKit().apply(participant);
             } else {
-                participant.getDuelKit().apply(player);
+                participant.getDuelKit().apply(participant);
             }
 
             player.teleport(participant.getSpawnLocation());

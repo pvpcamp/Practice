@@ -128,15 +128,13 @@ public class PlayerInteractListener implements Listener {
                                 int slot = player.getInventory().getHeldItemSlot() + 1;
                                 CustomDuelKit cdk = profile.getCustomDuelKits().get(kit).get(slot);
                                 if(cdk != null) {
-                                    cdk.apply(player);
-                                    participant.setKitApplied(true);
+                                    cdk.apply(participant);
                                     participant.setAppliedCustomKit(cdk);
                                     player.updateInventory();
                                 }
                                 break;
                             case BOOK:
-                                kit.apply(player);
-                                participant.setKitApplied(true);
+                                kit.apply(participant);
                                 player.updateInventory();
                                 break;
                         }
