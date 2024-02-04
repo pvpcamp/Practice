@@ -2,7 +2,6 @@ package camp.pvp.practice.listeners.bukkit.player;
 
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.games.Game;
 import io.github.thatkawaiisam.assemble.AssembleBoard;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,6 +13,8 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.UUID;
+
 public class PlayerJoinLeaveListeners implements Listener {
 
     private Practice plugin;
@@ -24,16 +25,30 @@ public class PlayerJoinLeaveListeners implements Listener {
 
     @EventHandler
     public void onPlayerPreLogin(AsyncPlayerPreLoginEvent event) {
+
+        String name = event.getName();
+        UUID uuid = event.getUniqueId();
+
+        if(name == null) event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Invalid username.");
+
+        GameProfile profile = plugin.getGameProfileManager().importFromDatabase(uuid, false, true);
+
+        if(profile == null) profile = plugin.getGameProfileManager().create(uuid, event.getName());
+
+        profile.setLastLoadFromDatabase(System.currentTimeMillis());
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        GameProfile profile = plugin.getGameProfileManager().find(player.getUniqueId(), true);
+        event.setJoinMessage(null);
 
-        if(profile == null) {
-            profile = plugin.getGameProfileManager().create(player);
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+
+        if(profile == null || System.currentTimeMillis() - profile.getLastLoadFromDatabase() > 5000) {
+            player.kickPlayer(ChatColor.RED + "There was an issue loading your profile, please reconnect.");
+            return;
         }
 
         profile.setName(player.getName());
@@ -43,25 +58,9 @@ public class PlayerJoinLeaveListeners implements Listener {
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
-        event.setJoinMessage(null);
-
         plugin.getAssemble().getBoards().put(player.getUniqueId(), new AssembleBoard(player, plugin.getAssemble()));
 
-        Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-            @Override
-            public void run() {
-                GameProfile p = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-                if (player.isOnline()) {
-                    if (p == null) {
-                        player.kickPlayer(ChatColor.RED + "There was an issue loading your profile, please reconnect.");
-                    } else {
-                        if(!player.hasPermission("practice.staff")) {
-                            p.setStaffMode(false);
-                        }
-                    }
-                }
-            }
-        }, 20);
+        if(!player.hasPermission("practice.staff")) profile.setStaffMode(false);
     }
 
     @EventHandler
@@ -69,24 +68,10 @@ public class PlayerJoinLeaveListeners implements Listener {
         Player player = event.getPlayer();
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
+        event.setQuitMessage(null);
+
         if(profile != null) {
-            Game game = profile.getGame();
-
-            if (game != null) {
-                game.leave(player);
-            }
-
-            if (profile.getParty() != null) {
-                profile.getParty().leave(player);
-            }
-
-            if (profile.getTournament() != null) {
-                profile.getTournament().leave(player);
-            }
-
-            plugin.getGameQueueManager().removeFromQueue(player);
-
-            event.setQuitMessage(null);
+            profile.logOff();
 
             plugin.getAssemble().getBoards().remove(player.getUniqueId());
 

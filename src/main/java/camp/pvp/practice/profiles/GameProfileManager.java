@@ -132,6 +132,23 @@ public class GameProfileManager {
         }
     }
 
+    public GameProfile create(UUID uuid, String name) {
+        GameProfile profile = new GameProfile(uuid);
+        profile.setName(name);
+
+        ProfileELO profileELO = new ProfileELO(uuid);
+        profileELO.setName(name);
+        profile.setProfileElo(profileELO);
+        exportElo(profileELO, true);
+
+        MongoUpdate mu = new MongoUpdate(profilesCollection, profile.getUuid());
+        mu.setUpdate(profile.export());
+
+        mongoManager.massUpdate(false, mu);
+        this.loadedProfiles.put(uuid, profile);
+        return profile;
+    }
+
     public GameProfile create(Player player) {
         GameProfile profile = new GameProfile(player.getUniqueId());
 
@@ -156,7 +173,20 @@ public class GameProfileManager {
             if(document != null) {
                 profile[0] = new GameProfile(uuid);
                 profile[0].importFromDocument(document);
-                importElo(uuid, async);
+                ProfileELO elo = importElo(uuid, async);
+
+                boolean exportElo = false;
+                if(elo == null) {
+                    elo = new ProfileELO(uuid);
+                    exportElo = true;
+                }
+
+                elo.setName(profile[0].getName());
+                profile[0].setProfileElo(elo);
+
+                if(exportElo) {
+                    exportElo(elo, async);
+                }
 
                 if(store) {
                     loadedProfiles.put(uuid, profile[0]);
@@ -189,6 +219,7 @@ public class GameProfileManager {
                 GameProfile profile = getLoadedProfiles().get(uuid);
                 if(profile != null) {
                     profile.setProfileElo(elo[0]);
+                    elo[0].setName(profile.getName());
                 }
             }
         });

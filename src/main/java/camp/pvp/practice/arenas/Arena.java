@@ -266,10 +266,6 @@ public class Arena implements Comparable<Arena>{
 
         if(!type.equals(Type.DUEL_BED_FIGHT)) return blocks.contains(location);
 
-        List<Material> bedMaterials = Arrays.asList(Material.BED_BLOCK, Material.ENDER_STONE, Material.WOOD);
-
-        if(!bedMaterials.contains(location.getBlock().getType())) return blocks.contains(location);
-
         for(ArenaPosition position : positions.values()) {
             if(position.getPosition().equalsIgnoreCase("bluebed") || position.getPosition().equalsIgnoreCase("redbed")) {
                 Location l = position.getLocation();

@@ -105,6 +105,8 @@ public class GameProfile {
 
     private Set<UUID> hiddenPlayers;
 
+    private long lastLoadFromDatabase;
+
     public GameProfile(UUID uuid) {
         this.uuid = uuid;
 
@@ -294,6 +296,32 @@ public class GameProfile {
                     } else {
                         player.teleport(location);
                     }
+                }
+            }
+        }
+    }
+
+    public void logOff() {
+        if (game != null) {
+            game.leave(getPlayer());
+        }
+
+        if (party != null) {
+            party.leave(getPlayer());
+        }
+
+        if (tournament != null) {
+            tournament.leave(getPlayer());
+        }
+
+        Practice.getInstance().getGameQueueManager().removeFromQueue(getPlayer());
+
+        List<GameProfile> profiles = new ArrayList<>(Practice.getInstance().getGameProfileManager().getLoadedProfiles().values());
+        for(GameProfile profile : profiles) {
+            for(UUID uuid : new HashSet<>(profile.getDuelRequests().keySet())) {
+                if(uuid == this.getUuid()) {
+                    profile.getDuelRequests().remove(uuid);
+                    break;
                 }
             }
         }
