@@ -141,6 +141,8 @@ public class GameProfileManager {
         profile.setProfileElo(profileELO);
         exportElo(profileELO, true);
 
+        profile.setLastLoadFromDatabase(System.currentTimeMillis());
+
         MongoUpdate mu = new MongoUpdate(profilesCollection, profile.getUuid());
         mu.setUpdate(profile.export());
 
@@ -173,6 +175,7 @@ public class GameProfileManager {
             if(document != null) {
                 profile[0] = new GameProfile(uuid);
                 profile[0].importFromDocument(document);
+                profile[0].setLastLoadFromDatabase(System.currentTimeMillis());
                 ProfileELO elo = importElo(uuid, async);
 
                 boolean exportElo = false;

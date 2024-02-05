@@ -272,6 +272,8 @@ public class SumoEvent extends GameEvent {
         if (getState().equals(State.STARTING)) {
             GameParticipant participant = super.join(player);
 
+            participant.setCurrentlyPlaying(false);
+
             player.teleport(getArena().getPositions().get("lobby").getLocation());
             PlayerUtils.reset(player, true);
 

@@ -140,7 +140,9 @@ public class Practice extends JavaPlugin {
         new ArenaPositionCommand(this);
         new BuildCommand(this);
         new DuelCommand(this);
+        new EloManagerCommand(this);
         new EventCommand(this);
+        new ExplodeCommand(this);
         new GameDebugCommand(this);
         new GamesCommand(this);
         new LeaderboardsCommand(this);
@@ -155,7 +157,6 @@ public class Practice extends JavaPlugin {
         new StatisticsCommand(this);
         new TournamentCommand(this);
         new WhereAmICommand(this);
-        new EloManagerCommand(this);
     }
 
     public void registerListeners() {

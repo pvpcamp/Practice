@@ -140,16 +140,16 @@ public abstract class Game {
 
         if(this.getState().equals(State.ENDED)) return;
 
-        participant.eliminate();
-        participant.clearCooldowns();
-
-        plugin.getGameProfileManager().updateGlobalPlayerVisibility();
-
         Location location = player.getLocation();
 
         boolean velocity = participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK);
 
         profile.getDeathAnimation().playAnimation(this, player, location, velocity);
+
+        participant.eliminate();
+        participant.clearCooldowns();
+
+        plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
         if(participant.isRespawn() && !leftGame) {
             killRespawn(player, participant);
@@ -176,6 +176,8 @@ public abstract class Game {
             spectateStart(player);
             announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
         }
+
+
     }
 
     public void handleDamage(Player victim, EntityDamageEvent event) {

@@ -89,7 +89,7 @@ public enum DeathAnimation {
                     victim.setVelocity(new Vector(0, 1.2, 0));
                 }
 
-                game.playEffect(l, Effect.EXPLOSION_LARGE, null);
+                game.playEffect(l, Effect.EXPLOSION_HUGE, null);
 
                 game.playSound(location, Sound.HURT_FLESH, 1F, 1F);
                 game.playSound(location, Sound.EXPLODE, 1F, 1F);

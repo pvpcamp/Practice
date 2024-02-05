@@ -34,8 +34,6 @@ public class PlayerJoinLeaveListeners implements Listener {
         GameProfile profile = plugin.getGameProfileManager().importFromDatabase(uuid, false, true);
 
         if(profile == null) profile = plugin.getGameProfileManager().create(uuid, event.getName());
-
-        profile.setLastLoadFromDatabase(System.currentTimeMillis());
     }
 
     @EventHandler(priority = EventPriority.HIGH)

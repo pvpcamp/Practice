@@ -4,6 +4,7 @@ import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.utils.Colors;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 public class EntityDamageByEntityListener implements Listener {
@@ -63,6 +65,14 @@ public class EntityDamageByEntityListener implements Listener {
             Game game = attackerProfile.getGame();
 
             if(game != null && playerProfile.getGame() != null) {
+
+                if(event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+                    if(attackerProfile.getCps() > 20) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+
                 game.handleHit(player, attacker, event);
             } else {
                 if(attacker.getPassenger() != null && attacker.getPassenger().equals(player)) {

@@ -28,6 +28,9 @@ commands:
     description: Manage the ELO of a player.
   event:
     description: Join, leave, or host event.
+  explode:
+    permission: practice.commands.explode
+    description: Explode a player.
   gamedebug:
     permission: practice.commands.gamedebug
     description: Miscellaneous game debugging utilities.
