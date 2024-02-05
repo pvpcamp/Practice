@@ -5,7 +5,6 @@ author: leuo
 depend:
   - Citizens
   - Gooey2
-  - NetworkHelper
   - ProtocolLib
   - Apollo-Bukkit
 

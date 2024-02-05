@@ -40,9 +40,10 @@ public class PlayerJoinLeaveListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
 
         event.setJoinMessage(null);
+
+        Player player = event.getPlayer();
 
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 

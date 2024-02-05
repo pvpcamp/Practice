@@ -71,7 +71,6 @@
             <groupId>camp.pvp</groupId>
             <artifactId>NetworkHelper</artifactId>
             <version>1.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>camp.pvp.utils</groupId>
