@@ -395,7 +395,11 @@ public abstract class Game {
             player.teleport(location);
         }
 
-        profile.givePlayerItems();
+        if(getAlive().size() < 2) {
+            PlayerUtils.reset(player, true);
+        } else {
+            profile.givePlayerItems();
+        }
 
         player.setAllowFlight(true);
         player.setFlying(true);

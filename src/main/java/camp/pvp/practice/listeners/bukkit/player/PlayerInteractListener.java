@@ -47,6 +47,7 @@ public class PlayerInteractListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
+
         Player player = event.getPlayer();
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         Action action = event.getAction();
@@ -54,10 +55,6 @@ public class PlayerInteractListener implements Listener {
 
         ItemStack item = event.getItem();
 
-        if(profile == null) {
-            player.sendMessage(ChatColor.RED + "Your profile has not been loaded yet, if this persists please reconnect.");
-            return;
-        }
         if(event.getAction().equals(Action.PHYSICAL)){
             Material mat = block.getType();
             if(mat == Material.STONE_PLATE || mat == Material.WOOD_PLATE || mat == Material.IRON_PLATE || mat == Material.GOLD_PLATE) {

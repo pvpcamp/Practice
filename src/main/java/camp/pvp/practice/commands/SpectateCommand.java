@@ -52,6 +52,13 @@ public class SpectateCommand implements CommandExecutor {
                         return true;
                     }
 
+                    if(label.equalsIgnoreCase("staffspectate") && player.hasPermission("practice.staff")) {
+                        if(!profile.isStaffMode()) {
+                            profile.setStaffMode(true);
+                            player.sendMessage(ChatColor.GREEN + "You have been set to staff mode to spectate this game.");
+                        }
+                    }
+
                     game.spectateStart(player, target.getLocation());
                 } else if (uuid != null) {
                     Game game = plugin.getGameManager().getGames().get(uuid);

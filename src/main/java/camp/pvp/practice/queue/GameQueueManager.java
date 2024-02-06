@@ -1,5 +1,6 @@
 package camp.pvp.practice.queue;
 
+import camp.pvp.practice.guis.queue.QueueGui;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;

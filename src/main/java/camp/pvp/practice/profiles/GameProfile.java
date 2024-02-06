@@ -3,6 +3,7 @@ package camp.pvp.practice.profiles;
 import camp.pvp.practice.arenas.ArenaCopier;
 import camp.pvp.practice.cosmetics.DeathAnimation;
 import camp.pvp.practice.games.GameParticipant;
+import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.Practice;
@@ -13,6 +14,7 @@ import camp.pvp.practice.kits.CustomDuelKit;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.PartyInvite;
 import camp.pvp.practice.profiles.stats.ProfileELO;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
@@ -81,15 +83,17 @@ public class GameProfile {
                     sidebarInGame, sidebarShowDuration, sidebarShowCps, sidebarShowLines, sidebarShowPing,
                     staffMode, buildMode;
     private DeathAnimation deathAnimation;
+    private GameQueue.Type lastSelectedQueueType;
     private Map<DuelKit, Map<Integer, CustomDuelKit>> customDuelKits;
 
     private Game game;
+    private Tournament tournament;
+    private SumoEvent sumoEvent;
     private PreviousQueue previousQueue;
     private Rematch rematch;
-    private Tournament tournament;
     private Map<UUID, DuelRequest> duelRequests;
 
-    private List<Date> clicks;
+    private List<Long> clicks;
     private Location selectedLocation;
 
     private Party party;
@@ -111,6 +115,7 @@ public class GameProfile {
         this.uuid = uuid;
 
         this.deathAnimation = DeathAnimation.DEFAULT;
+        this.lastSelectedQueueType = GameQueue.Type.UNRANKED;
 
         this.partyInvites = new HashMap<>();
         this.duelRequests = new HashMap<>();
@@ -401,18 +406,16 @@ public class GameProfile {
     }
 
     public void addClick() {
-        getClicks().add(new Date());
+        getClicks().add(System.currentTimeMillis());
     }
 
     public int getCps() {
-        Date now = new Date();
-
         int i = 0;
-        for(Date d : new ArrayList<>(getClicks())) {
-            if (now.getTime() - d.getTime() < 1000) {
+        for(long l : new ArrayList<>(getClicks())) {
+            if (System.currentTimeMillis() - l < 1000) {
                 i++;
             } else {
-                getClicks().remove(d);
+                getClicks().remove(l);
             }
         }
 
@@ -428,6 +431,7 @@ public class GameProfile {
         this.comboMessages = document.getBoolean("combo_messages");
         this.time = Time.valueOf(document.getString("player_time"));
         this.deathAnimation = DeathAnimation.valueOf(document.getString("death_animation"));
+        this.lastSelectedQueueType = GameQueue.Type.valueOf(document.get("last_selected_queue_type", "UNRANKED"));
         this.showSidebar = document.getBoolean("show_sidebar");
         this.sidebarInGame = document.getBoolean("sidebar_in_game");
         this.sidebarShowCps = document.getBoolean("sidebar_show_cps");
@@ -467,6 +471,7 @@ public class GameProfile {
         values.put("lobby_visibility", lobbyVisibility);
         values.put("tournament_notifications", tournamentNotifications);
         values.put("death_animation", deathAnimation.name());
+        values.put("last_selected_queue_type", lastSelectedQueueType.name());
         values.put("combo_messages", comboMessages);
         values.put("show_sidebar", isShowSidebar());
         values.put("sidebar_in_game", isSidebarInGame());

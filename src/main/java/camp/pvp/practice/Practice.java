@@ -188,6 +188,7 @@ public class Practice extends JavaPlugin {
         new PlayerJoinLeaveListeners(this);
         new PlayerMoveListener(this);
         new PlayerPickupItemListener(this);
+        new PlayerTeleportListener(this);
 
         new PotionSplashListener(this);
 

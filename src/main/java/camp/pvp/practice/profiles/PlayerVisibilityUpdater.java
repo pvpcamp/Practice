@@ -15,6 +15,12 @@ public class PlayerVisibilityUpdater implements Runnable{
     public void run() {
         for(Player player : Bukkit.getOnlinePlayers()) {
             GameProfile source = gpm.getLoadedProfiles().get(player.getUniqueId());
+
+            if(source == null) {
+                player.kickPlayer(ChatColor.RED + "An error occurred while loading your profile. Please rejoin.");
+                continue;
+            }
+
             for(Player p : Bukkit.getOnlinePlayers()) {
                 if(p != player) {
                     if(source.getHiddenPlayers().contains(p.getUniqueId())) {

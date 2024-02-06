@@ -61,7 +61,7 @@ commands:
     aliases: [options]
     description: General server settings.
   spectate:
-    aliases: [spec]
+    aliases: [spec, staffspectate]
     description: Spectate a game.
   stats:
     description: View the statistics of yourself or another player.

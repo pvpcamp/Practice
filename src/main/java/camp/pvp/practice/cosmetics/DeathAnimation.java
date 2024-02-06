@@ -52,6 +52,8 @@ public enum DeathAnimation {
                 ItemStack dyeItem = new ItemStack(Material.INK_SACK);
                 dyeItem.setDurability((short) 1);
 
+                ItemStack boneItem = new ItemStack(Material.BONE);
+
                 List<Item> items = new ArrayList<>();
 
                 for(int i = 0; i < 8; i++) {
@@ -63,6 +65,13 @@ public enum DeathAnimation {
 
                 for(int i = 0; i < 10; i++) {
                     Item bloodItem = location.getWorld().dropItemNaturally(l, dyeItem);
+                    bloodItem.setPickupDelay(Integer.MAX_VALUE);
+                    game.addEntity(bloodItem);
+                    items.add(bloodItem);
+                }
+
+                for(int i = 0; i < 6; i++) {
+                    Item bloodItem = location.getWorld().dropItemNaturally(l, boneItem);
                     bloodItem.setPickupDelay(Integer.MAX_VALUE);
                     game.addEntity(bloodItem);
                     items.add(bloodItem);
