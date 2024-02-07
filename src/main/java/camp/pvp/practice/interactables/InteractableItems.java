@@ -4,8 +4,9 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameManager;
 import camp.pvp.practice.games.GameSpectator;
-import camp.pvp.practice.games.impl.events.SumoEvent;
+import camp.pvp.practice.games.sumo.SumoEventDuel;
 import camp.pvp.practice.games.tournaments.Tournament;
+import camp.pvp.practice.interactables.impl.evemt.EventLeaveInteract;
 import camp.pvp.practice.interactables.impl.game.*;
 import camp.pvp.practice.interactables.impl.lobby.EventInteract;
 import camp.pvp.practice.interactables.impl.lobby.RematchInteract;
@@ -34,23 +35,29 @@ public enum InteractableItems {
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
+    EVENT_LEAVE,
     SHOW_SPECTATORS, STOP_SPECTATING, TELEPORTER, SPECTATOR_VISIBLE_TO_PLAYERS, SPECTATE_RANDOM;
 
     public InteractableItem getItem() {
-        switch(this) {
+        switch (this) {
             // LOBBY
             case QUEUE:
                 return new InteractableItem(
                         new ItemBuilder(Material.DIAMOND_SWORD, "&6Join a Queue").create(), 0, new QueueInteract());
             case EVENT:
                 GameManager gm = Practice.getInstance().getGameManager();
-                if(gm.isEventRunning()) {
-                    if(gm.getTournament() != null && gm.getTournament().getState().equals(Tournament.State.STARTING)) {
-                        return new InteractableItem(
-                                new ItemBuilder(Material.DIAMOND, "&6Join Current Tournament").create(), 1, new TournamentJoinInteract());
+                if (gm.isEventRunning()) {
+                    if (gm.getTournament() != null) {
+                        if (gm.getTournament().getState().equals(Tournament.State.STARTING)) {
+                            return new InteractableItem(
+                                    new ItemBuilder(Material.DIAMOND, "&6Join Current Tournament").create(), 1, new TournamentJoinInteract());
+                        } else {
+                            return new InteractableItem(
+                                    new ItemBuilder(Material.DIAMOND, "&6View Tournament Status").create(), 1, new TournamentStatusInteract());
+                        }
                     }
 
-                    if(gm.getActiveEvent() != null) {
+                    if (gm.getActiveEvent() != null) {
                         return new InteractableItem(
                                 new ItemBuilder(Material.EMERALD, "&6Join Current Event").create(), 1, new EventInteract());
                     }
@@ -58,6 +65,7 @@ public enum InteractableItems {
                     return new InteractableItem(
                             new ItemBuilder(Material.IRON_AXE, "&6Host an Event").create(), 1, new EventInteract());
                 }
+                return null;
             case REQUEUE:
                 return new InteractableItem(
                         new ItemBuilder(Material.PAPER, "&6Play Again").create(), 3,
@@ -66,7 +74,9 @@ public enum InteractableItems {
                             @Override
                             public void onUpdate(InteractableItem item, GameProfile profile) {
                                 PreviousQueue queue = profile.getPreviousQueue();
-                                item.updateName("&6Queue " + queue.getQueueType().toString() + " " + queue.getKit().getDisplayName());
+                                if (queue != null) {
+                                    item.updateName("&6Queue " + queue.getQueueType().toString() + " " + queue.getKit().getDisplayName());
+                                }
                             }
                         }
                 );
@@ -78,7 +88,9 @@ public enum InteractableItems {
                             @Override
                             public void onUpdate(InteractableItem item, GameProfile profile) {
                                 Rematch rematch = profile.getRematch();
-                                item.updateName("&dRematch &f" + rematch.getName());
+                                if (rematch != null) {
+                                    item.updateName("&6Rematch &f" + rematch.getName());
+                                }
                             }
                         }
                 );
@@ -118,6 +130,10 @@ public enum InteractableItems {
             case TOURNAMENT_LEAVE:
                 return new InteractableItem(
                         new ItemBuilder(Material.NETHER_STAR, "&6Leave Tournament").create(), 4, new TournamentLeaveInteract());
+            // LOBBY_EVENT
+            case EVENT_LEAVE:
+                return new InteractableItem(
+                        new ItemBuilder(Material.REDSTONE, "&cLeave Event").create(), 4, new EventLeaveInteract());
             // SPECTATING
             case SHOW_SPECTATORS:
                 return new InteractableItem(
@@ -192,12 +208,15 @@ public enum InteractableItems {
                 items.add(TOURNAMENT_STATUS);
                 items.add(SETTINGS);
                 break;
+            case LOBBY_EVENT:
+                items.add(EVENT_LEAVE);
+                break;
             case SPECTATING:
                 items.add(STOP_SPECTATING);
 
-                if(!(profile.getGame() instanceof SumoEvent)) {
-                    items.add(TELEPORTER);
+                if(!(profile.getGame() instanceof SumoEventDuel)) {
                     items.add(SHOW_SPECTATORS);
+                    items.add(TELEPORTER);
                 }
 
                 if(profile.getPlayer().hasPermission("practice.staff")) {

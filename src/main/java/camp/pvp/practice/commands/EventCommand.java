@@ -2,7 +2,7 @@ package camp.pvp.practice.commands;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import camp.pvp.practice.games.impl.events.GameEvent;
+import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.guis.games.events.HostEventGui;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
@@ -26,7 +26,7 @@ public class EventCommand implements CommandExecutor {
         if(sender instanceof Player) {
             Player player = (Player) sender;
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-            GameEvent event = plugin.getGameManager().getActiveEvent();
+            SumoEvent event = plugin.getGameManager().getActiveEvent();
             if(args.length > 0) {
                 switch(args[0].toLowerCase()) {
                     case "join":
@@ -35,16 +35,12 @@ public class EventCommand implements CommandExecutor {
                             return true;
                         }
 
-                        if(profile.getGame() != null) {
-                            player.sendMessage(ChatColor.RED + "You are already in a game.");
+                        if(!profile.getState().equals(GameProfile.State.LOBBY)) {
+                            player.sendMessage(ChatColor.RED + "You cannot join this event right now.");
                             return true;
                         }
 
-                        if(event.getState().equals(Game.State.STARTING)) {
-                            event.join(player);
-                        } else {
-                            event.spectateStart(player);
-                        }
+                        event.join(player);
 
                         return true;
                     case "leave":
@@ -53,13 +49,8 @@ public class EventCommand implements CommandExecutor {
                             return true;
                         }
 
-                        if(profile.getGame() == null) {
-                            player.sendMessage(ChatColor.RED + "You are not in a game.");
-                            return true;
-                        }
-
-                        if(!profile.getGame().equals(event)) {
-                            player.sendMessage(ChatColor.RED + "You are not participating in the active event.");
+                        if(profile.getSumoEvent() == null) {
+                            player.sendMessage(ChatColor.RED + "You are not in an event.");
                             return true;
                         }
 

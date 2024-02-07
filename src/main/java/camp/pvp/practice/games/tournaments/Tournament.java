@@ -134,7 +134,7 @@ public class Tournament {
                     return;
                 }
 
-                if (this.getActiveGames().size() == 0) {
+                if (this.getActiveGames().isEmpty()) {
                     this.nextRound();
                 }
             }, 1);
@@ -306,7 +306,7 @@ public class Tournament {
 
     public List<String> getScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
-        lines.add(" &7● &6Event: &fTournament");
+        lines.add("&6Tournament");
         switch(this.getState()) {
             case STARTING:
                 lines.add(" &7● &6Starting In: &f" + this.getTimer() + "s");
@@ -414,7 +414,6 @@ public class Tournament {
 
                 msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tournament join"));
                 msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Colors.get("&aClick to join the tournament!")).create()));
-
 
                 player.spigot().sendMessage(msg);
                 player.sendMessage(" ");

@@ -4,6 +4,7 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.*;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameManager;
+import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.parties.Party;
@@ -117,6 +118,10 @@ public class SidebarAdapter implements AssembleAdapter {
                 case LOBBY_TOURNAMENT:
                     Tournament tournament = profile.getTournament();
                     lines.addAll(tournament.getScoreboard(profile));
+                    break;
+                case LOBBY_EVENT:
+                    SumoEvent event = profile.getSumoEvent();
+                    lines.addAll(event.getScoreboard(profile));
                     break;
                 case IN_GAME:
                     Game game = profile.getGame();

@@ -582,7 +582,7 @@ public abstract class Game {
 
     public int countAll() {
         int i = 0;
-        i += getAlive().size();
+        i += getCurrentPlaying().size();
         i += getSpectators().size();
         return i;
     }

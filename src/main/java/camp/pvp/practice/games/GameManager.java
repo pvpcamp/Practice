@@ -1,8 +1,8 @@
 package camp.pvp.practice.games;
 
 import camp.pvp.practice.games.impl.Duel;
-import camp.pvp.practice.games.impl.events.GameEvent;
 import camp.pvp.practice.games.impl.teams.tasks.HCFEffectUpdater;
+import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.queue.GameQueue;
@@ -20,6 +20,7 @@ public class GameManager {
     private Logger logger;
     private Map<UUID, Game> games;
     private Tournament tournament;
+    private SumoEvent sumoEvent;
 
     private Map<UUID, PostGameInventory> postGameInventories;
 
@@ -29,17 +30,15 @@ public class GameManager {
         this.games = new HashMap<>();
         this.postGameInventories = new HashMap<>();
 
-        this.logger.info("Started GameManager.");
+        this.logger.info("Initialized GameManager.");
 
         Bukkit.getScheduler().runTaskTimer(plugin, new HCFEffectUpdater(this), 0, 2);
     }
 
-    public GameEvent getActiveEvent() {
-        for(Game game : games.values()) {
-            Game.State state = game.getState();
-            if(game instanceof GameEvent && !state.equals(Game.State.ENDED)) {
-                return (GameEvent) game;
-            }
+    public SumoEvent getActiveEvent() {
+
+        if(sumoEvent != null && !sumoEvent.getState().equals(SumoEvent.State.ENDED)) {
+            return sumoEvent;
         }
 
         return null;
@@ -58,11 +57,7 @@ public class GameManager {
     }
 
     public boolean isEventRunning() {
-        if(getActiveEvent() == null) {
-            return getTournament() != null;
-        } else {
-            return true;
-        }
+        return getActiveEvent() != null || getTournament() != null;
     }
 
     public int getTotalInGame() {
@@ -79,7 +74,7 @@ public class GameManager {
         for(Game game : getActiveGames()) {
             if(game instanceof Duel) {
                 Duel duel = (Duel) game;
-                if(duel.getQueueType().equals(queueType)) {
+                if(duel.getQueueType() != null && duel.getQueueType().equals(queueType)) {
                     i += game.getAlive().size();
                 }
             }

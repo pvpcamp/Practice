@@ -23,6 +23,8 @@ public class ArenaConfig {
         this.logger = plugin.getLogger();
         this.manager = manager;
 
+        logger.info("Loading arenas from arenas.yml.");
+
         this.file = new File(plugin.getDataFolder(), "arenas.yml");
         if (!file.exists()) {
             file.getParentFile().mkdirs();
@@ -75,8 +77,6 @@ public class ArenaConfig {
         }
 
         manager.getArenas().add(arena);
-
-        this.logger.info("Loaded arena '" + arena.getName() + "'.");
     }
 
     public void export(Arena arena) {
@@ -101,8 +101,6 @@ public class ArenaConfig {
             String p = path + ".positions." + position.getPosition();
             config.set(p, location);
         }
-
-        this.logger.info("Exported arena '" + arena.getName() + "'.");
     }
 
     public void shutdown() {

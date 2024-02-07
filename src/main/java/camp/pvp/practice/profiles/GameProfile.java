@@ -19,6 +19,7 @@ import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.WordUtils;
 import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -35,28 +36,24 @@ import java.util.*;
 public class GameProfile {
 
     public enum State {
-        LOBBY, LOBBY_QUEUE, LOBBY_PARTY, LOBBY_TOURNAMENT, KIT_EDITOR, IN_GAME, SPECTATING;
+        LOBBY, LOBBY_QUEUE, LOBBY_PARTY, LOBBY_TOURNAMENT, LOBBY_EVENT, KIT_EDITOR, IN_GAME, SPECTATING;
 
 
         @Override
         public String toString() {
             switch(this) {
-                case LOBBY:
-                    return "Lobby";
                 case LOBBY_QUEUE:
                     return "Lobby (In Queue)";
                 case LOBBY_PARTY:
                     return "Lobby (In Party)";
                 case LOBBY_TOURNAMENT:
                     return "Lobby (In Tournament)";
-                case KIT_EDITOR:
-                    return "Kit Editor";
-                case IN_GAME:
-                    return "Playing";
-                case SPECTATING:
-                    return "Spectating";
+                case LOBBY_EVENT:
+                    return "Lobby (In Event)";
                 default:
-                    return null;
+                    String name = this.name();
+                    name = name.replace("_", " ");
+                    return WordUtils.capitalizeFully(name);
             }
         }
     }
@@ -149,19 +146,22 @@ public class GameProfile {
     }
 
     public State getState() {
-        if(game != null) {
-            if(game.getCurrentPlaying().get(this.uuid) != null) {
+
+        if (game != null) {
+            if (game.getCurrentPlaying().get(this.uuid) != null) {
                 return State.IN_GAME;
             } else {
                 return State.SPECTATING;
             }
-        } else if(tournament != null) {
+        } else if (tournament != null) {
             return State.LOBBY_TOURNAMENT;
-        } else if(Practice.instance.getGameQueueManager().getQueue(uuid) != null) {
+        } else if (sumoEvent != null) {
+            return State.LOBBY_EVENT;
+        } else if (Practice.instance.getGameQueueManager().getQueue(uuid) != null) {
             return State.LOBBY_QUEUE;
-        } else if(editingKit != null){
+        } else if (editingKit != null) {
             return State.KIT_EDITOR;
-        } else if(party != null){
+        } else if (party != null) {
             return State.LOBBY_PARTY;
         } else {
             return State.LOBBY;
@@ -195,6 +195,7 @@ public class GameProfile {
                     case LOBBY_QUEUE:
                     case LOBBY_PARTY:
                     case LOBBY_TOURNAMENT:
+                    case LOBBY_EVENT:
                     case LOBBY:
                         flying = true;
                         break;
@@ -213,10 +214,7 @@ public class GameProfile {
                     case LOBBY_PARTY:
                         slot = 2;
                         break;
-                    case SPECTATING:
-                    case IN_GAME:
-                    case LOBBY_QUEUE:
-                        slot = 0;
+                    default:
                         break;
                 }
 
@@ -277,31 +275,23 @@ public class GameProfile {
 
             player.setPlayerTime(this.getTime().getTime(), false);
 
-            Location location = null;
-            State state = getState();
-            boolean check = false;
-            switch (state) {
-                case LOBBY_QUEUE:
-                case LOBBY_PARTY:
-                case LOBBY_TOURNAMENT:
-                case LOBBY:
-                    location = Practice.instance.getLobbyLocation();
-                    check = true;
-                    break;
-                case KIT_EDITOR:
-                    location = Practice.instance.getKitEditorLocation();
-                    check = true;
-                    break;
-            }
-
             if(updateLocation) {
-                if (check) {
-                    if (location == null) {
-                        player.sendMessage(ChatColor.RED + "Location for " + getState().toString().toLowerCase() + " could not be found.");
-                    } else {
-                        player.teleport(location);
-                    }
+
+                Location location = null;
+                State state = getState();
+                location = switch (state) {
+                    case LOBBY_QUEUE, LOBBY_PARTY, LOBBY_TOURNAMENT, LOBBY -> Practice.instance.getLobbyLocation();
+                    case KIT_EDITOR -> Practice.instance.getKitEditorLocation();
+                    case LOBBY_EVENT -> sumoEvent.getArena().getPositions().get("lobby").getLocation();
+                    default -> location;
+                };
+
+                if (location == null) {
+                    player.sendMessage(ChatColor.RED + "Location for " + getState().toString().toLowerCase() + " could not be found.");
+                    return;
                 }
+
+                player.teleport(location);
             }
         }
     }
@@ -389,19 +379,6 @@ public class GameProfile {
                     }
                 }
             }
-        }
-    }
-
-    public boolean isInLobby() {
-        State state = getState();
-        switch (state) {
-            case LOBBY_QUEUE:
-            case LOBBY_PARTY:
-            case LOBBY_TOURNAMENT:
-            case LOBBY:
-                return true;
-            default:
-                return false;
         }
     }
 

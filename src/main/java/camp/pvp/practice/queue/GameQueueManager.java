@@ -25,8 +25,8 @@ public class GameQueueManager {
         this.logger = plugin.getLogger();
         this.gameQueues = new HashSet<>();
 
+        logger.info("Initialized GameQueueManager.");
         this.refreshQueues();
-        logger.info("Started GameQueueManager.");
     }
 
     public GameQueueMember addToQueue(Player player, GameQueue gameQueue) {
@@ -140,6 +140,8 @@ public class GameQueueManager {
             q.stopQueue();
         }
 
+        int queues = 0;
+
         for(DuelKit duelKit : DuelKit.values()) {
             if(duelKit.isQueueable()) {
                 GameQueue queue = new GameQueue(plugin, duelKit, GameQueue.Type.UNRANKED);
@@ -147,7 +149,7 @@ public class GameQueueManager {
 
                 queue.startQueue();
 
-                logger.info("Initialized UNRANKED queue for " + duelKit.name() + ".");
+                queues++;
 
                 if(duelKit.isRanked()) {
                     GameQueue rankedQueue = new GameQueue(plugin, duelKit, GameQueue.Type.RANKED);
@@ -155,11 +157,11 @@ public class GameQueueManager {
 
                     rankedQueue.startQueue();
 
-                    logger.info("Initialized RANKED queue for " + duelKit.name() + ".");
+                    queues++;
                 }
             }
         }
 
-        logger.info("GameQueues have been refreshed.");
+        logger.info(queues + " GameQueue(s) have been refreshed.");
     }
 }

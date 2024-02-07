@@ -58,6 +58,9 @@ public class SplitKitGui extends ArrangedGui {
                         List<PartyMember> shuffledMembers = new ArrayList<>(members);
                         Collections.shuffle(shuffledMembers);
 
+                        teamDuel.setKit(kit);
+                        teamDuel.getParties().add(party);
+
                         int x = 0;
                         for (PartyMember member : shuffledMembers) {
                             GameParticipant p = teamDuel.join(member.getPlayer());
@@ -69,9 +72,6 @@ public class SplitKitGui extends ArrangedGui {
                             }
                             x++;
                         }
-
-                        teamDuel.setKit(kit);
-                        teamDuel.getParties().add(party);
 
                         teamDuel.start();
                     } else {

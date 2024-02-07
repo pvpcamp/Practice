@@ -26,7 +26,7 @@ public class ArenaManager {
         this.logger = plugin.getLogger();
         this.arenas = new HashSet<>();
 
-        logger.info("Starting ArenaManager...");
+        logger.info("Initialized ArenaManager.");
 
         arenaConfig = new ArenaConfig(plugin, this);
 
@@ -79,6 +79,13 @@ public class ArenaManager {
         }
     }
 
+    public Arena selectRandomArena(Arena.Type type) {
+        List<Arena> arenas = new ArrayList<>(getArenaForType(type));
+        Collections.shuffle(arenas);
+
+        return arenas.isEmpty() ? null : arenas.get(0);
+    }
+
     public List<Arena> getOriginalArenas() {
         List<Arena> arenas = new ArrayList<>();
         for(Arena arena : getArenas()) {
@@ -86,6 +93,17 @@ public class ArenaManager {
                 arenas.add(arena);
             }
         }
+        return arenas;
+    }
+
+    public List<Arena> getArenaForType(Arena.Type type) {
+        List<Arena> arenas = new ArrayList<>();
+        for(Arena arena : getArenas()) {
+            if(arena.isEnabled() && !arena.isInUse() &&arena.getType().equals(type)) {
+                arenas.add(arena);
+            }
+        }
+
         return arenas;
     }
 

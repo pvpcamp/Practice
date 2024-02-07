@@ -52,12 +52,12 @@ public class FFAKitGui extends ArrangedGui {
                             party.leave(member.getPlayer());
                         }
 
+                        ffa.getParties().add(party);
+                        ffa.setKit(kit);
+
                         for (PartyMember member : members) {
                             ffa.join(member.getPlayer());
                         }
-
-                        ffa.getParties().add(party);
-                        ffa.setKit(kit);
 
                         ffa.start();
                     } else {

@@ -1,7 +1,7 @@
 package camp.pvp.practice.guis.games.events;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.games.impl.events.SumoEvent;
+import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.guis.tournament.TournamentHostGui;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class HostEventGui extends StandardGui {
 
@@ -37,7 +36,7 @@ public class HostEventGui extends StandardGui {
                 @Override
                 public void run(Player player, Gui gui) {
                     if(!plugin.getGameManager().isEventRunning()) {
-                        SumoEvent event = new SumoEvent(plugin, UUID.randomUUID());
+                        SumoEvent event = new SumoEvent(plugin);
                         event.start();
                     } else {
                         player.sendMessage(ChatColor.RED + "This event is already running.");

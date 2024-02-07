@@ -36,6 +36,8 @@ public class GameProfileManager {
         this.logger = plugin.getLogger();
         this.loadedProfiles = new HashMap<>();
 
+        this.logger.info("Initialized GameProfileManager.");
+
         FileConfiguration config = plugin.getConfig();
 
         this.mongoManager = new MongoManager(plugin, config.getString("networking.mongo.uri"), config.getString("networking.mongo.database"));
@@ -45,8 +47,6 @@ public class GameProfileManager {
         this.leaderboardUpdater = new LeaderboardUpdater(this);
         this.leaderboardUpdaterTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, leaderboardUpdater, 0, 2400);
         this.playerVisibilityUpdaterTask = Bukkit.getScheduler().runTaskTimer(plugin, new PlayerVisibilityUpdater(this), 0, 1);
-
-        this.logger.info("Started GameProfileManager.");
     }
 
     public GameProfile find(UUID uuid, boolean store) {

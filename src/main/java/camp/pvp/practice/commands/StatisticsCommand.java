@@ -33,6 +33,10 @@ public class StatisticsCommand implements CommandExecutor {
 
             if(args.length > 0) {
                 target = args[0];
+                if(!target.matches("^[a-zA-Z0-9_]{1,16}$")) {
+                    return true;
+                }
+
                 target = target.replaceAll("\\$[A-Za-z0-9]+(_[A-Za-z0-9]+)*\\$", "");
             }
 
