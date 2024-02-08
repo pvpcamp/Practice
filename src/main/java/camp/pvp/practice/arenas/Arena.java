@@ -72,7 +72,7 @@ public class Arena implements Comparable<Arena>{
             }
         }
 
-        public boolean isUnloadChunks() {
+        public boolean isResetAfterGame() {
             switch(this) {
                 case DUEL_SKYWARS:
                 case DUEL_BUILD:
@@ -90,7 +90,8 @@ public class Arena implements Comparable<Arena>{
     private Map<String, ArenaPosition> positions;
     private boolean enabled, inUse;
     private String parent;
-    private Set<ChunkSnapshot> beforeSnapshots, afterSnapshots;
+    private Set<ChunkSnapshot> chunkSnapshots;
+    // X and Z differences are the amount of chunks away from the parent arena.
     private int xDifference, zDifference, buildLimit, voidLevel;
 
     private @Getter List<Location> beds, blocks, chests;
@@ -106,8 +107,7 @@ public class Arena implements Comparable<Arena>{
         this.blocks = new ArrayList<>();
         this.chests = new ArrayList<>();
         this.chunks = new HashSet<>();
-        this.beforeSnapshots = new HashSet<>();
-        this.afterSnapshots = new HashSet<>();
+        this.chunkSnapshots = new HashSet<>();
 
         this.buildLimit = 256;
         this.voidLevel = 0;
@@ -142,7 +142,7 @@ public class Arena implements Comparable<Arena>{
         for(ArenaPosition position : fromArena.getPositions().values()) {
             Location location = position.getLocation();
             Location newLocation = location.clone();
-            newLocation.add(xDifference, 0, zDifference);
+            newLocation.add(xDifference * 16, 0, zDifference * 16);
             positions.put(position.getPosition(), new ArenaPosition(position.getPosition(), newLocation));
         }
 
@@ -207,30 +207,32 @@ public class Arena implements Comparable<Arena>{
                 }
             }
 
-            for(Chunk chunk : getChunks()) {
-                beforeSnapshots.add(chunk.getChunkSnapshot());
+            if(!isCopy()) {
+                for (Chunk chunk : getChunks()) {
+                    chunkSnapshots.add(chunk.getChunkSnapshot());
+                }
             }
         }
     }
 
     /***
-     * Resets the arena, unloading chunks if necessary.
-     * @param delay Whether to delay the reset. Delay should always be used unless
-     *              the arena is being reset due to a server shutdown.
+     * Resets the arena.
      */
     public void resetArena() {
-        if(!getType().isUnloadChunks()) return; // We don't need to reset the arena if we don't need to unload chunks.
+        if(!getType().isResetAfterGame()) return;
 
         Bukkit.getScheduler().runTask(Practice.getInstance(), ()-> {
+            List<ChunkSnapshot> snapshots = new ArrayList<>();
             for(Chunk chunk : getChunks()) {
-                afterSnapshots.add(chunk.getChunkSnapshot());
+                snapshots.add(chunk.getChunkSnapshot());
             }
 
-            for(ChunkSnapshot snapshot : afterSnapshots) {
+            for(ChunkSnapshot snapshot : snapshots) {
 
                 ChunkSnapshot beforeSnapshot = null;
-                for(ChunkSnapshot before : beforeSnapshots) {
-                    if(before.getX() == snapshot.getX() && before.getZ() == snapshot.getZ()) {
+                for(ChunkSnapshot before : Practice.getInstance().getArenaManager().getArenaFromName(getParent()).getChunkSnapshots()) {
+
+                    if(snapshot.getX() == before.getX() + xDifference && snapshot.getZ() == before.getZ() + zDifference) {
                         beforeSnapshot = before;
                         break;
                     }

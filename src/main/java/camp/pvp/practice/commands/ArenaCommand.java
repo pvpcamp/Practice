@@ -41,45 +41,46 @@ public class ArenaCommand implements CommandExecutor {
 
             if(args.length > 0) {
 
-                if(args[0].equalsIgnoreCase("list")) {
-                    List<Arena> arenas = new ArrayList<>(plugin.getArenaManager().getOriginalArenas());
-                    Collections.sort(arenas);
+                switch(args[0].toLowerCase()) {
+                    case "list":
+                        List<Arena> arenas = new ArrayList<>(plugin.getArenaManager().getOriginalArenas());
+                        Collections.sort(arenas);
 
-                    TextComponent[] components = new TextComponent[arenas.size() + 1];
-                    TextComponent title = new TextComponent(Colors.get("&6Arenas &7(" + arenas.size() + "&7): &f"));
+                        TextComponent[] components = new TextComponent[arenas.size() + 1];
+                        TextComponent title = new TextComponent(Colors.get("&6Arenas &7(" + arenas.size() + "&7): &f"));
 
-                    components[0] = title;
+                        components[0] = title;
 
-                    for(int i = 0; i < arenas.size(); i++) {
-                        Arena a = arenas.get(i);
-                        String name = (a.isEnabled() ? "&e" : "&c") + a.getName();
+                        for(int i = 0; i < arenas.size(); i++) {
+                            Arena a = arenas.get(i);
+                            String name = (a.isEnabled() ? "&e" : "&c") + a.getName();
 
-                        String spacer;
-                        if (i + 1 == arenas.size()) {
-                            spacer = "&7.";
-                        } else {
-                            spacer = "&7, ";
+                            String spacer;
+                            if (i + 1 == arenas.size()) {
+                                spacer = "&7.";
+                            } else {
+                                spacer = "&7, ";
+                            }
+
+                            TextComponent component = new TextComponent(Colors.get(name + spacer));
+                            ComponentBuilder builder = new ComponentBuilder(Colors.get("&6Arena: &f" + a.getName()));
+                            builder.append(Colors.get("\n&6Enabled: &f" + a.isEnabled()));
+                            builder.append(Colors.get("\n&6In Use: &f" + a.isInUse()));
+                            builder.append(Colors.get("\n&6Type: &f" + a.getType().name()));
+
+                            int copies = arenaManager.getArenaCopies(a).size();
+                            if(copies > 0) {
+                                builder.append(Colors.get("\n&6Copies: &f" + copies));
+                            }
+
+                            component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/arena info " + a.getName()));
+                            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, builder.create()));
+
+                            components[i + 1] = component;
                         }
 
-                        TextComponent component = new TextComponent(Colors.get(name + spacer));
-                        ComponentBuilder builder = new ComponentBuilder(Colors.get("&6Arena: &f" + a.getName()));
-                        builder.append(Colors.get("\n&6Enabled: &f" + a.isEnabled()));
-                        builder.append(Colors.get("\n&6In Use: &f" + a.isInUse()));
-                        builder.append(Colors.get("\n&6Type: &f" + a.getType().name()));
-
-                        int copies = arenaManager.getArenaCopies(a).size();
-                        if(copies > 0) {
-                            builder.append(Colors.get("\n&6Copies: &f" + copies));
-                        }
-
-                        component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/arena info " + a.getName()));
-                        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, builder.create()));
-
-                        components[i + 1] = component;
-                    }
-
-                    player.spigot().sendMessage(components);
-                    return true;
+                        player.spigot().sendMessage(components);
+                        return true;
                 }
 
                 if(args.length < 2) {
@@ -631,7 +632,7 @@ public class ArenaCommand implements CommandExecutor {
         help.append("\n&6/arena buildlimit <name> <limit> &7- &fSets the build limit for an arena.");
         help.append("\n&6/arena voidlevel <name> <level> &7- &fSets the void level for an arena.");
         help.append("\n&6/arena teleport <name> <position> &7- &fTeleports you to a specific arena position.");
-        help.append("\n&6/arena copy <name> <x> <z> [times] [start_from] &7- &fCopies an arena to another location. X and Z are blocks away from the original." +
+        help.append("\n&6/arena copy <name> <x> <z> [times] [start_from] &7- &fCopies an arena to another location. X and Z are chunks (16x16 blocks) away from the original." +
                 " Times will duplicate x amount of times." +
                 " Start from will start copying from a specified arena.");
         help.append("\n&6/arena copies <name> &7- &fReturns the list of copies an arena has.");

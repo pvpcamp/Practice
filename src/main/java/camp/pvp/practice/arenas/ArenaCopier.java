@@ -23,16 +23,6 @@ public class ArenaCopier implements Runnable {
     private long started, ended;
     private Queue<Block> blocks;
 
-//    public ArenaCopier(Practice plugin, Arena arena, Arena newArena, int xDifference, int zDifference) {
-//        this.plugin = plugin;
-//        this.arena = arena;
-//        this.newArena = newArena;
-//        this.xDifference = xDifference;
-//        this.zDifference = zDifference;
-//        this.blocks = new LinkedList<>();
-//        this.startFrom = arena;
-//    }
-
     public ArenaCopier(Practice plugin, Arena arena, Arena newArena, int xDifference, int zDifference, Arena startFrom) {
         this.plugin = plugin;
         this.arena = arena;
@@ -66,7 +56,7 @@ public class ArenaCopier implements Runnable {
                     if(!block.isEmpty()) {
                         blocks.add(location.getBlock());
 
-                        Location newLocation = new Location(world, x + startFrom.getXDifference() + xDifference, y, z + startFrom.getZDifference() + zDifference);
+                        Location newLocation = new Location(world, x + startFrom.getXDifference() + xDifference * 16, y, z + startFrom.getZDifference() + zDifference * 16);
                         Block newBlock = newLocation.getBlock();
                         if (!newBlock.isEmpty()) {
                             return false;
@@ -88,7 +78,7 @@ public class ArenaCopier implements Runnable {
         for(int i = 0; i < 5000; i++) {
             if(!blocks.isEmpty()) {
                 Block block = blocks.poll();
-                Location newLocation = new Location(block.getWorld(), block.getX() + startFrom.getXDifference() + xDifference, block.getY(), block.getZ() + startFrom.getZDifference() + zDifference);
+                Location newLocation = new Location(block.getWorld(), block.getX() + ((startFrom.getXDifference() + xDifference) * 16), block.getY(), block.getZ() + ((startFrom.getZDifference() + zDifference) * 16));
                 Block newBlock = newLocation.getBlock();
                 if (block.isEmpty()) {
                     i--;

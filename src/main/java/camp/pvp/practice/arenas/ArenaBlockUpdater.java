@@ -50,7 +50,7 @@ public class ArenaBlockUpdater implements Runnable{
                         int xDif = a.getXDifference();
                         int zDif = a.getZDifference();
 
-                        Location l = new Location(world, xDif + x, y, zDif + z);
+                        Location l = new Location(world, (xDif * 16) + x, y, (zDif * 16)+ z);
                         Block b = l.getBlock();
 
                         if(!b.getType().equals(block.getType())) {
