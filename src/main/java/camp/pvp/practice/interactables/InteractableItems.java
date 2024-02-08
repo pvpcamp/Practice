@@ -8,8 +8,7 @@ import camp.pvp.practice.games.sumo.SumoEventDuel;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.interactables.impl.evemt.EventLeaveInteract;
 import camp.pvp.practice.interactables.impl.game.*;
-import camp.pvp.practice.interactables.impl.lobby.EventInteract;
-import camp.pvp.practice.interactables.impl.lobby.RematchInteract;
+import camp.pvp.practice.interactables.impl.lobby.*;
 import camp.pvp.practice.interactables.impl.queue.RequeueInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentJoinInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentLeaveInteract;
@@ -19,9 +18,7 @@ import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.PreviousQueue;
 import camp.pvp.practice.profiles.Rematch;
 import camp.pvp.practice.utils.ItemBuilder;
-import camp.pvp.practice.interactables.impl.lobby.KitEditorInteract;
 import camp.pvp.practice.interactables.impl.party.PartyCreateInteract;
-import camp.pvp.practice.interactables.impl.lobby.SettingsInteract;
 import camp.pvp.practice.interactables.impl.queue.LeaveQueueInteract;
 import camp.pvp.practice.interactables.impl.queue.QueueInteract;
 import camp.pvp.practice.interactables.impl.party.*;
@@ -31,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum InteractableItems {
-    QUEUE, EVENT, REQUEUE, REMATCH, PARTY_CREATE, KIT_EDITOR, SETTINGS,
+    QUEUE, EVENT, REQUEUE, REMATCH, PARTY_CREATE, COSMETICS, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
@@ -63,26 +60,26 @@ public enum InteractableItems {
                     }
                 } else {
                     return new InteractableItem(
-                            new ItemBuilder(Material.IRON_AXE, "&6Host an Event").create(), 1, new EventInteract());
+                            new ItemBuilder(Material.DIAMOND_AXE, "&6Host an Event").create(), 1, new EventInteract());
                 }
                 return null;
             case REQUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.PAPER, "&6Play Again").create(), 3,
+                        new ItemBuilder(Material.PAPER, "&6Play Again").create(), 2,
                         new RequeueInteract(),
                         new ItemUpdater() {
                             @Override
                             public void onUpdate(InteractableItem item, GameProfile profile) {
                                 PreviousQueue queue = profile.getPreviousQueue();
                                 if (queue != null) {
-                                    item.updateName("&6Queue " + queue.getQueueType().toString() + " " + queue.getKit().getDisplayName());
+                                    item.updateName("&6Queue for &f" + queue.getQueueType().toString() + " " + queue.getKit().getDisplayName());
                                 }
                             }
                         }
                 );
             case REMATCH:
                 return new InteractableItem(
-                        new ItemBuilder(Material.BLAZE_POWDER, "&6Rematch").create(), 2,
+                        new ItemBuilder(Material.BLAZE_POWDER, "&6Rematch").create(), 3,
                         new RematchInteract(),
                         new ItemUpdater() {
                             @Override
@@ -97,12 +94,15 @@ public enum InteractableItems {
             case PARTY_CREATE:
                 return new InteractableItem(
                         new ItemBuilder(Material.NETHER_STAR, "&6Create a Party").create(), 4, new PartyCreateInteract());
+            case COSMETICS:
+                return new InteractableItem(
+                        new ItemBuilder(Material.ENDER_CHEST, "&6Cosmetics").create(), 6, new CosmeticsInteract());
             case KIT_EDITOR:
                 return new InteractableItem(
                         new ItemBuilder(Material.BOOK, "&6Edit Your Kits").create(), 7, new KitEditorInteract());
             case SETTINGS:
                 return new InteractableItem(
-                        new ItemBuilder(Material.ANVIL, "&6Settings").create(), 8, new SettingsInteract());
+                        new ItemBuilder(Material.REDSTONE_COMPARATOR, "&6Customize Your Settings").create(), 8, new SettingsInteract());
             // LOBBY_QUEUE
             case LEAVE_QUEUE:
                 return new InteractableItem(
@@ -182,6 +182,7 @@ public enum InteractableItems {
                 }
 
                 items.add(PARTY_CREATE);
+                items.add(COSMETICS);
                 items.add(KIT_EDITOR);
                 items.add(SETTINGS);
                 break;

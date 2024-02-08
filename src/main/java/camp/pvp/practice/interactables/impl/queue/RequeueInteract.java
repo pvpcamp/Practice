@@ -6,6 +6,12 @@ import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.PreviousQueue;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.queue.GameQueueManager;
+import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.Gui;
+import camp.pvp.utils.guis.GuiAction;
+import camp.pvp.utils.guis.StandardGui;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 public class RequeueInteract implements ItemInteract {
@@ -14,11 +20,48 @@ public class RequeueInteract implements ItemInteract {
         PreviousQueue previousQueue = gameProfile.getPreviousQueue();
         GameQueueManager gqm = Practice.getInstance().getGameQueueManager();
 
-        for(GameQueue queue : gqm.getGameQueues()) {
-            if(queue.getType().equals(previousQueue.getQueueType()) && queue.getDuelKit().equals(previousQueue.getKit())) {
-                gqm.addToQueue(player, queue);
-                return;
+        GameQueue queue = null;
+
+        for(GameQueue q : gqm.getGameQueues()) {
+            if(q.getType().equals(previousQueue.getQueueType()) && q.getDuelKit().equals(previousQueue.getKit())) {
+                queue = q;
+                break;
             }
+        }
+
+        if(queue == null) {
+            player.sendMessage(ChatColor.RED + "The queue you were attempting to requeue for is no longer available.");
+            gameProfile.setPreviousQueue(null);
+            gameProfile.givePlayerItems(false);
+            return;
+        }
+
+        if(queue.getType().equals(GameQueue.Type.RANKED)) {
+            StandardGui confirm = new StandardGui("&6Confirm Requeue", 9);
+
+            for(int i = 0; i < 9; i++) {
+                GuiButton button = new GuiButton(Material.DIAMOND_SWORD, "&6&lAre you sure?");
+                button.setCloseOnClick(true);
+                button.setLore(
+                        "&7You are attempting to requeue",
+                        "&7for a ranked match.",
+                        " ",
+                        "&6Kit: &f" + queue.getDuelKit().getDisplayName(),
+                        " ",
+                        "&7Click to confirm requeue.");
+                button.setSlot(i);
+                GameQueue finalQueue = queue;
+                button.setAction(new GuiAction() {
+                    @Override
+                    public void run(Player player, Gui gui) {
+                        gqm.addToQueue(player, finalQueue);
+                    }
+                });
+                confirm.addButton(button);
+                confirm.open(player);
+            }
+        } else {
+            gqm.addToQueue(player, queue);
         }
     }
 }

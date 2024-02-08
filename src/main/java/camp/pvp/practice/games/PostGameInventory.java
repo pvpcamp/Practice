@@ -76,7 +76,7 @@ public class PostGameInventory extends GameInventory {
         GuiButton playerButton = new GuiButton(skull, (gameParticipant.isAlive() ? "&a" : "&c") + gameParticipant.getName());
         if(gameParticipant.isAlive()) {
             playerButton.setLore(
-                    "&6Health: &f" + gameParticipant.getHealth() + "/" + gameParticipant.getMaxHealth(),
+                    "&c" + (((double) gameParticipant.getHealth()) / 2) + "/" + (gameParticipant.getMaxHealth() / 2) + " &l❤",
                     "&6Total Hits: &f" + gameParticipant.getHits(),
                     "&6Longest Combo: &f" + gameParticipant.getLongestCombo()
             );

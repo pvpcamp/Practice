@@ -79,6 +79,7 @@ public class GameProfile {
     private boolean spectatorVisibility, lobbyVisibility, comboMessages, tournamentNotifications, showSidebar,
                     sidebarInGame, sidebarShowDuration, sidebarShowCps, sidebarShowLines, sidebarShowPing,
                     staffMode, buildMode;
+    private int noDropHotbarSlot;
     private DeathAnimation deathAnimation;
     private GameQueue.Type lastSelectedQueueType;
     private Map<DuelKit, Map<Integer, CustomDuelKit>> customDuelKits;
@@ -128,6 +129,7 @@ public class GameProfile {
         this.comboMessages = true;
         this.tournamentNotifications = true;
         this.showSidebar = true;
+        this.noDropHotbarSlot = 0;
 
         this.sidebarInGame = true;
         this.sidebarShowDuration = true;
@@ -172,10 +174,9 @@ public class GameProfile {
         this.giveItemsTask = Bukkit.getScheduler().runTaskLater(Practice.instance, new Runnable() {
             @Override
             public void run() {
-                previousQueue = null;
                 rematch = null;
                 if(getState().equals(State.LOBBY)) {
-                    givePlayerItems();
+                    givePlayerItems(false);
                 }
             }
         }, 20 * 15);
@@ -415,6 +416,7 @@ public class GameProfile {
         this.sidebarShowDuration = document.getBoolean("sidebar_show_duration");
         this.sidebarShowLines = document.getBoolean("sidebar_show_lines");
         this.sidebarShowPing = document.getBoolean("sidebar_show_ping");
+        this.noDropHotbarSlot = document.getInteger("no_drop_hotbar_slot", 0);
 
         // Get serialized kits from document, and turn them back into CustomDuelKits.
         Object serializedKits = document.get("custom_duel_kits");
@@ -456,6 +458,7 @@ public class GameProfile {
         values.put("sidebar_show_duration", isSidebarShowDuration());
         values.put("sidebar_show_lines", isSidebarShowLines());
         values.put("sidebar_show_ping", isSidebarShowPing());
+        values.put("no_drop_hotbar_slot", noDropHotbarSlot);
 
         // Convert CustomDuelKits to serialized form for DB storage.
         Map<String, Map<String, Map<String, Object>>> ck = new HashMap<>();

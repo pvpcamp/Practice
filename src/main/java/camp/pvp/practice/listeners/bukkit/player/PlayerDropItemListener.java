@@ -1,5 +1,6 @@
 package camp.pvp.practice.listeners.bukkit.player;
 
+import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
@@ -37,11 +38,18 @@ public class PlayerDropItemListener implements Listener {
                 return;
             }
 
-//            if(player.getInventory().getHeldItemSlot() == 0) {
-//                event.setCancelled(true);
-//                player.sendMessage(ChatColor.RED + "You cannot drop the item in your first slot.");
-//                return;
-//            }
+            GameParticipant participant = game.getParticipants().get(player.getUniqueId());
+            if(participant != null && !participant.isKitApplied()) {
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "You cannot drop anything until you apply your kit.");
+                return;
+            }
+
+            if(player.getInventory().getHeldItemSlot() == profile.getNoDropHotbarSlot()) {
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "You cannot drop the item in this slot.");
+                return;
+            }
 
             new BukkitRunnable() {
                 public void run() {

@@ -124,5 +124,15 @@ public class SidebarSettingsGui extends StandardGui {
         });
         sidebarShowPing.setSlot(15);
         this.addButton(sidebarShowPing, false);
+
+        GuiButton back = new GuiButton(Material.ARROW, "&cBack to Settings");
+        back.setAction(new GuiAction() {
+            @Override
+            public void run(Player player, Gui gui) {
+                new SettingsGui(profile).open(player);
+            }
+        });
+        back.setSlot(18);
+        this.addButton(back, false);
     }
 }
