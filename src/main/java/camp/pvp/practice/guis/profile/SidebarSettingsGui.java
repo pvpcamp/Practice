@@ -8,6 +8,7 @@ import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 public class SidebarSettingsGui extends StandardGui {
     public SidebarSettingsGui(GameProfile profile) {
@@ -18,7 +19,7 @@ public class SidebarSettingsGui extends StandardGui {
         GuiButton visibilityInGame = new GuiButton(Material.DIAMOND_SWORD, "&a&lVisible In Game");
         visibilityInGame.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 profile.setSidebarInGame(!profile.isSidebarInGame());
                 gui.updateGui();
             }
@@ -40,7 +41,7 @@ public class SidebarSettingsGui extends StandardGui {
         GuiButton sidebarShowDuration = new GuiButton(Material.WATCH, "&a&lShow Game Duration");
         sidebarShowDuration.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 profile.setSidebarShowDuration(!profile.isSidebarShowDuration());
                 gui.updateGui();
             }
@@ -62,7 +63,7 @@ public class SidebarSettingsGui extends StandardGui {
         GuiButton sidebarShowCps = new GuiButton(Material.LEASH, "&a&lShow CPS");
         sidebarShowCps.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 profile.setSidebarShowCps(!profile.isSidebarShowCps());
                 gui.updateGui();
             }
@@ -84,7 +85,7 @@ public class SidebarSettingsGui extends StandardGui {
         GuiButton sidebarShowLines = new GuiButton(Material.EMPTY_MAP, "&a&lShow Lines");
         sidebarShowLines.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 profile.setSidebarShowLines(!profile.isSidebarShowLines());
                 gui.updateGui();
             }
@@ -106,7 +107,7 @@ public class SidebarSettingsGui extends StandardGui {
         GuiButton sidebarShowPing = new GuiButton(Material.BEACON, "&a&lShow Ping");
         sidebarShowPing.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 profile.setSidebarShowPing(!profile.isSidebarShowPing());
                 gui.updateGui();
             }
@@ -128,7 +129,7 @@ public class SidebarSettingsGui extends StandardGui {
         GuiButton back = new GuiButton(Material.ARROW, "&cBack to Settings");
         back.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 new SettingsGui(profile).open(player);
             }
         });

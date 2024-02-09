@@ -18,6 +18,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 public class DuelCommand implements CommandExecutor {
 
@@ -60,7 +61,7 @@ public class DuelCommand implements CommandExecutor {
                                         "&6Arena: &f" + (duelRequest.getArena() == null ? "Random" : Colors.get(duelRequest.getArena().getDisplayName())));
                                 acceptButton.setAction(new GuiAction() {
                                     @Override
-                                    public void run(Player player, Gui gui) {
+                                    public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                         if(!duelRequest.isExpired() && profile.getState().equals(GameProfile.State.LOBBY) && targetProfile.getState().equals(GameProfile.State.LOBBY)) {
                                             duelRequest.startGame();
                                         } else {
@@ -76,7 +77,7 @@ public class DuelCommand implements CommandExecutor {
                                 GuiButton duelGuiButton = new GuiButton(Material.GOLD_SWORD, "&6Send New Duel Request");
                                 duelGuiButton.setAction(new GuiAction() {
                                     @Override
-                                    public void run(Player player, Gui gui) {
+                                    public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                         requestGui.open(player);
                                     }
                                 });

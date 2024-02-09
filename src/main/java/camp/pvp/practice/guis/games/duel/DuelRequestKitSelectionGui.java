@@ -38,7 +38,7 @@ public class DuelRequestKitSelectionGui extends ArrangedGui {
                 );
             }
 
-            button.setAction((pl, igui) -> {
+            button.setAction((pl, b, igui, click) -> {
                 duelRequest.setKit(duelKit);
                 if(hasPermission) {
                     new DuelRequestArenaSelectionGui(plugin, duelRequest).open(pl);

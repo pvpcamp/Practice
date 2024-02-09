@@ -8,6 +8,7 @@ import camp.pvp.utils.guis.paginated.PaginatedGui;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -25,7 +26,7 @@ public class SpectatorGui extends PaginatedGui {
             button.setCloseOnClick(true);
             button.setAction(new GuiAction() {
                 @Override
-                public void run(Player p, Gui gui) {
+                public void run(Player p, GuiButton button, Gui gui, ClickType click) {
                     p.teleport(player.getLocation());
                     p.sendMessage(ChatColor.GREEN + "You have teleported to " + ChatColor.WHITE + player.getName() + ChatColor.GREEN + ".");
                 }

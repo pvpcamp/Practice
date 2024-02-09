@@ -145,6 +145,19 @@ public enum DuelKit {
         }
     }
 
+    public boolean showHealthBar() {
+        switch(this) {
+            case BED_FIGHT:
+            case BUILD_UHC:
+            case STRATEGY:
+            case INVADED:
+            case CLASSIC:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public boolean isTakeDamage() {
         switch(this) {
             case BOXING:

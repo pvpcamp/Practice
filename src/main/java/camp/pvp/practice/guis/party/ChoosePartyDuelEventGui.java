@@ -11,6 +11,7 @@ import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 public class ChoosePartyDuelEventGui extends StandardGui {
     public ChoosePartyDuelEventGui(GameProfile profile, Party party) {
@@ -26,7 +27,7 @@ public class ChoosePartyDuelEventGui extends StandardGui {
                 "&aNext, choose a kit for this duel.");
         teamFight.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 StandardGui kitGui = new StandardGui("&6&lChoose a Kit", 36);
 
                 for(DuelKit kit : DuelKit.values()) {
@@ -37,7 +38,7 @@ public class ChoosePartyDuelEventGui extends StandardGui {
                         kitButton.setLore("&7Click to invite &6" + party.getLeader().getName() + "'s Party", "&7to a &f" + kit.getDisplayName() + " &7team fight.");
                         kitButton.setAction(new GuiAction() {
                             @Override
-                            public void run(Player player, Gui gui) {
+                            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                 if(party.getGame() == null && profile.getParty().getGame() == null) {
                                     PartyGameRequest pgr = new PartyGameRequest(profile.getParty(), party, PartyGameRequest.Type.TEAMS);
                                     pgr.setKit(kit);
@@ -63,7 +64,7 @@ public class ChoosePartyDuelEventGui extends StandardGui {
         hcfFight.setCloseOnClick(true);
         hcfFight.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 if(party.getGame() == null && profile.getParty().getGame() == null) {
                     PartyGameRequest pgr = new PartyGameRequest(profile.getParty(), party, PartyGameRequest.Type.HCF);
                     pgr.send();

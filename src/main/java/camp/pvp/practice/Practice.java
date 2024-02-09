@@ -19,10 +19,12 @@ import camp.pvp.practice.listeners.citizens.NPCRightClickListener;
 import camp.pvp.practice.listeners.packets.EnderpearlSound;
 import camp.pvp.practice.nametags.NameColorRunnable;
 import camp.pvp.practice.parties.PartyManager;
+import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.queue.GameQueueManager;
 import camp.pvp.practice.sidebar.SidebarAdapter;
 import camp.pvp.practice.tasks.ServerRebooter;
 import camp.pvp.practice.tasks.TickNumberCounter;
+import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.commands.*;
@@ -106,10 +108,6 @@ public class Practice extends JavaPlugin {
             entity.remove();
         }
 
-        for(World world : Bukkit.getWorlds()) {
-            world.setAutoSave(false);
-        }
-
         registerCommands();
         registerListeners();
     }
@@ -130,6 +128,8 @@ public class Practice extends JavaPlugin {
         }
 
         this.saveConfig();
+
+        shutdown();
 
         instance = null;
     }
@@ -216,6 +216,14 @@ public class Practice extends JavaPlugin {
         arenaManager.shutdown();
         gameManager.shutdown();
         gameProfileManager.shutdown();
-        this.getServer().shutdown();
+    }
+
+    public void sendDebugMessage(String message) {
+        for(GameProfile profile : getGameProfileManager().getLoadedProfiles().values()) {
+            if(profile.getPlayer() == null) continue;
+            if(!profile.isDebugMode()) continue;
+
+            profile.getPlayer().sendMessage(Colors.get("&4[" + getName() + " Debug] &f" + message));
+        }
     }
 }

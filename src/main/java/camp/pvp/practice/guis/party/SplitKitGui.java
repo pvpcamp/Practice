@@ -14,6 +14,7 @@ import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.*;
 
@@ -34,7 +35,7 @@ public class SplitKitGui extends ArrangedGui {
                     "&7Click to start &f" + kit.getDisplayName() + " &7Split Teams event!");
             button.setAction(new GuiAction() {
                 @Override
-                public void run(Player player, Gui gui) {
+                public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                     Practice plugin = Practice.instance;
 
                     List<PartyMember> members = new ArrayList<>(), kickedMembers = new ArrayList<>();

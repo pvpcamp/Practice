@@ -8,6 +8,7 @@ import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.Arrays;
 
@@ -30,7 +31,7 @@ public class TournamentHostGui extends ArrangedGui {
 
             button.setAction(new GuiAction() {
                 @Override
-                public void run(Player player, Gui gui) {
+                public void run(Player player, GuiButton guiButton, Gui gui, ClickType clickType) {
                     TournamentTeamSizeGui teamSizeGUI = new TournamentTeamSizeGui(plugin, kit);
                     teamSizeGUI.open(player);
                 }

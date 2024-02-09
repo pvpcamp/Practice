@@ -13,6 +13,7 @@ import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -34,7 +35,7 @@ public class PartyKitInteract implements ItemInteract {
                 GuiButton button = new GuiButton(skullItem, "&6&l" + m.getName());
                 button.setAction(new GuiAction() {
                     @Override
-                    public void run(Player player, Gui gui) {
+                    public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                         if(m.getHcfKit().ordinal() == HCFKit.ARCHER.ordinal()) {
                             m.setHcfKit(HCFKit.DIAMOND);
                         } else {
@@ -67,7 +68,7 @@ public class PartyKitInteract implements ItemInteract {
                 GuiButton button = new GuiButton(Material.DIAMOND_SWORD, "&6Choose Your HCF Kit");
                 button.setAction(new GuiAction() {
                     @Override
-                    public void run(Player player, Gui gui) {
+                    public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                         if(member.getHcfKit().ordinal() == HCFKit.ARCHER.ordinal()) {
                             member.setHcfKit(HCFKit.DIAMOND);
                         } else {

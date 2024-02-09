@@ -29,6 +29,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -190,7 +191,7 @@ public class PlayerInteractListener implements Listener {
                                     int finalX = x;
                                     createButton.setAction(new GuiAction() {
                                         @Override
-                                        public void run(Player player, Gui gui) {
+                                        public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                             CustomDuelKit cdk = new CustomDuelKit(editingKit, finalX, false);
                                             cdk.setItems(player.getInventory().getContents());
                                             customKits.put(finalX, cdk);
@@ -204,7 +205,7 @@ public class PlayerInteractListener implements Listener {
                                     loadButton.setSlot(1 + x);
                                     loadButton.setAction(new GuiAction() {
                                         @Override
-                                        public void run(Player player, Gui gui) {
+                                        public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                             player.getInventory().clear();
                                             cdk.apply(player);
                                             player.getInventory().setArmorContents(null);
@@ -218,7 +219,7 @@ public class PlayerInteractListener implements Listener {
                                     saveButton.setCloseOnClick(true);
                                     saveButton.setAction(new GuiAction() {
                                         @Override
-                                        public void run(Player player, Gui gui) {
+                                        public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                             cdk.setItems(player.getInventory().getContents());
                                             player.sendMessage(Colors.get("&aCustom kit " + cdk.getName() + " &ahas been saved."));
                                         }
@@ -231,7 +232,7 @@ public class PlayerInteractListener implements Listener {
                                     renameButton.setCloseOnClick(true);
                                     renameButton.setAction(new GuiAction() {
                                         @Override
-                                        public void run(Player player, Gui gui) {
+                                        public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                             profile.setEditingCustomKit(cdk);
                                             player.sendMessage(ChatColor.GREEN + "Type the desired name of your kit in chat.");
                                         }
@@ -244,7 +245,7 @@ public class PlayerInteractListener implements Listener {
                                     int finalX = x;
                                     deleteButton.setAction(new GuiAction() {
                                         @Override
-                                        public void run(Player player, Gui gui) {
+                                        public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                             customKits.remove(finalX);
                                         }
                                     });

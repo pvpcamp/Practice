@@ -32,7 +32,7 @@ public class QueueGui extends ArrangedGui {
 
         changeQueueType.setOverrideGuiArrangement(true);
 
-        changeQueueType.setAction((p, g) -> {
+        changeQueueType.setAction((p, b, g, click) -> {
             GameQueue.Type newQueueType = queueType.equals(GameQueue.Type.RANKED) ? GameQueue.Type.UNRANKED : GameQueue.Type.RANKED;
             profile.setLastSelectedQueueType(newQueueType);
             new QueueGui(newQueueType, profile).open(p);
@@ -110,7 +110,7 @@ public class QueueGui extends ArrangedGui {
                 }
             });
 
-            button.setAction((p, g) -> {
+            button.setAction((p, b, g, clickType) -> {
                 gqm.addToQueue(p, queue);
             });
             button.setCloseOnClick(true);

@@ -5,9 +5,6 @@ import camp.pvp.practice.kits.DuelKit;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -99,7 +96,7 @@ public class ArenaManager {
     public List<Arena> getArenaForType(Arena.Type type) {
         List<Arena> arenas = new ArrayList<>();
         for(Arena arena : getArenas()) {
-            if(arena.isEnabled() && !arena.isInUse() &&arena.getType().equals(type)) {
+            if(arena.isEnabled() && !arena.isInUse() && !arena.isCopy() && arena.getType().equals(type)) {
                 arenas.add(arena);
             }
         }
@@ -121,16 +118,30 @@ public class ArenaManager {
             }
         }
 
-        m = "Arena scanner has finished scanning " + arenas + " arenas.";
-        this.logger.info(m);
+        logger.info("Arena scanner has finished scanning " + arenas + " arenas.");
+    }
+
+    public void updateAndResetCopies() {
+
+        for(Arena arena : getArenas()) {
+            if(!arena.isCopy()) continue;
+            if(!arena.isInUse()) continue;
+
+            arena.updateCopy(true);
+        }
     }
 
     public void deleteArena(Arena arena) {
         this.arenas.remove(arena);
 
         if(arena.isCopy()) {
-            setArenaDeleter(new ArenaDeleter(this, arena));
+            arena.clearBlocks();
+        } else {
+            for(Arena a : getArenaCopies(arena)) {
+                deleteArena(a);
+            }
         }
+
     }
 
     public int getNextCopyNumber(Arena arena) {
@@ -152,34 +163,17 @@ public class ArenaManager {
         return hn + 1;
     }
 
-    public Arena createCopy(Arena arena, int xD, int zD) {
+    public Arena createCopy(Arena arena, int fromX, int fromZ, int xD, int zD) {
         int hn = getNextCopyNumber(arena);
 
         Arena copy = new Arena(arena.getName() + "_copy_" + hn);
         copy.setDisplayName(arena.getDisplayName());
         copy.setEnabled(arena.isEnabled());
-        copy.setXDifference(xD);
-        copy.setZDifference(zD);
-        copy.setBuildLimit(arena.getBuildLimit());
-        copy.setVoidLevel(arena.getVoidLevel());
-        copy.copyPositions(arena);
+        copy.setXDifference(fromX + xD);
+        copy.setZDifference(fromZ + zD);
         copy.setParent(arena.getName());
         copy.setType(arena.getType());
-
-        return copy;
-    }
-
-    public Arena createCopy(Arena arena, int xD, int zD, int override) {
-        Arena copy = new Arena(arena.getName() + "_copy_" + override);
-        copy.setDisplayName(arena.getDisplayName());
-        copy.setEnabled(arena.isEnabled());
-        copy.setXDifference(xD);
-        copy.setZDifference(zD);
-        copy.setBuildLimit(arena.getBuildLimit());
-        copy.setVoidLevel(arena.getVoidLevel());
-        copy.copyPositions(arena);
-        copy.setParent(arena.getName());
-        copy.setType(arena.getType());
+        copy.updateCopy(true);
 
         return copy;
     }
@@ -195,9 +189,9 @@ public class ArenaManager {
         return arenas;
     }
 
-    public void updateArenaCopies(Arena arena) {
+    public void updateArenaCopies(Arena arena, boolean reset) {
         for(Arena a : getArenaCopies(arena)) {
-            a.copyPositions(arena);
+            a.updateCopy(reset);
         }
     }
 

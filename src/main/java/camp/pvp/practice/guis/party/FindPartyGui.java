@@ -10,6 +10,7 @@ import camp.pvp.utils.guis.paginated.PaginatedGui;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
@@ -53,7 +54,7 @@ public class FindPartyGui extends PaginatedGui {
 
                 partyButton.setAction(new GuiAction() {
                     @Override
-                    public void run(Player player, Gui gui) {
+                    public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                         if(p.getGame() == null && party.getGame() == null) {
                             new ChoosePartyDuelEventGui(profile, p).open(player);
                         } else {

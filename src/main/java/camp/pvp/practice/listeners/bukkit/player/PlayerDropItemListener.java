@@ -10,7 +10,9 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class PlayerDropItemListener implements Listener {
@@ -45,8 +47,9 @@ public class PlayerDropItemListener implements Listener {
                 return;
             }
 
-            if(player.getInventory().getHeldItemSlot() == profile.getNoDropHotbarSlot()) {
+            if(player.getInventory().getHeldItemSlot() == profile.getNoDropHotbarSlot() && player.getOpenInventory().getTopInventory() == null) {
                 event.setCancelled(true);
+                player.sendMessage(player.getOpenInventory().getType().toString());
                 player.sendMessage(ChatColor.RED + "You cannot drop the item in this slot.");
                 return;
             }
@@ -59,8 +62,8 @@ public class PlayerDropItemListener implements Listener {
         } else if (profile.getState().equals(GameProfile.State.KIT_EDITOR)) {
             Item item = event.getItemDrop();
             item.remove();
-        } else if (!profile.isBuildMode()) {
-            event.setCancelled(true);
+        } else {
+            event.setCancelled(!profile.isBuildMode());
         }
     }
 }

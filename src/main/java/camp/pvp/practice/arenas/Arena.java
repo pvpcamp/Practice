@@ -4,6 +4,7 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.loot.LootChest;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 
@@ -11,79 +12,6 @@ import java.util.*;
 
 @Getter @Setter
 public class Arena implements Comparable<Arena>{
-
-    public enum Type {
-        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, DUEL_BED_FIGHT, DUEL_BRIDGE, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_OITC;
-
-        public List<String> getValidPositions() {
-            switch(this) {
-                case DUEL_BED_FIGHT:
-                    return Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluebed", "redbed");
-                case DUEL_BUILD:
-                case DUEL_SKYWARS:
-                case SPLEEF:
-                    return Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
-                case EVENT_SUMO:
-                    return Arrays.asList("spawn1", "spawn2", "lobby");
-                case FFA:
-                    return Arrays.asList("spawn");
-                default:
-                    return Arrays.asList("spawn1", "spawn2", "center");
-            }
-        }
-
-        public boolean isGenerateLoot() {
-            switch(this) {
-                case DUEL_SKYWARS:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        public boolean canModifyArena() {
-            switch(this) {
-                case DUEL_SKYWARS:
-                case SPLEEF:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        public List<Material> getSpecificBlocks() {
-            switch(this) {
-                case SPLEEF:
-                    return Collections.singletonList(Material.SNOW_BLOCK);
-                default:
-                    return null;
-            }
-        }
-
-        public boolean isBuild() {
-            switch(this) {
-                case DUEL_SKYWARS:
-                case DUEL_BUILD:
-                case DUEL_BED_FIGHT:
-                case SPLEEF:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        public boolean isResetAfterGame() {
-            switch(this) {
-                case DUEL_SKYWARS:
-                case DUEL_BUILD:
-                case DUEL_BED_FIGHT:
-                case SPLEEF:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-    }
 
     private String name, displayName;
     private Arena.Type type;
@@ -135,19 +63,29 @@ public class Arena implements Comparable<Arena>{
 
     /**
      * Copies positions from the parent arena to this arena, based on X and Z differences.
-     * @param fromArena Parent arena.
      */
 
-    public void copyPositions(Arena fromArena) {
-        for(ArenaPosition position : fromArena.getPositions().values()) {
+    public void updateCopy(boolean reset) {
+
+        Arena parent = Practice.getInstance().getArenaManager().getArenaFromName(getParent());
+
+        for(ArenaPosition position : parent.getPositions().values()) {
             Location location = position.getLocation();
             Location newLocation = location.clone();
             newLocation.add(xDifference * 16, 0, zDifference * 16);
             positions.put(position.getPosition(), new ArenaPosition(position.getPosition(), newLocation));
         }
 
-        setBuildLimit(fromArena.getBuildLimit());
-        setVoidLevel(fromArena.getVoidLevel());
+        setEnabled(parent.isEnabled());
+        setDisplayName(parent.getDisplayName());
+        setBuildLimit(parent.getBuildLimit());
+        setVoidLevel(parent.getVoidLevel());
+
+        scanArena();
+
+        if(reset) {
+            resetArena();
+        }
     }
 
     /**
@@ -197,9 +135,9 @@ public class Arena implements Comparable<Arena>{
                                 case CHEST:
                                 case TRAPPED_CHEST:
                                     getChests().add(block.getLocation());
-                                default:
-                                    getBlocks().add(location);
                             }
+
+                            getBlocks().add(location);
                         }
 
                         getChunks().add(location.getChunk());
@@ -212,6 +150,13 @@ public class Arena implements Comparable<Arena>{
                     chunkSnapshots.add(chunk.getChunkSnapshot());
                 }
             }
+        }
+    }
+
+    public void clearBlocks() {
+        scanArena();
+        for(Location location : getBlocks()) {
+            location.getBlock().setType(Material.AIR);
         }
     }
 
@@ -292,5 +237,106 @@ public class Arena implements Comparable<Arena>{
     @Override
     public int compareTo(Arena arena) {
         return this.getName().compareTo(arena.getName());
+    }
+
+    public enum Type {
+        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, DUEL_BED_FIGHT, DUEL_BRIDGE, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_OITC;
+
+        public List<String> getValidPositions() {
+            switch(this) {
+                case DUEL_BED_FIGHT:
+                    return Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluebed", "redbed");
+                case DUEL_BUILD:
+                case DUEL_SKYWARS:
+                case SPLEEF:
+                    return Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
+                case EVENT_SUMO:
+                    return Arrays.asList("spawn1", "spawn2", "lobby");
+                case FFA:
+                    return Arrays.asList("spawn");
+                default:
+                    return Arrays.asList("spawn1", "spawn2", "center");
+            }
+        }
+
+
+
+        public boolean isGenerateLoot() {
+            switch(this) {
+                case DUEL_SKYWARS:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public boolean canModifyArena() {
+            switch(this) {
+                case DUEL_SKYWARS:
+                case SPLEEF:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public List<Material> getSpecificBlocks() {
+            switch(this) {
+                case SPLEEF:
+                    return Collections.singletonList(Material.SNOW_BLOCK);
+                default:
+                    return null;
+            }
+        }
+
+        public boolean isBuild() {
+            switch(this) {
+                case DUEL_SKYWARS:
+                case DUEL_BUILD:
+                case DUEL_BED_FIGHT:
+                case SPLEEF:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public boolean isResetAfterGame() {
+            switch(this) {
+                case DUEL_SKYWARS:
+                case DUEL_BUILD:
+                case DUEL_BED_FIGHT:
+                case SPLEEF:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public Material getGuiMaterial() {
+            switch(this) {
+                case DUEL: return Material.GRASS;
+                case DUEL_FLAT: return Material.WOOD_PLATE;
+                case DUEL_BUILD: return Material.DIAMOND_PICKAXE;
+                case DUEL_HCF: return Material.FENCE;
+                case DUEL_SUMO: return Material.LEASH;
+                case DUEL_SKYWARS: return Material.EYE_OF_ENDER;
+                case DUEL_BED_FIGHT: return Material.BED;
+                case DUEL_BRIDGE: return Material.STAINED_CLAY;
+                case SPLEEF: return Material.SNOW_BLOCK;
+                case HCF_TEAMFIGHT: return Material.DIAMOND_SWORD;
+                case FFA: return Material.DIAMOND;
+                case EVENT_SUMO: return Material.SLIME_BALL;
+                case EVENT_OITC: return Material.ARROW;
+                default: return Material.STONE;
+            }
+        }
+
+        @Override
+        public String toString() {
+            String name = this.name();
+            name = name.replace("_", " ");
+            return WordUtils.capitalizeFully(name);
+        }
     }
 }

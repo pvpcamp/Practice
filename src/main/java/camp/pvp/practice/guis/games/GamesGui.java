@@ -10,6 +10,7 @@ import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.paginated.PaginatedGui;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class GamesGui extends PaginatedGui {
             button.setLore(lines);
             button.setAction(new GuiAction() {
                 @Override
-                public void run(Player player, Gui gui) {
+                public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                     GameProfile profile = Practice.getInstance().getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
                     if(profile.getState().equals(GameProfile.State.LOBBY) && game.getState().equals(Game.State.ACTIVE)) {
                         game.spectateStartRandom(player);
