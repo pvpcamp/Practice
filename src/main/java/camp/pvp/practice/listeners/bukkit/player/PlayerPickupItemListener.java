@@ -25,7 +25,7 @@ public class PlayerPickupItemListener implements Listener {
         Item item = event.getItem();
 
         if(game != null) {
-            if(game.getCurrentPlayersPlaying().contains(player)) {
+            if(game.getAlivePlayers().contains(player)) {
                 if (!plugin.getEntityHider().canSee(player, item)) {
                     event.setCancelled(true);
                 }

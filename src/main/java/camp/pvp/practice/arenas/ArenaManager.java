@@ -104,6 +104,17 @@ public class ArenaManager {
         return arenas;
     }
 
+    public List<Arena> getArenaForTypeAny(Arena.Type type) {
+        List<Arena> arenas = new ArrayList<>();
+        for(Arena arena : getArenas()) {
+            if(!arena.isCopy() && arena.getType().equals(type)) {
+                arenas.add(arena);
+            }
+        }
+
+        return arenas;
+    }
+
     public void scanBlocks() {
         String m = "Scanning arenas for all blocks.";
 

@@ -1,4 +1,4 @@
-package camp.pvp.practice.interactables.impl.evemt;
+package camp.pvp.practice.interactables.impl.event;
 
 import camp.pvp.practice.interactables.ItemInteract;
 import camp.pvp.practice.profiles.GameProfile;

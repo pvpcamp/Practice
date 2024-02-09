@@ -6,7 +6,7 @@ import camp.pvp.practice.games.GameManager;
 import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.sumo.SumoEventDuel;
 import camp.pvp.practice.games.tournaments.Tournament;
-import camp.pvp.practice.interactables.impl.evemt.EventLeaveInteract;
+import camp.pvp.practice.interactables.impl.event.EventLeaveInteract;
 import camp.pvp.practice.interactables.impl.game.*;
 import camp.pvp.practice.interactables.impl.lobby.*;
 import camp.pvp.practice.interactables.impl.queue.RequeueInteract;

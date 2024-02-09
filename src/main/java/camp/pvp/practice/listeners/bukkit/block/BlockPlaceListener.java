@@ -31,7 +31,7 @@ public class BlockPlaceListener implements Listener {
         Game game = profile.getGame();
 
         if(game != null && game.isBuild() && game.getState().equals(Game.State.ACTIVE)) {
-            if(game.getCurrentPlayersPlaying().contains(player)) {
+            if(game.getAlivePlayers().contains(player)) {
 
                 if(game.getArena().getBuildLimit() < block.getLocation().getBlockY()) {
                     event.setCancelled(true);

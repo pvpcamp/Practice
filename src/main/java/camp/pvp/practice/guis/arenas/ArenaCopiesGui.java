@@ -26,6 +26,7 @@ public class ArenaCopiesGui extends PaginatedGui {
 
         for(Arena copy : arenas) {
             GuiButton button = new GuiButton(copy.getType().getGuiMaterial(), "&6&l" + copy.getDisplayName() + " &a(" + copy.getName() + ")");
+            button.setLore("&7Click to view more information.");
             button.setAction((player, b, gui, click) -> {
                 new ArenaInfoGui(arenaManager, copy).open(player);
             });

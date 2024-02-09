@@ -25,7 +25,7 @@ public class ArenaListGui extends PaginatedGui {
         if(type == null) {
             arenas = new ArrayList<>(arenaManager.getOriginalArenas());
         } else {
-            arenas = arenaManager.getArenaForType(type);
+            arenas = arenaManager.getArenaForTypeAny(type);
         }
 
         arenas.sort(Comparator.comparing(Arena::getName));

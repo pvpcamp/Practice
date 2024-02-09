@@ -19,7 +19,7 @@ public class ArenaListChooseTypeGui extends ArrangedGui {
 
         for(Arena.Type type : Arena.Type.values()) {
             GuiButton button = new GuiButton(type.getGuiMaterial(), "&6&l" + type);
-            button.setLore("&7Click to view " + Practice.getInstance().getArenaManager().getArenaForType(type).size() + " &7arenas.");
+            button.setLore("&7Click to view " + Practice.getInstance().getArenaManager().getArenaForTypeAny(type).size() + " &7arenas.");
             button.setAction((player, b, gui, click) -> {
                 new ArenaListGui(Practice.getInstance().getArenaManager(), type).open(player);
             });
