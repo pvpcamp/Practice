@@ -14,6 +14,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.Potion;
@@ -51,7 +52,7 @@ public class GameDebugCommand implements CommandExecutor {
         GuiButton resetHits = new GuiButton(Material.DIAMOND_SWORD, "&6Reset Hits");
         resetHits.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 for(GameParticipant p : game.getParticipants().values()) {
                     p.setHits(0);
                 }
@@ -65,7 +66,7 @@ public class GameDebugCommand implements CommandExecutor {
         GuiButton refill = new GuiButton(Material.POTION, "&6Refill");
         refill.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton b, Gui gui, ClickType click) {
                 StandardGui refillGui = new StandardGui("&6Choose an Item", 9);
                 Potion health = new Potion(PotionType.INSTANT_HEAL, 2, true);
                 List<ItemStack> items = Arrays.asList(new ItemStack(Material.MUSHROOM_SOUP), health.toItemStack(1));
@@ -75,7 +76,7 @@ public class GameDebugCommand implements CommandExecutor {
                     GuiButton button = new GuiButton(i);
                     button.setAction(new GuiAction() {
                         @Override
-                        public void run(Player player, Gui gui) {
+                        public void run(Player player, GuiButton b, Gui gui, ClickType click) {
                             for(Player p : game.getCurrentPlayersPlaying()) {
                                 PlayerInventory pi = p.getInventory();
                                 for(int invSlot = 0; invSlot < 36; invSlot++) {

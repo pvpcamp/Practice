@@ -78,7 +78,7 @@ public class GameProfile {
     private Time time;
     private boolean spectatorVisibility, lobbyVisibility, comboMessages, tournamentNotifications, showSidebar,
                     sidebarInGame, sidebarShowDuration, sidebarShowCps, sidebarShowLines, sidebarShowPing,
-                    staffMode, buildMode;
+                    staffMode, buildMode, debugMode;
     private int noDropHotbarSlot;
     private DeathAnimation deathAnimation;
     private GameQueue.Type lastSelectedQueueType;
@@ -402,20 +402,21 @@ public class GameProfile {
 
     public void importFromDocument(Document document) {
         this.name = document.getString("name");
-        this.staffMode = document.getBoolean("staff_mode");
-        this.spectatorVisibility = document.getBoolean("spectator_visibility");
-        this.lobbyVisibility = document.getBoolean("lobby_visibility");
-        this.tournamentNotifications = document.getBoolean("tournament_notifications");
-        this.comboMessages = document.getBoolean("combo_messages");
-        this.time = Time.valueOf(document.getString("player_time"));
-        this.deathAnimation = DeathAnimation.valueOf(document.getString("death_animation"));
+        this.staffMode = document.getBoolean("staff_mode", false);
+        this.debugMode = document.getBoolean("debug_mode", false);
+        this.spectatorVisibility = document.getBoolean("spectator_visibility", true);
+        this.lobbyVisibility = document.getBoolean("lobby_visibility", true);
+        this.tournamentNotifications = document.getBoolean("tournament_notifications", true);
+        this.comboMessages = document.getBoolean("combo_messages", true);
+        this.time = Time.valueOf(document.get("player_time", "DAY"));
+        this.deathAnimation = DeathAnimation.valueOf(document.get("death_animation", "DEFAULT"));
         this.lastSelectedQueueType = GameQueue.Type.valueOf(document.get("last_selected_queue_type", "UNRANKED"));
-        this.showSidebar = document.getBoolean("show_sidebar");
-        this.sidebarInGame = document.getBoolean("sidebar_in_game");
-        this.sidebarShowCps = document.getBoolean("sidebar_show_cps");
-        this.sidebarShowDuration = document.getBoolean("sidebar_show_duration");
-        this.sidebarShowLines = document.getBoolean("sidebar_show_lines");
-        this.sidebarShowPing = document.getBoolean("sidebar_show_ping");
+        this.showSidebar = document.getBoolean("show_sidebar", true);
+        this.sidebarInGame = document.getBoolean("sidebar_in_game", true);
+        this.sidebarShowCps = document.getBoolean("sidebar_show_cps", false);
+        this.sidebarShowDuration = document.getBoolean("sidebar_show_duration", true);
+        this.sidebarShowLines = document.getBoolean("sidebar_show_lines", true);
+        this.sidebarShowPing = document.getBoolean("sidebar_show_ping", false);
         this.noDropHotbarSlot = document.getInteger("no_drop_hotbar_slot", 0);
 
         // Get serialized kits from document, and turn them back into CustomDuelKits.
@@ -446,6 +447,7 @@ public class GameProfile {
         values.put("name", name);
         values.put("player_time", time.toString());
         values.put("staff_mode", staffMode);
+        values.put("debug_mode", debugMode);
         values.put("spectator_visibility", spectatorVisibility);
         values.put("lobby_visibility", lobbyVisibility);
         values.put("tournament_notifications", tournamentNotifications);

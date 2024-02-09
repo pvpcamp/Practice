@@ -10,6 +10,7 @@ import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.paginated.PaginatedGui;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ public class DuelRequestArenaSelectionGui extends PaginatedGui {
 
                 button.setAction(new GuiAction() {
                     @Override
-                    public void run(Player player, Gui gui) {
+                    public void run(Player player, GuiButton guiButton, Gui gui, ClickType clickType) {
                         duelRequest.setArena(arena);
                         duelRequest.send();
                     }

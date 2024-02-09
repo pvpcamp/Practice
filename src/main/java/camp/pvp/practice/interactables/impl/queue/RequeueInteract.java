@@ -13,6 +13,7 @@ import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 public class RequeueInteract implements ItemInteract {
     @Override
@@ -53,7 +54,7 @@ public class RequeueInteract implements ItemInteract {
                 GameQueue finalQueue = queue;
                 button.setAction(new GuiAction() {
                     @Override
-                    public void run(Player player, Gui gui) {
+                    public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                         gqm.addToQueue(player, finalQueue);
                     }
                 });

@@ -1,6 +1,7 @@
 package camp.pvp.practice.profiles.leaderboard;
 
 import camp.pvp.mongo.MongoCollectionResult;
+import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfileManager;
 import com.mongodb.client.MongoCollection;
@@ -20,6 +21,8 @@ public class LeaderboardUpdater implements Runnable{
 
     @Override
     public void run() {
+
+        long start = System.currentTimeMillis();
         gpm.getMongoManager().getCollection(true, gpm.getEloCollection(), new MongoCollectionResult() {
             @Override
             public void call(MongoCollection<Document> mongoCollection) {
@@ -42,6 +45,8 @@ public class LeaderboardUpdater implements Runnable{
                         leaderboard.put(kit, entries);
                     }
                 }
+
+                Practice.getInstance().sendDebugMessage("Leaderboards refreshed in " + (System.currentTimeMillis() - start) + "ms.");
             }
         });
     }

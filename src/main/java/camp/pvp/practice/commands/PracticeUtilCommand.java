@@ -115,31 +115,6 @@ public class PracticeUtilCommand implements CommandExecutor {
                             return true;
                         }
                         break;
-                    case "restart":
-                    case "stop":
-                    case "shutdown":
-                    case "stopserver":
-                        StandardGui gui = new StandardGui("Are you sure?", 27);
-                        gui.setDefaultBackground();
-
-                        GuiButton yes = new GuiButton(Material.GOLD_BLOCK, "&aYes");
-                        yes.setSlot(12);
-                        yes.setLore(
-                                "&4&lCAUTION: &fYou could be disrupting games!",
-                                "&f&lAre you sure you want to stop the server?"
-                        );
-                        yes.setAction((player1, gui1) -> {
-                            plugin.shutdown();
-                        });
-                        gui.addButton(yes, false);
-
-                        GuiButton no = new GuiButton(Material.REDSTONE_BLOCK, "&cNo");
-                        no.setSlot(14);
-                        no.setCloseOnClick(true);
-                        gui.addButton(no, false);
-
-                        gui.open(player);
-                        return true;
                     case "schedulereboot":
                         plugin.getServerRebooter().setRebootTime(new Date());
                         player.sendMessage(ChatColor.GREEN + "You have scheduled a server reboot.");
@@ -158,7 +133,6 @@ public class PracticeUtilCommand implements CommandExecutor {
             sb.append("\n&6/" + label + " setkiteditor &7- &fSets the kit editor location.");
             sb.append("\n&6/" + label + " setlobby &7- &fSets the lobby location.");
             sb.append("\n&6/" + label + " setnpcid <clickable type> <npc id> &7- &fAssign a clickable type to an NPC.");
-            sb.append("\n&6/" + label + " shutdown &7- &fShutdown the server immediately.");
 
             player.sendMessage(Colors.get(sb.toString()));
         }

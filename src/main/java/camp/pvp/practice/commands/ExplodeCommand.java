@@ -33,7 +33,7 @@ public class ExplodeCommand implements CommandExecutor {
 
         target.sendMessage(ChatColor.DARK_RED + "You go boom.");
         target.damage(5D);
-        target.setVelocity(new Vector(0, 1.5, 0));
+        target.setVelocity(new Vector(0, .75, 0));
 
         for(Player player : Bukkit.getOnlinePlayers()) {
             if(player.canSee(target)) {

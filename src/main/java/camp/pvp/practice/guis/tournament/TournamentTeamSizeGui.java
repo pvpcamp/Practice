@@ -10,6 +10,7 @@ import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 public class TournamentTeamSizeGui extends StandardGui {
 
@@ -24,7 +25,7 @@ public class TournamentTeamSizeGui extends StandardGui {
         singles.setCloseOnClick(true);
         singles.setAction(new GuiAction() {
             @Override
-            public void run(Player player, Gui gui) {
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 if(plugin.getGameManager().getTournament() == null || plugin.getGameManager().getTournament().getState().equals(Tournament.State.ENDED)) {
                     Tournament tournament = new Tournament(plugin, duelKit, 1, 64);
                     plugin.getGameManager().setTournament(tournament);

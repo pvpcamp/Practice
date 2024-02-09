@@ -18,6 +18,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +71,7 @@ public class PartyCommand implements CommandExecutor {
 
                                     openPartyButton.setAction(new GuiAction() {
                                         @Override
-                                        public void run(Player player, Gui gui) {
+                                        public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                             fParty.setOpen(!fParty.isOpen());
                                             gui.updateGui();
                                         }
@@ -93,7 +94,7 @@ public class PartyCommand implements CommandExecutor {
 
                                     playerKitsButton.setAction(new GuiAction() {
                                         @Override
-                                        public void run(Player player, Gui gui) {
+                                        public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                             fParty.setChooseKits(!fParty.isChooseKits());
                                             gui.updateGui();
                                         }

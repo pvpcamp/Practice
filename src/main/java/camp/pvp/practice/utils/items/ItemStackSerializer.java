@@ -8,11 +8,13 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.Type;
+
 
 public class ItemStackSerializer implements JsonSerializer<ItemStack> {
 
     @Override
-    public JsonElement serialize(ItemStack itemStack, java.lang.reflect.Type type, JsonSerializationContext context) {
+    public JsonElement serialize(ItemStack itemStack, Type type, JsonSerializationContext context) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("type", itemStack.getType().name());
         jsonObject.addProperty("amount", itemStack.getAmount());

@@ -1,16 +1,15 @@
 package camp.pvp.practice.nametags;
 
+import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.impl.teams.TeamGame;
+import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameParticipant;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.NameTagVisibility;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +46,26 @@ public class NameColorRunnable implements Runnable{
                 Team spectatorTeam = scoreboard.getTeam("spectators");
                 Team partyTeam = scoreboard.getTeam("party");
                 Team tournamentTeam = scoreboard.getTeam("tournament");
+
+                boolean showHealth = false;
+                if(profile.getGame() != null) {
+                    Game game = profile.getGame();
+                    DuelKit kit = game.getKit();
+
+                    if(kit.showHealthBar() && game.getCurrentPlaying().containsKey(player.getUniqueId())) {
+                        showHealth = true;
+                    }
+                }
+
+                Objective objective = scoreboard.getObjective(DisplaySlot.BELOW_NAME);
+                if(showHealth) {
+                    if(objective == null) {
+                        objective = scoreboard.registerNewObjective(Colors.get("&c❤"), "health");
+                        objective.setDisplaySlot(DisplaySlot.BELOW_NAME);
+                    }
+                } else {
+                    if(objective != null) objective.unregister();
+                }
 
                 if (blueTeam == null) {
                     blueTeam = scoreboard.registerNewTeam("blue");

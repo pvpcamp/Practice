@@ -45,7 +45,7 @@ public class GameProfileManager {
         this.eloCollection = config.getString("networking.mongo.elo_collection");
 
         this.leaderboardUpdater = new LeaderboardUpdater(this);
-        this.leaderboardUpdaterTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, leaderboardUpdater, 0, 2400);
+        this.leaderboardUpdaterTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, leaderboardUpdater, 0, 6000);
         this.playerVisibilityUpdaterTask = Bukkit.getScheduler().runTaskTimer(plugin, new PlayerVisibilityUpdater(this), 0, 1);
     }
 

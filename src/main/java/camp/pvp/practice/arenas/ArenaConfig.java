@@ -84,7 +84,7 @@ public class ArenaConfig {
 
         config.set(path, " ");
 
-        config.set(path + ".type", arena.getType().toString());
+        config.set(path + ".type", arena.getType().name());
         config.set(path + ".display_name", arena.getDisplayName());
         config.set(path + ".enabled", arena.isEnabled());
         config.set(path + ".x_difference", arena.getXDifference());

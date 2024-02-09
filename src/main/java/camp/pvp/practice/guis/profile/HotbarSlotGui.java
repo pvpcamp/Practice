@@ -8,6 +8,7 @@ import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,17 +45,14 @@ public class HotbarSlotGui extends StandardGui {
                 }
             });
 
-            hotbarSlot.setAction(new GuiAction() {
-                @Override
-                public void run(Player player, Gui gui) {
-                    if(profile.getNoDropHotbarSlot() == slot) {
-                        profile.setNoDropHotbarSlot(-1);
-                    } else {
-                        profile.setNoDropHotbarSlot(slot);
-                    }
-
-                    gui.updateGui();
+            hotbarSlot.setAction((player, button, gui, click) -> {
+                if(profile.getNoDropHotbarSlot() == slot) {
+                    profile.setNoDropHotbarSlot(-1);
+                } else {
+                    profile.setNoDropHotbarSlot(slot);
                 }
+
+                gui.updateGui();
             });
 
             hotbarSlot.setSlot(i);
@@ -62,12 +60,7 @@ public class HotbarSlotGui extends StandardGui {
         }
 
         GuiButton back = new GuiButton(Material.ARROW, "&cBack to Settings");
-        back.setAction(new GuiAction() {
-            @Override
-            public void run(Player player, Gui gui) {
-                new SettingsGui(profile).open(player);
-            }
-        });
+        back.setAction((player, button, gui, click) -> new SettingsGui(profile).open(player));
         back.setSlot(9);
         addButton(back, false);
     }

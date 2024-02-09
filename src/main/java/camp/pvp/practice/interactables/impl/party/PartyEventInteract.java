@@ -20,6 +20,7 @@ import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +37,7 @@ public class PartyEventInteract implements ItemInteract {
             GuiButton ffaEvent = new GuiButton(Material.GOLD_AXE, "&6&lFree For All");
             ffaEvent.setAction(new GuiAction() {
                 @Override
-                public void run(Player player, Gui gui) {
+                public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                     StandardGui kitGui = new FFAKitGui(gameProfile, party);
 
                     kitGui.open(player);
@@ -49,7 +50,7 @@ public class PartyEventInteract implements ItemInteract {
             GuiButton duelOtherParties = new GuiButton(Material.NAME_TAG, "&6&lDuel Other Parties");
             duelOtherParties.setAction(new GuiAction() {
                 @Override
-                public void run(Player player, Gui gui) {
+                public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                     new FindPartyGui(gameProfile, party).open(player);
                 }
             });
@@ -59,7 +60,7 @@ public class PartyEventInteract implements ItemInteract {
             GuiButton splitEvent = new GuiButton(Material.IRON_SWORD, "&6&lSplit Teams");
             splitEvent.setAction(new GuiAction() {
                 @Override
-                public void run(Player player, Gui gui) {
+                public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                     StandardGui kitGui = new SplitKitGui(gameProfile, party);
 
                     kitGui.open(player);
