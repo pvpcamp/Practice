@@ -7,14 +7,11 @@ import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -47,48 +44,48 @@ public abstract class TeamGame extends Game {
                     return;
                 }
 
-                if(!victimParticipant.getTeam().equals(participant.getTeam())) {
-                    victimParticipant.setAttacker(attacker.getUniqueId());
+                if(victimParticipant.getTeam().equals(participant.getTeam())) {
+                    attacker.sendMessage(ChatColor.RED + victim.getName() + " is your teammate.");
+                    event.setCancelled(true);
+                }
 
-                    if(event.getDamager() instanceof Arrow && participant.getAppliedHcfKit() != null && participant.getAppliedHcfKit().equals(HCFKit.ARCHER) && (victimParticipant.getAppliedHcfKit() == null || !victimParticipant.getAppliedHcfKit().equals(HCFKit.ARCHER))) {
-                        victimParticipant.archerTag();
-                    }
+                victimParticipant.setAttacker(attacker.getUniqueId());
 
-                    if(event.getDamager() instanceof Player) {
-                        if (victim.getNoDamageTicks() < 10) {
-                            participant.hits++;
-                            participant.currentCombo++;
+                if(event.getDamager() instanceof Arrow && participant.getAppliedHcfKit() != null && participant.getAppliedHcfKit().equals(HCFKit.ARCHER) && (victimParticipant.getAppliedHcfKit() == null || !victimParticipant.getAppliedHcfKit().equals(HCFKit.ARCHER))) {
+                    victimParticipant.archerTag();
+                }
 
-                            participant.setHealth(Math.round(victim.getHealth()));
-                            participant.setMaxHealth(Math.round(victim.getMaxHealth()));
-                            participant.setHunger(victim.getFoodLevel());
-                            participant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
+                if(event.getDamager() instanceof Player) {
+                    if (victim.getNoDamageTicks() == 0) {
+                        participant.hits++;
+                        participant.currentCombo++;
 
-                            if (participant.isComboMessages()) {
-                                switch ((int) participant.getCurrentCombo()) {
-                                    case 5:
-                                        attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
-                                        attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
-                                        break;
-                                    case 10:
-                                        attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
-                                        attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
-                                        break;
-                                    case 20:
-                                        attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
-                                        attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
-                                        break;
+                        participant.setHealth(Math.round(victim.getHealth()));
+                        participant.setMaxHealth(Math.round(victim.getMaxHealth()));
+                        participant.setHunger(victim.getFoodLevel());
+                        participant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
+
+                        if (participant.isComboMessages()) {
+                            switch ((int) participant.getCurrentCombo()) {
+                                case 5 -> {
+                                    attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+                                    attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
+                                }
+                                case 10 -> {
+                                    attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
+                                    attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
+                                }
+                                case 20 -> {
+                                    attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
+                                    attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
                                 }
                             }
                         }
                     }
+                }
 
-                    if (participant.currentCombo > participant.longestCombo) {
-                        participant.longestCombo = participant.currentCombo;
-                    }
-                } else {
-                    attacker.sendMessage(ChatColor.RED + victim.getName() + " is your teammate.");
-                    event.setCancelled(true);
+                if (participant.currentCombo > participant.longestCombo) {
+                    participant.longestCombo = participant.currentCombo;
                 }
             } else {
                 event.setCancelled(true);

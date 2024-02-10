@@ -59,7 +59,18 @@ public class GameTeam {
     public Map<UUID, GameParticipant> getAliveParticipants() {
         Map<UUID, GameParticipant> participants = new HashMap<>();
         for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
-            if(entry.getValue().isAlive()) {
+            if(entry.getValue().isCurrentlyPlaying()) {
+                participants.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return participants;
+    }
+
+    public Map<UUID, GameParticipant> getCurrentParticipants() {
+        Map<UUID, GameParticipant> participants = new HashMap<>();
+        for(Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
+            if(entry.getValue().isCurrentlyPlaying()) {
                 participants.put(entry.getKey(), entry.getValue());
             }
         }
@@ -72,6 +83,6 @@ public class GameTeam {
             return true;
         }
 
-        return getAliveParticipants().isEmpty();
+        return getCurrentParticipants().isEmpty();
     }
 }

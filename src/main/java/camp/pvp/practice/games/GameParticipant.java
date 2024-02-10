@@ -104,11 +104,17 @@ public class GameParticipant {
         alive = false;
         invincible = true;
 
-        if(!respawn) {
+        if(!isRespawn()) {
             currentlyPlaying = false;
 
             if(respawnTask != null) respawnTask.cancel();
         }
+    }
+
+    public boolean isRespawn() {
+        if(team != null) return team.isRespawn();
+
+        return respawn;
     }
 
     public void respawn() {

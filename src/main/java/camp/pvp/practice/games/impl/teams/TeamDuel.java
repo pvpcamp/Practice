@@ -4,6 +4,7 @@ import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.EndingTask;
 import camp.pvp.practice.games.tasks.StartingTask;
 import camp.pvp.practice.games.tasks.TeleportFix;
+import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
@@ -45,36 +46,29 @@ public class TeamDuel extends TeamGame {
                 showDuration = profile.isSidebarShowDuration(),
                 showPing = profile.isSidebarShowPing();
 
+        if(!getState().equals(State.ENDED)) {
+
+            String blue = "&9B &fBlue " + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? "(You)" : "") + ": ";
+            String red = "&cR &fRed " + (friendlyTeam.getColor().equals(GameTeam.Color.RED) ? "(You)" : "") + ": ";
+
+            if (getKit().equals(DuelKit.BED_FIGHT)) {
+                lines.add(blue + "&9&l" + (getBlue().isRespawn() ? "✓" : "✗"));
+                lines.add(red + "&c&l" + (getRed().isRespawn() ? "✓" : "✗"));
+            } else {
+                lines.add(blue + "&f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
+                lines.add(red + "&f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+            }
+        }
+
         switch(getState()) {
             case STARTING:
+                lines.add(" ");
                 lines.add("&6Kit: &f" + getKit().getDisplayName());
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
-                lines.add("");
-                lines.add("&9Blue Team " + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? "(You)" : "") + ": &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
-                lines.add("&cRed Team " + (friendlyTeam.getColor().equals(GameTeam.Color.RED) ? "(You)" : "") + ": &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
                 break;
             case ACTIVE:
                 if(!showInGame) {
                     return null;
-                }
-
-                int ping = 0;
-                ping = PlayerUtils.getPing(self.getPlayer());
-
-                if(showDuration) {
-                    lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
-                }
-
-                if(showPing) {
-                    lines.add("&6Your Ping: &f" + ping + " ms");
-                }
-
-                if(showCps) {
-                    lines.add("&6Your CPS: &f" + profile.getCps());
-                }
-
-                if(showPing || showCps || showDuration) {
-                    lines.add("");
                 }
 
                 lines.add(friendlyTeam.getColor().getChatColor() + "Alive Teammates:");
@@ -91,11 +85,25 @@ public class TeamDuel extends TeamGame {
                     i++;
                 }
 
-                lines.add(" ");
+                if(showPing || showCps || showDuration) {
+                    lines.add(" ");
+                }
 
+                int ping = 0;
+                ping = PlayerUtils.getPing(self.getPlayer());
 
-                lines.add("&9Blue Team " + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? "(You)" : "") + ": &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
-                lines.add("&cRed Team " + (friendlyTeam.getColor().equals(GameTeam.Color.RED) ? "(You)" : "") + ": &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+                if(showDuration) {
+                    lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
+                }
+
+                if(showPing) {
+                    lines.add("&6Ping: &f" + ping + " ms");
+                }
+
+                if(showCps) {
+                    lines.add("&6CPS: &f" + profile.getCps());
+                }
+
                 break;
             case ENDED:
                 lines.add("&6&lYour Team Wins!");
@@ -113,27 +121,35 @@ public class TeamDuel extends TeamGame {
     public List<String> getSpectatorScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
 
+        boolean showDuration = profile.isSidebarShowDuration();
+
+        String blue = "&9B &fBlue: ";
+        String red = "&cR &fRed: ";
+
+        if (getKit().equals(DuelKit.BED_FIGHT)) {
+            lines.add(blue + "&9&l" + (getBlue().isRespawn() ? "✓" : "✗"));
+            lines.add(red + "&c&l" + (getRed().isRespawn() ? "✓" : "✗"));
+        } else {
+            lines.add(blue + "&f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
+            lines.add(red + "&f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+        }
+
         switch(getState()) {
             case STARTING:
+                lines.add(" ");
                 lines.add("&6Kit: &f" + getKit().getDisplayName());
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
-                lines.add(" ");
-                lines.add("&9Blue Team: &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
-                lines.add("&cRed Team: &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
                 break;
             case ACTIVE:
-                lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
-                lines.add(" ");
-                lines.add("&9Blue Team: &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
-                lines.add("&cRed Team: &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+                if(showDuration) {
+                    lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
+                }
 
                 break;
             case ENDED:
-                lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
-                lines.add(" ");
-                lines.add("&9Blue Team: &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
-                lines.add("&cRed Team: &f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
-
+                if(showDuration) {
+                    lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
+                }
                 break;
         }
 

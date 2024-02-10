@@ -483,7 +483,7 @@ public abstract class Game {
         List<GameParticipant> allParticipants = new ArrayList<>(getParticipants().values());
 
         GameParticipant participant = null;
-        ChatColor color = null;
+        GameTeam.Color color = null;
         ArenaPosition bedPosition = null;
 
         for(int x = block.getX() - 2; x < block.getX() + 2; x++) {
@@ -497,25 +497,24 @@ public abstract class Game {
 
         if(bedPosition == null) return;
 
-        if(bedPosition.getPosition().equalsIgnoreCase("bluebed")) {
-            participant = allParticipants.get(0);
-            color = ChatColor.BLUE;
-        }
-
-        if(bedPosition.getPosition().equalsIgnoreCase("redbed")) {
-            participant = allParticipants.get(1);
-            color = ChatColor.RED;
+        for(GameParticipant p : getParticipants().values()) {
+            if(bedPosition.getPosition().contains(p.getTeamColor().getName().toLowerCase())) {
+                color = p.getTeamColor();
+                participant = p;
+            }
         }
 
         if(participant != null) {
             participant.setRespawn(false);
             announceAll(
                     " ",
-                    color + "&l!!! " + color.name() + " BED DESTROYED !!!",
-                    "&f" + participant.getName() + "'s " + color + "bed has been destroyed by &f" + player.getName() + color + "!",
+                    color.getChatColor() + color.name() + " BED DESTROYED!",
+                    color.getChatColor() + "Bed has been destroyed by &f" + player.getName() + color.getChatColor() + "!",
                     " ");
 
             playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 1F);
+
+            if(participant.getTeam() != null) participant.getTeam().setRespawn(false);
         }
     }
 
