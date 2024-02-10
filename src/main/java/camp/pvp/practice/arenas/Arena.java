@@ -165,6 +165,7 @@ public class Arena implements Comparable<Arena>{
      */
     public void resetArena() {
         if(!getType().isResetAfterGame()) return;
+        if(!isCopy()) return;
 
         Bukkit.getScheduler().runTask(Practice.getInstance(), ()-> {
             List<ChunkSnapshot> snapshots = new ArrayList<>();

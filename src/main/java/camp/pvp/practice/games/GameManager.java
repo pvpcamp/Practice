@@ -93,7 +93,7 @@ public class GameManager {
 
     public void shutdown() {
         for(Game game : getActiveGames()) {
-            game.forceEnd();
+            game.forceEnd(false);
         }
     }
 }

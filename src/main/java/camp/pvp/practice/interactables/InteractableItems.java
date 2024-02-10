@@ -23,6 +23,7 @@ import camp.pvp.practice.interactables.impl.queue.LeaveQueueInteract;
 import camp.pvp.practice.interactables.impl.queue.QueueInteract;
 import camp.pvp.practice.interactables.impl.party.*;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -220,8 +221,12 @@ public enum InteractableItems {
                     items.add(TELEPORTER);
                 }
 
-                if(profile.getPlayer().hasPermission("practice.staff")) {
+                Player player = profile.getPlayer();
+                if(player.hasPermission("practice.spectator.visible")) {
                     items.add(SPECTATOR_VISIBLE_TO_PLAYERS);
+                }
+
+                if(profile.getPlayer().hasPermission("practice.staff")) {
                     items.add(SPECTATE_RANDOM);
                 }
                 break;

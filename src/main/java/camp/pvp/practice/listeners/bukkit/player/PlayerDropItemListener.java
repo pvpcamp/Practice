@@ -47,12 +47,12 @@ public class PlayerDropItemListener implements Listener {
                 return;
             }
 
-            if(player.getInventory().getHeldItemSlot() == profile.getNoDropHotbarSlot() && player.getOpenInventory().getTopInventory() == null) {
+            if(player.getInventory().getHeldItemSlot() == profile.getNoDropHotbarSlot() && !item.getItemStack().equals(profile.getLastClickedItem())) {
                 event.setCancelled(true);
-                player.sendMessage(player.getOpenInventory().getType().toString());
                 player.sendMessage(ChatColor.RED + "You cannot drop the item in this slot.");
-                return;
             }
+
+            profile.setLastClickedItem(null);
 
             new BukkitRunnable() {
                 public void run() {

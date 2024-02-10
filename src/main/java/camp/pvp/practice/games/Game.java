@@ -82,7 +82,7 @@ public abstract class Game {
 
     public abstract void end();
 
-    public void forceEnd() {
+    public void forceEnd(boolean resetPlayers) {
         this.announce("&c&lThis match has been forcefully ended by the server.");
 
         if(getStartingTimer() != null) {
@@ -93,23 +93,28 @@ public abstract class Game {
             getEndingTimer().cancel();
         }
 
-        for(Map.Entry<UUID, GameParticipant> entry : getParticipants().entrySet()) {
-            Player player = Bukkit.getPlayer(entry.getKey());
-            GameParticipant participant = entry.getValue();
-            GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
+        if(resetPlayers) {
 
-            if(player != null) {
-                if(entry.getValue().isAlive()) {
-                    participant.clearCooldowns();
+            for (Map.Entry<UUID, GameParticipant> entry : getParticipants().entrySet()) {
+                Player player = Bukkit.getPlayer(entry.getKey());
+                GameParticipant participant = entry.getValue();
+                GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
 
-                    profile.setGame(null);
-                    profile.playerUpdate(true);
+                if (player != null) {
+                    if (entry.getValue().isAlive()) {
+                        participant.clearCooldowns();
+
+                        profile.setGame(null);
+                        profile.playerUpdate(true);
+                    }
                 }
             }
-        }
 
-        for(GameSpectator spectator : new ArrayList<>(getSpectators().values())) {
-            spectateEnd(spectator.getPlayer(), true);
+            for(GameSpectator spectator : new ArrayList<>(getSpectators().values())) {
+                spectateEnd(spectator.getPlayer(), true);
+            }
+
+            plugin.getGameProfileManager().refreshLobbyItems();
         }
 
         clearEntities();
@@ -117,8 +122,6 @@ public abstract class Game {
         setState(State.ENDED);
 
         arena.resetArena();
-
-        plugin.getGameProfileManager().refreshLobbyItems();
     }
 
     private void killRespawn(Player player, GameParticipant participant) {

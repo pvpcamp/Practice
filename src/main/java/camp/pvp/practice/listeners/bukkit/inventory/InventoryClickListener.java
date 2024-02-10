@@ -34,6 +34,11 @@ public class InventoryClickListener implements Listener {
             case IN_GAME:
                 Game game = profile.getGame();
                 if(game != null) {
+
+                    if(event.getClickedInventory() instanceof PlayerInventory) {
+                        profile.setLastClickedItem(event.getCurrentItem());
+                    }
+
                     GameParticipant participant = game.getAlive().get(player.getUniqueId());
                     if(participant != null) {
                         if(!participant.isKitApplied()) {

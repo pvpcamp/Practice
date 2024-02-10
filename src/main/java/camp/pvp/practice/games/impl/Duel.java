@@ -149,6 +149,8 @@ public class Duel extends Game {
             PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
             participant.setPostGameInventory(pgi);
             getPlugin().getGameManager().getPostGameInventories().put(pgi.getUuid(), pgi);
+
+            if(participant.getRespawnTask() != null) participant.getRespawnTask().cancel();
         }
 
         GameParticipant winnerParticipant = null, loserParticipant = null;

@@ -280,7 +280,7 @@ public class Tournament {
 
     public void forceEnd() {
         for(Game game : getActiveGames()) {
-            game.forceEnd();
+            game.forceEnd(false);
         }
 
         for(TournamentParticipant p : getAlive()) {

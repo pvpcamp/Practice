@@ -31,6 +31,14 @@ public class ArenaManager {
         Bukkit.getScheduler().runTaskTimer(plugin, arenaCopyQueue, 0, 4);
 
         scanBlocks();
+
+        logger.info("Resetting all arenas, this might take a bit.");
+
+        for(Arena arena : getArenas()) {
+            arena.resetArena();
+        }
+
+        logger.info("ArenaManager has finished the startup process.");
     }
 
     public Arena getArenaFromName(String name) {
@@ -135,10 +143,7 @@ public class ArenaManager {
     public void updateAndResetCopies() {
 
         for(Arena arena : getArenas()) {
-            if(!arena.isCopy()) continue;
-            if(!arena.isInUse()) continue;
-
-            arena.updateCopy(true);
+            arena.resetArena();
         }
     }
 

@@ -93,6 +93,7 @@ public class GameProfile {
 
     private List<Long> clicks;
     private Location selectedLocation;
+    private ItemStack lastClickedItem;
 
     private Party party;
     private Map<UUID, PartyInvite> partyInvites;
