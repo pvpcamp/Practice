@@ -36,7 +36,7 @@ public class TeamDuel extends TeamGame {
     public List<String> getScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
 
-        GameParticipant self = getAlive().get(profile.getUuid());
+        GameParticipant self = getParticipants().get(profile.getUuid());
 
         GameTeam friendlyTeam = self.getTeam();
         GameTeam enemyTeam = friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? getBlue() : getRed();
@@ -47,17 +47,22 @@ public class TeamDuel extends TeamGame {
                 showPing = profile.isSidebarShowPing();
 
         if(!getState().equals(State.ENDED)) {
-
-            String blue = "&9B &fBlue " + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? "(You)" : "") + ": ";
-            String red = "&cR &fRed " + (friendlyTeam.getColor().equals(GameTeam.Color.RED) ? "(You)" : "") + ": ";
+            String blue = "&9B &fBlue: ";
+            String red = "&cR &fRed: ";
 
             if (getKit().equals(DuelKit.BED_FIGHT)) {
-                lines.add(blue + "&9&l" + (getBlue().isRespawn() ? "✓" : "✗"));
-                lines.add(red + "&c&l" + (getRed().isRespawn() ? "✓" : "✗"));
+                blue = blue + "&9&l" + (getBlue().isRespawn() ? "✓" : "✗");
+                red = red + "&c&l" + (getRed().isRespawn() ? "✓" : "✗");
             } else {
-                lines.add(blue + "&f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
-                lines.add(red + "&f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+                blue = blue + "&9" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size();
+                red = red + "&c" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size();
             }
+
+            blue = blue + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? " &7YOU" : "");
+            red = red + (friendlyTeam.getColor().equals(GameTeam.Color.RED) ? " &7YOU" : "");
+
+            lines.add(blue);
+            lines.add(red);
         }
 
         switch(getState()) {
@@ -71,18 +76,35 @@ public class TeamDuel extends TeamGame {
                     return null;
                 }
 
-                lines.add(friendlyTeam.getColor().getChatColor() + "Alive Teammates:");
+                lines.add(" ");
 
-                int i = 0;
-                for(GameParticipant participant : friendlyTeam.getAliveParticipants().values()) {
-                    if(i < 5) {
-                        Player player = participant.getPlayer();
-                        lines.add(" &f" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
-                    } else {
-                        lines.add("&f...");
+                List<GameParticipant> teammateParticipants = new ArrayList<>(friendlyTeam.getAliveParticipants().values());
+                teammateParticipants.remove(self);
+
+                if(teammateParticipants.isEmpty()) {
+                    lines.add("&c&oNo Teammates Alive!");
+                } else {
+
+                    List<Player> teammates = new ArrayList<>();
+                    for (GameParticipant participant : friendlyTeam.getAliveParticipants().values()) {
+                        teammates.add(participant.getPlayer());
                     }
 
-                    i++;
+                    lines.add(friendlyTeam.getColor().getChatColor() + "Alive Teammates &7(" + teammates.size() + "):");
+
+                    teammates.sort(Comparator.comparingDouble(Player::getHealth).reversed());
+
+                    for (int x = 0; x < 6; x++) {
+                        if (teammates.size() == x) break;
+                        if (x == 5) {
+                            lines.add("&7...");
+                            break;
+                        }
+
+                        Player p = teammates.get(x);
+                        double health = p.getHealth();
+                        lines.add((health < 4 ? "&c&l>" : "&7") + "> &f" + p.getName() + " &c" + Math.round(p.getHealth()) + " ❤");
+                    }
                 }
 
                 if(showPing || showCps || showDuration) {
@@ -158,21 +180,7 @@ public class TeamDuel extends TeamGame {
 
     @Override
     public void start() {
-        List<Arena> list = new ArrayList<>();
-        if(getArena() == null) {
-            for(Arena a : getPlugin().getArenaManager().getArenas()) {
-                if(a.isEnabled()) {
-                    if(a.getType().equals(Arena.Type.HCF_TEAMFIGHT) && getKit().getArenaTypes().contains(Arena.Type.DUEL_HCF)) {
-                        list.add(a);
-                    } else if(getKit().getArenaTypes().contains(a.getType())) {
-                        list.add(a);
-                    }
-                }
-            }
-
-            Collections.shuffle(list);
-            this.setArena(list.get(0));
-        }
+        setArena(getPlugin().getArenaManager().selectRandomArena(getKit()));
 
         if(getArena() == null) {
             for(Player p : getAlivePlayers()) {
@@ -190,6 +198,11 @@ public class TeamDuel extends TeamGame {
 
         for(Party party : this.getParties()) {
             party.setGame(this);
+        }
+
+        if(getKit().isRespawn()) {
+            getBlue().setRespawn(true);
+            getRed().setRespawn(true);
         }
 
         this.setState(State.STARTING);
@@ -216,10 +229,9 @@ public class TeamDuel extends TeamGame {
                 sb.append("&7, ");
             }
 
+            participant.setSpawnLocation(blueSpawn.getLocation());
             player.teleport(blueSpawn.getLocation());
-
-            participant.setKitApplied(true);
-            participant.getAppliedHcfKit().apply(player);
+            participant.getProfile().givePlayerItems();
         }
 
         ArenaPosition redSpawn = arena.getPositions().get("spawn2");
@@ -239,6 +251,7 @@ public class TeamDuel extends TeamGame {
                 sb.append("&7, ");
             }
 
+            participant.setSpawnLocation(redSpawn.getLocation());
             player.teleport(redSpawn.getLocation());
             participant.getProfile().givePlayerItems();
         }

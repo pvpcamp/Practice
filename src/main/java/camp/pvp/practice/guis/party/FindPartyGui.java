@@ -39,14 +39,15 @@ public class FindPartyGui extends PaginatedGui {
                     lines.add("&cUnavailable");
                 }
 
+                lines.add(" ");
                 lines.add("&6Members &7(" + p.getMembers().size() + "&7):");
 
                 int i = 0;
                 for(PartyMember member : p.getMembers().values()) {
                     if(i < 9) {
-                        lines.add(" &f● " + member.getName());
+                        lines.add(" &7● &f" + member.getName());
                     } else {
-                        lines.add(" &f...");
+                        lines.add(" &7...");
                         break;
                     }
                     i++;

@@ -64,6 +64,7 @@ public class PartyCommand implements CommandExecutor {
                                             guiButton.setLore(
                                                     "&7Should the party be open to",
                                                     "&7the public or invite only?",
+                                                    " ",
                                                     "&6Current Setting: &f" + (fParty.isOpen() ? "Public" : "Invite Only")
                                             );
                                         }
@@ -87,6 +88,7 @@ public class PartyCommand implements CommandExecutor {
                                             guiButton.setLore(
                                                     "&7Should party members have the",
                                                     "&7ability to customize their HCF kit?",
+                                                    " ",
                                                     "&6Current Setting: &f" + (fParty.isChooseKits() ? "Enabled" : "Disabled")
                                             );
                                         }
@@ -125,7 +127,7 @@ public class PartyCommand implements CommandExecutor {
                                             party.join(player);
                                         } else {
                                             PartyInvite invite = profile.getPartyInvites().get(target.getUniqueId());
-                                            if (invite != null && !invite.isExpired() && invite.getParty().getMembers().size() > 0 && invite.getParty().getMembers().containsKey(target.getUniqueId())) {
+                                            if (invite != null && !invite.isExpired() && !invite.getParty().getMembers().isEmpty() && invite.getParty().getMembers().containsKey(target.getUniqueId())) {
                                                 invite.getParty().join(player);
                                             } else {
                                                 player.sendMessage(ChatColor.RED + "You do not have a party invitation from this player right now.");

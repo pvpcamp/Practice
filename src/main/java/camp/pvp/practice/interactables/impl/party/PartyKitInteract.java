@@ -7,6 +7,7 @@ import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.parties.PartyMember;
 import camp.pvp.utils.buttons.AbstractButtonUpdater;
 import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.ArrangedGui;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
@@ -17,16 +18,26 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 public class PartyKitInteract implements ItemInteract {
     @Override
     public void onInteract(Player player, GameProfile gameProfile) {
         Party party = gameProfile.getParty();
         PartyMember member = party.getMembers().get(player.getUniqueId());
         if(party.getLeader().getUuid().equals(player.getUniqueId())) {
-            StandardGui gui = new StandardGui("Choose Player Kits", 54);
+            ArrangedGui gui = new ArrangedGui("Choose Player Kits");
 
             int x = 0;
-            for(PartyMember m : party.getMembers().values()) {
+            List<PartyMember> members = new ArrayList<>(party.getMembers().values());
+            members.sort(Comparator.comparing(PartyMember::getName));
+
+            for(PartyMember m : members) {
+
+                if(x == 54) break;
+
                 ItemStack skullItem = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
                 SkullMeta meta = (SkullMeta) skullItem.getItemMeta();
                 meta.setOwner(m.getName());
@@ -57,8 +68,8 @@ public class PartyKitInteract implements ItemInteract {
                         );
                     }
                 });
-                button.setSlot(x);
-                gui.addButton(button, false);
+                gui.addButton(button);
+
                 x++;
             }
             gui.open(player);

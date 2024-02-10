@@ -108,6 +108,7 @@ public class Arena implements Comparable<Arena>{
 
         if(corner1 != null && corner2 != null) {
 
+            getChunkSnapshots().clear();
             getBeds().clear();
             getChests().clear();
             getBlocks().clear();
