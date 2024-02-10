@@ -203,7 +203,7 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
     }
 
     private void buildlimit(Player player, String[] args) {
-        if(args.length < 3) {
+        if(args.length < 2) {
             player.sendMessage(ChatColor.RED + "Usage: /arena buildlimit <arena> <limit>");
             return;
         }
@@ -212,6 +212,24 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         if(arena == null) {
             player.sendMessage(ChatColor.RED + "The arena you specified does not exist.");
             return;
+        }
+
+        int level = 0;
+        try {
+            level = Integer.parseInt(args[2]);
+        } catch(NumberFormatException e) {
+            player.sendMessage(ChatColor.RED + "You must provide a valid number for the build limit.");
+        }
+
+        arena.setBuildLimit(level);
+        plugin.getArenaManager().updateArenaCopies(arena, false);
+
+        int copies = plugin.getArenaManager().getArenaCopies(arena).size();
+
+        if(copies == 0) {
+            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " now has a build limit of " + ChatColor.WHITE + level + ChatColor.GREEN + ".");
+        } else {
+            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " and its " + copies + " copies now have a build limit of " + ChatColor.WHITE + level + ChatColor.GREEN + ".");
         }
     }
 
@@ -225,6 +243,24 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         if(arena == null) {
             player.sendMessage(ChatColor.RED + "The arena you specified does not exist.");
             return;
+        }
+
+        int level = 0;
+        try {
+            level = Integer.parseInt(args[2]);
+        } catch(NumberFormatException e) {
+            player.sendMessage(ChatColor.RED + "You must provide a valid number for the void level.");
+        }
+
+        arena.setVoidLevel(level);
+        plugin.getArenaManager().updateArenaCopies(arena, false);
+
+        int copies = plugin.getArenaManager().getArenaCopies(arena).size();
+
+        if(copies == 0) {
+            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " now has a void level of " + ChatColor.WHITE + level + ChatColor.GREEN + ".");
+        } else {
+            player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " and its " + copies + " copies now have a void level of " + ChatColor.WHITE + level + ChatColor.GREEN + ".");
         }
     }
 
