@@ -261,7 +261,7 @@ public class Duel extends Game {
                 showDuration = profile.isSidebarShowDuration(),
                 showPing = profile.isSidebarShowPing();
 
-        for(GameParticipant p : getAlive().values()) {
+        for(GameParticipant p : getCurrentPlaying().values()) {
             if(p.getUuid() != self.getUuid()) {
                 opponent = p;
                 break;

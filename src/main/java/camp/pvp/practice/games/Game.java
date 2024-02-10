@@ -441,8 +441,9 @@ public abstract class Game {
 
     public void handleBlockBreak(Player player, Block block, BlockBreakEvent event) {
 
-        Arena.Type type = arena.getType();
-        Location location = block.getLocation();
+        final GameParticipant breaker = getParticipants().get(player.getUniqueId());
+        final Arena.Type type = arena.getType();
+        final Location location = block.getLocation();
         final Material material = block.getType();
 
         if(type.canModifyArena()) {
@@ -463,7 +464,7 @@ public abstract class Game {
             player.getInventory().addItem(new ItemStack(Material.SNOW_BALL));
         } else {
             for (ItemStack item : block.getDrops()) {
-                Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
+                Item i = block.getLocation().getWorld().dropItem(block.getLocation().add(0, 0.5, 0), item);
                 addEntity(i);
             }
         }
@@ -474,16 +475,14 @@ public abstract class Game {
             return;
         }
 
-        block.setType(Material.AIR);
+        if(!block.getType().equals(Material.BED_BLOCK)) block.setType(Material.AIR);
 
         if(!arena.getType().equals(Arena.Type.DUEL_BED_FIGHT)) return;
 
         if(!material.equals(Material.BED_BLOCK)) return;
 
-        List<GameParticipant> allParticipants = new ArrayList<>(getParticipants().values());
-
         GameParticipant participant = null;
-        ChatColor color = null;
+        GameTeam.Color color = null;
         ArenaPosition bedPosition = null;
 
         for(int x = block.getX() - 2; x < block.getX() + 2; x++) {
@@ -497,26 +496,33 @@ public abstract class Game {
 
         if(bedPosition == null) return;
 
-        if(bedPosition.getPosition().equalsIgnoreCase("bluebed")) {
-            participant = allParticipants.get(0);
-            color = ChatColor.BLUE;
+        for(GameParticipant p : getParticipants().values()) {
+            if(bedPosition.getPosition().contains(p.getTeamColor().getName().toLowerCase())) {
+                color = p.getTeamColor();
+                participant = p;
+            }
         }
 
-        if(bedPosition.getPosition().equalsIgnoreCase("redbed")) {
-            participant = allParticipants.get(1);
-            color = ChatColor.RED;
+        if(participant == null) return;
+
+        if(breaker.getTeamColor().equals(color)) {
+            player.sendMessage(ChatColor.RED + "You cannot destroy your own bed.");
+            event.setCancelled(true);
+            return;
         }
 
-        if(participant != null) {
-            participant.setRespawn(false);
-            announceAll(
-                    " ",
-                    color + "&l!!! " + color.name() + " BED DESTROYED !!!",
-                    "&f" + participant.getName() + "'s " + color + "bed has been destroyed by &f" + player.getName() + color + "!",
-                    " ");
+        block.setType(Material.AIR);
 
-            playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 1F);
-        }
+        participant.setRespawn(false);
+        announceAll(
+                " ",
+                color.getChatColor() + "&l" + color.name() + " BED DESTROYED!",
+                color.getChatColor() + "Bed has been destroyed by &f" + player.getName() + color.getChatColor() + "!",
+                " ");
+
+        playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 1F);
+
+        if(participant.getTeam() != null) participant.getTeam().setRespawn(false);
     }
 
     public boolean isBuild() {

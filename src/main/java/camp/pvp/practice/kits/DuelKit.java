@@ -197,6 +197,7 @@ public enum DuelKit {
             case HCF:
             case BOXING:
             case SKYWARS:
+            case BED_FIGHT:
                 return false;
         }
     }

@@ -5,6 +5,7 @@ import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.parties.PartyGameRequest;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.ArrangedGui;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.StandardGui;
@@ -28,7 +29,9 @@ public class ChoosePartyDuelEventGui extends StandardGui {
         teamFight.setAction(new GuiAction() {
             @Override
             public void run(Player player, GuiButton button, Gui gui, ClickType click) {
-                StandardGui kitGui = new StandardGui("&6&lChoose a Kit", 36);
+                ArrangedGui kitGui = new ArrangedGui("&6Choose a Kit");
+
+                kitGui.setDefaultBorder();
 
                 for(DuelKit kit : DuelKit.values()) {
                     if(kit.isQueueable() && kit.isTeams()) {
@@ -49,7 +52,7 @@ public class ChoosePartyDuelEventGui extends StandardGui {
                             }
                         });
 
-                        kitGui.addButton(kitButton, false);
+                        kitGui.addButton(kitButton);
                     }
                 }
 
