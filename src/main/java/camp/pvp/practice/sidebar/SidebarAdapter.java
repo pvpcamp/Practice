@@ -71,14 +71,11 @@ public class SidebarAdapter implements AssembleAdapter {
                         }
                     }
 
-                    lines.add("&6Online: &f" + online);
+                    lines.add("&6Online: &f" + online + (staff ? " &7(" + staffOnline + " Staff)" : ""));
                     lines.add("&6In Game: &f" + inGame);
 
-                    if(staff) {
-                        lines.add("&6Staff Online: &f" + staffOnline);
-                        lines.add("&6Staff Mode: &f" + (profile.isStaffMode() ? "Enabled" : "Disabled"));
-                        lines.add("&6Active Games: &f" + plugin.getGameManager().getActiveGames().size());
-                    }
+                    if(staff) lines.add("&6Staff Mode: &f" + (profile.isStaffMode() ? "Enabled" : "Disabled"));
+
 
                     break;
                 case LOBBY_QUEUE:
@@ -89,7 +86,7 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
                     lines.add("&6In Queue:");
-                    lines.add(" &7● &6" + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
+                    lines.add(" &7● " + queue.getType().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
 
                     if(queue.getType().equals(GameQueue.Type.RANKED)) {
                         lines.add(" &7● &6ELO: &f" + profile.getProfileElo().getRatings().get(queue.getDuelKit()));
@@ -197,6 +194,10 @@ public class SidebarAdapter implements AssembleAdapter {
             }
 
             lines.add(" ");
+
+            if(profile.isDebugMode()) {
+                lines.add("&8&o" + "Debug Mode");
+            }
 
             lines.add(plugin.getConfig().getString("scoreboard.ip"));
 

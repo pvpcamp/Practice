@@ -8,11 +8,11 @@ import org.bukkit.Material;
 
 public class MinigameQueueGui extends ArrangedGui {
 
-    public MinigameQueueGui(GameManager gameManager, GameProfile profile) {
+    public MinigameQueueGui(GameProfile profile) {
         super("&6Minigame Queue");
 
         this.setAutoUpdate(true);
-        this.setDefaultBackground();
+        this.setDefaultBorder();
 
         GuiButton skywars = new GuiButton(Material.EYE_OF_ENDER, "&6&lSkywars");
         skywars.setLore("&7&o4 Player Skywars", " ", "&aComing soon!");

@@ -9,6 +9,6 @@ import org.bukkit.entity.Player;
 public class MinigamesInteract implements ItemInteract {
     @Override
     public void onInteract(Player player, GameProfile gameProfile) {
-        new MinigameQueueGui(Practice.getInstance().getGameManager(), gameProfile).open(player);
+        new MinigameQueueGui(gameProfile).open(player);
     }
 }
