@@ -10,13 +10,13 @@ import camp.pvp.utils.buttons.AbstractButtonUpdater;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
 import camp.pvp.utils.guis.Gui;
-import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 
 import java.util.*;
 
-public class QueueGui extends ArrangedGui {
-    public QueueGui(GameQueue.Type queueType, GameProfile profile) {
+public class DuelQueueGui extends ArrangedGui {
+    public DuelQueueGui(GameQueue.Type queueType, GameProfile profile) {
         super("&6" + queueType.toString() + " Queue");
 
         GameQueueManager gqm = Practice.getInstance().getGameQueueManager();
@@ -24,37 +24,75 @@ public class QueueGui extends ArrangedGui {
         this.setAutoUpdate(true);
         this.setDefaultBackground();
 
-        String buttonName = queueType.equals(GameQueue.Type.RANKED) ? "&aSwitch to &lUnranked Queue" : "&6Switch to &lRanked Queue";
-        GuiButton changeQueueType = new GuiButton(
-                queueType.equals(GameQueue.Type.RANKED) ? Material.IRON_INGOT : Material.DIAMOND,
-                buttonName
-        );
+        GuiButton unrankedQueue = new GuiButton(Material.IRON_SWORD, "&a&lUnranked Queue");
 
-        changeQueueType.setOverrideGuiArrangement(true);
+        if(queueType.equals(GameQueue.Type.UNRANKED)) {
+            unrankedQueue.addEnchantment(Enchantment.DURABILITY, 1);
+        }
 
-        changeQueueType.setAction((p, b, g, click) -> {
-            GameQueue.Type newQueueType = queueType.equals(GameQueue.Type.RANKED) ? GameQueue.Type.UNRANKED : GameQueue.Type.RANKED;
-            profile.setLastSelectedQueueType(newQueueType);
-            new QueueGui(newQueueType, profile).open(p);
-        });
-
-        changeQueueType.setButtonUpdater(new AbstractButtonUpdater() {
+        unrankedQueue.setButtonUpdater(new AbstractButtonUpdater() {
             @Override
-            public void update(GuiButton b, Gui gui) {
-
-                GameQueue.Type qt = queueType.equals(GameQueue.Type.RANKED) ? GameQueue.Type.UNRANKED : GameQueue.Type.RANKED;
-
-                b.setLore(
-                        "&6Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(qt),
-                        "&6In Queue: &f" + gqm.getTotalInQueue(qt),
-                        " ",
-                        "&7Click to switch to the &f" + qt.toString() + " Queue&7."
-                );
+            public void update(GuiButton guiButton, Gui gui) {
+                if(queueType.equals(GameQueue.Type.UNRANKED)) {
+                    guiButton.setLore(
+                            "&ePlaying: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.Type.UNRANKED),
+                            "&eIn Queue: &f" + gqm.getTotalInQueue(GameQueue.Type.UNRANKED)
+                            );
+                } else {
+                    guiButton.setLore(
+                            "&6Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.Type.UNRANKED),
+                            "&6In Queue: &f" + gqm.getTotalInQueue(GameQueue.Type.UNRANKED),
+                            " ",
+                            "&7Click to view &aUnranked Queues&7."
+                    );
+                }
             }
         });
 
-        changeQueueType.setSlot(4);
-        buttons.add(changeQueueType);
+        unrankedQueue.setAction((p, b, g, click) -> {
+            if(queueType.equals(GameQueue.Type.RANKED)) {
+                profile.setLastSelectedQueueType(GameQueue.Type.UNRANKED);
+                new DuelQueueGui(GameQueue.Type.UNRANKED, profile).open(p);
+            }
+        });
+        unrankedQueue.setOverrideGuiArrangement(true);
+        unrankedQueue.setSlot(2);
+        addButton(unrankedQueue);
+
+        GuiButton rankedQueue = new GuiButton(Material.DIAMOND_SWORD, "&6&lRanked Queue");
+
+        if(queueType.equals(GameQueue.Type.RANKED)) {
+            rankedQueue.addEnchantment(Enchantment.DURABILITY, 1);
+        }
+
+        rankedQueue.setButtonUpdater(new AbstractButtonUpdater() {
+            @Override
+            public void update(GuiButton guiButton, Gui gui) {
+                if(queueType.equals(GameQueue.Type.RANKED)) {
+                    guiButton.setLore(
+                            "&ePlaying: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.Type.RANKED),
+                            "&eIn Queue: &f" + gqm.getTotalInQueue(GameQueue.Type.RANKED)
+                    );
+                } else {
+                    guiButton.setLore(
+                            "&6Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.Type.RANKED),
+                            "&6In Queue: &f" + gqm.getTotalInQueue(GameQueue.Type.RANKED),
+                            " ",
+                            "&7Click to view &6Ranked Queues&7."
+                    );
+                }
+            }
+        });
+
+        rankedQueue.setAction((p, b, g, click) -> {
+            if(queueType.equals(GameQueue.Type.UNRANKED)) {
+                profile.setLastSelectedQueueType(GameQueue.Type.RANKED);
+                new DuelQueueGui(GameQueue.Type.RANKED, profile).open(p);
+            }
+        });
+        rankedQueue.setOverrideGuiArrangement(true);
+        rankedQueue.setSlot(6);
+        addButton(rankedQueue);
 
         for(DuelKit kit : DuelKit.values()) {
             GameQueue queue = gqm.getQueue(kit, queueType);

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum InteractableItems {
-    QUEUE, EVENT, REQUEUE, REMATCH, PARTY_CREATE, COSMETICS, KIT_EDITOR, SETTINGS,
+    QUEUE, MINIGAMES, EVENT, REQUEUE, REMATCH, PARTY_CREATE, COSMETICS, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
@@ -42,31 +42,34 @@ public enum InteractableItems {
             case QUEUE:
                 return new InteractableItem(
                         new ItemBuilder(Material.DIAMOND_SWORD, "&6Join a Queue").create(), 0, new QueueInteract());
+            case MINIGAMES:
+                return new InteractableItem(
+                        new ItemBuilder(Material.DIAMOND_AXE, "&6Join a Minigame Queue").create(), 1, new MinigamesInteract());
             case EVENT:
                 GameManager gm = Practice.getInstance().getGameManager();
                 if (gm.isEventRunning()) {
                     if (gm.getTournament() != null) {
                         if (gm.getTournament().getState().equals(Tournament.State.STARTING)) {
                             return new InteractableItem(
-                                    new ItemBuilder(Material.DIAMOND, "&6Join Current Tournament").create(), 1, new TournamentJoinInteract());
+                                    new ItemBuilder(Material.DIAMOND, "&6Join Current Tournament").create(), 2, new TournamentJoinInteract());
                         } else {
                             return new InteractableItem(
-                                    new ItemBuilder(Material.DIAMOND, "&6View Tournament Status").create(), 1, new TournamentStatusInteract());
+                                    new ItemBuilder(Material.DIAMOND, "&6View Tournament Status").create(), 2, new TournamentStatusInteract());
                         }
                     }
 
                     if (gm.getActiveEvent() != null) {
                         return new InteractableItem(
-                                new ItemBuilder(Material.EMERALD, "&6Join Current Event").create(), 1, new EventInteract());
+                                new ItemBuilder(Material.EMERALD, "&6Join Current Event").create(), 2, new EventInteract());
                     }
                 } else {
                     return new InteractableItem(
-                            new ItemBuilder(Material.DIAMOND_AXE, "&6Host an Event").create(), 1, new EventInteract());
+                            new ItemBuilder(Material.NETHER_STAR, "&6Host an Event").create(), 2, new EventInteract());
                 }
                 return null;
             case REQUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.PAPER, "&6Play Again").create(), 2,
+                        new ItemBuilder(Material.PAPER, "&6Play Again").create(), 3,
                         new RequeueInteract(),
                         new ItemUpdater() {
                             @Override
@@ -80,7 +83,7 @@ public enum InteractableItems {
                 );
             case REMATCH:
                 return new InteractableItem(
-                        new ItemBuilder(Material.BLAZE_POWDER, "&6Rematch").create(), 3,
+                        new ItemBuilder(Material.BLAZE_POWDER, "&6Rematch").create(), 4,
                         new RematchInteract(),
                         new ItemUpdater() {
                             @Override
@@ -94,7 +97,7 @@ public enum InteractableItems {
                 );
             case PARTY_CREATE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.NETHER_STAR, "&6Create a Party").create(), 4, new PartyCreateInteract());
+                        new ItemBuilder(Material.MAGMA_CREAM, "&6Create a Party").create(), 5, new PartyCreateInteract());
             case COSMETICS:
                 return new InteractableItem(
                         new ItemBuilder(Material.ENDER_CHEST, "&6Cosmetics").create(), 6, new CosmeticsInteract());
@@ -111,16 +114,16 @@ public enum InteractableItems {
             // LOBBY_PARTY
             case PARTY_EVENT:
                 return new InteractableItem(
-                        new ItemBuilder(Material.GOLD_SWORD, "&6Start a Party Event").create(), 1, new PartyEventInteract());
+                        new ItemBuilder(Material.GOLD_SWORD, "&6Start a Party Event").create(), 0, new PartyEventInteract());
             case PARTY_SPECTATE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.COMPASS, "&6Spectate Party Game").create(), 1, new PartySpectateInteract());
-            case PARTY_KIT:
-                return new InteractableItem(
-                        new ItemBuilder(Material.CHEST, "&6Customize HCF Kits").create(), 0, new PartyKitInteract());
+                        new ItemBuilder(Material.COMPASS, "&6Spectate Party Game").create(), 0, new PartySpectateInteract());
             case PARTY_LEAVE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.REDSTONE, "&6Leave Party").create(), 4, new PartyLeaveInteract());
+                        new ItemBuilder(Material.REDSTONE, "&6Leave Party").create(), 5, new PartyLeaveInteract());
+            case PARTY_KIT:
+                return new InteractableItem(
+                        new ItemBuilder(Material.CHEST, "&6Customize HCF Kits").create(), 6, new PartyKitInteract());
             case PARTY_SETTINGS:
                 return new InteractableItem(
                         new ItemBuilder(Material.PAPER, "&6Party Settings").create(), 7, new PartySettingsInteract());
