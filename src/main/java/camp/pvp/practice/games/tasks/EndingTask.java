@@ -44,11 +44,9 @@ public class EndingTask implements Runnable{
                     GameQueue.Type queueType = duel.getQueueType();
                     boolean delayItems = false;
                     if(queueType.equals(GameQueue.Type.UNRANKED) || queueType.equals(GameQueue.Type.RANKED) || queueType.equals(GameQueue.Type.PRIVATE)) {
-                        if(!queueType.equals(GameQueue.Type.PRIVATE)) {
-                            PreviousQueue previousQueue = new PreviousQueue(game.getKit(), queueType);
-                            profile.setPreviousQueue(previousQueue);
-                            delayItems = true;
-                        }
+                        PreviousQueue previousQueue = new PreviousQueue(game.getKit(), queueType.equals(GameQueue.Type.PRIVATE) ? GameQueue.Type.UNRANKED : queueType);
+                        profile.setPreviousQueue(previousQueue);
+                        delayItems = true;
 
                         Rematch rematch;
                         for(GameParticipant p : game.getParticipants().values()) {

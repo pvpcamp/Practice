@@ -8,6 +8,7 @@ import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.LinkedList;
@@ -34,6 +35,19 @@ public class GameQueue {
                     return "Tournament";
                 default:
                     return null;
+            }
+        }
+
+        public ChatColor getColor() {
+            switch (this) {
+                case RANKED:
+                    return ChatColor.GOLD;
+                case PRIVATE:
+                    return ChatColor.AQUA;
+                case TOURNAMENT:
+                    return ChatColor.LIGHT_PURPLE;
+                default:
+                    return ChatColor.YELLOW;
             }
         }
     }

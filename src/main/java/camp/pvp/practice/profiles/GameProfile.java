@@ -190,6 +190,7 @@ public class GameProfile {
 
     public void givePlayerItems(boolean update) {
         Player player = getPlayer();
+
         if(player != null) {
 
             boolean flying = false;
@@ -215,7 +216,7 @@ public class GameProfile {
                         break;
                     case LOBBY:
                     case LOBBY_PARTY:
-                        slot = 2;
+                        slot = 3;
                         break;
                     default:
                         break;
@@ -265,16 +266,16 @@ public class GameProfile {
     public void playerUpdate(boolean updateLocation) {
         Player player = getPlayer();
         if(player != null) {
-            updatePlayerVisibility();
-            givePlayerItems();
-//            setEditing(null);
-//            setRenaming(null);
 
             if(!updateLocation) {
                 if(giveItemsTask != null) {
+                    rematch = null;
                     giveItemsTask.cancel();
                 }
             }
+
+            updatePlayerVisibility();
+            givePlayerItems();
 
             player.setPlayerTime(this.getTime().getTime(), false);
 

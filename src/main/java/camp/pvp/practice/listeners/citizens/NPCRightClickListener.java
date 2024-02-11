@@ -1,7 +1,7 @@
 package camp.pvp.practice.listeners.citizens;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.guis.queue.QueueGui;
+import camp.pvp.practice.guis.queue.DuelQueueGui;
 import camp.pvp.practice.guis.statistics.LeaderboardsGui;
 import camp.pvp.practice.guis.statistics.StatisticsGui;
 import camp.pvp.practice.profiles.GameProfile;
@@ -35,12 +35,12 @@ public class NPCRightClickListener implements Listener {
                 switch (clickable) {
                     case UNRANKED:
                         if(profile.getState().equals(GameProfile.State.LOBBY)) {
-                            new QueueGui(GameQueue.Type.UNRANKED, profile).open(player);
+                            new DuelQueueGui(GameQueue.Type.UNRANKED, profile).open(player);
                         }
                         break;
                     case RANKED:
                         if(profile.getState().equals(GameProfile.State.LOBBY)) {
-                            new QueueGui(GameQueue.Type.RANKED, profile).open(player);
+                            new DuelQueueGui(GameQueue.Type.RANKED, profile).open(player);
                         }
                         break;
                     case LEADERBOARDS:
