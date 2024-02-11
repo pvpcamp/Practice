@@ -21,7 +21,7 @@ public class PlayerTimeCommand implements CommandExecutor {
 
         if(sender instanceof Player) {
             Player player = (Player) sender;
-            GameProfile profile = plugin.getGameProfileManager().find(player.getUniqueId(), true);
+            GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
             switch(label.toLowerCase()) {
                 case "day":

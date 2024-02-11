@@ -221,6 +221,17 @@ public enum DuelKit {
         }
     }
 
+    public boolean isDropItemsOnDeath() {
+        switch(this) {
+            case BED_FIGHT:
+            case SUMO:
+            case SPLEEF:
+                return false;
+            default:
+                return true;
+        }
+    }
+
     public boolean isFallDamage() {
         return !this.equals(BED_FIGHT);
     }

@@ -25,9 +25,10 @@ public class GameProfileManager {
     private Practice plugin;
     private Logger logger;
     private @Getter Map<UUID, GameProfile> loadedProfiles;
+    private @Getter Map<UUID, MatchRecord> matchRecords;
 
     private @Getter MongoManager mongoManager;
-    private @Getter String profilesCollection, eloCollection;
+    private @Getter String profilesCollection, eloCollection, matchRecordsCollection;
 
     private BukkitTask leaderboardUpdaterTask, playerVisibilityUpdaterTask;
     private @Getter LeaderboardUpdater leaderboardUpdater;
@@ -35,6 +36,7 @@ public class GameProfileManager {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
         this.loadedProfiles = new HashMap<>();
+        this.matchRecords = new HashMap<>();
 
         this.logger.info("Initialized GameProfileManager.");
 
@@ -43,16 +45,17 @@ public class GameProfileManager {
         this.mongoManager = new MongoManager(plugin, config.getString("networking.mongo.uri"), config.getString("networking.mongo.database"));
         this.profilesCollection = config.getString("networking.mongo.profiles_collection");
         this.eloCollection = config.getString("networking.mongo.elo_collection");
+        this.matchRecordsCollection = config.getString("networking.mongo.match_records_collection");
 
         this.leaderboardUpdater = new LeaderboardUpdater(this);
         this.leaderboardUpdaterTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, leaderboardUpdater, 0, 6000);
         this.playerVisibilityUpdaterTask = Bukkit.getScheduler().runTaskTimer(plugin, new PlayerVisibilityUpdater(this), 0, 1);
     }
 
-    public GameProfile find(UUID uuid, boolean store) {
+    public GameProfile find(UUID uuid) {
         GameProfile profile = loadedProfiles.get(uuid);
         if(profile == null) {
-            profile = importFromDatabase(uuid, false, store);
+            profile = importFromDatabase(uuid, false);
 
             if(profile != null) {
                 ProfileELO elo = importElo(uuid, false);
@@ -63,16 +66,18 @@ public class GameProfileManager {
                     exportElo(elo, true);
                 }
 
-                if(store) {
-                    loadedProfiles.put(uuid, profile);
-                }
+                profile.setLastLoadFromDatabase(System.currentTimeMillis());
+
+                importMatchRecordsBulk(uuid, false);
+
+                loadedProfiles.put(uuid, profile);
             }
         }
 
         return profile;
     }
 
-    public GameProfile find(String name, boolean store) {
+    public GameProfile find(String name) {
 
         if(!name.matches("^[a-zA-Z0-9_]{1,16}$")) {
             return null;
@@ -101,9 +106,10 @@ public class GameProfileManager {
                         exportElo(elo, true);
                     }
 
-                    if(store) {
-                        getLoadedProfiles().put(p.getUuid(), p);
-                    }
+                    p.setLastLoadFromDatabase(System.currentTimeMillis());
+                    importMatchRecordsBulk(p.getUuid(), false);
+
+                    getLoadedProfiles().put(p.getUuid(), p);
                     profile[0] = p;
                 }
             }
@@ -169,7 +175,7 @@ public class GameProfileManager {
         return profile;
     }
 
-    public GameProfile importFromDatabase(UUID uuid, boolean async, boolean store) {
+    public GameProfile importFromDatabase(UUID uuid, boolean async) {
         final GameProfile[] profile = {null};
         mongoManager.getDocument(async, profilesCollection, uuid, document -> {
             if(document != null) {
@@ -191,9 +197,9 @@ public class GameProfileManager {
                     exportElo(elo, async);
                 }
 
-                if(store) {
-                    loadedProfiles.put(uuid, profile[0]);
-                }
+                importMatchRecordsBulk(uuid, async);
+
+                loadedProfiles.put(uuid, profile[0]);
             }
         });
 
@@ -233,6 +239,30 @@ public class GameProfileManager {
     public void exportElo(ProfileELO elo, boolean async) {
         MongoUpdate mu = new MongoUpdate(eloCollection, elo.getUuid());
         mu.setUpdate(elo.export());
+        mongoManager.massUpdate(async, mu);
+    }
+
+    public Map<UUID, MatchRecord> importMatchRecordsBulk(UUID uuid, boolean async) {
+        Map<UUID, MatchRecord> records = new HashMap<>();
+        mongoManager.getCollection(async, matchRecordsCollection, mongoCollection -> {
+            for(Document doc : mongoCollection.find(Filters.or(Filters.eq("winner", uuid), Filters.eq("loser", uuid)))) {
+                MatchRecord record = new MatchRecord(doc.get("_id", UUID.class));
+                plugin.sendDebugMessage("Importing match record " + record.getUuid() + " for " + uuid + " from database.");
+                record.importFromDocument(doc);
+                matchRecords.put(record.getUuid(), record);
+                records.put(record.getUuid(), record);
+            }
+        });
+
+        return records;
+    }
+
+    public void exportMatchRecord(MatchRecord record, boolean async) {
+
+        matchRecords.put(record.getUuid(), record);
+
+        MongoUpdate mu = new MongoUpdate(matchRecordsCollection, record.getUuid());
+        mu.setUpdate(record.export());
         mongoManager.massUpdate(async, mu);
     }
 

@@ -31,7 +31,7 @@ public class PlayerJoinLeaveListeners implements Listener {
 
         if(name == null) event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Invalid username.");
 
-        GameProfile profile = plugin.getGameProfileManager().importFromDatabase(uuid, false, true);
+        GameProfile profile = plugin.getGameProfileManager().importFromDatabase(uuid, false);
 
         if(profile == null) profile = plugin.getGameProfileManager().create(uuid, event.getName());
     }

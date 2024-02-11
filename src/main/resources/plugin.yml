@@ -40,6 +40,9 @@ commands:
   leaderboards:
     aliases: [leaderboard, lb, elo]
     description: View player leaderboards.
+  matches:
+    aliases: [mhistory, matchhistory, matchhist, duelhistory, duelhist, dhist, dh, mh]
+    description: View the duel history of a player.
   party:
     aliases: [p]
     description: Manage your party.

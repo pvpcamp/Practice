@@ -146,6 +146,7 @@ public class Practice extends JavaPlugin {
         new GameDebugCommand(this);
         new GamesCommand(this);
         new LeaderboardsCommand(this);
+        new MatchesCommand(this);
         new PartyCommand(this);
         new PingCommand(this);
         new PlayerTimeCommand(this);
