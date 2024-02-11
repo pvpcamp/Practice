@@ -12,7 +12,7 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfileManager;
-import camp.pvp.practice.profiles.MatchRecord;
+import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.Colors;

@@ -3,11 +3,15 @@ package camp.pvp.practice.commands;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.profiles.MatchRecord;
+import camp.pvp.practice.profiles.GameProfileManager;
+import camp.pvp.practice.profiles.stats.MatchRecord;
+import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.queue.GameQueue;
+import camp.pvp.practice.utils.Colors;
 import camp.pvp.utils.buttons.AbstractButtonUpdater;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
+import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.paginated.PaginatedGui;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,6 +19,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +59,8 @@ public class MatchesCommand implements CommandExecutor {
                 DuelKit kit = record.getKit();
                 GuiButton button = new GuiButton(record.getKit().getIcon(), "&6&l" + kit.getDisplayName() + " Duel");
 
+                boolean admin = player.hasPermission("practice.admin");
+
                 button.setButtonUpdater(new AbstractButtonUpdater() {
                     @Override
                     public void update(GuiButton guiButton, Gui gui) {
@@ -71,7 +78,7 @@ public class MatchesCommand implements CommandExecutor {
                             lore.add("&a" + record.getWinnerName() + " ELO: &f" + record.getWinnerElo() + " &7(+" + record.getEloChange() + ")");
                             lore.add("&c" + record.getLoserName() + " ELO: &f" + record.getLoserElo() + " &7(-" + record.getEloChange() + ")");
 
-                            if(player.hasPermission("practice.admin")) {
+                            if(admin) {
                                 lore.add(" ");
 
                                 if(record.isRolledBack()) {
@@ -85,6 +92,35 @@ public class MatchesCommand implements CommandExecutor {
                         guiButton.setLore(lore);
                     }
                 });
+
+                if(admin) {
+                    button.setAction(new GuiAction() {
+                        @Override
+                        public void run(Player player, GuiButton guiButton, Gui gui, ClickType clickType) {
+                            if(record.isRolledBack()) return;
+
+                            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                                GameProfile winnerProfile = plugin.getGameProfileManager().find(record.getWinner());
+                                GameProfile loserProfile = plugin.getGameProfileManager().find(record.getLoser());
+
+                                ProfileELO winnerElo = winnerProfile.getProfileElo();
+                                ProfileELO loserElo = loserProfile.getProfileElo();
+
+                                winnerElo.subtractElo(record.getKit(), record.getEloChange());
+                                loserElo.addElo(record.getKit(), record.getEloChange());
+
+                                record.setRolledBack(true);
+                                plugin.getGameProfileManager().exportElo(winnerElo, true);
+                                plugin.getGameProfileManager().exportElo(loserElo, true);
+
+                                player.sendMessage(Colors.get("&aSuccessfully rolled back ELO changes for match between &f" + record.getWinnerName() + " &aand &f" + record.getLoserName() + "&a."));
+
+                                gui.updateGui();
+                            });
+                        }
+                    });
+                }
+
 
                 gui.addButton(button);
             }

@@ -4,6 +4,7 @@ import camp.pvp.practice.Practice;
 import camp.pvp.mongo.MongoCollectionResult;
 import camp.pvp.mongo.MongoManager;
 import camp.pvp.mongo.MongoUpdate;
+import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.profiles.leaderboard.LeaderboardUpdater;
 import com.mongodb.client.MongoCollection;

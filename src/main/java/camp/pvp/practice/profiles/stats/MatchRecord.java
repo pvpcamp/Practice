@@ -1,4 +1,4 @@
-package camp.pvp.practice.profiles;
+package camp.pvp.practice.profiles.stats;
 
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.impl.Duel;

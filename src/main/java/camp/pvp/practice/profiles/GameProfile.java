@@ -13,6 +13,7 @@ import camp.pvp.practice.interactables.InteractableItems;
 import camp.pvp.practice.kits.CustomDuelKit;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.PartyInvite;
+import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.ItemBuilder;

@@ -38,6 +38,24 @@ public class ProfileELO {
         }
     }
 
+    public int setElo(DuelKit kit, int elo) {
+        return ratings.put(kit, elo);
+    }
+
+    public int getElo(DuelKit kit) {
+        return ratings.get(kit);
+    }
+
+    public void addElo(DuelKit kit, int difference) {
+        final int current = ratings.get(kit);
+        ratings.put(kit, current + difference);
+    }
+
+    public void subtractElo(DuelKit kit, int difference) {
+        final int current = ratings.get(kit);
+        ratings.put(kit, current - difference);
+    }
+
     public Map<String, Object> export() {
         Map<String, Object> map = new HashMap<>();
         map.put("name", name);
