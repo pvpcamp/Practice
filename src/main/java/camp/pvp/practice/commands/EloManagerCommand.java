@@ -25,7 +25,7 @@ public class EloManagerCommand implements CommandExecutor {
             switch(args[0].toLowerCase()) {
                 case "reset":
                     if(args.length > 1) {
-                        GameProfile profile = plugin.getGameProfileManager().find(args[1], false);
+                        GameProfile profile = plugin.getGameProfileManager().find(args[1]);
                         if(profile == null) {
                             sender.sendMessage(ChatColor.RED + "The player you specified has never joined the network.");
                             return true;
@@ -41,7 +41,7 @@ public class EloManagerCommand implements CommandExecutor {
                     break;
                 case "ladder":
                     if(args.length > 3) {
-                        GameProfile profile = plugin.getGameProfileManager().find(args[1], false);
+                        GameProfile profile = plugin.getGameProfileManager().find(args[1]);
                         if(profile == null) {
                             sender.sendMessage(ChatColor.RED + "The player you specified has never joined the network.");
                             return true;

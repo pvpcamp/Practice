@@ -154,22 +154,22 @@ public abstract class Game {
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
-        if(participant.isRespawn() && !leftGame) {
-            killRespawn(player, participant);
-            return;
-        }
-
         PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());
         participant.setPostGameInventory(pgi);
         getPlugin().getGameManager().getPostGameInventories().put(pgi.getUuid(), pgi);
 
-        if(getAlive().size() > 1) {
+        if(getAlive().size() > 1 && kit.isDropItemsOnDeath()) {
             for (ItemStack item : player.getInventory()) {
                 if (item != null && !item.getType().equals(Material.AIR)) {
                     Item i = player.getWorld().dropItem(player.getLocation(), item);
                     this.addEntity(i);
                 }
             }
+        }
+
+        if(participant.isRespawn() && !leftGame) {
+            killRespawn(player, participant);
+            return;
         }
 
         if(leftGame) {
@@ -328,7 +328,7 @@ public abstract class Game {
     }
 
     public GameParticipant join(Player player) {
-        GameProfile profile = plugin.getGameProfileManager().find(player.getUniqueId(), true);
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
         if(profile.getGame() != null) {
             profile.getGame().leave(player);

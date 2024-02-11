@@ -13,6 +13,7 @@ import camp.pvp.practice.interactables.InteractableItems;
 import camp.pvp.practice.kits.CustomDuelKit;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.PartyInvite;
+import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.ItemBuilder;
@@ -399,6 +400,19 @@ public class GameProfile {
         }
 
         return i;
+    }
+
+    public List<MatchRecord> getMatchRecords() {
+        List<MatchRecord> list = new ArrayList<>();
+        for(MatchRecord record : Practice.getInstance().getGameProfileManager().getMatchRecords().values()) {
+            if(record.getWinner().equals(this.getUuid()) || record.getLoser().equals(this.getUuid())) {
+                list.add(record);
+            }
+        }
+
+        list.sort(Comparator.comparing(MatchRecord::getEnded).reversed());
+
+        return list;
     }
 
     public void importFromDocument(Document document) {
