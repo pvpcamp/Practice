@@ -390,6 +390,12 @@ public class GameProfile {
         getClicks().add(System.currentTimeMillis());
     }
 
+    public boolean isValid() {
+        if(getProfileElo() == null) return false;
+
+        return true;
+    }
+
     public int getCps() {
         int i = 0;
         for(long l : new ArrayList<>(getClicks())) {

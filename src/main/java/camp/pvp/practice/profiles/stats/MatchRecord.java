@@ -68,6 +68,7 @@ public class MatchRecord {
         export.put("started", started);
         export.put("ended", ended);
         export.put("rolled_back", rolledBack);
+        export.put("kit", kit.name());
         export.put("queue_type", queueType.name());
         export.put("elo_change", eloChange);
         export.put("before_winner_elo", beforeWinnerElo);

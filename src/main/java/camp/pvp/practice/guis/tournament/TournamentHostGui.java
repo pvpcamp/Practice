@@ -16,8 +16,6 @@ public class TournamentHostGui extends ArrangedGui {
     public TournamentHostGui(Practice plugin) {
         super("&6Host a Tournament");
 
-        setDefaultBorder();
-
         for(DuelKit kit : DuelKit.values()) {
 
             if(!kit.isTournament()) continue;

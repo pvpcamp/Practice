@@ -26,7 +26,6 @@ public class Rematch {
 
     public void send() {
         profile.setRematch(null);
-        profile.setPreviousQueue(null);
 
         if(profile.getGiveItemsTask() != null) {
             profile.getGiveItemsTask().cancel();

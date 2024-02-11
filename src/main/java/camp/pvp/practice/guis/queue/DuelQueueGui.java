@@ -23,8 +23,8 @@ public class DuelQueueGui extends ArrangedGui {
 
         GameQueueManager gqm = Practice.getInstance().getGameQueueManager();
 
-        this.setAutoUpdate(true);
-        this.setDefaultBackground();
+        setAutoUpdate(true);
+        setDefaultNavigationBar();
 
         final ChatColor color = queueType.getColor();
 
@@ -160,7 +160,5 @@ public class DuelQueueGui extends ArrangedGui {
 
             buttons.add(button);
         }
-
-        setDefaultBorder();
     }
 }

@@ -19,8 +19,6 @@ public class KitEditorInteract implements ItemInteract {
     public void onInteract(Player player, GameProfile gameProfile) {
         ArrangedGui gui = new ArrangedGui("&6Edit a Kit");
 
-        gui.setDefaultBorder();
-
         for(DuelKit kit : DuelKit.values()) {
             if(!kit.isEditable()) continue;
 

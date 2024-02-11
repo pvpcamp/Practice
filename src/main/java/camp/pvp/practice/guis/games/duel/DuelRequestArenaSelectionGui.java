@@ -17,11 +17,21 @@ import java.util.Collections;
 import java.util.List;
 
 public class DuelRequestArenaSelectionGui extends PaginatedGui {
-    public DuelRequestArenaSelectionGui(Practice plugin, DuelRequest duelRequest) {
+    public DuelRequestArenaSelectionGui(Practice plugin, DuelRequest duelRequest, DuelRequestKitSelectionGui kitSelectionGui) {
         super("Select an Arena", 27);
 
         List<Arena> arenas = new ArrayList<>(plugin.getArenaManager().getOriginalArenas());
         Collections.sort(arenas);
+
+        GuiButton kitSelection = new GuiButton(Material.BOOK, "&6Back to Kit Selection");
+        kitSelection.setSlot(4);
+        kitSelection.setAction(new GuiAction() {
+            @Override
+            public void run(Player player, GuiButton guiButton, Gui gui, ClickType clickType) {
+                kitSelectionGui.open(player);
+            }
+        });
+        addNavigationButton(kitSelection);
 
         for(Arena arena : arenas) {
             if(duelRequest.getKit().getArenaTypes().contains(arena.getType()) && arena.isEnabled()) {

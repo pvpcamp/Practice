@@ -1,6 +1,7 @@
 package camp.pvp.practice.commands;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.guis.profile.MyProfileGui;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.GameProfileManager;
@@ -15,11 +16,13 @@ import camp.pvp.utils.guis.GuiAction;
 import camp.pvp.utils.guis.paginated.PaginatedGui;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +58,21 @@ public class MatchesCommand implements CommandExecutor {
             }
 
             PaginatedGui gui = new PaginatedGui("&6Matches &7- &6" + profile.getName(), 36);
+
+            if(profile.getUuid().equals(player.getUniqueId())) {
+                GuiButton myProfile = new GuiButton(Material.SKULL_ITEM, "&6&lGo to My Profile");
+                myProfile.setDurability((short) 3);
+                SkullMeta meta = (SkullMeta) myProfile.getItemMeta();
+                meta.setOwner(player.getName());
+                myProfile.setItemMeta(meta);
+
+                myProfile.setAction((p, b, g, click) -> {
+                    new MyProfileGui(profile).open(p);
+                });
+                myProfile.setSlot(4);
+                gui.addNavigationButton(myProfile);
+            }
+
             for(MatchRecord record : profile.getMatchRecords()) {
                 DuelKit kit = record.getKit();
                 GuiButton button = new GuiButton(record.getKit().getIcon(), "&6&l" + kit.getDisplayName() + " Duel");
@@ -69,7 +87,6 @@ public class MatchesCommand implements CommandExecutor {
                         lore.add("&6Loser: &f" + record.getLoserName());
                         lore.add(" ");
                         lore.add("&6Queue Type: &f" + record.getQueueType().toString());
-                        lore.add(" ");
                         lore.add("&6Date: &f" + record.getEnded());
                         lore.add("&6Duration: &f" + record.getMatchDuration());
 
@@ -97,7 +114,7 @@ public class MatchesCommand implements CommandExecutor {
                     button.setAction(new GuiAction() {
                         @Override
                         public void run(Player player, GuiButton guiButton, Gui gui, ClickType clickType) {
-                            if(record.isRolledBack()) return;
+                            if(record.isRolledBack() || !record.getQueueType().equals(GameQueue.Type.RANKED)) return;
 
                             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                                 GameProfile winnerProfile = plugin.getGameProfileManager().find(record.getWinner());

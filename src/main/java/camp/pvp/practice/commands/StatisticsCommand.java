@@ -22,13 +22,14 @@ public class StatisticsCommand implements CommandExecutor {
     private Practice plugin;
     public StatisticsCommand(Practice plugin) {
         this.plugin = plugin;
-        plugin.getCommand("stats").setExecutor(this);
+        plugin.getCommand("statistics").setExecutor(this);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(sender instanceof Player) {
             Player player = (Player) sender;
+            final Player opener = player;
             String target = player.getName();
 
             if(args.length > 0) {
@@ -39,8 +40,6 @@ public class StatisticsCommand implements CommandExecutor {
 
                 target = target.replaceAll("\\$[A-Za-z0-9]+(_[A-Za-z0-9]+)*\\$", "");
             }
-
-            player.sendMessage(ChatColor.GREEN + "Attempting to find statistics for player " + ChatColor.WHITE + target + ChatColor.GREEN + "...");
 
             GameProfileManager gpm = plugin.getGameProfileManager();
 
@@ -57,7 +56,7 @@ public class StatisticsCommand implements CommandExecutor {
                     });
 
                     if(elo[0] != null) {
-                        new StatisticsGui(elo[0]).open(player);
+                        new StatisticsGui(opener, elo[0]).open(player);
                     } else {
                         player.sendMessage(ChatColor.RED + "The player you specified has not played on this server.");
                     }

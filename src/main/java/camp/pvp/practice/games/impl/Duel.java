@@ -220,8 +220,8 @@ public class Duel extends Game {
             stringBuilder.append(Colors.get("\n &7● &aWinner: &f" + winnerParticipant.getName() + " &7- &a" + (winnerElo + difference) + " +" + difference));
             stringBuilder.append(Colors.get("\n &7● &cLoser: &f" + loserParticipant.getName()+ " &7- &c" + (loserElo - difference) + " -" + difference));
 
-            winnerEloProfile.getRatings().put(getKit(), EloCalculator.getNewWinnerElo(winnerElo, loserElo));
-            loserEloProfile.getRatings().put(kit, EloCalculator.getNewLoserElo(winnerElo, loserElo));
+            winnerEloProfile.addElo(getKit(), difference);
+            loserEloProfile.subtractElo(getKit(), difference);
 
             gpm.exportElo(winnerEloProfile, true);
             gpm.exportElo(loserEloProfile, true);

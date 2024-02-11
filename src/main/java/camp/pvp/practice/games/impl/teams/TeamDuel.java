@@ -87,16 +87,16 @@ public class TeamDuel extends TeamGame {
 
                     List<Player> teammates = new ArrayList<>();
                     for (GameParticipant participant : friendlyTeam.getAliveParticipants().values()) {
-                        teammates.add(participant.getPlayer());
+                        if(!participant.getUuid().equals(profile.getUuid())) teammates.add(participant.getPlayer());
                     }
 
                     lines.add(friendlyTeam.getColor().getChatColor() + "Alive Teammates &7(" + teammates.size() + "):");
 
-                    teammates.sort(Comparator.comparingDouble(Player::getHealth).reversed());
+                    teammates.sort(Comparator.comparingDouble(Player::getHealth));
 
-                    for (int x = 0; x < 6; x++) {
+                    for (int x = 0; x < 5; x++) {
                         if (teammates.size() == x) break;
-                        if (x == 5) {
+                        if (x == 4) {
                             lines.add("&7...");
                             break;
                         }
@@ -337,7 +337,7 @@ public class TeamDuel extends TeamGame {
             player.sendMessage(" ");
         }
 
-        BukkitTask endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), new EndingTask(this), 100);
+        BukkitTask endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), new EndingTask(this), 60);
         setEndingTimer(endingTimer);
     }
 }

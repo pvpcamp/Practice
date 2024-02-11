@@ -45,7 +45,7 @@ public class PlayerJoinLeaveListeners implements Listener {
 
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
-        if(profile == null || System.currentTimeMillis() - profile.getLastLoadFromDatabase() > 5000) {
+        if(profile == null || !profile.isValid() || System.currentTimeMillis() - profile.getLastLoadFromDatabase() > 5000) {
             player.kickPlayer(ChatColor.RED + "There was an issue loading your profile, please reconnect.");
             return;
         }

@@ -13,8 +13,6 @@ public class LeaderboardsGui extends ArrangedGui {
     public LeaderboardsGui() {
         super("&6ELO Leaderboards");
 
-        setDefaultBorder();
-
         Map<DuelKit, List<LeaderboardEntry>> leaderboard = Practice.getInstance().getGameProfileManager().getLeaderboardUpdater().getLeaderboard();
 
         for(DuelKit kit : DuelKit.values()) {

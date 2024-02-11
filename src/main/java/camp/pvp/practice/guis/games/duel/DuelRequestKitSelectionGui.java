@@ -29,7 +29,7 @@ public class DuelRequestKitSelectionGui extends ArrangedGui {
 
             if(hasPermission) {
                 button.setLore(
-                        "&7Next, please select a map for" +
+                        "&7Next, please select a map for",
                         "&7your duel against &6" + duelRequest.getOpponent().getName() + "&7."
                 );
             } else {
@@ -41,7 +41,7 @@ public class DuelRequestKitSelectionGui extends ArrangedGui {
             button.setAction((pl, b, igui, click) -> {
                 duelRequest.setKit(duelKit);
                 if(hasPermission) {
-                    new DuelRequestArenaSelectionGui(plugin, duelRequest).open(pl);
+                    new DuelRequestArenaSelectionGui(plugin, duelRequest, this).open(pl);
                 } else {
                     duelRequest.send();
                 }

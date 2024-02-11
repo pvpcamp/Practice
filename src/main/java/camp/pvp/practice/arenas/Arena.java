@@ -168,47 +168,46 @@ public class Arena implements Comparable<Arena>{
         if(!getType().isResetAfterGame()) return;
         if(!isCopy()) return;
 
-        Bukkit.getScheduler().runTask(Practice.getInstance(), ()-> {
-            List<ChunkSnapshot> snapshots = new ArrayList<>();
-            for(Chunk chunk : getChunks()) {
-                snapshots.add(chunk.getChunkSnapshot());
+        List<ChunkSnapshot> snapshots = new ArrayList<>();
+
+        for(Chunk chunk : getChunks()) {
+            snapshots.add(chunk.getChunkSnapshot());
+        }
+
+        for(ChunkSnapshot snapshot : snapshots) {
+
+            ChunkSnapshot beforeSnapshot = null;
+            for(ChunkSnapshot before : Practice.getInstance().getArenaManager().getArenaFromName(getParent()).getChunkSnapshots()) {
+
+                if(snapshot.getX() == before.getX() + xDifference && snapshot.getZ() == before.getZ() + zDifference) {
+                    beforeSnapshot = before;
+                    break;
+                }
             }
 
-            for(ChunkSnapshot snapshot : snapshots) {
+            if(beforeSnapshot == null) continue;
 
-                ChunkSnapshot beforeSnapshot = null;
-                for(ChunkSnapshot before : Practice.getInstance().getArenaManager().getArenaFromName(getParent()).getChunkSnapshots()) {
+            for(int x = 0; x < 16; x++) {
+                for(int z = 0; z < 16; z++) {
+                    for(int y = 0; y < 256; y++) {
+                        int type = beforeSnapshot.getBlockTypeId(x, y, z);
+                        int data = beforeSnapshot.getBlockData(x, y, z);
+                        boolean blockChanged = snapshot.getBlockTypeId(x, y, z) != type;
+                        if(!blockChanged) {
+                            blockChanged = snapshot.getBlockData(x, y, z) != data;
+                        }
 
-                    if(snapshot.getX() == before.getX() + xDifference && snapshot.getZ() == before.getZ() + zDifference) {
-                        beforeSnapshot = before;
-                        break;
-                    }
-                }
-
-                if(beforeSnapshot == null) continue;
-
-                for(int x = 0; x < 16; x++) {
-                    for(int z = 0; z < 16; z++) {
-                        for(int y = 0; y < 256; y++) {
-                            int type = beforeSnapshot.getBlockTypeId(x, y, z);
-                            int data = beforeSnapshot.getBlockData(x, y, z);
-                            boolean blockChanged = snapshot.getBlockTypeId(x, y, z) != type;
-                            if(!blockChanged) {
-                                blockChanged = snapshot.getBlockData(x, y, z) != data;
-                            }
-
-                            if(blockChanged) {
-                                Location location = new Location(Bukkit.getWorld(snapshot.getWorldName()), snapshot.getX() * 16 + x, y, snapshot.getZ() * 16 + z);
-                                RestoreBlock block = new RestoreBlock(location, type, data);
-                                block.restore();
-                            }
+                        if(blockChanged) {
+                            Location location = new Location(Bukkit.getWorld(snapshot.getWorldName()), snapshot.getX() * 16 + x, y, snapshot.getZ() * 16 + z);
+                            RestoreBlock block = new RestoreBlock(location, type, data);
+                            block.restore();
                         }
                     }
                 }
             }
+        }
 
-            inUse = false;
-        });
+        inUse = false;
     }
 
     public boolean isOriginalBlock(Location location) {

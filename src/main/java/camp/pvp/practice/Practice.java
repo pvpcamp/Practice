@@ -1,5 +1,6 @@
 package camp.pvp.practice;
 
+import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaManager;
 import camp.pvp.practice.cooldowns.CooldownRunnable;
 import camp.pvp.practice.games.GameManager;
@@ -76,6 +77,11 @@ public class Practice extends JavaPlugin {
         this.entityHider = new EntityHider(this, EntityHider.Policy.BLACKLIST);
 
         this.arenaManager = new ArenaManager(this);
+
+        for(Arena arena : arenaManager.getArenas()) {
+            arena.resetArena();
+        }
+
         this.gameManager = new GameManager(this);
         this.gameQueueManager = new GameQueueManager(this);
         this.gameProfileManager = new GameProfileManager(this);

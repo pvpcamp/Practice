@@ -32,12 +32,6 @@ public class ArenaManager {
 
         scanBlocks();
 
-        logger.info("Resetting all arenas, this might take a bit.");
-
-        for(Arena arena : getArenas()) {
-            arena.resetArena();
-        }
-
         logger.info("ArenaManager has finished the startup process.");
     }
 
