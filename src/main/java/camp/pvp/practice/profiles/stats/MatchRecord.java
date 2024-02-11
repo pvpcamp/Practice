@@ -68,7 +68,7 @@ public class MatchRecord {
         export.put("started", started);
         export.put("ended", ended);
         export.put("rolled_back", rolledBack);
-        export.put("queue_type", queueType.toString());
+        export.put("queue_type", queueType.name());
         export.put("elo_change", eloChange);
         export.put("before_winner_elo", beforeWinnerElo);
         export.put("before_loser_elo", befloreLoserElo);
@@ -91,7 +91,4 @@ public class MatchRecord {
     public int getLoserElo() {
         return befloreLoserElo - eloChange;
     }
-
-
-
 }

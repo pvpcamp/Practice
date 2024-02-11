@@ -248,7 +248,6 @@ public class GameProfileManager {
         mongoManager.getCollection(async, matchRecordsCollection, mongoCollection -> {
             for(Document doc : mongoCollection.find(Filters.or(Filters.eq("winner", uuid), Filters.eq("loser", uuid)))) {
                 MatchRecord record = new MatchRecord(doc.get("_id", UUID.class));
-                plugin.sendDebugMessage("Importing match record " + record.getUuid() + " for " + uuid + " from database.");
                 record.importFromDocument(doc);
                 matchRecords.put(record.getUuid(), record);
                 records.put(record.getUuid(), record);

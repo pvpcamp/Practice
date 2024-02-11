@@ -82,7 +82,7 @@ public class MatchesCommand implements CommandExecutor {
                                 lore.add(" ");
 
                                 if(record.isRolledBack()) {
-                                    lore.add("&c&oThis match was rolled back.");
+                                    lore.add("&c&l&oThis match was rolled back.");
                                 } else {
                                     lore.add("&aClick to roll back ELO changes.");
                                 }
@@ -110,6 +110,7 @@ public class MatchesCommand implements CommandExecutor {
                                 loserElo.addElo(record.getKit(), record.getEloChange());
 
                                 record.setRolledBack(true);
+                                plugin.getGameProfileManager().exportMatchRecord(record, true);
                                 plugin.getGameProfileManager().exportElo(winnerElo, true);
                                 plugin.getGameProfileManager().exportElo(loserElo, true);
 
