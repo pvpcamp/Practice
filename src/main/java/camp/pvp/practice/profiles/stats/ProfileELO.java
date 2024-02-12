@@ -21,11 +21,7 @@ public class ProfileELO {
         this.uuid = uuid;
         this.ratings = new HashMap<>();
 
-        for(DuelKit kit : DuelKit.values()) {
-            if(kit.isRanked()) {
-                ratings.put(kit, 1000);
-            }
-        }
+        resetRatings();
     }
 
     public void importFromDocument(Document doc) {
@@ -54,6 +50,14 @@ public class ProfileELO {
     public void subtractElo(DuelKit kit, int difference) {
         final int current = ratings.get(kit);
         ratings.put(kit, current - difference);
+    }
+
+    public void resetRatings() {
+        for(DuelKit kit : DuelKit.values()) {
+            if(kit.isRanked()) {
+                ratings.put(kit, 1000);
+            }
+        }
     }
 
     public Map<String, Object> export() {

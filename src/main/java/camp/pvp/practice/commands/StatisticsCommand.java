@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class StatisticsCommand implements CommandExecutor {
 
@@ -30,37 +31,26 @@ public class StatisticsCommand implements CommandExecutor {
         if(sender instanceof Player) {
             Player player = (Player) sender;
             final Player opener = player;
-            String target = player.getName();
+            String target = args.length > 0 ? args[0] : player.getName();
 
             if(args.length > 0) {
-                target = args[0];
                 if(!target.matches("^[a-zA-Z0-9_]{1,16}$")) {
+                    player.sendMessage(ChatColor.RED + "Invalid name.");
                     return true;
                 }
-
-                target = target.replaceAll("\\$[A-Za-z0-9]+(_[A-Za-z0-9]+)*\\$", "");
             }
 
             GameProfileManager gpm = plugin.getGameProfileManager();
 
-            final String fTarget = target;
-            plugin.getGameProfileManager().getMongoManager().getCollection(true, gpm.getEloCollection(), new MongoCollectionResult() {
-                @Override
-                public void call(MongoCollection<Document> mongoCollection) {
-                    ProfileELO[] elo = {null};
-                    mongoCollection.find(Filters.regex("name","(?i)" + fTarget)).forEach(document -> {
-                        if(document.getString("name").equalsIgnoreCase(fTarget)) {
-                            elo[0] = new ProfileELO(document.get("_id", UUID.class));
-                            elo[0].importFromDocument(document);
-                        }
-                    });
-
-                    if(elo[0] != null) {
-                        new StatisticsGui(opener, elo[0]).open(player);
-                    } else {
-                        player.sendMessage(ChatColor.RED + "The player you specified has not played on this server.");
-                    }
+            CompletableFuture<GameProfile> future = gpm.findAsync(target);
+            future.thenAccept(profile -> {
+                if(profile == null) {
+                    player.sendMessage(ChatColor.RED + "The player you specified has not played on this server.");
+                    return;
                 }
+
+                ProfileELO elo = profile.getProfileElo();
+                new StatisticsGui(opener, elo).open(player);
             });
         }
 

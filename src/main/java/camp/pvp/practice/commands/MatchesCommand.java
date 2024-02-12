@@ -26,6 +26,9 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public class MatchesCommand implements CommandExecutor {
 
@@ -49,17 +52,19 @@ public class MatchesCommand implements CommandExecutor {
             return true;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            GameProfile profile = plugin.getGameProfileManager().find(targetName);
+        CompletableFuture<GameProfile> profileFuture = plugin.getGameProfileManager().findAsync(targetName);
 
-            if(profile == null) {
+        profileFuture.thenAccept(profile -> {
+           if(profile == null) {
                 player.sendMessage(ChatColor.RED + "No match records found for " + targetName + ".");
                 return;
-            }
+           }
 
-            PaginatedGui gui = new PaginatedGui("&6Matches &7- &6" + profile.getName(), 36);
+            if(profile.getMatchRecords() == null) return;
 
-            if(profile.getUuid().equals(player.getUniqueId())) {
+            PaginatedGui gui = new PaginatedGui("&6Matches &7- &6" + targetName, 36);
+
+            if(targetName.equals(sender.getName())) {
                 GuiButton myProfile = new GuiButton(Material.SKULL_ITEM, "&6&lGo to My Profile");
                 myProfile.setDurability((short) 3);
                 SkullMeta meta = (SkullMeta) myProfile.getItemMeta();
@@ -90,15 +95,15 @@ public class MatchesCommand implements CommandExecutor {
                         lore.add("&6Date: &f" + record.getEnded());
                         lore.add("&6Duration: &f" + record.getMatchDuration());
 
-                        if(record.getQueueType().equals(GameQueue.Type.RANKED)) {
+                        if (record.getQueueType().equals(GameQueue.Type.RANKED)) {
                             lore.add(" ");
                             lore.add("&a" + record.getWinnerName() + " ELO: &f" + record.getWinnerElo() + " &7(+" + record.getEloChange() + ")");
                             lore.add("&c" + record.getLoserName() + " ELO: &f" + record.getLoserElo() + " &7(-" + record.getEloChange() + ")");
 
-                            if(admin) {
+                            if (admin) {
                                 lore.add(" ");
 
-                                if(record.isRolledBack()) {
+                                if (record.isRolledBack()) {
                                     lore.add("&c&l&oThis match was rolled back.");
                                 } else {
                                     lore.add("&aClick to roll back ELO changes.");
@@ -117,19 +122,22 @@ public class MatchesCommand implements CommandExecutor {
                             if(record.isRolledBack() || !record.getQueueType().equals(GameQueue.Type.RANKED)) return;
 
                             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                                GameProfile winnerProfile = plugin.getGameProfileManager().find(record.getWinner());
-                                GameProfile loserProfile = plugin.getGameProfileManager().find(record.getLoser());
+                                CompletableFuture<GameProfile> winnerProfile = plugin.getGameProfileManager().findAsync(record.getWinner());
+                                winnerProfile.thenAccept(profile -> {
+                                    ProfileELO elo = profile.getProfileElo();
+                                    elo.subtractElo(record.getKit(), record.getEloChange());
+                                    plugin.getGameProfileManager().exportElo(elo);
+                                });
 
-                                ProfileELO winnerElo = winnerProfile.getProfileElo();
-                                ProfileELO loserElo = loserProfile.getProfileElo();
-
-                                winnerElo.subtractElo(record.getKit(), record.getEloChange());
-                                loserElo.addElo(record.getKit(), record.getEloChange());
+                                CompletableFuture<GameProfile> loserProfile = plugin.getGameProfileManager().findAsync(record.getLoser());
+                                loserProfile.thenAccept(profile -> {
+                                    ProfileELO elo = profile.getProfileElo();
+                                    elo.addElo(record.getKit(), record.getEloChange());
+                                    plugin.getGameProfileManager().exportElo(elo);
+                                });
 
                                 record.setRolledBack(true);
-                                plugin.getGameProfileManager().exportMatchRecord(record, true);
-                                plugin.getGameProfileManager().exportElo(winnerElo, true);
-                                plugin.getGameProfileManager().exportElo(loserElo, true);
+                                plugin.getGameProfileManager().exportMatchRecord(record);
 
                                 player.sendMessage(Colors.get("&aSuccessfully rolled back ELO changes for match between &f" + record.getWinnerName() + " &aand &f" + record.getLoserName() + "&a."));
 
@@ -143,9 +151,10 @@ public class MatchesCommand implements CommandExecutor {
                 gui.addButton(button);
             }
 
-            gui.open(player);
+            if(player.isOnline()) {
+                gui.open(player);
+            }
         });
-
         return true;
     }
 }

@@ -31,9 +31,7 @@ public class PlayerJoinLeaveListeners implements Listener {
 
         if(name == null) event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Invalid username.");
 
-        GameProfile profile = plugin.getGameProfileManager().importFromDatabase(uuid, false);
-
-        if(profile == null) profile = plugin.getGameProfileManager().create(uuid, event.getName());
+        plugin.getGameProfileManager().preLogin(uuid, name);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -45,7 +43,7 @@ public class PlayerJoinLeaveListeners implements Listener {
 
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
-        if(profile == null || !profile.isValid() || System.currentTimeMillis() - profile.getLastLoadFromDatabase() > 5000) {
+        if(profile == null || System.currentTimeMillis() - profile.getLastLoadFromDatabase() > 5000) {
             player.kickPlayer(ChatColor.RED + "There was an issue loading your profile, please reconnect.");
             return;
         }
@@ -74,7 +72,7 @@ public class PlayerJoinLeaveListeners implements Listener {
 
             plugin.getAssemble().getBoards().remove(player.getUniqueId());
 
-            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getGameProfileManager().exportToDatabase(player.getUniqueId(), true, false), 2);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getGameProfileManager().exportToDatabase(player.getUniqueId(), true), 2);
         }
     }
 }

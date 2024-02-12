@@ -23,31 +23,27 @@ public class LeaderboardUpdater implements Runnable{
     public void run() {
 
         long start = System.currentTimeMillis();
-        gpm.getMongoManager().getCollection(true, gpm.getEloCollection(), new MongoCollectionResult() {
-            @Override
-            public void call(MongoCollection<Document> mongoCollection) {
-                for(DuelKit kit : DuelKit.values()) {
-                    if(kit.isQueueable() && kit.isRanked()) {
-                        List<LeaderboardEntry> entries = new ArrayList<>();
 
-                        mongoCollection.find().sort(new Document("kit_" + kit.name(), -1)).limit(10).forEach(
-                                document ->  {
-                                    if(document.containsKey("kit_" + kit.name())) {
-                                        String name = document.getString("name");
-                                        int elo = document.getInteger("kit_" + kit.name());
-                                        entries.add(new LeaderboardEntry(name, elo));
-                                    }
-                                }
-                        );
+        for(DuelKit kit : DuelKit.values()) {
+            if(kit.isQueueable() && kit.isRanked()) {
+                List<LeaderboardEntry> entries = new ArrayList<>();
 
-                        Collections.sort(entries);
+                gpm.getEloCollection().find().sort(new Document("kit_" + kit.name(), -1)).limit(10).forEach(
+                        document ->  {
+                            if(document.containsKey("kit_" + kit.name())) {
+                                String name = document.getString("name");
+                                int elo = document.getInteger("kit_" + kit.name());
+                                entries.add(new LeaderboardEntry(name, elo));
+                            }
+                        }
+                );
 
-                        leaderboard.put(kit, entries);
-                    }
-                }
+                Collections.sort(entries);
 
-                Practice.getInstance().sendDebugMessage("Leaderboards refreshed in " + (System.currentTimeMillis() - start) + "ms.");
+                leaderboard.put(kit, entries);
             }
-        });
+        }
+
+        Practice.getInstance().sendDebugMessage("Leaderboards refreshed in " + (System.currentTimeMillis() - start) + "ms.");
     }
 }

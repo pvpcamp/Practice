@@ -386,14 +386,12 @@ public class GameProfile {
         }
     }
 
-    public void addClick() {
-        getClicks().add(System.currentTimeMillis());
+    public boolean isValid() {
+        return getPlayer() != null || System.currentTimeMillis() - getLastLoadFromDatabase() < 5000;
     }
 
-    public boolean isValid() {
-        if(getProfileElo() == null) return false;
-
-        return true;
+    public void addClick() {
+        getClicks().add(System.currentTimeMillis());
     }
 
     public int getCps() {

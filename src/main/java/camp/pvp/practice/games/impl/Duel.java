@@ -223,15 +223,15 @@ public class Duel extends Game {
             winnerEloProfile.addElo(getKit(), difference);
             loserEloProfile.subtractElo(getKit(), difference);
 
-            gpm.exportElo(winnerEloProfile, true);
-            gpm.exportElo(loserEloProfile, true);
+            gpm.exportElo(winnerEloProfile);
+            gpm.exportElo(loserEloProfile);
         } else {
             stringBuilder.append(Colors.get("\n &7● &6Winner: &f" + winnerParticipant.getName()));
         }
 
         // Export match record.
         MatchRecord record = new MatchRecord(this, winnerParticipant, loserParticipant, difference, winnerElo, loserElo);
-        getPlugin().getGameProfileManager().exportMatchRecord(record, true);
+        getPlugin().getGameProfileManager().exportMatchRecord(record);
 
         for(Player player : this.getAllPlayers()) {
             player.sendMessage(" ");

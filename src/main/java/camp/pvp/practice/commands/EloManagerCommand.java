@@ -10,6 +10,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import java.util.concurrent.CompletableFuture;
+
 public class EloManagerCommand implements CommandExecutor {
 
     private Practice plugin;
@@ -23,42 +25,14 @@ public class EloManagerCommand implements CommandExecutor {
 
         if(args.length > 0) {
             switch(args[0].toLowerCase()) {
-                case "reset":
+                case "reset" -> {
                     if(args.length > 1) {
-                        GameProfile profile = plugin.getGameProfileManager().find(args[1]);
-                        if(profile == null) {
-                            sender.sendMessage(ChatColor.RED + "The player you specified has never joined the network.");
-                            return true;
-                        }
-
-                        ProfileELO elo = new ProfileELO(profile.getUuid());
-                        elo.setName(profile.getName());
-                        profile.setProfileElo(elo);
-                        plugin.getGameProfileManager().exportElo(profile.getProfileElo(), true);
-                        sender.sendMessage(ChatColor.GREEN + "ELO has been reset for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + ".");
+                        reset(sender, args[1]);
                         return true;
                     }
-                    break;
-                case "ladder":
+                }
+                case "ladder" -> {
                     if(args.length > 3) {
-                        GameProfile profile = plugin.getGameProfileManager().find(args[1]);
-                        if(profile == null) {
-                            sender.sendMessage(ChatColor.RED + "The player you specified has never joined the network.");
-                            return true;
-                        }
-
-                        DuelKit kit = null;
-                        for(DuelKit k : DuelKit.values()) {
-                            if(k.name().equalsIgnoreCase(args[2])) {
-                                kit = k;
-                            }
-                        }
-
-                        if(kit == null) {
-                            sender.sendMessage(ChatColor.RED + "The kit you specified does not exist.");
-                            return true;
-                        }
-
                         int elo;
                         try {
                             elo = Integer.parseInt(args[3]);
@@ -67,17 +41,10 @@ public class EloManagerCommand implements CommandExecutor {
                             return true;
                         }
 
-                        ProfileELO profileELO = profile.getProfileElo();
-                        if(profileELO == null) {
-                            profileELO = plugin.getGameProfileManager().importElo(profile.getUuid(), false);
-                        }
-
-                        profileELO.getRatings().put(kit, elo);
-                        plugin.getGameProfileManager().exportElo(profileELO, true);
-                        sender.sendMessage(ChatColor.GREEN + "ELO for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + " for kit " + ChatColor.WHITE + kit.getDisplayName() + ChatColor.GREEN + " has been set to " + elo + ".");
+                        ladder(sender, args[1], args[2], elo);
                         return true;
                     }
-                    break;
+                }
             }
         }
 
@@ -89,5 +56,48 @@ public class EloManagerCommand implements CommandExecutor {
         sender.sendMessage(Colors.get(help.toString()));
 
         return true;
+    }
+
+    public void reset(CommandSender sender, String target) {
+        CompletableFuture<GameProfile> profileFuture = plugin.getGameProfileManager().findAsync(target);
+        profileFuture.thenAccept(profile -> {
+            if(profile == null) {
+                sender.sendMessage(ChatColor.RED + "The player you specified has never joined the network.");
+                return;
+            }
+
+            ProfileELO profileELO = profile.getProfileElo();
+            profileELO.resetRatings();
+            plugin.getGameProfileManager().exportElo(profileELO);
+            sender.sendMessage(ChatColor.GREEN + "ELO for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + " has been reset.");
+        });
+    }
+
+    public void ladder(CommandSender sender, String target, String kit, int elo) {
+        CompletableFuture<GameProfile> profileFuture = plugin.getGameProfileManager().findAsync(target);
+        profileFuture.thenAccept(profile -> {
+            if(profile == null) {
+                sender.sendMessage(ChatColor.RED + "The player you specified has never joined the network.");
+                return;
+            }
+
+            DuelKit duelKit = null;
+            for(DuelKit k : DuelKit.values()) {
+                if(k.name().equalsIgnoreCase(kit)) {
+                    duelKit = k;
+                }
+            }
+
+            if(duelKit == null) {
+                sender.sendMessage(ChatColor.RED + "The kit you specified does not exist.");
+                return;
+            }
+
+            ProfileELO profileELO = profile.getProfileElo();
+
+            profileELO.setElo(duelKit, elo);
+            plugin.getGameProfileManager().exportElo(profileELO);
+            sender.sendMessage(ChatColor.GREEN + "ELO for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + " for kit " + ChatColor.WHITE + duelKit.getDisplayName() + ChatColor.GREEN + " has been set to " + elo + ".");
+        });
     }
 }
