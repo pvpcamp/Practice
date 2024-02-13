@@ -331,9 +331,13 @@ public class GameProfileManager {
     }
 
     public void exportStatistics(ProfileStatistics statistics, boolean async) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        if(async) {
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                statistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", statistics.getUuid()), Updates.set(key, value)));
+            });
+        } else {
             statistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", statistics.getUuid()), Updates.set(key, value)));
-        });
+        }
     }
 
     public void exportMatchRecord(MatchRecord record) {

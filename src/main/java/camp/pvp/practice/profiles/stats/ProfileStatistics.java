@@ -33,40 +33,52 @@ public class ProfileStatistics {
     }
 
     public void incrementKills(DuelKit kit, GameQueue.Type type) {
-        if (type == GameQueue.Type.UNRANKED) {
-            unranked.get(kit).incrementKills();
-        } else {
-            ranked.get(kit).incrementKills();
+        switch(type) {
+            case UNRANKED:
+                unranked.get(kit).incrementKills();
+                break;
+            case RANKED:
+                ranked.get(kit).incrementKills();
+                break;
         }
 
         global.incrementKills();
     }
 
     public void incrementDeaths(DuelKit kit, GameQueue.Type type) {
-        if (type == GameQueue.Type.UNRANKED) {
-            unranked.get(kit).incrementDeaths();
-        } else {
-            ranked.get(kit).incrementDeaths();
+        switch(type) {
+            case UNRANKED:
+                unranked.get(kit).incrementDeaths();
+                break;
+            case RANKED:
+                ranked.get(kit).incrementDeaths();
+                break;
         }
 
         global.incrementDeaths();
     }
 
     public void incrementWins(DuelKit kit, GameQueue.Type type) {
-        if (type == GameQueue.Type.UNRANKED) {
-            unranked.get(kit).incrementWins();
-        } else {
-            ranked.get(kit).incrementWins();
+        switch(type) {
+            case UNRANKED:
+                unranked.get(kit).incrementWins();
+                break;
+            case RANKED:
+                ranked.get(kit).incrementWins();
+                break;
         }
 
         global.incrementWins();
     }
 
     public void resetWinStreak(DuelKit kit, GameQueue.Type type) {
-        if (type == GameQueue.Type.UNRANKED) {
-            unranked.get(kit).resetWinStreak();
-        } else {
-            ranked.get(kit).resetWinStreak();
+        switch(type) {
+            case UNRANKED:
+                unranked.get(kit).resetWinStreak();
+                break;
+            case RANKED:
+                ranked.get(kit).resetWinStreak();
+                break;
         }
 
         global.resetWinStreak();

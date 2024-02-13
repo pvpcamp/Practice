@@ -216,7 +216,6 @@ public class GameProfile {
                     case LOBBY_TOURNAMENT:
                         slot = 1;
                         break;
-                    case LOBBY:
                     case LOBBY_PARTY:
                         slot = 3;
                         break;
