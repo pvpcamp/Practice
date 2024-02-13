@@ -350,7 +350,7 @@ public class GameProfileManager {
     public void shutdown() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             GameProfile profile = loadedProfiles.get(player.getUniqueId());
-            exportStatistics(profile.getProfileStatistics(), false);
+            profile.getProfileStatistics().export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", player.getUniqueId()), Updates.set(key, value)));
             exportToDatabase(player.getUniqueId(), false);
         }
 

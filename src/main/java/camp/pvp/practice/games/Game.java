@@ -265,7 +265,7 @@ public abstract class Game {
 
         if(!participant.isAlive() || !victimParticipant.isAlive()) event.setCancelled(true);
 
-        if(victim.getNoDamageTicks() > 0) event.setCancelled(true);
+        if(victim.getNoDamageTicks() > 0 && event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) event.setCancelled(true);
 
         if(event.isCancelled()) {
             victimParticipant.setLastInvalidHitTick(currentTick);
