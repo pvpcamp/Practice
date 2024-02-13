@@ -35,7 +35,7 @@ public class PlayerMoveListener implements Listener {
 
             if (game != null) {
                 GameParticipant participant = game.getParticipants().get(player.getUniqueId());
-                if(game.getCurrentPlayersPlaying().contains(player)) {
+                if(game.getAlivePlayers().contains(player)) {
                     if (event.getTo().getBlock().isLiquid()) {
                         if (game.getKit().isDieInWater() && game.getState().equals(Game.State.ACTIVE)) {
                             participant.setLastDamageCause(EntityDamageEvent.DamageCause.DROWNING);

@@ -204,14 +204,14 @@ public class GameProfileManager {
     }
 
     public GameProfile getLoadedProfile(UUID uuid) {
-        GameProfile profile = loadedProfiles.get(uuid);
-        return profile.isValid() ? profile : null;
+        GameProfile profile = getLoadedProfiles().get(uuid);
+        return profile == null ? null : (profile.isValid() ? profile : null);
     }
 
     public GameProfile getLoadedProfile(String name) {
         for(Player player : Bukkit.getOnlinePlayers()) {
             if(player.getName().equalsIgnoreCase(name)) {
-                GameProfile profile = loadedProfiles.get(player.getUniqueId());
+                GameProfile profile = getLoadedProfiles().get(player.getUniqueId());
                 return profile.isValid() ? profile : null;
             }
         }
@@ -300,7 +300,7 @@ public class GameProfileManager {
             matchRecords.put(record.getUuid(), record);
         });
 
-        loadedProfiles.put(uuid, fProfile);
+        getLoadedProfiles().put(uuid, fProfile);
     }
 
     public void logOff(UUID uuid) {

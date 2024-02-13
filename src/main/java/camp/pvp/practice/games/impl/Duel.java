@@ -249,6 +249,7 @@ public class Duel extends Game {
 
     @Override
     public void eliminate(Player player, boolean leftGame) {
+
         super.eliminate(player, leftGame);
 
         GameParticipant participant = getParticipants().get(player.getUniqueId());
@@ -256,15 +257,15 @@ public class Duel extends Game {
         profile.getProfileStatistics().incrementDeaths(getKit(), queueType);
 
         GameProfile attackerProfile = getPlugin().getGameProfileManager().getLoadedProfile(participant.getAttacker());
-        if(attackerProfile != null) {
+        if (attackerProfile != null) {
             attackerProfile.getProfileStatistics().incrementKills(getKit(), queueType);
         }
 
-        if(getTournament() != null) {
+        if (getTournament() != null) {
             getTournament().eliminate(player);
         }
 
-        if(getCurrentPlaying().size() < 2) {
+        if (getCurrentPlaying().size() < 2) {
             end();
         }
     }
