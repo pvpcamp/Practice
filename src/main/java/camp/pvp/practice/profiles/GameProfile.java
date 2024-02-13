@@ -15,6 +15,7 @@ import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.PartyInvite;
 import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
+import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.utils.PlayerUtils;
@@ -103,6 +104,7 @@ public class GameProfile {
     private CustomDuelKit editingCustomKit;
 
     private ProfileELO profileElo;
+    private ProfileStatistics profileStatistics;
 
     private BukkitTask giveItemsTask;
     private ArenaCopier arenaCopier;

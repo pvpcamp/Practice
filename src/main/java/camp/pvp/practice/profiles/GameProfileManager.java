@@ -1,12 +1,11 @@
 package camp.pvp.practice.profiles;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.mongo.MongoCollectionResult;
 import camp.pvp.mongo.MongoManager;
-import camp.pvp.mongo.MongoUpdate;
 import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.profiles.leaderboard.LeaderboardUpdater;
+import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
@@ -15,17 +14,12 @@ import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 
-import javax.swing.text.html.Option;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Logger;
 
 public class GameProfileManager {
@@ -36,7 +30,7 @@ public class GameProfileManager {
     private @Getter Map<UUID, MatchRecord> matchRecords;
 
     private @Getter MongoManager mongoManager;
-    private @Getter MongoCollection<Document> profilesCollection, eloCollection, matchRecordsCollection;
+    private @Getter MongoCollection<Document> profilesCollection, eloCollection, statisticsCollection, matchRecordsCollection;
 
     private BukkitTask leaderboardUpdaterTask, playerVisibilityUpdaterTask;
     private @Getter LeaderboardUpdater leaderboardUpdater;
@@ -53,6 +47,7 @@ public class GameProfileManager {
         this.mongoManager = new MongoManager(plugin, config.getString("networking.mongo.uri"), config.getString("networking.mongo.database"));
         this.profilesCollection = mongoManager.getDatabase().getCollection(config.getString("networking.mongo.profiles_collection"));
         this.eloCollection = mongoManager.getDatabase().getCollection(config.getString("networking.mongo.elo_collection"));
+        this.statisticsCollection = mongoManager.getDatabase().getCollection(config.getString("networking.mongo.statistics_collection"));
         this.matchRecordsCollection = mongoManager.getDatabase().getCollection(config.getString("networking.mongo.match_records_collection"));
 
         this.leaderboardUpdater = new LeaderboardUpdater(this);
@@ -71,7 +66,7 @@ public class GameProfileManager {
             }
         }
 
-        return CompletableFuture.supplyAsync(() -> {
+        CompletableFuture<GameProfile> profileFuture = CompletableFuture.supplyAsync(() -> {
 
             Document doc = profilesCollection.find(Filters.regex("name", "(?i)" + name)).first();
             if(doc != null) {
@@ -97,6 +92,24 @@ public class GameProfileManager {
                     profileELO.export().forEach((key, value) -> eloCollection.updateOne(Filters.eq("_id", profileELO.getUuid()), Updates.set(key, value)));
                 }
 
+                statisticsCollection.find(Filters.eq("_id", p.getUuid())).forEach(document -> {
+                    ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class));
+                    profileStatistics.importFromDocument(document);
+                    p.setProfileStatistics(profileStatistics);
+                });
+
+                if(p.getProfileStatistics() == null) {
+                    ProfileStatistics profileStatistics = new ProfileStatistics(p.getUuid());
+                    p.setProfileStatistics(profileStatistics);
+
+                    Document document = statisticsCollection.find(new Document("_id", profileStatistics.getUuid())).first();
+                    if(document == null) {
+                        statisticsCollection.insertOne(new Document("_id", profileStatistics.getUuid()));
+                    }
+
+                    profileStatistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", profileStatistics.getUuid()), Updates.set(key, value)));
+                }
+
                 matchRecordsCollection.find(Filters.or(Filters.eq("winner", p.getUuid()), Filters.eq("loser", p.getUuid()))).forEach(document -> {
                     MatchRecord record = new MatchRecord(document.get("_id", UUID.class));
                     record.importFromDocument(document);
@@ -111,12 +124,19 @@ public class GameProfileManager {
                 return null;
             }
         });
+
+        profileFuture.exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
+        });
+
+        return profileFuture;
     }
 
     public CompletableFuture<GameProfile> findAsync(UUID uuid) {
         if(Bukkit.getPlayer(uuid) != null) return CompletableFuture.supplyAsync(() -> getLoadedProfiles().get(uuid));
 
-        return CompletableFuture.supplyAsync(() -> {
+        CompletableFuture<GameProfile> profileFuture = CompletableFuture.supplyAsync(() -> {
 
             Document doc = profilesCollection.find(new Document("_id", uuid)).first();
             if(doc != null) {
@@ -142,6 +162,24 @@ public class GameProfileManager {
                     profileELO.export().forEach((key, value) -> eloCollection.updateOne(Filters.eq("_id", profileELO.getUuid()), Updates.set(key, value)));
                 }
 
+                statisticsCollection.find(Filters.eq("_id", p.getUuid())).forEach(document -> {
+                    ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class));
+                    profileStatistics.importFromDocument(document);
+                    p.setProfileStatistics(profileStatistics);
+                });
+
+                if(p.getProfileStatistics() == null) {
+                    ProfileStatistics profileStatistics = new ProfileStatistics(p.getUuid());
+                    p.setProfileStatistics(profileStatistics);
+
+                    Document document = statisticsCollection.find(new Document("_id", profileStatistics.getUuid())).first();
+                    if(document == null) {
+                        statisticsCollection.insertOne(new Document("_id", profileStatistics.getUuid()));
+                    }
+
+                    profileStatistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", profileStatistics.getUuid()), Updates.set(key, value)));
+                }
+
                 matchRecordsCollection.find(Filters.or(Filters.eq("winner", p.getUuid()), Filters.eq("loser", p.getUuid()))).forEach(document -> {
                     MatchRecord record = new MatchRecord(document.get("_id", UUID.class));
                     record.importFromDocument(document);
@@ -156,6 +194,13 @@ public class GameProfileManager {
                 return null;
             }
         });
+
+        profileFuture.exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return null;
+        });
+
+        return profileFuture;
     }
 
     public GameProfile getLoadedProfile(UUID uuid) {
@@ -231,6 +276,24 @@ public class GameProfileManager {
             profileELO.export().forEach((key, value) -> eloCollection.updateOne(Filters.eq("_id", profileELO.getUuid()), Updates.set(key, value)));
         }
 
+        statisticsCollection.find(Filters.eq("_id", uuid)).forEach(document -> {
+            ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class));
+            profileStatistics.importFromDocument(document);
+            fProfile.setProfileStatistics(profileStatistics);
+        });
+
+        if(fProfile.getProfileStatistics() == null) {
+            ProfileStatistics profileStatistics = new ProfileStatistics(uuid);
+            fProfile.setProfileStatistics(profileStatistics);
+
+            Document document = statisticsCollection.find(new Document("_id", profileStatistics.getUuid())).first();
+            if(document == null) {
+                statisticsCollection.insertOne(new Document("_id", profileStatistics.getUuid()));
+            }
+
+            profileStatistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", profileStatistics.getUuid()), Updates.set(key, value)));
+        }
+
         matchRecordsCollection.find(Filters.or(Filters.eq("winner", uuid), Filters.eq("loser", uuid))).forEach(document -> {
             MatchRecord record = new MatchRecord(document.get("_id", UUID.class));
             record.importFromDocument(document);
@@ -238,6 +301,14 @@ public class GameProfileManager {
         });
 
         loadedProfiles.put(uuid, fProfile);
+    }
+
+    public void logOff(UUID uuid) {
+        GameProfile profile = loadedProfiles.get(uuid);
+        if(profile == null) return;
+
+        exportToDatabase(uuid, true);
+        exportStatistics(profile.getProfileStatistics(), true);
     }
 
     public void exportToDatabase(UUID uuid, boolean async) {
@@ -259,6 +330,12 @@ public class GameProfileManager {
         });
     }
 
+    public void exportStatistics(ProfileStatistics statistics, boolean async) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            statistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", statistics.getUuid()), Updates.set(key, value)));
+        });
+    }
+
     public void exportMatchRecord(MatchRecord record) {
         matchRecords.put(record.getUuid(), record);
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -268,6 +345,8 @@ public class GameProfileManager {
 
     public void shutdown() {
         for (Player player : Bukkit.getOnlinePlayers()) {
+            GameProfile profile = loadedProfiles.get(player.getUniqueId());
+            exportStatistics(profile.getProfileStatistics(), false);
             exportToDatabase(player.getUniqueId(), false);
         }
 

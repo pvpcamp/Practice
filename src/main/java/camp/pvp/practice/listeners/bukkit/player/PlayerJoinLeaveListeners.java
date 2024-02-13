@@ -72,7 +72,7 @@ public class PlayerJoinLeaveListeners implements Listener {
 
             plugin.getAssemble().getBoards().remove(player.getUniqueId());
 
-            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getGameProfileManager().exportToDatabase(player.getUniqueId(), true), 2);
+            Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> plugin.getGameProfileManager().logOff(player.getUniqueId()), 2);
         }
     }
 }

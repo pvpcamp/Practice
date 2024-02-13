@@ -229,6 +229,9 @@ public class Duel extends Game {
             stringBuilder.append(Colors.get("\n &7● &6Winner: &f" + winnerParticipant.getName()));
         }
 
+        winnerProfile.getProfileStatistics().incrementWins(getKit(), queueType);
+        loserProfile.getProfileStatistics().resetWinStreak(getKit(), queueType);
+
         // Export match record.
         MatchRecord record = new MatchRecord(this, winnerParticipant, loserParticipant, difference, winnerElo, loserElo);
         getPlugin().getGameProfileManager().exportMatchRecord(record);
@@ -247,6 +250,15 @@ public class Duel extends Game {
     @Override
     public void eliminate(Player player, boolean leftGame) {
         super.eliminate(player, leftGame);
+
+        GameParticipant participant = getParticipants().get(player.getUniqueId());
+        GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfile(player.getUniqueId());
+        profile.getProfileStatistics().incrementDeaths(getKit(), queueType);
+
+        GameProfile attackerProfile = getPlugin().getGameProfileManager().getLoadedProfile(participant.getAttacker());
+        if(attackerProfile != null) {
+            attackerProfile.getProfileStatistics().incrementKills(getKit(), queueType);
+        }
 
         if(getTournament() != null) {
             getTournament().eliminate(player);

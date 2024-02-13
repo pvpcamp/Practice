@@ -7,6 +7,7 @@ networking:
     database: "db"
     profiles_collection: "practice_profiles"
     elo_collection: "practice_elo_profiles"
+    statistics_collection: "practice_profile_statistics"
     match_records_collection: "practice_match_records"
   redis:
     host: "127.0.0.1"

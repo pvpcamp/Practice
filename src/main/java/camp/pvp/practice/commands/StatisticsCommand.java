@@ -6,6 +6,7 @@ import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.profiles.stats.ProfileELO;
+import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
@@ -50,7 +51,8 @@ public class StatisticsCommand implements CommandExecutor {
                 }
 
                 ProfileELO elo = profile.getProfileElo();
-                new StatisticsGui(opener, elo).open(player);
+                ProfileStatistics statistics = profile.getProfileStatistics();
+                new StatisticsGui(opener, elo, statistics).open(player);
             });
         }
 
