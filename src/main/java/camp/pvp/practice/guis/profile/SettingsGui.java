@@ -190,45 +190,6 @@ public class SettingsGui extends StandardGui {
         hotbarSlot.setSlot(16);
         this.addButton(hotbarSlot, false);
 
-        GuiButton deathAnimation = new GuiButton(gameProfile.getDeathAnimation().getIcon().getType(), "&4&lDeath Animation");
-        deathAnimation.setAction(new GuiAction() {
-            @Override
-            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
-                if(player.hasPermission("practice.cosmetics.death_animation")) {
-                    if (gameProfile.getDeathAnimation().ordinal() == DeathAnimation.values().length - 1) {
-                        gameProfile.setDeathAnimation(DeathAnimation.DEFAULT);
-                    } else {
-                        gameProfile.setDeathAnimation(DeathAnimation.values()[gameProfile.getDeathAnimation().ordinal() + 1]);
-                    }
-                    gui.updateGui();
-                } else {
-                    player.sendMessage(Colors.get("&aThis feature is only available to players that have &5&lPlus Rank &aor higher." ));
-                    player.sendMessage(Colors.get("&aIf you would like to support us, you can buy a rank here: &fstore.pvp.camp" ));
-                }
-            }
-        });
-
-        deathAnimation.setButtonUpdater(new AbstractButtonUpdater() {
-            @Override
-            public void update(GuiButton guiButton, Gui gui) {
-                DeathAnimation da = gameProfile.getDeathAnimation();
-                guiButton.setType(da.getIcon().getType());
-
-                List<String> lore = new ArrayList<>();
-                lore.add("&7What would you like your");
-                lore.add("&7death animation to be?");
-                lore.add(" ");
-
-                for(DeathAnimation deathAnimation : DeathAnimation.values()) {
-                    lore.add((da.equals(deathAnimation) ? "&6&l" : "&8") +" ● " + deathAnimation);
-                }
-
-                guiButton.setLore(lore);
-            }
-        });
-        deathAnimation.setSlot(21);
-        this.addButton(deathAnimation, false);
-
         GuiButton sidebarSettings = new GuiButton(Material.BOAT, "&d&lSidebar Settings");
         sidebarSettings.setAction(new GuiAction() {
             @Override
@@ -253,7 +214,7 @@ public class SettingsGui extends StandardGui {
                 }
             }
         });
-        sidebarSettings.setSlot(23);
+        sidebarSettings.setSlot(19);
         this.addButton(sidebarSettings, false);
 
         if(player.hasPermission("practice.staff.debug_mode")) {
@@ -276,7 +237,7 @@ public class SettingsGui extends StandardGui {
                             "&aCurrent Setting: &f" + (gameProfile.isDebugMode() ? "Enabled" : "Disabled"));
                 }
             });
-            debugMode.setSlot(31);
+            debugMode.setSlot(23);
             this.addButton(debugMode);
         }
 
@@ -300,7 +261,7 @@ public class SettingsGui extends StandardGui {
                             "&aCurrent Setting: &f" + (gameProfile.isBuildMode() ? "Enabled" : "Disabled"));
                 }
             });
-            buildMode.setSlot(27);
+            buildMode.setSlot(24);
             this.addButton(buildMode);
         }
 
@@ -326,7 +287,7 @@ public class SettingsGui extends StandardGui {
                             "&aCurrent Setting: &f" + (gameProfile.isStaffMode() ? "Enabled" : "Disabled"));
                 }
             });
-            staffMode.setSlot(35);
+            staffMode.setSlot(25);
             this.addButton(staffMode);
         }
     }

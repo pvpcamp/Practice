@@ -333,9 +333,21 @@ public class GameProfileManager {
     public void exportStatistics(ProfileStatistics statistics, boolean async) {
         if(async) {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+
+                Document doc = statisticsCollection.find().filter(Filters.eq("_id", statistics.getUuid())).first();
+                if(doc == null) {
+                    statisticsCollection.insertOne(new Document("_id", statistics.getUuid()));
+                }
+
                 statistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", statistics.getUuid()), Updates.set(key, value)));
             });
         } else {
+
+            Document doc = statisticsCollection.find().filter(Filters.eq("_id", statistics.getUuid())).first();
+            if(doc == null) {
+                statisticsCollection.insertOne(new Document("_id", statistics.getUuid()));
+            }
+
             statistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", statistics.getUuid()), Updates.set(key, value)));
         }
     }
@@ -343,6 +355,12 @@ public class GameProfileManager {
     public void exportMatchRecord(MatchRecord record) {
         matchRecords.put(record.getUuid(), record);
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+
+            Document doc = matchRecordsCollection.find().filter(Filters.eq("_id", record.getUuid())).first();
+            if(doc == null) {
+                matchRecordsCollection.insertOne(new Document("_id", record.getUuid()));
+            }
+
             record.export().forEach((key, value) -> matchRecordsCollection.updateOne(Filters.eq("_id", record.getUuid()), Updates.set(key, value)));
         });
     }

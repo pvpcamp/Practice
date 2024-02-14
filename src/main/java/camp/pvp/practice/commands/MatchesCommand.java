@@ -55,16 +55,14 @@ public class MatchesCommand implements CommandExecutor {
         CompletableFuture<GameProfile> profileFuture = plugin.getGameProfileManager().findAsync(targetName);
 
         profileFuture.thenAccept(profile -> {
-           if(profile == null) {
-                player.sendMessage(ChatColor.RED + "No match records found for " + targetName + ".");
+           if(profile == null || profile.getMatchRecords().isEmpty()) {
+                player.sendMessage(ChatColor.RED + "No match records found for " + profile.getName() + ".");
                 return;
            }
 
-            if(profile.getMatchRecords() == null) return;
-
             PaginatedGui gui = new PaginatedGui("&6Matches &7- &6" + targetName, 36);
 
-            if(targetName.equals(sender.getName())) {
+            if(targetName.equalsIgnoreCase(sender.getName())) {
                 GuiButton myProfile = new GuiButton(Material.SKULL_ITEM, "&6&lGo to My Profile");
                 myProfile.setDurability((short) 3);
                 SkullMeta meta = (SkullMeta) myProfile.getItemMeta();

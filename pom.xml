@@ -73,6 +73,11 @@
             <version>1.0</version>
         </dependency>
         <dependency>
+            <groupId>camp.pvp</groupId>
+            <artifactId>Core</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
             <groupId>camp.pvp.utils</groupId>
             <artifactId>Gooey2</artifactId>
             <version>1.0</version>

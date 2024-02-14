@@ -1,5 +1,6 @@
 package camp.pvp.practice.profiles;
 
+import camp.pvp.core.Core;
 import camp.pvp.practice.arenas.ArenaCopier;
 import camp.pvp.practice.cosmetics.DeathAnimation;
 import camp.pvp.practice.games.GameParticipant;
@@ -57,6 +58,10 @@ public class GameProfile {
                     name = name.replace("_", " ");
                     return WordUtils.capitalizeFully(name);
             }
+        }
+
+        public boolean isLobby() {
+            return this.name().contains("LOBBY");
         }
     }
 
@@ -190,22 +195,23 @@ public class GameProfile {
         givePlayerItems(true);
     }
 
+    public void applyLobbyArmor() {
+        Player player = getPlayer();
+        if(player != null) {
+            ItemStack[] lobbyArmor = Core.getApi().getLoadedProfile(player.getUniqueId()).getAppliedLobbyArmor().getArmor();
+            player.getInventory().setArmorContents(lobbyArmor);
+        }
+    }
+
     public void givePlayerItems(boolean update) {
         Player player = getPlayer();
 
         if(player != null) {
 
             boolean flying = false;
-            if (player.hasPermission("practice.lobby.fly")) {
-                switch(getState()) {
-                    case LOBBY_QUEUE:
-                    case LOBBY_PARTY:
-                    case LOBBY_TOURNAMENT:
-                    case LOBBY_EVENT:
-                    case LOBBY:
-                        flying = true;
-                        break;
-                }
+
+            if (player.hasPermission("practice.lobby.fly") && getState().isLobby()) {
+                flying = true;
             }
 
             // Update is only used for when the player is in the lobby and their items need to be updated.
@@ -227,6 +233,10 @@ public class GameProfile {
                 PlayerUtils.reset(player, flying);
             } else {
                 player.getInventory().clear();
+            }
+
+            if(getState().isLobby()) {
+                applyLobbyArmor();
             }
 
             PlayerInventory pi = player.getInventory();
