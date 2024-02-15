@@ -59,7 +59,7 @@ public class CosmeticsGui extends StandardGui {
 
         lobbyArmor.setAction((player, button, gui, click) -> {
             if(!player.hasPermission("core.cosmetics.lobby_armor")) {
-                player.sendMessage(Colors.get("&aThis feature is only available to players that have &6&lPremium Rank." ));
+                player.sendMessage(Colors.get("&aThis feature is only available to players that have &5&lPlus Rank&a or higher." ));
                 player.sendMessage(Colors.get("&aIf you would like to support us, you can buy a rank here: &fstore.pvp.camp" ));
                 return;
             }
@@ -95,7 +95,7 @@ public class CosmeticsGui extends StandardGui {
 
         flightEffect.setAction((player, button, gui, click) -> {
             if(!player.hasPermission("core.cosmetics.flight_effect")) {
-                player.sendMessage(Colors.get("&aThis feature is only available to players that have &5&lPlus Rank&a or higher." ));
+                player.sendMessage(Colors.get("&aThis feature is only available to players that have &6&lPremium Rank." ));
                 player.sendMessage(Colors.get("&aIf you would like to support us, you can buy a rank here: &fstore.pvp.camp" ));
                 return;
             }

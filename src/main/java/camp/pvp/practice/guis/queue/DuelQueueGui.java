@@ -26,6 +26,13 @@ public class DuelQueueGui extends ArrangedGui {
         setAutoUpdate(true);
         setDefaultNavigationBar();
 
+        GuiButton back = new GuiButton(Material.ARROW, "&c&lBack");
+        back.setAction((p, b, g, click) -> new ChooseQueueGui(profile).open(p));
+        back.setLore("&7Click to return to", "&7the play menu.");
+        back.setSlot(0);
+        back.setOverrideGuiArrangement(true);
+        addButton(back);
+
         final ChatColor color = queueType.getColor();
 
         GuiButton unrankedQueue = new GuiButton(Material.IRON_SWORD, GameQueue.Type.UNRANKED.getColor() + "&lUnranked Queue");

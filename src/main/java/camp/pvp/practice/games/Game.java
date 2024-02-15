@@ -335,6 +335,7 @@ public abstract class Game {
         }
 
         profile.setGame(this);
+        profile.setRematch(null);
         profile.getDuelRequests().clear();
         plugin.getGameQueueManager().removeFromQueue(player);
 

@@ -42,24 +42,17 @@ public class EndingTask implements Runnable{
                 if(game instanceof Duel) {
                     Duel duel = (Duel) game;
                     GameQueue.Type queueType = duel.getQueueType();
-                    boolean delayItems = false;
                     if(queueType.equals(GameQueue.Type.UNRANKED) || queueType.equals(GameQueue.Type.RANKED) || queueType.equals(GameQueue.Type.PRIVATE)) {
                         PreviousQueue previousQueue = new PreviousQueue(game.getKit(), queueType.equals(GameQueue.Type.PRIVATE) ? GameQueue.Type.UNRANKED : queueType);
                         profile.setPreviousQueue(previousQueue);
-                        delayItems = true;
 
                         Rematch rematch;
                         for(GameParticipant p : game.getParticipants().values()) {
                             if(p.getUuid() != participant.getUuid() && p.getPlayer() != null && p.getPlayer().isOnline()) {
                                 rematch = new Rematch(profile, p.getUuid(), p.getName(), duel.getKit());
                                 profile.setRematch(rematch);
-                                delayItems = true;
                             }
                         }
-                    }
-
-                    if(delayItems) {
-                        profile.delayGiveItemsTask();
                     }
                 }
 

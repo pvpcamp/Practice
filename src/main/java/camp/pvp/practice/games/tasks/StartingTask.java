@@ -1,8 +1,6 @@
 package camp.pvp.practice.games.tasks;
 
-import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import camp.pvp.practice.games.impl.FreeForAll;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;

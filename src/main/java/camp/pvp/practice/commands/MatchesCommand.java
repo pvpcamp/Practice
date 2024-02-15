@@ -43,7 +43,7 @@ public class MatchesCommand implements CommandExecutor {
 
         if(!(sender instanceof Player)) return true;
 
-        Player player = (Player) sender;
+        final Player player = (Player) sender;
 
         String targetName = args.length > 0 ? args[0] : player.getName();
 
@@ -56,8 +56,8 @@ public class MatchesCommand implements CommandExecutor {
 
         profileFuture.thenAccept(profile -> {
            if(profile == null || profile.getMatchRecords().isEmpty()) {
-                player.sendMessage(ChatColor.RED + "No match records found for " + profile.getName() + ".");
-                return;
+               player.sendMessage(ChatColor.RED + "The target you specified does not have any match records.");
+               return;
            }
 
             PaginatedGui gui = new PaginatedGui("&6Matches &7- &6" + targetName, 36);
@@ -152,6 +152,9 @@ public class MatchesCommand implements CommandExecutor {
             if(player.isOnline()) {
                 gui.open(player);
             }
+        }).exceptionally(ex -> {
+            ex.printStackTrace();
+            return null;
         });
         return true;
     }

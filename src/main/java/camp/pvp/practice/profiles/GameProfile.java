@@ -111,7 +111,6 @@ public class GameProfile {
     private ProfileELO profileElo;
     private ProfileStatistics profileStatistics;
 
-    private BukkitTask giveItemsTask;
     private ArenaCopier arenaCopier;
 
     private Set<UUID> hiddenPlayers;
@@ -132,7 +131,7 @@ public class GameProfile {
 
         this.hiddenPlayers = new HashSet<>();
 
-        this.time = Time.DAY;
+        this.time = Time.NIGHT;
         this.lobbyVisibility = true;
         this.spectatorVisibility = true;
         this.comboMessages = true;
@@ -179,18 +178,6 @@ public class GameProfile {
         }
     }
 
-    public void delayGiveItemsTask() {
-        this.giveItemsTask = Bukkit.getScheduler().runTaskLater(Practice.instance, new Runnable() {
-            @Override
-            public void run() {
-                rematch = null;
-                if(getState().equals(State.LOBBY)) {
-                    givePlayerItems(false);
-                }
-            }
-        }, 20 * 15);
-    }
-
     public void givePlayerItems() {
         givePlayerItems(true);
     }
@@ -221,6 +208,9 @@ public class GameProfile {
                 switch (this.getState()) {
                     case LOBBY_TOURNAMENT:
                         slot = 1;
+                        break;
+                    case LOBBY:
+                        slot = 2;
                         break;
                     case LOBBY_PARTY:
                         slot = 3;
@@ -277,14 +267,6 @@ public class GameProfile {
     public void playerUpdate(boolean updateLocation) {
         Player player = getPlayer();
         if(player != null) {
-
-            if(!updateLocation) {
-                if(giveItemsTask != null) {
-                    rematch = null;
-                    giveItemsTask.cancel();
-                }
-            }
-
             updatePlayerVisibility();
             givePlayerItems();
 

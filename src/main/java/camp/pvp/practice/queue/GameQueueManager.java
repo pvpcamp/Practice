@@ -52,6 +52,11 @@ public class GameQueueManager {
         return null;
     }
 
+    public GameQueueMember addToQueue(Player player, DuelKit kit, GameQueue.Type queueType) {
+        GameQueue queue = getQueue(kit, queueType);
+        return addToQueue(player, queue);
+    }
+
     public boolean removeFromQueue(Player player) {
         return removeFromQueue(player.getUniqueId());
     }

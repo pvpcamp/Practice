@@ -9,7 +9,6 @@ import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.interactables.impl.event.EventLeaveInteract;
 import camp.pvp.practice.interactables.impl.game.*;
 import camp.pvp.practice.interactables.impl.lobby.*;
-import camp.pvp.practice.interactables.impl.queue.RequeueInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentJoinInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentLeaveInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentStatusInteract;
@@ -31,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum InteractableItems {
-    QUEUE, MINIGAMES, EVENT, REQUEUE, REMATCH, PARTY_CREATE, PROFILE, KIT_EDITOR, SETTINGS,
+    QUEUE, PARTY_CREATE, PROFILE, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS, PARTY_INFO,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
@@ -43,63 +42,10 @@ public enum InteractableItems {
             // LOBBY
             case QUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.DIAMOND_SWORD, "&6Join a Queue").create(), 0, new QueueInteract());
-            case MINIGAMES:
-                return new InteractableItem(
-                        new ItemBuilder(Material.BOW, "&6Join a Minigame Queue").create(), 1, new MinigamesInteract());
-            case EVENT:
-                GameManager gm = Practice.getInstance().getGameManager();
-                if (gm.isEventRunning()) {
-                    if (gm.getTournament() != null) {
-                        if (gm.getTournament().getState().equals(Tournament.State.STARTING)) {
-                            return new InteractableItem(
-                                    new ItemBuilder(Material.DIAMOND, "&6Join Current Tournament").create(), 2, new TournamentJoinInteract());
-                        } else {
-                            return new InteractableItem(
-                                    new ItemBuilder(Material.DIAMOND, "&6View Tournament Status").create(), 2, new TournamentStatusInteract());
-                        }
-                    }
-
-                    if (gm.getActiveEvent() != null) {
-                        return new InteractableItem(
-                                new ItemBuilder(Material.EMERALD, "&6Join Current Event").create(), 2, new EventInteract());
-                    }
-                } else {
-                    return new InteractableItem(
-                            new ItemBuilder(Material.NETHER_STAR, "&6Host an Event").create(), 2, new EventInteract());
-                }
-                return null;
-            case REQUEUE:
-                return new InteractableItem(
-                        new ItemBuilder(Material.PAPER, "&6Play Again").create(), 3,
-                        new RequeueInteract(),
-                        new ItemUpdater() {
-                            @Override
-                            public void onUpdate(InteractableItem item, GameProfile profile) {
-                                PreviousQueue queue = profile.getPreviousQueue();
-                                if (queue != null) {
-                                    item.updateName("&6Queue for &f" + queue.getQueueType().toString() + " " + queue.getKit().getDisplayName());
-                                }
-                            }
-                        }
-                );
-            case REMATCH:
-                return new InteractableItem(
-                        new ItemBuilder(Material.BLAZE_POWDER, "&6Rematch").create(), 4,
-                        new RematchInteract(),
-                        new ItemUpdater() {
-                            @Override
-                            public void onUpdate(InteractableItem item, GameProfile profile) {
-                                Rematch rematch = profile.getRematch();
-                                if (rematch != null) {
-                                    item.updateName("&6Rematch &f" + rematch.getName());
-                                }
-                            }
-                        }
-                );
+                        new ItemBuilder(Material.DIAMOND_SWORD, "&6Play").create(), 0, new QueueInteract());
             case PARTY_CREATE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.NAME_TAG, "&6Create a Party").create(), 5, new PartyCreateInteract());
+                        new ItemBuilder(Material.NAME_TAG, "&6Create a Party").create(), 1, new PartyCreateInteract());
             case PROFILE:
                 return new InteractableItem(
                         new ItemBuilder(Material.SKULL_ITEM, "&6My Profile").create(), 6, new MyProfileInteract(), (item, profile) -> {
@@ -189,17 +135,6 @@ public enum InteractableItems {
         switch(profile.getState()) {
             case LOBBY:
                 items.add(QUEUE);
-                items.add(MINIGAMES);
-                items.add(EVENT);
-
-                if(profile.getPreviousQueue() != null) {
-                    items.add(REQUEUE);
-                }
-
-                if(profile.getRematch() != null) {
-                    items.add(REMATCH);
-                }
-
                 items.add(PARTY_CREATE);
                 items.add(PROFILE);
                 items.add(KIT_EDITOR);

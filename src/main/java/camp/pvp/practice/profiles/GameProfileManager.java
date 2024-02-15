@@ -251,6 +251,12 @@ public class GameProfileManager {
         if(profile == null) {
             profile = new GameProfile(uuid);
             profile.setName(name);
+
+            Document document = profilesCollection.find(new Document("_id", uuid)).first();
+            if(document == null) {
+                profilesCollection.insertOne(new Document("_id", uuid));
+            }
+
             profile.export().forEach((key, value) -> profilesCollection.updateOne(Filters.eq("_id", uuid), Updates.set(key, value)));
         }
 
@@ -268,12 +274,7 @@ public class GameProfileManager {
             profileELO.setName(name);
             fProfile.setProfileElo(profileELO);
 
-            Document document = eloCollection.find(new Document("_id", profileELO.getUuid())).first();
-            if(document == null) {
-                eloCollection.insertOne(new Document("_id", profileELO.getUuid()));
-            }
-
-            profileELO.export().forEach((key, value) -> eloCollection.updateOne(Filters.eq("_id", profileELO.getUuid()), Updates.set(key, value)));
+            exportElo(profileELO);
         }
 
         statisticsCollection.find(Filters.eq("_id", uuid)).forEach(document -> {
@@ -286,12 +287,7 @@ public class GameProfileManager {
             ProfileStatistics profileStatistics = new ProfileStatistics(uuid);
             fProfile.setProfileStatistics(profileStatistics);
 
-            Document document = statisticsCollection.find(new Document("_id", profileStatistics.getUuid())).first();
-            if(document == null) {
-                statisticsCollection.insertOne(new Document("_id", profileStatistics.getUuid()));
-            }
-
-            profileStatistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", profileStatistics.getUuid()), Updates.set(key, value)));
+            exportStatistics(profileStatistics, true);
         }
 
         matchRecordsCollection.find(Filters.or(Filters.eq("winner", uuid), Filters.eq("loser", uuid))).forEach(document -> {
@@ -326,6 +322,11 @@ public class GameProfileManager {
 
     public void exportElo(ProfileELO elo) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            Document doc = eloCollection.find().filter(Filters.eq("_id", elo.getUuid())).first();
+            if(doc == null) {
+                eloCollection.insertOne(new Document("_id", elo.getUuid()));
+            }
+
             elo.export().forEach((key, value) -> eloCollection.updateOne(Filters.eq("_id", elo.getUuid()), Updates.set(key, value)));
         });
     }

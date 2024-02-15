@@ -27,11 +27,6 @@ public class Rematch {
     public void send() {
         profile.setRematch(null);
 
-        if(profile.getGiveItemsTask() != null) {
-            profile.getGiveItemsTask().cancel();
-            profile.givePlayerItems();
-        }
-
         Player player = profile.getPlayer();
         Player target = Bukkit.getPlayer(uuid);
         if(target != null) {

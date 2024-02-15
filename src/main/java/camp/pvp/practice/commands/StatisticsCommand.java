@@ -46,13 +46,16 @@ public class StatisticsCommand implements CommandExecutor {
             CompletableFuture<GameProfile> future = gpm.findAsync(target);
             future.thenAccept(profile -> {
                 if(profile == null) {
-                    player.sendMessage(ChatColor.RED + "The player you specified has not played on this server.");
+                    player.sendMessage(ChatColor.RED + "The target you specified has not played on this server.");
                     return;
                 }
 
                 ProfileELO elo = profile.getProfileElo();
                 ProfileStatistics statistics = profile.getProfileStatistics();
                 new StatisticsGui(opener, elo, statistics).open(player);
+            }).exceptionally(ex -> {
+                ex.printStackTrace();
+                return null;
             });
         }
 

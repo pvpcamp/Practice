@@ -339,7 +339,7 @@ public class Duel extends Game {
 
                     if(showPing) {
                         show = true;
-                        if (opponent == null) {
+                        if (opponent == null || opponent.getPlayer() == null) {
                             lines.add("&6Ping: &f" + ping + " ms");
                         } else {
                             enemyPing = PlayerUtils.getPing(opponent.getPlayer());
@@ -352,7 +352,7 @@ public class Duel extends Game {
                         if(opponent == null) {
                             lines.add("&6CPS: &f" + profile.getCps());
                         } else {
-                            GameProfile opponentProfile = getPlugin().getGameProfileManager().getLoadedProfiles().get(opponent.getUuid());
+                            GameProfile opponentProfile = getPlugin().getGameProfileManager().getLoadedProfile(opponent.getUuid());
                             lines.add("&6CPS: &f" + profile.getCps() + " &7┃ &f" + opponentProfile.getCps());
                         }
                     }

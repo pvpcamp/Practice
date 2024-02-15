@@ -2,6 +2,7 @@ package camp.pvp.practice.guis.games.events;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.sumo.SumoEvent;
+import camp.pvp.practice.guis.queue.ChooseQueueGui;
 import camp.pvp.practice.guis.tournament.TournamentHostGui;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
@@ -24,6 +25,13 @@ public class HostEventGui extends StandardGui {
 
         Practice plugin = Practice.instance;
 
+        GuiButton back = new GuiButton(Material.ARROW, "&c&lBack");
+        back.setAction((p, b, g, click) -> new ChooseQueueGui(plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId())).open(p));
+        back.setLore("&7Click to return to", "&7the play menu.");
+        back.setSlot(0);
+        back.setOverrideGuiArrangement(true);
+        addButton(back);
+
         GuiButton sumoEvent = new GuiButton(Material.LEASH, "&6&lSumo Event");
 
         List<String> sumoLines = new ArrayList<>();
@@ -40,7 +48,7 @@ public class HostEventGui extends StandardGui {
                         SumoEvent event = new SumoEvent(plugin);
                         event.start();
                     } else {
-                        player.sendMessage(ChatColor.RED + "This event is already running.");
+                        player.sendMessage(ChatColor.RED + "There is an event already running.");
                     }
                 }
             });
