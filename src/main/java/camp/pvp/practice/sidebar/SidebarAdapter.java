@@ -81,16 +81,28 @@ public class SidebarAdapter implements AssembleAdapter {
                 case LOBBY_QUEUE:
                     GameQueue queue = gameQueueManager.getQueue(player);
                     GameQueueMember queueMember = gameQueueManager.findQueueMember(queue, player.getUniqueId());
+
                     boolean ranked = queue.getType().equals(GameQueue.Type.RANKED);
+
                     lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
-                    lines.add("&6In Queue:");
-                    lines.add(" &7● " + queue.getType().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
 
-                    if(queue.getType().equals(GameQueue.Type.RANKED)) {
-                        lines.add(" &7● &6ELO: &f" + profile.getProfileElo().getRatings().get(queue.getDuelKit()));
-                        lines.add(" &7● &6Range: &f" + queueMember.getEloLow() + " - " + queueMember.getEloHigh());
+                    switch(queue.getGameType()) {
+                        case DUEL -> {
+                            lines.add("&6In Duel Queue:");
+                            lines.add(" &7● " + queue.getType().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
+
+                            if(queue.getType().equals(GameQueue.Type.RANKED)) {
+                                lines.add(" &7● &6ELO: &f" + profile.getProfileElo().getRatings().get(queue.getDuelKit()));
+                                lines.add(" &7● &6Range: &f" + queueMember.getEloLow() + " - " + queueMember.getEloHigh());
+                            }
+                        }
+                        case MINIGAME -> {
+                            lines.add("&6In Minigame Queue:");
+                            lines.add(" &7● " + queue.getType().getColor() + queue.getMinigameType().toString() + (ranked ? " &f&l(R)" : " &f(U)"));
+                            lines.add(" &7● &6In Queue: &f" + queue.getQueueMembers().size());
+                        }
                     }
 
                     if(showDuration) {
@@ -148,49 +160,6 @@ public class SidebarAdapter implements AssembleAdapter {
                     break;
                 default:
                     lines.add("&f&oIn Development.");
-            }
-
-            if(profile.getArenaCopier() != null) {
-                ArenaCopier act = profile.getArenaCopier();
-                lines.add(" ");
-                lines.add("&6&lArenaCopyTask");
-                lines.add(" &7● &6Source: &f" + act.getArena().getName());
-                lines.add(" &7● &6Copy: &f" + act.getNewArena().getName());
-                lines.add(" &7● &6Difference: &fX" + act.getXDifference() + " Z" + act.getZDifference());
-                lines.add(" &7● &6Blocks Left: &f" + act.getBlocks().size());
-                lines.add(" &7● &6Duration: &f" + TimeUtil.get(act.getStarted()));
-            }
-
-            if(staff) {
-                ArenaBlockUpdater abu = plugin.getArenaManager().getArenaBlockUpdater();
-                if(abu != null && abu.getEnded() == 0) {
-                    lines.add(" ");
-                    lines.add("&6&lArenaBlockUpdater");
-                    lines.add(" &7● &6Source: &f" + abu.getArena().getName());
-                    lines.add(" &7● &6Blocks Left: &f" + abu.getBlocks().size());
-                    lines.add(" &7● &6Duration: &f" + TimeUtil.get(abu.getStarted()));
-                }
-
-                ArenaCopyQueue acu = plugin.getArenaManager().getArenaCopyQueue();
-                if(!acu.getCopyQueue().isEmpty()) {
-                    Queue<ArenaCopier> copierQueue = acu.getCopyQueue();
-                    ArenaCopier ac = copierQueue.peek();
-                    lines.add(" ");
-                    lines.add("&6&lArenaCopyQueue &7(" + copierQueue.size() + ")");
-                    lines.add(" &7● &6Source: &f" + ac.getArena().getName());
-                    lines.add(" &7● &6Current: &f" + ac.getNewArena().getName());
-                    lines.add(" &7● &6Blocks Left: &f" + ac.getBlocks().size());
-                    lines.add(" &7● &6Duration: &f" + TimeUtil.get(ac.getStarted()));
-                }
-
-                ArenaDeleter ad = plugin.getArenaManager().getArenaDeleter();
-                if(ad != null && ad.getEnded() == 0) {
-                    lines.add(" ");
-                    lines.add("&6&lArenaDeleter");
-                    lines.add(" &7● &6Source: &f" + ad.getArena().getName());
-                    lines.add(" &7● &6Blocks Left: &f" + ad.getBlocks().size());
-                    lines.add(" &7● &6Duration: &f" + TimeUtil.get(ad.getStarted()));
-                }
             }
 
             lines.add(" ");

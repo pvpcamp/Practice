@@ -111,8 +111,6 @@ public class GameProfile {
     private ProfileELO profileElo;
     private ProfileStatistics profileStatistics;
 
-    private ArenaCopier arenaCopier;
-
     private Set<UUID> hiddenPlayers;
 
     private long lastLoadFromDatabase;

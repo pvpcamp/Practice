@@ -1,18 +1,13 @@
 package camp.pvp.practice.commands;
 
-import camp.pvp.practice.arenas.ArenaBlockUpdater;
-import camp.pvp.practice.arenas.ArenaCopyQueue;
 import camp.pvp.practice.listeners.citizens.NPCClickable;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
-import camp.pvp.utils.buttons.GuiButton;
-import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -70,27 +65,6 @@ public class PracticeUtilCommand implements CommandExecutor {
                         plugin.getArenaManager().scanBlocks();
 
                         return true;
-                    case "cancel":
-                        ArenaCopyQueue acq = plugin.getArenaManager().getArenaCopyQueue();
-                        if(!acq.getCopyQueue().isEmpty()) {
-                            final int size = acq.getCopyQueue().size();
-                            Bukkit.getScheduler().cancelTask(acq.getCopyQueue().peek().getTaskId());
-                            acq.getCopyQueue().clear();
-
-                            player.sendMessage(ChatColor.GREEN.toString() + size + " arenas in the copy queue have been cancelled, blocks may still remain.");
-                        } else {
-                            player.sendMessage(ChatColor.GRAY + "Copy queue is empty.");
-                        }
-
-                        ArenaBlockUpdater abu = plugin.getArenaManager().getArenaBlockUpdater();
-                        if(abu != null && abu.getEnded() == 0) {
-                            Bukkit.getScheduler().cancelTask(abu.getTaskId());
-                            player.sendMessage(ChatColor.GREEN + "Arena block updater has been cancelled for arena " + ChatColor.WHITE + abu.getArena().getName() + ".");
-                        } else {
-                            player.sendMessage(ChatColor.GRAY + "Arena block updater is not running.");
-                        }
-
-                        return true;
                     case "setnpcid":
                         if(args.length > 2) {
                             NPCClickable clickable;
@@ -125,7 +99,6 @@ public class PracticeUtilCommand implements CommandExecutor {
             StringBuilder sb = new StringBuilder();
             sb.append("&6&lPractice Utilities");
             sb.append("\n&6Next Scheduled Restart: &f" + plugin.getServerRebooter().getRebootTime().toString());
-            sb.append("\n&6/" + label + " cancel &7- &fCancels all arena copy, update, and delete tasks.");
             sb.append("\n&6/" + label + " debug &7- &fShows a bunch of useful information.");
             sb.append("\n&6/" + label + " reset &7- &fResets your player.");
             sb.append("\n&6/" + label + " scanner &7- &fRescan all arenas for important blocks.");

@@ -1,5 +1,7 @@
 package camp.pvp.practice.queue;
 
+import camp.pvp.practice.games.Game;
+import camp.pvp.practice.games.minigames.QueueableMinigame;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
@@ -52,6 +54,25 @@ public class GameQueueManager {
         return null;
     }
 
+    public GameQueueMember addToQueue(Player player, QueueableMinigame.Type minigameType, GameQueue.Type queueType) {
+        GameQueue queue = getQueue(minigameType, queueType);
+
+        if(getQueue(player) != null) return null;
+
+        GameQueueMember gqm;
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
+
+        gqm = new GameQueueMember(player.getUniqueId(), player.getName());
+
+        gqm.setQueue(queue);
+        queue.getQueueMembers().add(gqm);
+
+        profile.playerUpdate(false);
+        player.sendMessage(ChatColor.GREEN + "You have joined the queue for " + queue.getType().name().toLowerCase() + " " + ChatColor.WHITE + queue.getMinigameType().toString() + ChatColor.GREEN + ".");
+
+        return gqm;
+    }
+
     public GameQueueMember addToQueue(Player player, DuelKit kit, GameQueue.Type queueType) {
         GameQueue queue = getQueue(kit, queueType);
         return addToQueue(player, queue);
@@ -102,7 +123,17 @@ public class GameQueueManager {
 
     public GameQueue getQueue(DuelKit kit, GameQueue.Type queueType) {
         for(GameQueue q : getGameQueues()) {
-            if(q.getDuelKit().equals(kit) && q.getType().equals(queueType)) {
+            if(q.getDuelKit() != null && q.getDuelKit().equals(kit) && q.getType().equals(queueType)) {
+                return q;
+            }
+        }
+
+        return null;
+    }
+
+    public GameQueue getQueue(QueueableMinigame.Type minigameType, GameQueue.Type queueType) {
+        for(GameQueue q : getGameQueues()) {
+            if(q.getMinigameType() != null && q.getMinigameType().equals(minigameType) && q.getType().equals(queueType)) {
                 return q;
             }
         }
@@ -163,6 +194,13 @@ public class GameQueueManager {
                     queues++;
                 }
             }
+        }
+
+        for(QueueableMinigame.Type minigameType : QueueableMinigame.Type.values()) {
+            GameQueue queue = new GameQueue(plugin, minigameType, GameQueue.Type.UNRANKED);
+            queue.startQueue();
+            addQueue(queue);
+            queues++;
         }
 
         logger.info(queues + " GameQueue(s) have been refreshed.");

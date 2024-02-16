@@ -1,10 +1,16 @@
 package camp.pvp.practice.guis.queue;
 
+import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameManager;
+import camp.pvp.practice.games.minigames.QueueableMinigame;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
 import org.bukkit.Material;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MinigameQueueGui extends ArrangedGui {
 
@@ -21,9 +27,24 @@ public class MinigameQueueGui extends ArrangedGui {
         back.setOverrideGuiArrangement(true);
         addButton(back);
 
-        GuiButton skywars = new GuiButton(Material.EYE_OF_ENDER, "&6&lSkywars");
-        skywars.setLore("&7&o4 Player Skywars", " ", "&aComing soon!");
+        for(QueueableMinigame.Type minigame : QueueableMinigame.Type.values()) {
+            GuiButton button = new GuiButton(minigame.getMaterial(), "&6&l" + minigame.toString());
+            button.setCloseOnClick(true);
+            button.setButtonUpdater((b, g) -> {
+                GameQueue queue = Practice.getInstance().getGameQueueManager().getQueue(minigame, GameQueue.Type.UNRANKED);
+                List<String> lore = new ArrayList<>(minigame.getDescription());
+                lore.add(" ");
+                lore.add("&6In Queue: &f" + queue.getQueueMembers().size());
+                lore.add("&6Playing: &f" + queue.getPlaying());
+                lore.add(" ");
+                lore.add("&7Click to join the queue.");
+                b.setLore(lore);
+            });
+            button.setAction((p, b, g, click) -> {
+                Practice.getInstance().getGameQueueManager().addToQueue(p, minigame, GameQueue.Type.UNRANKED);
+            });
 
-        addButton(skywars);
+            addButton(button);
+        }
     }
 }

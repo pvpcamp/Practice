@@ -1,6 +1,8 @@
 package camp.pvp.practice.guis.profile.cosmetics;
 
 import camp.pvp.core.Core;
+import camp.pvp.core.guis.cosmetics.FlightEffectsGui;
+import camp.pvp.core.guis.cosmetics.LobbyArmorGui;
 import camp.pvp.core.profiles.CoreProfile;
 import camp.pvp.core.profiles.FlightEffect;
 import camp.pvp.core.profiles.LobbyArmor;
@@ -45,68 +47,44 @@ public class CosmeticsGui extends StandardGui {
         addButton(myProfile);
 
         GuiButton lobbyArmor = new GuiButton(Material.DIAMOND_CHESTPLATE, "&6&lLobby Armor");
-        lobbyArmor.setButtonUpdater((guiButton, gui) -> {
-            List<String> lore = new ArrayList<>();
-            lore.add("&7What armor would you like");
-            lore.add("&7to wear in all lobbies?");
-            lore.add(" ");
-            for(LobbyArmor la : LobbyArmor.values()) {
-                lore.add((coreProfile.getAppliedLobbyArmor().equals(la) ? "&6&l" : "&8") + " ● " + la.toString());
-            }
-
-            guiButton.setLore(lore);
-        });
+        lobbyArmor.setLore("&7Click to customize your lobby armor.", " ", "&6Currently Applied: &f" + coreProfile.getAppliedLobbyArmor().toString());
 
         lobbyArmor.setAction((player, button, gui, click) -> {
-            if(!player.hasPermission("core.cosmetics.lobby_armor")) {
-                player.sendMessage(Colors.get("&aThis feature is only available to players that have &5&lPlus Rank&a or higher." ));
-                player.sendMessage(Colors.get("&aIf you would like to support us, you can buy a rank here: &fstore.pvp.camp" ));
-                return;
-            }
+            LobbyArmorGui lobbyArmorGui = new LobbyArmorGui(player);
 
-            if (coreProfile.getAppliedLobbyArmor().ordinal() == LobbyArmor.values().length - 1) {
-                coreProfile.setAppliedLobbyArmor(LobbyArmor.NONE);
-            } else {
-                coreProfile.setAppliedLobbyArmor(LobbyArmor.values()[coreProfile.getAppliedLobbyArmor().ordinal() + 1]);
-            }
+            GuiButton back = new GuiButton(Material.ARROW, "&c&lBack");
+            back.setAction((p, b, g, c) -> this.open(player));
+            back.setLore("&7Click to return to", "&7the cosmetics menu.");
+            back.setOverrideGuiArrangement(true);
+            back.setSlot(0);
+            lobbyArmorGui.addButton(back);
 
-            if(profile.getState().isLobby()) {
-                profile.applyLobbyArmor();
-            }
+            lobbyArmorGui.setCloseAction((p, g) -> {
+                if(profile.getState().isLobby()) {
+                    p.getInventory().setArmorContents(coreProfile.getAppliedLobbyArmor().getArmor());
+                }
+            });
 
-            gui.updateGui();
+            lobbyArmorGui.open(player);
         });
 
         lobbyArmor.setSlot(11);
         addButton(lobbyArmor);
 
         GuiButton flightEffect = new GuiButton(Material.FEATHER, "&6&lFlight Effects");
-        flightEffect.setButtonUpdater((guiButton, gui) -> {
-            List<String> lore = new ArrayList<>();
-            lore.add("&7What flight effect would you");
-            lore.add("&7like to use in game?");
-            lore.add(" ");
-            for(FlightEffect fa : FlightEffect.values()) {
-                lore.add((coreProfile.getAppliedFlightEffect().equals(fa) ? "&6&l" : "&8") + " ● " + fa.toString());
-            }
-
-            guiButton.setLore(lore);
-        });
+        flightEffect.setLore("&7Click to customize your flight effect.", " ", "&6Currently Applied: &f" + coreProfile.getAppliedFlightEffect().toString());
 
         flightEffect.setAction((player, button, gui, click) -> {
-            if(!player.hasPermission("core.cosmetics.flight_effect")) {
-                player.sendMessage(Colors.get("&aThis feature is only available to players that have &6&lPremium Rank." ));
-                player.sendMessage(Colors.get("&aIf you would like to support us, you can buy a rank here: &fstore.pvp.camp" ));
-                return;
-            }
+            FlightEffectsGui flightEffectsGui = new FlightEffectsGui(player);
 
-            if (coreProfile.getAppliedFlightEffect().ordinal() == FlightEffect.values().length - 1) {
-                coreProfile.setAppliedFlightEffect(FlightEffect.NONE);
-            } else {
-                coreProfile.setAppliedFlightEffect(FlightEffect.values()[coreProfile.getAppliedFlightEffect().ordinal() + 1]);
-            }
+            GuiButton back = new GuiButton(Material.ARROW, "&c&lBack");
+            back.setAction((p, b, g, c) -> this.open(player));
+            back.setLore("&7Click to return to", "&7the cosmetics menu.");
+            back.setOverrideGuiArrangement(true);
+            back.setSlot(0);
+            flightEffectsGui.addButton(back);
 
-            gui.updateGui();
+            flightEffectsGui.open(player);
         });
         flightEffect.setSlot(13);
         addButton(flightEffect);

@@ -70,7 +70,7 @@ public class ChooseQueueGui extends StandardGui {
             guiButton.setDurability((short) 0);
             guiButton.setLore(
                     "&6Queue: &f" + previousQueue.getQueueType().toString(),
-                    "&6Kit: &f" + previousQueue.getKit().toString(),
+                    "&6Kit: &f" + previousQueue.getKit().getDisplayName(),
                     " ",
                     "&7Click to requeue.");
         });
@@ -110,7 +110,7 @@ public class ChooseQueueGui extends StandardGui {
                 guiButton.setType(Material.BLAZE_ROD);
                 guiButton.setLore(
                         "&6Opponent: &f" + duelRequest.getSender().getName(),
-                        "&6Kit: &f" + duelRequest.getKit().toString(),
+                        "&6Kit: &f" + duelRequest.getKit().getDisplayName(),
                         " ",
                         "&7Click to accept rematch.");
             } else {

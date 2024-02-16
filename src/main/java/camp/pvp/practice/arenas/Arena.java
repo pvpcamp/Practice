@@ -24,6 +24,7 @@ public class Arena implements Comparable<Arena>{
 
     private @Getter List<Location> beds, blocks, chests;
     private @Getter Set<Chunk> chunks;
+    private @Getter Queue<RestoreBlock> restoreBlockQueue;
 
     public Arena(String name) {
         this.name = name;
@@ -36,6 +37,7 @@ public class Arena implements Comparable<Arena>{
         this.chests = new ArrayList<>();
         this.chunks = new HashSet<>();
         this.chunkSnapshots = new HashSet<>();
+        this.restoreBlockQueue = new LinkedList<>();
 
         this.buildLimit = 256;
         this.voidLevel = 0;
@@ -165,49 +167,47 @@ public class Arena implements Comparable<Arena>{
      * Resets the arena.
      */
     public void resetArena() {
-        if(!getType().isResetAfterGame()) return;
-        if(!isCopy()) return;
+        if (!getType().isResetAfterGame()) return;
+        if (!isCopy()) return;
 
-        List<ChunkSnapshot> snapshots = new ArrayList<>();
+        Bukkit.getScheduler().runTaskAsynchronously(Practice.getInstance(), ()-> {
+            for(Chunk chunk : getChunks()) {
 
-        for(Chunk chunk : getChunks()) {
-            snapshots.add(chunk.getChunkSnapshot());
-        }
+                ChunkSnapshot beforeSnapshot = null;
+                for(ChunkSnapshot before : Practice.getInstance().getArenaManager().getArenaFromName(getParent()).getChunkSnapshots()) {
 
-        for(ChunkSnapshot snapshot : snapshots) {
-
-            ChunkSnapshot beforeSnapshot = null;
-            for(ChunkSnapshot before : Practice.getInstance().getArenaManager().getArenaFromName(getParent()).getChunkSnapshots()) {
-
-                if(snapshot.getX() == before.getX() + xDifference && snapshot.getZ() == before.getZ() + zDifference) {
-                    beforeSnapshot = before;
-                    break;
+                    if(chunk.getX() == before.getX() + xDifference && chunk.getZ() == before.getZ() + zDifference) {
+                        beforeSnapshot = before;
+                        break;
+                    }
                 }
-            }
 
-            if(beforeSnapshot == null) continue;
+                if(beforeSnapshot == null) continue;
 
-            for(int x = 0; x < 16; x++) {
-                for(int z = 0; z < 16; z++) {
-                    for(int y = 0; y < 256; y++) {
-                        int type = beforeSnapshot.getBlockTypeId(x, y, z);
-                        int data = beforeSnapshot.getBlockData(x, y, z);
-                        boolean blockChanged = snapshot.getBlockTypeId(x, y, z) != type;
-                        if(!blockChanged) {
-                            blockChanged = snapshot.getBlockData(x, y, z) != data;
-                        }
+                for(int x = 0; x < 16; x++) {
+                    for(int z = 0; z < 16; z++) {
+                        for(int y = 0; y < 256; y++) {
+                            int type = beforeSnapshot.getBlockTypeId(x, y, z);
+                            int data = beforeSnapshot.getBlockData(x, y, z);
+                            boolean blockChanged = chunk.getBlock(x, y, z).getTypeId() != type;
+                            if(!blockChanged) {
+                                blockChanged = chunk.getBlock(x, y, z).getData() != data;
+                            }
 
-                        if(blockChanged) {
-                            Location location = new Location(Bukkit.getWorld(snapshot.getWorldName()), snapshot.getX() * 16 + x, y, snapshot.getZ() * 16 + z);
-                            RestoreBlock block = new RestoreBlock(location, type, data);
-                            block.restore();
+                            if(blockChanged) {
+                                Location location = new Location(chunk.getWorld(), chunk.getX() * 16 + x, y, chunk.getZ() * 16 + z);
+                                RestoreBlock block = new RestoreBlock(location, type, data);
+                                restoreBlockQueue.add(block);
+                            }
                         }
                     }
                 }
             }
-        }
 
-        inUse = false;
+            Practice.getInstance().sendDebugMessage("Resetting arena " + getName() + " with " + restoreBlockQueue.size() + " blocks.");
+
+            Practice.getInstance().getArenaManager().getBlockRestorer().addArena(this);
+        });
     }
 
     public boolean isOriginalBlock(Location location) {

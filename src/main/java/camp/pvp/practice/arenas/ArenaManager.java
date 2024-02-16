@@ -5,6 +5,7 @@ import camp.pvp.practice.kits.DuelKit;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -15,9 +16,8 @@ public class ArenaManager {
     private Logger logger;
     private ArenaConfig arenaConfig;
     private @Getter Set<Arena> arenas;
-    private @Getter ArenaCopyQueue arenaCopyQueue;
-    private @Getter @Setter ArenaBlockUpdater arenaBlockUpdater;
-    private @Getter @Setter ArenaDeleter arenaDeleter;
+    private @Getter ArenaBlockRestorer blockRestorer;
+    private BukkitTask arenaBlockRestorerTask;
     public ArenaManager(Practice plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
@@ -27,8 +27,8 @@ public class ArenaManager {
 
         arenaConfig = new ArenaConfig(plugin, this);
 
-        arenaCopyQueue = new ArenaCopyQueue(plugin);
-        Bukkit.getScheduler().runTaskTimer(plugin, arenaCopyQueue, 0, 4);
+        blockRestorer = new ArenaBlockRestorer();
+        arenaBlockRestorerTask = Bukkit.getScheduler().runTaskTimer(plugin, blockRestorer, 0, 1);
 
         scanBlocks();
 

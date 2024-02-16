@@ -76,6 +76,7 @@ public class Practice extends JavaPlugin {
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.entityHider = new EntityHider(this, EntityHider.Policy.BLACKLIST);
 
+        this.gameProfileManager = new GameProfileManager(this);
         this.arenaManager = new ArenaManager(this);
 
         for(Arena arena : arenaManager.getArenas()) {
@@ -84,7 +85,6 @@ public class Practice extends JavaPlugin {
 
         this.gameManager = new GameManager(this);
         this.gameQueueManager = new GameQueueManager(this);
-        this.gameProfileManager = new GameProfileManager(this);
         this.partyManager = new PartyManager(this);
 
         this.assemble = new Assemble(this, new SidebarAdapter(this));
