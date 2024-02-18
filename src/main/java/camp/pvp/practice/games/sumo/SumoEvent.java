@@ -6,7 +6,6 @@ import camp.pvp.practice.games.Game;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.utils.Colors;
-import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
 import lombok.Data;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -45,8 +44,6 @@ public class SumoEvent {
             forceEnd();
             return;
         }
-
-        getPlugin().getGameProfileManager().refreshLobbyItems();
 
         timer = 60;
 
@@ -96,7 +93,7 @@ public class SumoEvent {
 
         currentDuel = duel;
 
-        duel.start();
+        duel.initialize();
 
     }
 

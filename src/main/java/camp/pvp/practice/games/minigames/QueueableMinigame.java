@@ -31,7 +31,7 @@ public class QueueableMinigame extends Game {
     }
 
     @Override
-    public void start() {
+    public void initialize() {
 
     }
 

@@ -60,7 +60,7 @@ public class FFAKitGui extends ArrangedGui {
                             ffa.join(member.getPlayer());
                         }
 
-                        ffa.start();
+                        ffa.initialize();
                     } else {
                         player.sendMessage(ChatColor.RED + "You do not have enough players in your party to participate in this event.");
                     }

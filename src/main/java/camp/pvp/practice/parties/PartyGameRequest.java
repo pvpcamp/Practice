@@ -104,7 +104,7 @@ public class PartyGameRequest {
                 toParty.getPartyGameRequests().clear();
                 fromParty.getPartyGameRequests().clear();
 
-                teamDuel.start();
+                teamDuel.initialize();
             } else {
                 HCFTeams teamDuel = new HCFTeams(Practice.instance, UUID.randomUUID());
 
@@ -127,7 +127,7 @@ public class PartyGameRequest {
                 toParty.getPartyGameRequests().clear();
                 fromParty.getPartyGameRequests().clear();
 
-                teamDuel.start();
+                teamDuel.initialize();
             }
 
             return true;

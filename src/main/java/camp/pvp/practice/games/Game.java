@@ -2,17 +2,23 @@ package camp.pvp.practice.games;
 
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
+import camp.pvp.practice.cooldowns.PlayerCooldown;
+import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.profiles.PreviousQueue;
+import camp.pvp.practice.profiles.Rematch;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.BukkitReflection;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.utils.PlayerUtils;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketContainer;
+import com.lunarclient.apollo.Apollo;
+import com.lunarclient.apollo.module.cooldown.CooldownModule;
+import com.lunarclient.apollo.player.ApolloPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
@@ -25,7 +31,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Bed;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -56,7 +61,7 @@ public abstract class Game {
     public int round, timer;
     private Date created, started, ended;
 
-    private BukkitTask startingTimer, endingTimer;
+    private BukkitTask startingTimer, endingTimer, shutdownTask;
 
     private List<Entity> entities;
 
@@ -78,20 +83,115 @@ public abstract class Game {
 
     public abstract List<String> getSpectatorScoreboard(GameProfile profile);
 
-    public abstract void start();
+    public abstract void initialize();
 
+
+    public void startingTimer(int delay) {
+        startingTimer = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
+            int timer = delay;
+            @Override
+            public void run() {
+                if(timer == 0) {
+                    start();
+                    startingTimer.cancel();
+                } else {
+                    if(timer == 30 || timer == 15 || timer == 10 || timer <= 5) {
+                        announce("&aGame starting in &f" + timer + " &aseconds.");
+                    }
+                    timer--;
+                }
+            }
+        }, 0, 20);
+    }
+
+    public void start() {
+        for(Player p : getAllPlayers()) {
+            if(p != null) {
+                p.removePotionEffect(PotionEffectType.JUMP);
+                p.playSound(p.getLocation(), Sound.FIREWORK_BLAST, 1, 1);
+                p.sendMessage(ChatColor.GREEN + "The game has started.");
+            }
+        }
+
+        setStarted(new Date());
+        setState(Game.State.ACTIVE);
+    }
+
+    /***
+     *
+     */
     public abstract void end();
+
+    /***
+     * Does the final shutdown/cleanup of the game.
+     * @param delay The delay in seconds before the game is shutdown.
+     */
+    public void cleanup(int delay) {
+        shutdownTask = Bukkit.getScheduler().runTaskLater(plugin, ()-> {
+            clearEntities();
+
+            for(Map.Entry<UUID, GameParticipant> entry : getParticipants().entrySet()) {
+                Player player = Bukkit.getPlayer(entry.getKey());
+                GameParticipant participant = entry.getValue();
+                GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(entry.getKey());
+
+                if(player != null) {
+                    if(this instanceof Duel duel) {
+                        GameQueue.Type queueType = duel.getQueueType();
+                        if(queueType.equals(GameQueue.Type.UNRANKED) || queueType.equals(GameQueue.Type.RANKED) || queueType.equals(GameQueue.Type.PRIVATE)) {
+                            PreviousQueue previousQueue = new PreviousQueue(duel.getKit(), queueType.equals(GameQueue.Type.PRIVATE) ? GameQueue.Type.UNRANKED : queueType);
+                            profile.setPreviousQueue(previousQueue);
+
+                            Rematch rematch;
+                            for(GameParticipant p : getParticipants().values()) {
+                                if(p.getUuid() != participant.getUuid() && p.getPlayer() != null && p.getPlayer().isOnline()) {
+                                    rematch = new Rematch(profile, p.getUuid(), p.getName(), duel.getKit());
+                                    profile.setRematch(rematch);
+                                }
+                            }
+                        }
+                    }
+
+                    if(entry.getValue().isAlive()) {
+
+                        for(PlayerCooldown cooldown : participant.getCooldowns().values()) {
+                            cooldown.remove();
+                        }
+
+                        if(Apollo.getPlayerManager().hasSupport(player.getUniqueId())) {
+
+                            CooldownModule cooldownModule = Apollo.getModuleManager().getModule(CooldownModule.class);
+
+                            Optional<ApolloPlayer> apolloPlayer = Apollo.getPlayerManager().getPlayer(player.getUniqueId());
+                            apolloPlayer.ifPresent(cooldownModule::resetCooldowns);
+
+                        }
+
+                        profile.setGame(null);
+                        profile.playerUpdate(true);
+                    }
+                }
+            }
+
+            for(GameSpectator spectator : new ArrayList<>(getSpectators().values())) {
+                Player player = Bukkit.getPlayer(spectator.getUuid());
+                spectateEnd(player, true);
+            }
+
+            Practice.getInstance().getGameProfileManager().updateGlobalPlayerVisibility();
+
+            getArena().resetArena();
+
+            setState(State.INACTIVE);
+        }, delay * 20L);
+    }
 
     public void forceEnd(boolean resetPlayers) {
         this.announce("&c&lThis match has been forcefully ended by the server.");
 
-        if(getStartingTimer() != null) {
-            getStartingTimer().cancel();
-        }
-
-        if(getEndingTimer() != null) {
-            getEndingTimer().cancel();
-        }
+        if(getStartingTimer() != null) getStartingTimer().cancel();
+        if(getEndingTimer() != null) getEndingTimer().cancel();
+        if(getShutdownTask() != null) getShutdownTask().cancel();
 
         if(resetPlayers) {
 
@@ -113,8 +213,6 @@ public abstract class Game {
             for(GameSpectator spectator : new ArrayList<>(getSpectators().values())) {
                 spectateEnd(spectator.getPlayer(), true);
             }
-
-            plugin.getGameProfileManager().refreshLobbyItems();
         }
 
         clearEntities();
@@ -132,7 +230,7 @@ public abstract class Game {
         PotionEffect invisibility = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true, false);
         player.addPotionEffect(invisibility);
 
-        participant.respawn();
+        participant.respawn(3);
     }
 
     public void eliminate(Player player, boolean leftGame) {

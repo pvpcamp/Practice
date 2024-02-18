@@ -15,7 +15,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 
@@ -133,7 +132,7 @@ public class GameQueue {
                                 member1.getPlayer().sendMessage(message);
                                 member2.getPlayer().sendMessage(message);
 
-                                duel.start();
+                                duel.initialize();
                             }
                         }, 5, 5);
                         break;
@@ -163,7 +162,7 @@ public class GameQueue {
                                                 member1.getPlayer().sendMessage(message);
                                                 member2.getPlayer().sendMessage(message);
 
-                                                duel.start();
+                                                duel.initialize();
                                                 return;
                                             }
                                         }
@@ -209,7 +208,7 @@ public class GameQueue {
                     minigame.join(member3.getPlayer());
                     minigame.join(member4.getPlayer());
 
-                    minigame.start();
+                    minigame.initialize();
                 }, 5, 5);
             }
         }

@@ -74,7 +74,7 @@ public class SplitKitGui extends ArrangedGui {
                             x++;
                         }
 
-                        teamDuel.start();
+                        teamDuel.initialize();
                     } else {
                         player.sendMessage(ChatColor.RED + "You do not have enough players in your party to participate in this event.");
                     }

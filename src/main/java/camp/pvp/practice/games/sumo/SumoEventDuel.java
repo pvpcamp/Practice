@@ -3,7 +3,6 @@ package camp.pvp.practice.games.sumo;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.impl.Duel;
-import camp.pvp.practice.games.tasks.StartingTask;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.profiles.GameProfile;
@@ -28,7 +27,7 @@ public class SumoEventDuel extends Duel {
     }
 
     @Override
-    public void start() {
+    public void initialize() {
         Map<Player, Location> locations = new HashMap<>();
 
         this.setState(State.STARTING);
@@ -60,8 +59,7 @@ public class SumoEventDuel extends Duel {
 
         Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
 
-        BukkitTask startingTimer = new StartingTask(this, 3).runTaskTimer(this.getPlugin(), 20, 20);
-        setStartingTimer(startingTimer);
+        startingTimer(3);
     }
 
     @Override

@@ -4,8 +4,6 @@ import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.PostGameInventory;
-import camp.pvp.practice.games.tasks.EndingTask;
-import camp.pvp.practice.games.tasks.StartingTask;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
@@ -27,7 +25,6 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -40,7 +37,7 @@ public class Duel extends Game {
     }
 
     @Override
-    public void start() {
+    public void initialize() {
         if(getArena() == null) {
             setArena(getPlugin().getArenaManager().selectRandomArena(getKit()));
         }
@@ -122,8 +119,7 @@ public class Duel extends Game {
 
             Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
 
-            BukkitTask startingTimer = new StartingTask(this, 3).runTaskTimer(this.getPlugin(), 20, 20);
-            setStartingTimer(startingTimer);
+            startingTimer(3);
         } else {
             for(Player p : getAlivePlayers()) {
                 GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
@@ -243,8 +239,7 @@ public class Duel extends Game {
             player.sendMessage(" ");
         }
 
-        BukkitTask endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), new EndingTask(this), 60);
-        setEndingTimer(endingTimer);
+        cleanup(3);
     }
 
     @Override
@@ -296,7 +291,7 @@ public class Duel extends Game {
                 break;
             case ACTIVE:
                 if(showInGame) {
-                    int ping = 0, enemyPing = 0;
+                    int ping, enemyPing;
                     ping = PlayerUtils.getPing(self.getPlayer());
 
                     boolean show = false;
@@ -306,8 +301,8 @@ public class Duel extends Game {
                         GameParticipant blue = pList.get(0);
                         GameParticipant red = pList.get(1);
 
-                        lines.add("&9B &fBlue: &9&l" + (blue.isRespawn() ? "✓" : "✗") + " " + (blue.equals(self) ? "&7YOU" : ""));
-                        lines.add("&cR &fRed: &c&l" + (red.isRespawn() ? "✓" : "✗") + " " + (red.equals(self) ? "&7YOU" : ""));
+                        lines.add("&9B &fBlue: &9&l" + (blue.isRespawn() ? "✓" : "1") + " " + (blue.equals(self) ? "&7YOU" : ""));
+                        lines.add("&cR &fRed: &c&l" + (red.isRespawn() ? "✓" : "1") + " " + (red.equals(self) ? "&7YOU" : ""));
                         lines.add(" ");
                     }
 

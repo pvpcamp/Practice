@@ -41,7 +41,7 @@ public class TournamentMatch {
         }
 
         if(startGame) {
-            game.start();
+            game.initialize();
         } else {
             game.setState(Game.State.ENDED);
             for(TournamentParticipant p : participants.values()) {

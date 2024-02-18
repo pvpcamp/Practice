@@ -1,7 +1,5 @@
 package camp.pvp.practice.games.impl;
 
-import camp.pvp.practice.games.tasks.EndingTask;
-import camp.pvp.practice.games.tasks.StartingTask;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
@@ -103,7 +101,7 @@ public class FreeForAll extends Game {
     }
 
     @Override
-    public void start() {
+    public void initialize() {
         if(getArena() == null) {
             List<Arena> list = new ArrayList<>();
             for(Arena a : getPlugin().getArenaManager().getArenas()) {
@@ -184,8 +182,7 @@ public class FreeForAll extends Game {
             getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
             Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
-            BukkitTask startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
-            setStartingTimer(startingTimer);
+            startingTimer(5);
 
         } else {
             for(Player p : getAlivePlayers()) {
@@ -199,7 +196,6 @@ public class FreeForAll extends Game {
 
     @Override
     public void end() {
-        GameProfileManager gpm = getPlugin().getGameProfileManager();
         this.setEnded(new Date());
         this.setState(State.ENDED);
 
@@ -268,7 +264,6 @@ public class FreeForAll extends Game {
             player.sendMessage(" ");
         }
 
-        BukkitTask endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), new EndingTask(this), 100);
-        setEndingTimer(endingTimer);
+        cleanup(3);
     }
 }

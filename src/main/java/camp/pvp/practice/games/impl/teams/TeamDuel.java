@@ -1,8 +1,6 @@
 package camp.pvp.practice.games.impl.teams;
 
 import camp.pvp.practice.games.GameTeam;
-import camp.pvp.practice.games.tasks.EndingTask;
-import camp.pvp.practice.games.tasks.StartingTask;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.Party;
@@ -179,7 +177,7 @@ public class TeamDuel extends TeamGame {
     }
 
     @Override
-    public void start() {
+    public void initialize() {
         setArena(getPlugin().getArenaManager().selectRandomArena(getKit()));
 
         if(getArena() == null) {
@@ -263,8 +261,7 @@ public class TeamDuel extends TeamGame {
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
         Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
-        BukkitTask startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
-        setStartingTimer(startingTimer);
+        startingTimer(3);
     }
 
     @Override
@@ -337,7 +334,6 @@ public class TeamDuel extends TeamGame {
             player.sendMessage(" ");
         }
 
-        BukkitTask endingTimer = Bukkit.getScheduler().runTaskLater(getPlugin(), new EndingTask(this), 60);
-        setEndingTimer(endingTimer);
+        cleanup(3);
     }
 }

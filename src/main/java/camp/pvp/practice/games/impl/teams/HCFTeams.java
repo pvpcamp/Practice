@@ -5,7 +5,6 @@ import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.GameTeam;
-import camp.pvp.practice.games.tasks.StartingTask;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.parties.Party;
@@ -28,7 +27,7 @@ public class HCFTeams extends TeamDuel {
     }
 
     @Override
-    public void start() {
+    public void initialize() {
         List<Arena> list = new ArrayList<>();
         if(getArena() == null) {
             for(Arena a : getPlugin().getArenaManager().getArenas()) {
@@ -125,8 +124,7 @@ public class HCFTeams extends TeamDuel {
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
 
         Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
-        BukkitTask startingTimer = new StartingTask(this, 5).runTaskTimer(this.getPlugin(), 20, 20);
-        setStartingTimer(startingTimer);
+        startingTimer(5);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package camp.pvp.practice.games;
 
-import camp.pvp.practice.arenas.ArenaPosition;
-import camp.pvp.practice.games.tasks.RespawnTask;
 import camp.pvp.practice.kits.CustomDuelKit;
 import camp.pvp.practice.kits.DuelKit;
 import camp.pvp.practice.kits.HCFKit;
@@ -117,10 +115,37 @@ public class GameParticipant {
         return respawn;
     }
 
-    public void respawn() {
-        BukkitTask respawnTask = Bukkit.getScheduler().runTaskTimer(Practice.getInstance(),
-                new RespawnTask(this, getPlayer()), 0L, 20L);
-        setRespawnTask(respawnTask);
+    public void respawn(int delay) {
+        respawnTask = Bukkit.getScheduler().runTaskTimer(Practice.getInstance(), new Runnable() {
+            int time = delay;
+            @Override
+            public void run() {
+                if(time == 0) {
+                    if(getAppliedCustomKit() != null) {
+                        getAppliedCustomKit().apply(GameParticipant.this);
+                    } else {
+                        getDuelKit().apply(GameParticipant.this);
+                    }
+
+                    getPlayer().teleport(getSpawnLocation());
+                    setAlive(true);
+
+                    setLastDamageCause(null);
+                    setAttacker(null);
+
+                    Practice.getInstance().getGameProfileManager().updateGlobalPlayerVisibility();
+
+                    Bukkit.getScheduler().runTaskLater(Practice.getInstance(), () -> {
+                        setInvincible(false);
+                    }, 20L);
+
+                    getRespawnTask().cancel();
+                } else {
+                    getPlayer().sendMessage(ChatColor.GREEN + "Respawning in " + time + " second(s).");
+                    time--;
+                }
+            }
+        }, 0, 20);
     }
 
     public void applyTemporaryEffect(PotionEffectType type, int duration, int strength) {
