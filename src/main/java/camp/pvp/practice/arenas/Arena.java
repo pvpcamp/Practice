@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.material.MaterialData;
 
 import java.util.*;
 
@@ -18,13 +19,11 @@ public class Arena implements Comparable<Arena>{
     private Map<String, ArenaPosition> positions;
     private boolean enabled, inUse;
     private String parent;
-    private Set<ChunkSnapshot> chunkSnapshots;
     // X and Z differences are the amount of chunks away from the parent arena.
     private int xDifference, zDifference, buildLimit, voidLevel;
 
     private @Getter List<Location> beds, blocks, chests;
-    private @Getter Set<Chunk> chunks;
-    private @Getter Queue<RestoreBlock> restoreBlockQueue;
+    private @Getter Queue<StoredBlock> blockQueue;
 
     public Arena(String name) {
         this.name = name;
@@ -35,9 +34,7 @@ public class Arena implements Comparable<Arena>{
         this.beds = new ArrayList<>();
         this.blocks = new ArrayList<>();
         this.chests = new ArrayList<>();
-        this.chunks = new HashSet<>();
-        this.chunkSnapshots = new HashSet<>();
-        this.restoreBlockQueue = new LinkedList<>();
+        this.blockQueue = new LinkedList<>();
 
         this.buildLimit = 256;
         this.voidLevel = 0;
@@ -110,11 +107,9 @@ public class Arena implements Comparable<Arena>{
 
         if(corner1 != null && corner2 != null) {
 
-            getChunkSnapshots().clear();
             getBeds().clear();
             getChests().clear();
             getBlocks().clear();
-            getChunks().clear();
 
             int minX, minY, minZ, maxX, maxY, maxZ;
             Location c1 = corner1.getLocation(), c2 = corner2.getLocation();
@@ -142,15 +137,7 @@ public class Arena implements Comparable<Arena>{
 
                             getBlocks().add(location);
                         }
-
-                        getChunks().add(location.getChunk());
                     }
-                }
-            }
-
-            if(!isCopy()) {
-                for (Chunk chunk : getChunks()) {
-                    chunkSnapshots.add(chunk.getChunkSnapshot());
                 }
             }
         }
@@ -171,40 +158,20 @@ public class Arena implements Comparable<Arena>{
         if (!isCopy()) return;
 
         Bukkit.getScheduler().runTaskAsynchronously(Practice.getInstance(), ()-> {
-            for(Chunk chunk : getChunks()) {
 
-                ChunkSnapshot beforeSnapshot = null;
-                for(ChunkSnapshot before : Practice.getInstance().getArenaManager().getArenaFromName(getParent()).getChunkSnapshots()) {
+            for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParent()).getBlocks()) {
+                Location location = parentLocation.clone().add(xDifference * 16, 0, zDifference * 16);
 
-                    if(chunk.getX() == before.getX() + xDifference && chunk.getZ() == before.getZ() + zDifference) {
-                        beforeSnapshot = before;
-                        break;
-                    }
-                }
+                Block parentBlock = parentLocation.getBlock();
+                Block block = location.getBlock();
 
-                if(beforeSnapshot == null) continue;
-
-                for(int x = 0; x < 16; x++) {
-                    for(int z = 0; z < 16; z++) {
-                        for(int y = 0; y < 256; y++) {
-                            int type = beforeSnapshot.getBlockTypeId(x, y, z);
-                            int data = beforeSnapshot.getBlockData(x, y, z);
-                            boolean blockChanged = chunk.getBlock(x, y, z).getTypeId() != type;
-                            if(!blockChanged) {
-                                blockChanged = chunk.getBlock(x, y, z).getData() != data;
-                            }
-
-                            if(blockChanged) {
-                                Location location = new Location(chunk.getWorld(), chunk.getX() * 16 + x, y, chunk.getZ() * 16 + z);
-                                RestoreBlock block = new RestoreBlock(location, type, data);
-                                restoreBlockQueue.add(block);
-                            }
-                        }
-                    }
+                if(parentBlock.getType() != block.getType()) {
+                    StoredBlock storedBlock = new StoredBlock(parentBlock, location);
+                    blockQueue.add(storedBlock);
                 }
             }
 
-            Practice.getInstance().sendDebugMessage("Resetting arena " + getName() + " with " + restoreBlockQueue.size() + " blocks.");
+            Practice.getInstance().sendDebugMessage("Resetting arena " + getName() + " with " + blockQueue.size() + " blocks.");
 
             Practice.getInstance().getArenaManager().getBlockRestorer().addArena(this);
         });

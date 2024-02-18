@@ -23,13 +23,13 @@ public class ArenaBlockRestorer implements Runnable {
 
             Arena arena = arenaQueue.peek();
             if(arena != null) {
-                if(arena.getRestoreBlockQueue().isEmpty()) {
+                if(arena.getBlockQueue().isEmpty()) {
                     arena.setInUse(false);
                     arenaQueue.poll();
                     return;
                 }
 
-                arena.getRestoreBlockQueue().poll().restore();
+                arena.getBlockQueue().poll().replace();
             }
         }
     }
