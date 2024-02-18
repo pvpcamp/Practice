@@ -44,7 +44,6 @@ public class GameParticipant {
     public long health, maxHealth, hunger,
             hits, currentCombo, longestCombo,
             thrownPotions, missedPotions;
-    private int spawnNumber; // Used for Bed Fight.
 
     private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
