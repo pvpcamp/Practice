@@ -160,24 +160,21 @@ public class Arena implements Comparable<Arena>{
         if (!getType().isResetAfterGame()) return;
         if (!isCopy()) return;
 
-        Bukkit.getScheduler().runTaskAsynchronously(Practice.getInstance(), ()-> {
+        for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParentName()).getBlocks()) {
+            Location location = parentLocation.clone().add(xDifference, 0, zDifference);
 
-            for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParentName()).getBlocks()) {
-                Location location = parentLocation.clone().add(xDifference, 0, zDifference);
+            Block parentBlock = parentLocation.getBlock();
+            Block block = location.getBlock();
 
-                Block parentBlock = parentLocation.getBlock();
-                Block block = location.getBlock();
-
-                if(parentBlock.getType() != block.getType()) {
-                    StoredBlock storedBlock = new StoredBlock(parentBlock, location);
-                    blockQueue.add(storedBlock);
-                }
+            if(parentBlock.getType() != block.getType()) {
+                StoredBlock storedBlock = new StoredBlock(parentBlock, location);
+                blockQueue.add(storedBlock);
             }
+        }
 
-            Practice.getInstance().sendDebugMessage("Resetting arena " + getName() + " with " + blockQueue.size() + " blocks.");
+        Practice.getInstance().sendDebugMessage("Resetting arena " + getName() + " with " + blockQueue.size() + " blocks.");
 
-            Practice.getInstance().getArenaManager().getBlockRestorer().addArena(this);
-        });
+        Practice.getInstance().getArenaManager().getBlockRestorer().addArena(this);
     }
 
     public boolean isOriginalBlock(Location location) {

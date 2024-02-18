@@ -41,6 +41,7 @@ public class ArenaInfoGui extends StandardGui {
 
         List<String> infoLore = new ArrayList<>();
         infoLore.add("&6Name: &f" + arena.getName());
+        infoLore.add("&6In Use: &f" + (arena.isInUse() ? "Yes" : "No"));
 
         if(arena.getType().isBuild()) {
             infoLore.add("&6Build Limit: &f" + arena.getBuildLimit());
@@ -68,7 +69,11 @@ public class ArenaInfoGui extends StandardGui {
             }
 
             if(arena.isCopy()) {
-                button.setLore("&7This arena is a copy.");
+                button.setLore(
+                        "&7This arena is a copy.",
+                        " ",
+                        "&cRight Click to reset arena."
+                );
                 button.setType(Material.COBBLESTONE);
             } else {
                 button.setLore(
@@ -82,6 +87,12 @@ public class ArenaInfoGui extends StandardGui {
         });
 
         copies.setAction((player, button, gui, click) -> {
+            if(arena.isCopy() && click.isRightClick()) {
+                arena.resetArena();
+                player.sendMessage(Colors.get("&aReset arena &f" + arena.getName() + "&a."));
+                return;
+            }
+
             if(!arena.isCopy() && !arenaManager.getArenaCopies(arena).isEmpty()) {
                 if(click.isLeftClick()) {
                     new ArenaCopiesGui(arenaManager, arena).open(player);

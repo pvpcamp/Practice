@@ -8,6 +8,7 @@ import camp.pvp.practice.guis.arenas.ArenaTeleportGui;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -124,6 +125,17 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         arena.setDisplayName(name);
         plugin.getArenaManager().getArenas().add(arena);
         player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " has been created.");
+
+        Location location = plugin.getArenaManager().getNextAvailableArenaLocation(player.getWorld());
+        if(location != null) {
+            player.teleport(location);
+            player.sendMessage(Colors.get(
+                    "&aThe arena manager has found a location for you to set up your arena automatically.",
+                    "&7When setting up your arena, please keep it as close to X: " + location.getBlockX() + " and Z: " + location.getBlockZ() + " as possible."
+            ));
+        } else {
+            player.sendMessage(ChatColor.RED + "The arena manager could not find a valid location. You will need to find a safe location to set up your arena.");
+        }
 
         new ArenaInfoGui(plugin.getArenaManager(), arena).open(player);
     }
@@ -317,12 +329,11 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
     private void copy(Player player, String[] args) {
 
         if(args.length < 5) {
-            player.sendMessage(ChatColor.RED + "Usage: /arena copy <arena> <xD> <zD> <x times> [start from arena]");
+            player.sendMessage(ChatColor.RED + "Usage: /arena copy <arena> <xD> <zD> <x times>");
             return;
         }
 
         int xD, zD, times;
-        String startFrom;
 
         try {
             xD = Integer.parseInt(args[2]);
@@ -333,28 +344,31 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
+        if(xD < 500 && zD < 500) {
+            player.sendMessage(ChatColor.RED + "Arenas should be at a minimum 500 blocks apart.");
+            return;
+        }
+
         Arena arena = plugin.getArenaManager().getArenaFromName(args[1]);
         if(arena == null) {
             player.sendMessage(ChatColor.RED + "The arena you specified does not exist.");
             return;
         }
 
-        if(args.length > 5) {
-            startFrom = args[5];
-        } else {
-            startFrom = arena.getName();
+        Arena furthest = null;
+        for(Arena a : plugin.getArenaManager().getArenaCopies(arena)) {
+            if(furthest == null || (xD > 0 && a.getXDifference() > furthest.getXDifference()) || (zD > 0 && a.getZDifference() > furthest.getZDifference())) {
+                furthest = a;
+            }
         }
 
-        Arena startFromArena = plugin.getArenaManager().getArenaFromName(startFrom);
-        if(startFromArena == null) {
-            player.sendMessage(ChatColor.RED + "The start from arena you specified does not exist.");
-            return;
-        }
+        Arena startFromArena = furthest;
+        if(furthest == null) startFromArena = arena;
 
         arena.scanArena();
 
         for(int i = 0; i < times; i++) {
-            Arena copy = plugin.getArenaManager().createCopy(arena, startFromArena.getXDifference(), startFromArena.getZDifference(), xD, zD);
+            Arena copy = plugin.getArenaManager().createCopy(arena, startFromArena.getXDifference(), startFromArena.getZDifference(), xD * (i + 1), zD * (i + 1));
             plugin.getArenaManager().getArenas().add(copy);
         }
 
@@ -374,7 +388,7 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         help.append("\n&6/arena rename <name> <new name> &7- &fRenames an arena.");
         help.append("\n&6/arena buildlimit <name> <limit> &7- &fSets the build limit for an arena.");
         help.append("\n&6/arena voidlevel <name> <level> &7- &fSets the void level for an arena.");
-        help.append("\n&6/arena copy <name> <x> <z> <times> [start from arena] &7- &fCopies an arena to another location." +
+        help.append("\n&6/arena copy <name> <x> <z> <times> &7- &fCopies an arena to another location." +
                 "\n&eX and Z are blocks away from the original." +
                 "\n&eTimes will duplicate x amount of times." +
                 "\n&eStart from will start copying from a specified arena.");

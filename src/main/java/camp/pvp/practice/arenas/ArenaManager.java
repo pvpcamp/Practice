@@ -4,6 +4,9 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Sign;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -131,6 +134,37 @@ public class ArenaManager {
         }
 
         logger.info("Arena scanner has finished scanning " + arenas + " arenas.");
+    }
+
+    public Location getNextAvailableArenaLocation(World world) {
+
+        List<Location> locations = new ArrayList<>();
+        for(Arena arena : getArenas()) {
+            for(ArenaPosition position : arena.getPositions().values()) {
+                Location l = position.getLocation();
+                if(l.getWorld().equals(world)) {
+                    locations.add(l);
+                }
+            }
+        }
+
+        for(int x = 2000; x < 1000000; x += 1000) {
+
+            boolean found = false;
+            for (Location l  : locations) {
+                int difference = l.getBlockX() - x;
+                if (difference > -200 && difference < 200) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if(!found) {
+                return new Location(world, x, 80, 0);
+            }
+        }
+
+        return null;
     }
 
     public void updateAndResetCopies() {
