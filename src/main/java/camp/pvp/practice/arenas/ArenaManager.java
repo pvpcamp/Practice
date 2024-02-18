@@ -3,7 +3,6 @@ package camp.pvp.practice.arenas;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.DuelKit;
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -181,7 +180,7 @@ public class ArenaManager {
         copy.setEnabled(arena.isEnabled());
         copy.setXDifference(fromX + xD);
         copy.setZDifference(fromZ + zD);
-        copy.setParent(arena.getName());
+        copy.setParentName(arena.getName());
         copy.setType(arena.getType());
         copy.updateCopy(true);
 
@@ -191,7 +190,7 @@ public class ArenaManager {
     public Set<Arena> getArenaCopies(Arena arena) {
         Set<Arena> arenas = new HashSet<>();
         for(Arena a : getArenas()) {
-            if(a.getParent() != null && a.getParent().equals(arena.getName())) {
+            if(a.getParentName() != null && a.getParentName().equals(arena.getName())) {
                 arenas.add(a);
             }
         }

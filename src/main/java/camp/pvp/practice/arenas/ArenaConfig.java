@@ -60,7 +60,7 @@ public class ArenaConfig {
         arena.setBuildLimit(config.getInt(path + "build_limit", 256));
 
         if(config.isSet(path + "parent")) {
-            arena.setParent(config.getString(path + "parent"));
+            arena.setParentName(config.getString(path + "parent"));
         }
 
         for(String s : config.getConfigurationSection(path + "positions").getKeys(false)) {
@@ -92,8 +92,8 @@ public class ArenaConfig {
         config.set(path + ".void_level", arena.getVoidLevel());
         config.set(path + ".build_limit", arena.getBuildLimit());
 
-        if(arena.getParent() != null) {
-            config.set(path + ".parent", arena.getParent());
+        if(arena.getParentName() != null) {
+            config.set(path + ".parent", arena.getParentName());
         }
 
         for(ArenaPosition position : arena.getPositions().values()) {

@@ -1,7 +1,6 @@
 package camp.pvp.practice.profiles;
 
 import camp.pvp.core.Core;
-import camp.pvp.practice.arenas.ArenaCopier;
 import camp.pvp.practice.cosmetics.DeathAnimation;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.sumo.SumoEvent;
@@ -31,7 +30,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 

@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.material.MaterialData;
 
 import java.util.*;
 
@@ -18,8 +17,7 @@ public class Arena implements Comparable<Arena>{
     private Arena.Type type;
     private Map<String, ArenaPosition> positions;
     private boolean enabled, inUse;
-    private String parent;
-    // X and Z differences are the amount of chunks away from the parent arena.
+    private String parentName;
     private int xDifference, zDifference, buildLimit, voidLevel;
 
     private @Getter List<Location> beds, blocks, chests;
@@ -44,7 +42,11 @@ public class Arena implements Comparable<Arena>{
      * Returns true if this arena is a copy of another arena.
      */
     public boolean isCopy() {
-        return this.getParent() != null;
+        return this.getParentName() != null;
+    }
+
+    public Arena getParent() {
+        return getParentName() == null ? null : Practice.getInstance().getArenaManager().getArenaFromName(getParentName());
     }
 
     /**
@@ -63,15 +65,16 @@ public class Arena implements Comparable<Arena>{
     /**
      * Copies positions from the parent arena to this arena, based on X and Z differences.
      */
-
     public void updateCopy(boolean reset) {
 
-        Arena parent = Practice.getInstance().getArenaManager().getArenaFromName(getParent());
+        if(!isCopy()) return;
+
+        Arena parent = Practice.getInstance().getArenaManager().getArenaFromName(getParentName());
 
         for(ArenaPosition position : parent.getPositions().values()) {
             Location location = position.getLocation();
             Location newLocation = location.clone();
-            newLocation.add(xDifference * 16, 0, zDifference * 16);
+            newLocation.add(xDifference, 0, zDifference);
             positions.put(position.getPosition(), new ArenaPosition(position.getPosition(), newLocation));
         }
 
@@ -159,8 +162,8 @@ public class Arena implements Comparable<Arena>{
 
         Bukkit.getScheduler().runTaskAsynchronously(Practice.getInstance(), ()-> {
 
-            for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParent()).getBlocks()) {
-                Location location = parentLocation.clone().add(xDifference * 16, 0, zDifference * 16);
+            for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParentName()).getBlocks()) {
+                Location location = parentLocation.clone().add(xDifference, 0, zDifference);
 
                 Block parentBlock = parentLocation.getBlock();
                 Block block = location.getBlock();
@@ -208,7 +211,8 @@ public class Arena implements Comparable<Arena>{
     }
 
     public enum Type {
-        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, DUEL_BED_FIGHT, DUEL_BRIDGE, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO, EVENT_OITC;
+        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, DUEL_BED_FIGHT, DUEL_BRIDGE, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO,
+        MINIGAME_SKYWARS, MINIGAME_OITC;
 
         public List<String> getValidPositions() {
             switch(this) {
@@ -281,6 +285,15 @@ public class Arena implements Comparable<Arena>{
             }
         }
 
+        public boolean isRandomSpawnLocation() {
+            switch(this) {
+                case MINIGAME_OITC:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         public Material getGuiMaterial() {
             switch(this) {
                 case DUEL: return Material.GRASS;
@@ -295,7 +308,7 @@ public class Arena implements Comparable<Arena>{
                 case HCF_TEAMFIGHT: return Material.DIAMOND_SWORD;
                 case FFA: return Material.DIAMOND;
                 case EVENT_SUMO: return Material.SLIME_BALL;
-                case EVENT_OITC: return Material.ARROW;
+                case MINIGAME_OITC: return Material.ARROW;
                 default: return Material.STONE;
             }
         }

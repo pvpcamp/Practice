@@ -191,7 +191,7 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         for(Arena a : plugin.getArenaManager().getArenaCopies(arena)) {
             String cn = a.getName().replace(arena.getName() + "_copy_", "");
             a.setName(name.toLowerCase() + "_copy_" + cn);
-            a.setParent(name.toLowerCase());
+            a.setParentName(name.toLowerCase());
             copies++;
         }
 
@@ -375,7 +375,7 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         help.append("\n&6/arena buildlimit <name> <limit> &7- &fSets the build limit for an arena.");
         help.append("\n&6/arena voidlevel <name> <level> &7- &fSets the void level for an arena.");
         help.append("\n&6/arena copy <name> <x> <z> <times> [start from arena] &7- &fCopies an arena to another location." +
-                "\n&eX and Z are chunks (16x16 blocks) away from the original." +
+                "\n&eX and Z are blocks away from the original." +
                 "\n&eTimes will duplicate x amount of times." +
                 "\n&eStart from will start copying from a specified arena.");
 
