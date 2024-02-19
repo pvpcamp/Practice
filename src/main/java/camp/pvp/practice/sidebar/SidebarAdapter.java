@@ -164,11 +164,7 @@ public class SidebarAdapter implements AssembleAdapter {
 
             lines.add(" ");
 
-            if(profile.isDebugMode()) {
-                lines.add("&8&o" + "Debug Mode");
-            }
-
-            lines.add(plugin.getConfig().getString("scoreboard.ip"));
+            lines.add(plugin.getConfig().getString("scoreboard.ip") + (profile.isDebugMode() ? " &8&o(Debug)" : ""));
 
             if(showLines) {
                 lines.add("&7&m------------------");

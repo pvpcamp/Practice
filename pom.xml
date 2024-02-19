@@ -35,6 +35,13 @@
             <id>Citizens-Repo</id>
             <url>https://repo.citizensnpcs.co/</url>
         </repository>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/ThatKawaiiSam/Assemble</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
     </repositories>
 
     <dependencies>
