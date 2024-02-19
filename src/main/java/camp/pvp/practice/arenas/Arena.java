@@ -1,7 +1,6 @@
 package camp.pvp.practice.arenas;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.loot.LootChest;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.WordUtils;
@@ -16,6 +15,8 @@ public class Arena implements Comparable<Arena>{
     private String name, displayName;
     private Arena.Type type;
     private Map<String, ArenaPosition> positions;
+    private List<LootChest> lootChests;
+
     private boolean enabled, inUse;
     private String parentName;
     private int xDifference, zDifference, buildLimit, voidLevel;
@@ -28,6 +29,7 @@ public class Arena implements Comparable<Arena>{
         this.displayName = name;
         this.type = Type.DUEL;
         this.positions = new HashMap<>();
+        this.lootChests = new ArrayList<>();
 
         this.beds = new ArrayList<>();
         this.blocks = new ArrayList<>();
@@ -99,7 +101,13 @@ public class Arena implements Comparable<Arena>{
         }
 
         if(getType().isGenerateLoot()) {
-            LootChest.generateLoot(this);
+            for(LootChest lootChest : lootChests) {
+                Location l = lootChest.getLocation();
+                l.getBlock().setType(Material.CHEST);
+                l.getBlock().getState().update(true);
+
+                lootChest.generateLoot(lootChests);
+            }
         }
     }
 

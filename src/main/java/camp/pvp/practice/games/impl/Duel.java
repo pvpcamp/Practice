@@ -385,8 +385,8 @@ public class Duel extends Game {
                 GameParticipant blue = pList.get(0);
                 GameParticipant red = pList.get(1);
 
-                lines.add("&9B &fBlue: &9&l" + (blue.isRespawn() ? "✓" : "✗"));
-                lines.add("&cR &fRed: &c&l" + (red.isRespawn() ? "✓" : "✗"));
+                lines.add("&9B &fBlue: &9&l" + (blue.isRespawn() ? "✓" : "1"));
+                lines.add("&cR &fRed: &c&l" + (red.isRespawn() ? "✓" : "1"));
                 lines.add(" ");
             }
 
