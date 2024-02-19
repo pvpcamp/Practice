@@ -23,7 +23,6 @@ import camp.pvp.practice.parties.PartyManager;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.queue.GameQueueManager;
 import camp.pvp.practice.sidebar.SidebarAdapter;
-import camp.pvp.practice.tasks.ServerRebooter;
 import camp.pvp.practice.tasks.TickNumberCounter;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
@@ -64,7 +63,6 @@ public class Practice extends JavaPlugin {
     private PartyManager partyManager;
 
     private BukkitTask cooldownTask, energyTask, nameColorTask, tickNumberTask;
-    private ServerRebooter serverRebooter;
     private TickNumberCounter tickNumberCounter;
 
     @Override
@@ -95,9 +93,6 @@ public class Practice extends JavaPlugin {
         cooldownTask = this.getServer().getScheduler().runTaskTimer(this, new CooldownRunnable(this), 2, 2);
         energyTask = this.getServer().getScheduler().runTaskTimer(this, new EnergyRunnable(this), 0, 20);
         nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 0, 20);
-
-        this.serverRebooter = new ServerRebooter(this);
-        Bukkit.getScheduler().runTaskTimer(this, serverRebooter, 20, 20);
 
         tickNumberCounter = new TickNumberCounter();
         tickNumberTask = Bukkit.getScheduler().runTaskTimer(this, tickNumberCounter, 0, 1);

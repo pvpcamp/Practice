@@ -89,16 +89,11 @@ public class PracticeUtilCommand implements CommandExecutor {
                             return true;
                         }
                         break;
-                    case "schedulereboot":
-                        plugin.getServerRebooter().setRebootTime(new Date());
-                        player.sendMessage(ChatColor.GREEN + "You have scheduled a server reboot.");
-                        return true;
                 }
             }
 
             StringBuilder sb = new StringBuilder();
             sb.append("&6&lPractice Utilities");
-            sb.append("\n&6Next Scheduled Restart: &f" + plugin.getServerRebooter().getRebootTime().toString());
             sb.append("\n&6/" + label + " debug &7- &fShows a bunch of useful information.");
             sb.append("\n&6/" + label + " reset &7- &fResets your player.");
             sb.append("\n&6/" + label + " scanner &7- &fRescan all arenas for important blocks.");
