@@ -15,22 +15,12 @@ import java.util.*;
 @Data
 public class LootChest {
 
-    private int x;
-    private int y;
-    private int z;
-    private String world;
+    private Location location;
     private LootChest.Category lootCategory;
 
-    public LootChest(int x, int y, int z, String world, LootChest.Category lootCategory) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.world = world;
+    public LootChest(Location location, LootChest.Category lootCategory) {
+        this.location = location;
         this.lootCategory = lootCategory;
-    }
-
-    public Location getLocation() {
-        return new Location(Bukkit.getWorld(world), x, y, z);
     }
 
     public boolean hasItem(ItemStack item) {
@@ -79,8 +69,8 @@ public class LootChest {
         }
     }
 
-    public static String serialize(LootChest position) {
-        return position.x + "," + position.y + "," + position.z + "," + position.world + "," + position.lootCategory.name();
+    public String serialize() {
+        return location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ() + "," + location.getWorld().getName() + "," + lootCategory.name();
     }
 
     public static LootChest deserialize(String serialized) {
@@ -90,7 +80,7 @@ public class LootChest {
         int z = Integer.parseInt(split[2]);
         String world = split[3];
         LootChest.Category category = LootChest.Category.valueOf(split[4]);
-        return new LootChest(x, y, z, world, category);
+        return new LootChest(new Location(Bukkit.getWorld(world), x, y, z), category);
     }
 
     public enum Category {

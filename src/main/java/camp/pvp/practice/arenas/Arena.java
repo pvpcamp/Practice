@@ -15,6 +15,7 @@ public class Arena implements Comparable<Arena>{
     private String name, displayName;
     private Arena.Type type;
     private Map<String, ArenaPosition> positions;
+    private List<Location> randomSpawnLocations;
     private List<LootChest> lootChests;
 
     private boolean enabled, inUse;
@@ -29,6 +30,7 @@ public class Arena implements Comparable<Arena>{
         this.displayName = name;
         this.type = Type.DUEL;
         this.positions = new HashMap<>();
+        this.randomSpawnLocations = new ArrayList<>();
         this.lootChests = new ArrayList<>();
 
         this.beds = new ArrayList<>();
@@ -61,6 +63,9 @@ public class Arena implements Comparable<Arena>{
             }
         }
 
+        if(getType().isGenerateLoot() && lootChests.isEmpty()) return false;
+        if(getType().isRandomSpawnLocation() && randomSpawnLocations.isEmpty()) return false;
+
         return true;
     }
 
@@ -78,6 +83,14 @@ public class Arena implements Comparable<Arena>{
             Location newLocation = location.clone();
             newLocation.add(xDifference, 0, zDifference);
             positions.put(position.getPosition(), new ArenaPosition(position.getPosition(), newLocation));
+        }
+
+        for(LootChest lootChest : parent.getLootChests()) {
+            Location location = lootChest.getLocation();
+            Location newLocation = location.clone();
+            newLocation.add(xDifference, 0, zDifference);
+            lootChests.add(new LootChest(newLocation, lootChest.getLootCategory()
+            ));
         }
 
         setEnabled(parent.isEnabled());
@@ -220,20 +233,15 @@ public class Arena implements Comparable<Arena>{
         MINIGAME_SKYWARS, MINIGAME_OITC;
 
         public List<String> getValidPositions() {
-            switch(this) {
-                case DUEL_BED_FIGHT:
-                    return Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluebed", "redbed");
-                case DUEL_BUILD:
-                case DUEL_SKYWARS:
-                case SPLEEF:
-                    return Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
-                case EVENT_SUMO:
-                    return Arrays.asList("spawn1", "spawn2", "lobby");
-                case FFA:
-                    return Arrays.asList("spawn");
-                default:
-                    return Arrays.asList("spawn1", "spawn2", "center");
-            }
+            return switch (this) {
+                case DUEL_BED_FIGHT -> Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluebed", "redbed");
+                case DUEL_BUILD, DUEL_SKYWARS, SPLEEF -> Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
+                case EVENT_SUMO -> Arrays.asList("spawn1", "spawn2", "lobby");
+                case FFA -> Arrays.asList("spawn");
+                case MINIGAME_OITC -> Arrays.asList("center");
+                case MINIGAME_SKYWARS -> Arrays.asList("spawn1", "spawn2", "spawn3", "spawn4", "center");
+                default -> Arrays.asList("spawn1", "spawn2", "center");
+            };
         }
 
 

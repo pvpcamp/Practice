@@ -8,6 +8,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -71,6 +73,11 @@ public class ArenaConfig {
             arena.getPositions().put(pos.getPosition(), pos);
         }
 
+        List<String> serializedChests = config.getStringList(path + "loot_chests");
+        for(String serializedChest : serializedChests) {
+            arena.getLootChests().add(LootChest.deserialize(serializedChest));
+        }
+
         if(!arena.hasValidPositions()) {
             arena.setEnabled(false);
             this.logger.info("Arena '" + arena.getName() + "' does not have all of its valid positions, this must be fixed.");
@@ -83,7 +90,6 @@ public class ArenaConfig {
         String path = "arenas." + arena.getName();
 
         config.set(path, " ");
-
         config.set(path + ".type", arena.getType().name());
         config.set(path + ".display_name", arena.getDisplayName());
         config.set(path + ".enabled", arena.isEnabled());
@@ -101,6 +107,13 @@ public class ArenaConfig {
             String p = path + ".positions." + position.getPosition();
             config.set(p, location);
         }
+
+        List<String> serializedChests = new ArrayList<>();
+        for(LootChest chest : arena.getLootChests()) {
+            serializedChests.add(chest.serialize());
+        }
+
+        config.set(path + ".loot_chests", serializedChests);
     }
 
     public void shutdown() {
