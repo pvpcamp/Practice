@@ -27,10 +27,7 @@ public class GamesCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(sender instanceof Player) {
-            Player player = (Player) sender;
-            new GamesGui().open(player);
-        }
+        if(sender instanceof Player player) new GamesGui().open(player);
 
         return true;
     }

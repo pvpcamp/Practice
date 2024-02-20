@@ -65,12 +65,14 @@ public class ArenaConfig {
             arena.setParentName(config.getString(path + "parent"));
         }
 
-        for(String s : config.getConfigurationSection(path + "positions").getKeys(false)) {
-            String p = path + "positions." + s;
+        if(config.isSet(path + "positions")) {
+            for (String s : config.getConfigurationSection(path + "positions").getKeys(false)) {
+                String p = path + "positions." + s;
 
-            ArenaPosition pos = new ArenaPosition(s, (Location) config.get(p, Location.class));
+                ArenaPosition pos = new ArenaPosition(s, (Location) config.get(p, Location.class));
 
-            arena.getPositions().put(pos.getPosition(), pos);
+                arena.getPositions().put(pos.getPosition(), pos);
+            }
         }
 
         List<String> serializedChests = config.getStringList(path + "loot_chests");
