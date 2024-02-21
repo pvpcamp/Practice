@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 
-public class QueueableMinigame extends Game {
+public abstract class QueueableMinigame extends Game {
 
     @Getter @Setter private Type type;
 
@@ -30,19 +30,8 @@ public class QueueableMinigame extends Game {
         return null;
     }
 
-    @Override
-    public void initialize() {
-
-    }
-
-    @Override
-    public void end() {
-
-    }
-
     public enum Type {
         SKYWARS, ONE_IN_THE_CHAMBER;
-
 
         @Override
         public String toString() {

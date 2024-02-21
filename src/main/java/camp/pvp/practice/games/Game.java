@@ -247,8 +247,7 @@ public abstract class Game {
 
         profile.getDeathAnimation().playAnimation(this, player, location, velocity);
 
-        participant.eliminate();
-        participant.clearCooldowns();
+        participant.kill();
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 

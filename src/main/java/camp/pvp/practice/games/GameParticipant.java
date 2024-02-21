@@ -44,6 +44,7 @@ public class GameParticipant {
     public long health, maxHealth, hunger,
             hits, currentCombo, longestCombo,
             thrownPotions, missedPotions;
+    private int kills, deaths;
 
     private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
@@ -97,9 +98,18 @@ public class GameParticipant {
         }
     }
 
-    public void eliminate() {
+    public void kill() {
         alive = false;
         invincible = true;
+        deaths++;
+
+        clearCooldowns();
+
+        if(attacker != null) {
+            GameParticipant a = game.getParticipants().get(attacker);
+
+            if(a != null) a.setKills(a.getKills() + 1);
+        }
 
         if(!isRespawn()) {
             currentlyPlaying = false;
@@ -126,7 +136,7 @@ public class GameParticipant {
                         getDuelKit().apply(GameParticipant.this);
                     }
 
-                    getPlayer().teleport(getSpawnLocation());
+                    getPlayer().teleport(getRespawnLocation());
                     setAlive(true);
 
                     setLastDamageCause(null);
@@ -179,6 +189,31 @@ public class GameParticipant {
             }
             getPreviousEffects().clear();
         }
+    }
+
+    public Location getRespawnLocation() {
+        if(game.getArena().getType().isRandomSpawnLocation()) {
+            Map<Location, Double> distances = new HashMap<>();
+            for(Location l : game.getArena().getRandomSpawnLocations()) {
+                double nearestDistance = Double.MAX_VALUE;
+                for(Player player : game.getAlivePlayers()) {
+                    double distance = player.getLocation().distance(l);
+                    if(distance < nearestDistance) {
+                        nearestDistance = distance;
+                    }
+                }
+
+                distances.put(l, nearestDistance);
+            }
+
+            for(Map.Entry<Location, Double> entry : distances.entrySet()) {
+                if(Objects.equals(entry.getValue(), Collections.min(distances.values()))) {
+                    return entry.getKey();
+                }
+            }
+        }
+
+        return spawnLocation;
     }
 
     public GameTeam.Color getTeamColor() {
