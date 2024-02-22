@@ -6,7 +6,7 @@ import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.TeleportFix;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.PlayerUtils;
@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +55,7 @@ public class HCFTeams extends TeamDuel {
 
         arena.prepare();
 
-        this.setKit(DuelKit.NO_DEBUFF);
+        this.setKit(GameKit.NO_DEBUFF);
 
         for(Party party : this.getParties()) {
             party.setGame(this);

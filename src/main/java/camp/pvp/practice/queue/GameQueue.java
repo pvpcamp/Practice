@@ -7,7 +7,7 @@ import camp.pvp.practice.games.minigames.SkywarsMinigame;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
@@ -61,16 +61,16 @@ public class GameQueue {
     private final Practice plugin;
     private final GameType gameType;
     private final Type type;
-    private DuelKit duelKit;
+    private GameKit gameKit;
     private QueueableMinigame.Type minigameType;
     private Queue<GameQueueMember> queueMembers;
     private BukkitTask queueTask;
     private boolean available;
 
-    public GameQueue(Practice plugin, DuelKit duelKit, Type type) {
+    public GameQueue(Practice plugin, GameKit gameKit, Type type) {
         this.plugin = plugin;
         this.gameType = GameType.DUEL;
-        this.duelKit = duelKit;
+        this.gameKit = gameKit;
         this.type = type;
         this.queueMembers = new LinkedList<>();
         this.available = true;
@@ -95,7 +95,7 @@ public class GameQueue {
         switch(gameType) {
             case DUEL -> {
                 for(Game game : getPlugin().getGameManager().getActiveGames()) {
-                    if(game instanceof Duel && game.getKit().equals(duelKit) && ((Duel) game).getQueueType().equals(getType())) {
+                    if(game instanceof Duel && game.getKit().equals(gameKit) && ((Duel) game).getQueueType().equals(getType())) {
                         i += game.getAlive().size();
                     }
                 }
@@ -129,7 +129,7 @@ public class GameQueue {
                             Duel duel = new Duel(plugin, UUID.randomUUID());
 
                             duel.setQueueType(type);
-                            duel.setKit(duelKit);
+                            duel.setKit(gameKit);
 
                             duel.join(member1.getPlayer());
                             duel.join(member2.getPlayer());
@@ -161,7 +161,7 @@ public class GameQueue {
                                             Duel duel = new Duel(plugin, UUID.randomUUID());
 
                                             duel.setQueueType(type);
-                                            duel.setKit(duelKit);
+                                            duel.setKit(gameKit);
 
                                             duel.join(member1.getPlayer());
                                             duel.join(member2.getPlayer());

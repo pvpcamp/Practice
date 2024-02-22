@@ -2,7 +2,7 @@ package camp.pvp.practice.games.impl.teams;
 
 import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.TeleportFix;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
@@ -20,7 +20,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -46,7 +45,7 @@ public class TeamDuel extends TeamGame {
             String blue = "&9B &fBlue: ";
             String red = "&cR &fRed: ";
 
-            if (getKit().equals(DuelKit.BED_FIGHT)) {
+            if (getKit().equals(GameKit.BED_FIGHT)) {
                 blue = blue + "&9&l" + (getBlue().isRespawn() ? "✓" : getBlue().getCurrentParticipants().size());
                 red = red + "&c&l" + (getRed().isRespawn() ? "✓" : getRed().getCurrentParticipants().size());
             } else {
@@ -144,7 +143,7 @@ public class TeamDuel extends TeamGame {
         String blue = "&9B &fBlue: ";
         String red = "&cR &fRed: ";
 
-        if (getKit().equals(DuelKit.BED_FIGHT)) {
+        if (getKit().equals(GameKit.BED_FIGHT)) {
             lines.add(blue + "&9&l" + (getBlue().isRespawn() ? "✓" : getBlue().getCurrentParticipants().size()));
             lines.add(red + "&c&l" + (getRed().isRespawn() ? "✓" : getRed().getCurrentParticipants().size()));
         } else {

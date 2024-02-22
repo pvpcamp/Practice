@@ -2,7 +2,7 @@ package camp.pvp.practice.profiles.stats;
 
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.impl.Duel;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.TimeUtil;
 import lombok.Data;
@@ -22,7 +22,7 @@ public class MatchRecord {
     private boolean rolledBack;
 
     private GameQueue.Type queueType;
-    private DuelKit kit;
+    private GameKit kit;
 
     public MatchRecord(UUID uuid) {
         this.uuid = uuid;
@@ -56,7 +56,7 @@ public class MatchRecord {
         this.befloreLoserElo = doc.getInteger("before_loser_elo");
         this.rolledBack = doc.getBoolean("rolled_back", false);
         this.queueType = GameQueue.Type.valueOf(doc.get("queue_type", "UNRANKED"));
-        this.kit = DuelKit.valueOf(doc.get("kit", "NO_DEBUFF"));
+        this.kit = GameKit.valueOf(doc.get("kit", "NO_DEBUFF"));
     }
 
     public Map<String, Object> export() {

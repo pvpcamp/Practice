@@ -1,6 +1,6 @@
 package camp.pvp.practice.listeners.bukkit.projectile;
 
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
@@ -37,7 +37,7 @@ public class ProjectileHitListener implements Listener {
         if(game != null) {
             game.addEntity(event.getEntity());
 
-            if(game.getKit().equals(DuelKit.SPLEEF)) {
+            if(game.getKit().equals(GameKit.SPLEEF)) {
                 Location location = event.getEntity().getLocation();
                 location.subtract(0, 1, 0);
 

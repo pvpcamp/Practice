@@ -5,7 +5,7 @@ import camp.pvp.practice.profiles.DuelRequest;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
@@ -54,7 +54,7 @@ public class DuelCommand implements CommandExecutor {
                             if(duelRequest != null && !duelRequest.isExpired()) {
                                 StandardGui acceptGui = new StandardGui("Accept Duel from " + target.getName() + "?", 27);
 
-                                DuelKit kit = duelRequest.getKit();
+                                GameKit kit = duelRequest.getKit();
                                 GuiButton acceptButton = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName() + " Duel Request");
                                 acceptButton.setLore(
                                         "&7Would you like to accept this duel?",

@@ -2,7 +2,7 @@ package camp.pvp.practice.guis.party;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.impl.FreeForAll;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.parties.PartyMember;
 import camp.pvp.practice.profiles.GameProfile;
@@ -23,8 +23,8 @@ public class FFAKitGui extends ArrangedGui {
 
         this.setDefaultBorder();
 
-        for(DuelKit kit : DuelKit.values()) {
-            if(!kit.isFfa()) continue;
+        for(GameKit kit : GameKit.values()) {
+            if(!kit.isDuelKit() || !kit.isFfa()) continue;
 
             GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
             button.setCloseOnClick(true);

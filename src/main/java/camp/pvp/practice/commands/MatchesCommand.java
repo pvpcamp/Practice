@@ -2,9 +2,8 @@ package camp.pvp.practice.commands;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.guis.profile.MyProfileGui;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.queue.GameQueue;
@@ -26,9 +25,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 public class MatchesCommand implements CommandExecutor {
 
@@ -77,7 +74,7 @@ public class MatchesCommand implements CommandExecutor {
             }
 
             for(MatchRecord record : profile.getMatchRecords()) {
-                DuelKit kit = record.getKit();
+                GameKit kit = record.getKit();
                 GuiButton button = new GuiButton(record.getKit().getIcon(), "&6&l" + kit.getDisplayName() + " Duel");
 
                 boolean admin = player.hasPermission("practice.admin");

@@ -26,7 +26,6 @@ public class EntityDamageByEntityListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        Player player = null;
         Player attacker = null;
 
         if(event.getEntity().hasMetadata("NPC")) {
@@ -34,23 +33,9 @@ public class EntityDamageByEntityListener implements Listener {
             return;
         }
 
-        if(event.getEntity() instanceof Player) {
-            player = (Player) event.getEntity();
-        }
+        if(!(event.getEntity() instanceof Player player)) return;
 
-        if(event.getDamager() instanceof Player) {
-            attacker = (Player) event.getDamager();
-        }
-
-        if(event.getDamager() instanceof Arrow) {
-            Arrow arrow = (Arrow) event.getDamager();
-            if(arrow.getShooter() instanceof Player) {
-                attacker = (Player) arrow.getShooter();
-                if(attacker != player) {
-                    attacker.sendMessage(Colors.get("&f" + player.getName() + " &6is now at &c" + Math.round(player.getHealth()) + " ❤"));
-                }
-            }
-        }
+        if(event.getDamager() instanceof Player) attacker = (Player) event.getDamager();
 
         if(event.getDamager() instanceof FishHook && event.getEntity() instanceof Player) {
             FishHook fishHook = (FishHook) event.getDamager();
@@ -59,7 +44,7 @@ public class EntityDamageByEntityListener implements Listener {
             }
         }
 
-        if(player != null && attacker != null) {
+        if(attacker != null) {
             GameProfile playerProfile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
             GameProfile attackerProfile = plugin.getGameProfileManager().getLoadedProfiles().get(attacker.getUniqueId());
             Game game = attackerProfile.getGame();

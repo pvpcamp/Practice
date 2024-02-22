@@ -1,7 +1,7 @@
 package camp.pvp.practice.profiles;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,9 +15,9 @@ public class Rematch {
     private GameProfile profile;
     private final UUID uuid;
     private final String name;
-    private final DuelKit kit;
+    private final GameKit kit;
 
-    public Rematch(GameProfile profile, UUID uuid, String name, DuelKit kit) {
+    public Rematch(GameProfile profile, UUID uuid, String name, GameKit kit) {
         this.profile = profile;
         this.uuid = uuid;
         this.name = name;

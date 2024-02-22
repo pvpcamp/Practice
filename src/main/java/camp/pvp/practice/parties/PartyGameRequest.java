@@ -4,7 +4,7 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.impl.teams.HCFTeams;
 import camp.pvp.practice.games.impl.teams.TeamDuel;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +29,7 @@ public class PartyGameRequest {
 
     private final Party fromParty, toParty;
     private final Type type;
-    private DuelKit kit;
+    private GameKit kit;
     private Date expires;
 
     public PartyGameRequest(Party fromParty, Party toParty, Type type) {

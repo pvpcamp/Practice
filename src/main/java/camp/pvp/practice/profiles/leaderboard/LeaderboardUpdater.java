@@ -1,10 +1,8 @@
 package camp.pvp.practice.profiles.leaderboard;
 
-import camp.pvp.mongo.MongoCollectionResult;
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfileManager;
-import com.mongodb.client.MongoCollection;
 import lombok.Getter;
 import org.bson.Document;
 
@@ -13,7 +11,7 @@ import java.util.*;
 public class LeaderboardUpdater implements Runnable{
 
     private GameProfileManager gpm;
-    private @Getter Map<DuelKit, List<LeaderboardEntry>> leaderboard;
+    private @Getter Map<GameKit, List<LeaderboardEntry>> leaderboard;
     public LeaderboardUpdater(GameProfileManager gpm) {
         this.gpm = gpm;
         this.leaderboard = new HashMap<>();
@@ -24,8 +22,8 @@ public class LeaderboardUpdater implements Runnable{
 
         long start = System.currentTimeMillis();
 
-        for(DuelKit kit : DuelKit.values()) {
-            if(kit.isQueueable() && kit.isRanked()) {
+        for(GameKit kit : GameKit.values()) {
+            if(kit.isDuelKit() && kit.isRanked()) {
                 List<LeaderboardEntry> entries = new ArrayList<>();
 
                 gpm.getEloCollection().find().sort(new Document("kit_" + kit.name(), -1)).limit(10).forEach(

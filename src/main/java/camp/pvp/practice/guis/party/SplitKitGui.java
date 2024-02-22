@@ -3,7 +3,7 @@ package camp.pvp.practice.guis.party;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.impl.teams.TeamDuel;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.parties.PartyMember;
 import camp.pvp.practice.profiles.GameProfile;
@@ -25,8 +25,8 @@ public class SplitKitGui extends ArrangedGui {
 
         this.setDefaultBorder();
 
-        for(DuelKit kit : DuelKit.values()) {
-            if(!kit.isQueueable()) continue;
+        for(GameKit kit : GameKit.values()) {
+            if(!kit.isDuelKit()) continue;
             if(!kit.isTeams()) continue;
 
             GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());

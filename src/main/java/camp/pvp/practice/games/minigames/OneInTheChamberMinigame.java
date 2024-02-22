@@ -5,21 +5,25 @@ import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.tasks.TeleportFix;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import java.util.*;
 
 public class OneInTheChamberMinigame extends QueueableMinigame{
+
     public OneInTheChamberMinigame(Practice plugin, UUID uuid) {
         super(plugin, uuid);
+
+        setKit(GameKit.ONE_IN_THE_CHAMBER);
     }
 
     @Override
@@ -74,11 +78,13 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
         }
 
         String startingMessage = """
+                
                 &6&lMinigame starting in 5 seconds.
-                 &7● &6Minigame: &fOne in the Chamber
+                 &7● &6Minigame: &fOne In The Chamber
                  &7● &6Arena: &f%s
                  &7● &6Participants: &f%s
-                """.formatted(arena.getDisplayName(), sb);
+                 
+                 """.formatted(arena.getDisplayName(), sb);
 
         int spawnNumber = 1;
         for(GameParticipant participant : getParticipants().values()) {
@@ -96,8 +102,35 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
     }
 
     @Override
-    public void end() {
+    public void eliminate(Player player, boolean leftGame) {
+        super.eliminate(player, leftGame);
 
+        if(getCurrentPlaying().size() < 2) {
+            end();
+        }
+    }
+
+    @Override
+    public void handleHit(Player victim, Player attacker, EntityDamageByEntityEvent event) {
+        super.handleHit(victim, attacker, event);
+
+        GameParticipant victimParticipant = getParticipants().get(victim.getUniqueId());
+        GameParticipant attackerParticipant = getParticipants().get(attacker.getUniqueId());
+
+        if(!victimParticipant.isAlive()) return;
+
+        if(event.getDamager() instanceof Arrow) {
+            eliminate(victim.getPlayer(), false);
+        }
+
+        if(attackerParticipant.getKills() >= 20) {
+            end();
+        }
+    }
+
+    @Override
+    public void end() {
+        determineWinner();
     }
 
     @Override
@@ -110,7 +143,7 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
             case STARTING -> {
                 lines.add("&6Minigame: &fOITC");
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
-                lines.add(" ");
+                lines.add("&7&oFirst to 20 kills wins!");
 
                 lines.add("&6Players:");
                 for(GameParticipant p : this.getCurrentPlaying().values()) {
@@ -142,15 +175,7 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
                 }
             }
             case ENDED -> {
-                GameParticipant winner = null;
-                for(GameParticipant p : getCurrentPlaying().values()) {
-                    if(p.getKills() == 20) {
-                        winner = p;
-                        break;
-                    }
-                }
-
-                if(winner != null) lines.add("&6Winner: &f" + winner.getName());
+                lines.add("&6Winner: &f" + getWinner().getName());
 
                 if(profile.isSidebarShowDuration()) {
                     lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
@@ -159,5 +184,15 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
         }
 
         return lines;
+    }
+
+    @Override
+    public GameParticipant determineWinner() {
+
+        List<GameParticipant> sp = new ArrayList<>(this.getCurrentPlaying().values());
+        sp.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
+        setWinner(sp.get(0));
+
+        return getWinner();
     }
 }

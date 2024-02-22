@@ -8,7 +8,6 @@ import camp.pvp.practice.utils.items.ItemStackDeserializer;
 import camp.pvp.practice.utils.items.ItemStackSerializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Color;
@@ -25,20 +24,20 @@ import java.util.Map;
 @Getter @Setter
 public class CustomDuelKit {
 
-    private final DuelKit duelKit;
+    private final GameKit gameKit;
     private final int slot;
     private ItemStack[] items;
     private String name;
 
-    public CustomDuelKit(DuelKit duelKit, int slot, boolean existing) {
-        this.duelKit = duelKit;
+    public CustomDuelKit(GameKit gameKit, int slot, boolean existing) {
+        this.gameKit = gameKit;
         this.slot = slot;
-        this.name = "&f" + duelKit.getDisplayName() + " Kit " + slot;
+        this.name = "&f" + gameKit.getDisplayName() + " Kit " + slot;
 
         if (existing) {
             items = new ItemStack[36];
         } else {
-            this.items = duelKit.getGameInventory().getInventory();
+            this.items = gameKit.getGameInventory().getInventory();
         }
     }
 
@@ -81,7 +80,7 @@ public class CustomDuelKit {
 
     public void apply(Player player) {
         PlayerInventory pi = player.getInventory();
-        GameInventory gi = duelKit.getGameInventory();
+        GameInventory gi = gameKit.getGameInventory();
 
         PlayerUtils.reset(player, false);
 
@@ -97,7 +96,7 @@ public class CustomDuelKit {
     public void apply(GameParticipant participant) {
         Player player = participant.getPlayer();
         PlayerInventory pi = player.getInventory();
-        GameInventory gi = duelKit.getGameInventory();
+        GameInventory gi = gameKit.getGameInventory();
 
         PlayerUtils.reset(player, false);
 
@@ -110,7 +109,7 @@ public class CustomDuelKit {
 
         participant.setKitApplied(true);
 
-        if(duelKit.equals(DuelKit.BED_FIGHT)) {
+        if(gameKit.equals(GameKit.BED_FIGHT)) {
             ItemStack[] armor = pi.getArmorContents();
             GameTeam.Color color = participant.getTeamColor();
 

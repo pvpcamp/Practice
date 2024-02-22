@@ -3,7 +3,7 @@ package camp.pvp.practice.profiles;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.games.impl.Duel;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
@@ -23,7 +23,7 @@ import java.util.UUID;
 public class DuelRequest {
 
     private final GameProfile sender, opponent;
-    private DuelKit kit;
+    private GameKit kit;
     private Arena arena;
     private Date expires;
 

@@ -1,6 +1,6 @@
 package camp.pvp.practice.guis.party;
 
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.parties.PartyGameRequest;
 import camp.pvp.practice.profiles.GameProfile;
@@ -33,8 +33,8 @@ public class ChoosePartyDuelEventGui extends StandardGui {
 
                 kitGui.setDefaultBorder();
 
-                for(DuelKit kit : DuelKit.values()) {
-                    if(kit.isQueueable() && kit.isTeams()) {
+                for(GameKit kit : GameKit.values()) {
+                    if(kit.isDuelKit() && kit.isTeams()) {
                         GuiButton kitButton = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
                         kitButton.setCloseOnClick(true);
 

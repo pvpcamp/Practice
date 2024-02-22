@@ -52,7 +52,7 @@ public class ChooseQueueGui extends StandardGui {
                 return;
             }
 
-            plugin.getGameQueueManager().addToQueue(player, previousQueue.getKit(), previousQueue.getQueueType());
+            plugin.getGameQueueManager().addToQueue(player, previousQueue.kit(), previousQueue.queueType());
             player.closeInventory();
         });
 
@@ -69,8 +69,8 @@ public class ChooseQueueGui extends StandardGui {
             guiButton.setType(Material.PAPER);
             guiButton.setDurability((short) 0);
             guiButton.setLore(
-                    "&6Queue: &f" + previousQueue.getQueueType().toString(),
-                    "&6Kit: &f" + previousQueue.getKit().getDisplayName(),
+                    "&6Queue: &f" + previousQueue.queueType().toString(),
+                    "&6Kit: &f" + previousQueue.kit().getDisplayName(),
                     " ",
                     "&7Click to requeue.");
         });
@@ -117,7 +117,7 @@ public class ChooseQueueGui extends StandardGui {
                 guiButton.setType(Material.BLAZE_POWDER);
                 guiButton.setLore(
                         "&6Opponent: &f" + rm.getName(),
-                        "&6Kit: &f" + rm.getKit(),
+                        "&6Kit: &f" + rm.getKit().getDisplayName(),
                         " ",
                         "&7Click to send rematch request.");
             }

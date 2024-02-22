@@ -1,6 +1,6 @@
 package camp.pvp.practice.profiles.stats;
 
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.Document;
@@ -14,7 +14,7 @@ public class ProfileELO {
 
     private final UUID uuid;
     private String name;
-    private Map<DuelKit, Integer> ratings;
+    private Map<GameKit, Integer> ratings;
 
 
     public ProfileELO(UUID uuid) {
@@ -27,33 +27,33 @@ public class ProfileELO {
     public void importFromDocument(Document doc) {
         this.name = doc.getString("name");
 
-        for(DuelKit kit : DuelKit.values()) {
+        for(GameKit kit : GameKit.values()) {
             if(doc.get("kit_" + kit.name()) != null) {
                 ratings.put(kit, doc.getInteger("kit_" + kit.name()));
             }
         }
     }
 
-    public int setElo(DuelKit kit, int elo) {
+    public int setElo(GameKit kit, int elo) {
         return ratings.put(kit, elo);
     }
 
-    public int getElo(DuelKit kit) {
+    public int getElo(GameKit kit) {
         return ratings.get(kit);
     }
 
-    public void addElo(DuelKit kit, int difference) {
+    public void addElo(GameKit kit, int difference) {
         final int current = ratings.get(kit);
         ratings.put(kit, current + difference);
     }
 
-    public void subtractElo(DuelKit kit, int difference) {
+    public void subtractElo(GameKit kit, int difference) {
         final int current = ratings.get(kit);
         ratings.put(kit, current - difference);
     }
 
     public void resetRatings() {
-        for(DuelKit kit : DuelKit.values()) {
+        for(GameKit kit : GameKit.values()) {
             if(kit.isRanked()) {
                 ratings.put(kit, 1000);
             }
@@ -64,7 +64,7 @@ public class ProfileELO {
         Map<String, Object> map = new HashMap<>();
         map.put("name", name);
 
-        for(Map.Entry<DuelKit, Integer> entry : ratings.entrySet()) {
+        for(Map.Entry<GameKit, Integer> entry : ratings.entrySet()) {
             map.put("kit_" + entry.getKey().name(), entry.getValue());
         }
 

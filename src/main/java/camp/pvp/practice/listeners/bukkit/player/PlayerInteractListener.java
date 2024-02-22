@@ -10,7 +10,7 @@ import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.kits.CustomDuelKit;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
@@ -120,7 +120,7 @@ public class PlayerInteractListener implements Listener {
                                 break;
                         }
                     } else {
-                        DuelKit kit = game.getKit();
+                        GameKit kit = game.getKit();
                         switch(player.getItemInHand().getType()) {
                             case ENCHANTED_BOOK:
                                 int slot = player.getInventory().getHeldItemSlot() + 1;
@@ -163,7 +163,7 @@ public class PlayerInteractListener implements Listener {
                 }
             } else if(profile.getState().equals(GameProfile.State.KIT_EDITOR)) {
                 if(block != null) {
-                    DuelKit editingKit = profile.getEditingKit();
+                    GameKit editingKit = profile.getEditingKit();
                     switch (block.getType()) {
                         case CHEST:
                             if(editingKit.getMoreItems() != null) {

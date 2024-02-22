@@ -22,11 +22,10 @@ import org.bukkit.potion.PotionType;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public enum DuelKit {
-    NO_DEBUFF, BOXING, BED_FIGHT, SUMO, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, STRATEGY;
+public enum GameKit {
+    NO_DEBUFF, BOXING, BED_FIGHT, SUMO, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, STRATEGY, ONE_IN_THE_CHAMBER;
 
     public String getDisplayName() {
         switch(this) {
@@ -58,6 +57,8 @@ public enum DuelKit {
                 return Collections.singletonList(Arena.Type.SPLEEF);
             case BED_FIGHT:
                 return Collections.singletonList(Arena.Type.DUEL_BED_FIGHT);
+            case ONE_IN_THE_CHAMBER:
+                return Collections.singletonList(Arena.Type.MINIGAME_OITC);
             default:
                 return Arrays.asList(Arena.Type.DUEL, Arena.Type.DUEL_FLAT);
         }
@@ -77,7 +78,7 @@ public enum DuelKit {
     }
 
     public boolean isRespawn() {
-        return this.equals(BED_FIGHT);
+        return this.equals(BED_FIGHT) || this.equals(ONE_IN_THE_CHAMBER);
     }
 
     public boolean isRegen() {
@@ -89,7 +90,7 @@ public enum DuelKit {
         }
     }
 
-    public boolean isQueueable () {
+    public boolean isDuelKit() {
         return true;
     }
 
@@ -152,6 +153,7 @@ public enum DuelKit {
             case STRATEGY:
             case INVADED:
             case CLASSIC:
+            case ONE_IN_THE_CHAMBER:
                 return true;
             default:
                 return false;
@@ -174,6 +176,7 @@ public enum DuelKit {
             case BED_FIGHT:
             case SUMO:
             case SKYWARS:
+            case ONE_IN_THE_CHAMBER:
                 return false;
             default:
                 return true;
@@ -234,6 +237,10 @@ public enum DuelKit {
 
     public boolean isFallDamage() {
         return !this.equals(BED_FIGHT);
+    }
+
+    public boolean isShowArrowDamage() {
+        return !this.equals(ONE_IN_THE_CHAMBER);
     }
 
     public ItemStack getIcon() {

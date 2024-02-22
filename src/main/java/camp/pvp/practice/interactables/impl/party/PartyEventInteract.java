@@ -5,14 +5,7 @@ import camp.pvp.practice.guis.party.FindPartyGui;
 import camp.pvp.practice.guis.party.SplitKitGui;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.Practice;
-import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.games.impl.FreeForAll;
-import camp.pvp.practice.games.impl.teams.TeamDuel;
 import camp.pvp.practice.interactables.ItemInteract;
-import camp.pvp.practice.kits.DuelKit;
-import camp.pvp.practice.parties.PartyMember;
-import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
@@ -21,11 +14,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 public class PartyEventInteract implements ItemInteract {
     @Override

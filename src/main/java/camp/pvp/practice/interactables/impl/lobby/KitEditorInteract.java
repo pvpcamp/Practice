@@ -2,24 +2,20 @@ package camp.pvp.practice.interactables.impl.lobby;
 
 import camp.pvp.practice.interactables.ItemInteract;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
-import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class KitEditorInteract implements ItemInteract {
     @Override
     public void onInteract(Player player, GameProfile gameProfile) {
         ArrangedGui gui = new ArrangedGui("&6Edit a Kit");
 
-        for(DuelKit kit : DuelKit.values()) {
+        for(GameKit kit : GameKit.values()) {
             if(!kit.isEditable()) continue;
 
             GuiButton button = new GuiButton(kit.getIcon(), "&6&l" + kit.getDisplayName());

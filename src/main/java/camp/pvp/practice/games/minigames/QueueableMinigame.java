@@ -2,6 +2,7 @@ package camp.pvp.practice.games.minigames;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
+import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.profiles.GameProfile;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public abstract class QueueableMinigame extends Game {
 
     @Getter @Setter private Type type;
+    @Getter @Setter private GameParticipant winner;
 
     protected QueueableMinigame(Practice plugin, UUID uuid) {
         super(plugin, uuid);
@@ -29,6 +31,8 @@ public abstract class QueueableMinigame extends Game {
     public List<String> getSpectatorScoreboard(GameProfile profile) {
         return null;
     }
+
+    public abstract GameParticipant determineWinner();
 
     public enum Type {
         SKYWARS, ONE_IN_THE_CHAMBER;

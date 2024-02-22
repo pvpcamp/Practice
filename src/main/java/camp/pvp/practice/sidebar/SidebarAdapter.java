@@ -1,7 +1,6 @@
 package camp.pvp.practice.sidebar;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.arenas.*;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameManager;
 import camp.pvp.practice.games.sumo.SumoEvent;
@@ -22,7 +21,6 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Queue;
 
 public class SidebarAdapter implements AssembleAdapter {
 
@@ -91,10 +89,10 @@ public class SidebarAdapter implements AssembleAdapter {
                     switch(queue.getGameType()) {
                         case DUEL -> {
                             lines.add("&6In Duel Queue:");
-                            lines.add(" &7● " + queue.getType().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
+                            lines.add(" &7● " + queue.getType().getColor() + queue.getGameKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
 
                             if(queue.getType().equals(GameQueue.Type.RANKED)) {
-                                lines.add(" &7● &6ELO: &f" + profile.getProfileElo().getRatings().get(queue.getDuelKit()));
+                                lines.add(" &7● &6ELO: &f" + profile.getProfileElo().getRatings().get(queue.getGameKit()));
                                 lines.add(" &7● &6Range: &f" + queueMember.getEloLow() + " - " + queueMember.getEloHigh());
                             }
                         }

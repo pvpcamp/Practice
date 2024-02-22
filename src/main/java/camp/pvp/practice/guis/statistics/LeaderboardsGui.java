@@ -1,11 +1,10 @@
 package camp.pvp.practice.guis.statistics;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.leaderboard.LeaderboardEntry;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
-import camp.pvp.utils.guis.StandardGui;
 
 import java.util.*;
 
@@ -13,10 +12,10 @@ public class LeaderboardsGui extends ArrangedGui {
     public LeaderboardsGui() {
         super("&6ELO Leaderboards");
 
-        Map<DuelKit, List<LeaderboardEntry>> leaderboard = Practice.getInstance().getGameProfileManager().getLeaderboardUpdater().getLeaderboard();
+        Map<GameKit, List<LeaderboardEntry>> leaderboard = Practice.getInstance().getGameProfileManager().getLeaderboardUpdater().getLeaderboard();
 
-        for(DuelKit kit : DuelKit.values()) {
-            if(!kit.isQueueable()) continue;
+        for(GameKit kit : GameKit.values()) {
+            if(!kit.isDuelKit()) continue;
             if(!kit.isRanked()) continue;
 
             List<LeaderboardEntry> entries = leaderboard.get(kit);

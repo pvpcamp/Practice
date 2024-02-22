@@ -1,7 +1,7 @@
 package camp.pvp.practice.games;
 
 import camp.pvp.practice.kits.CustomDuelKit;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
@@ -49,7 +49,7 @@ public class GameParticipant {
     private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
     private Location spawnLocation;
-    private DuelKit duelKit;
+    private GameKit gameKit;
     private CustomDuelKit appliedCustomKit;
 
     private BukkitTask respawnTask;
@@ -133,7 +133,7 @@ public class GameParticipant {
                     if(getAppliedCustomKit() != null) {
                         getAppliedCustomKit().apply(GameParticipant.this);
                     } else {
-                        getDuelKit().apply(GameParticipant.this);
+                        getGameKit().apply(GameParticipant.this);
                     }
 
                     getPlayer().teleport(getRespawnLocation());
@@ -207,7 +207,7 @@ public class GameParticipant {
             }
 
             for(Map.Entry<Location, Double> entry : distances.entrySet()) {
-                if(Objects.equals(entry.getValue(), Collections.min(distances.values()))) {
+                if(Objects.equals(entry.getValue(), Collections.max(distances.values()))) {
                     return entry.getKey();
                 }
             }
