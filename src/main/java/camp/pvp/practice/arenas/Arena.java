@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -187,7 +188,7 @@ public class Arena implements Comparable<Arena>{
             Block parentBlock = parentLocation.getBlock();
             Block block = location.getBlock();
 
-            if(parentBlock.getType() != block.getType()) {
+            if(parentBlock.getType() != block.getType() || !parentBlock.getState().equals(block.getState())) {
                 StoredBlock storedBlock = new StoredBlock(parentBlock, location);
                 blockQueue.add(storedBlock);
             }
@@ -200,18 +201,18 @@ public class Arena implements Comparable<Arena>{
 
     public boolean isOriginalBlock(Location location) {
 
-        if(!type.equals(Type.DUEL_BED_FIGHT)) return blocks.contains(location);
+        if (!type.equals(Type.DUEL_BED_FIGHT)) return blocks.contains(location);
 
-        for(ArenaPosition position : positions.values()) {
-            if(position.getPosition().equalsIgnoreCase("bluebed") || position.getPosition().equalsIgnoreCase("redbed")) {
+        for (ArenaPosition position : positions.values()) {
+            if (position.getPosition().equalsIgnoreCase("bluebed") || position.getPosition().equalsIgnoreCase("redbed")) {
                 Location l = position.getLocation();
 
-                for(int x = l.getBlockX() - 3; x < l.getBlockX() + 3; x++) {
-                    for(int y = l.getBlockY(); y < l.getBlockY() + 3; y++) {
-                        for(int z = l.getBlockZ() - 3; z < l.getBlockZ() + 3; z++) {
+                for (int x = l.getBlockX() - 4; x < l.getBlockX() + 4; x++) {
+                    for (int y = l.getBlockY(); y < l.getBlockY() + 3; y++) {
+                        for (int z = l.getBlockZ() - 4; z < l.getBlockZ() + 4; z++) {
                             Location blockLocation = new Location(l.getWorld(), x, y, z);
                             Block block = blockLocation.getBlock();
-                            if(block.equals(location.getBlock())) {
+                            if (block.equals(location.getBlock())) {
                                 return false;
                             }
                         }

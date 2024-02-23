@@ -75,6 +75,16 @@ public class ArenaConfig {
             }
         }
 
+        if(config.isSet(path + "random_spawns")) {
+            for (String s : config.getConfigurationSection(path + "random_spawns").getKeys(false)) {
+                String p = path + "random_spawns." + s;
+
+                Location loc = (Location) config.get(p, Location.class);
+
+                arena.getRandomSpawnLocations().add(loc);
+            }
+        }
+
         List<String> serializedChests = config.getStringList(path + "loot_chests");
         for(String serializedChest : serializedChests) {
             arena.getLootChests().add(LootChest.deserialize(serializedChest));
@@ -108,6 +118,13 @@ public class ArenaConfig {
             Location location = position.getLocation();
             String p = path + ".positions." + position.getPosition();
             config.set(p, location);
+        }
+
+        int x = 0;
+        for(Location location : arena.getRandomSpawnLocations()) {
+            String p = path + ".random_spawns." + x;
+            config.set(p, location);
+            x++;
         }
 
         List<String> serializedChests = new ArrayList<>();

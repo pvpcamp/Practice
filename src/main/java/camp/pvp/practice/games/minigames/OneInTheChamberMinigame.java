@@ -2,11 +2,12 @@ package camp.pvp.practice.games.minigames;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
-import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.profiles.GameProfileManager;
+import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
 import org.bukkit.Bukkit;
@@ -86,11 +87,9 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
                  
                  """.formatted(arena.getDisplayName(), sb);
 
-        int spawnNumber = 1;
         for(GameParticipant participant : getParticipants().values()) {
-            ArenaPosition pos = arena.getPositions().get("spawn" + spawnNumber);
             Player p = Bukkit.getPlayer(participant.getUuid());
-            p.teleport(pos.getLocation());
+            p.teleport(getRespawnLocation(participant));
             p.sendMessage(startingMessage);
         }
 
@@ -123,14 +122,62 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
             eliminate(victim.getPlayer(), false);
         }
 
-        if(attackerParticipant.getKills() >= 20) {
+        if(attackerParticipant.getKills() > 19) {
             end();
         }
     }
 
     @Override
     public void end() {
-        determineWinner();
+        GameParticipant winner = determineWinner();
+
+        GameProfileManager gpm = getPlugin().getGameProfileManager();
+        setEnded(new Date());
+        setState(State.ENDED);
+
+        if(getStarted() == null) {
+            setStarted(new Date());
+            getStartingTimer().cancel();
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(Colors.get(" \n&6&lMatch ended."));
+        stringBuilder.append("\n &7● &6Winner: &f" + winner.getName());
+        stringBuilder.append(" \n");
+        stringBuilder.append("\n&6&lKills:");
+
+        List<GameParticipant> sortedParticipants = new ArrayList<>(this.getParticipants().values());
+        sortedParticipants.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
+
+        for(GameParticipant p : sortedParticipants) {
+            stringBuilder.append("\n &f" + p.getName() + " &7- &f" + p.getKills() + " Kill(s)");
+        }
+
+        StringBuilder sortedNames = new StringBuilder();
+        List<Player> players = new ArrayList<>(this.getAlivePlayers());
+        players.sort(Comparator.comparing(HumanEntity::getName));
+
+        int s = 0;
+        while(s != this.getAlive().size()) {
+            Player p = players.get(0);
+            sortedNames.append(ChatColor.WHITE + p.getName());
+
+            players.remove(p);
+            s++;
+            if(s == this.getAlivePlayers().size()) {
+                sortedNames.append(ChatColor.GRAY + ".");
+            } else {
+                sortedNames.append(ChatColor.GRAY + ", ");
+            }
+        }
+
+        sortedNames.append(" ");
+
+        for(Player player : this.getAllPlayers()) {
+            player.sendMessage(sortedNames.toString());
+        }
+
+        cleanup(3);
     }
 
     @Override
@@ -151,7 +198,6 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
                 }
             }
             case ACTIVE -> {
-
                 boolean addSpace = false;
                 if(profile.isSidebarShowPing()) {
                     addSpace = true;
@@ -170,7 +216,7 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
                 List<GameParticipant> sp = new ArrayList<>(this.getCurrentPlaying().values());
                 sp.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
 
-                for(GameParticipant p : this.getCurrentPlaying().values()) {
+                for(GameParticipant p : sp) {
                     lines.add(p.getName() + " &7" + p.getKills());
                 }
             }

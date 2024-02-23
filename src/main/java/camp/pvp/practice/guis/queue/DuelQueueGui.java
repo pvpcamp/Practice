@@ -105,6 +105,9 @@ public class DuelQueueGui extends ArrangedGui {
         addButton(rankedQueue);
 
         for(GameKit kit : GameKit.values()) {
+
+            if(!kit.isDuelKit()) continue;
+
             GameQueue queue = gqm.getQueue(kit, queueType);
             GuiButton button = new GuiButton(kit.getIcon(), color + "&l" + kit.getDisplayName());
 

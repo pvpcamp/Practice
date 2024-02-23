@@ -31,7 +31,7 @@ public class KitEditorInteract implements ItemInteract {
                 }
             });
 
-            gui.addButton(button, false);
+            gui.addButton(button);
         }
 
         gui.open(player);

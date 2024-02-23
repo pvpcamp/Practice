@@ -136,7 +136,7 @@ public class GameParticipant {
                         getGameKit().apply(GameParticipant.this);
                     }
 
-                    getPlayer().teleport(getRespawnLocation());
+                    getPlayer().teleport(GameParticipant.this.game.getRespawnLocation(GameParticipant.this));
                     setAlive(true);
 
                     setLastDamageCause(null);
@@ -189,31 +189,6 @@ public class GameParticipant {
             }
             getPreviousEffects().clear();
         }
-    }
-
-    public Location getRespawnLocation() {
-        if(game.getArena().getType().isRandomSpawnLocation()) {
-            Map<Location, Double> distances = new HashMap<>();
-            for(Location l : game.getArena().getRandomSpawnLocations()) {
-                double nearestDistance = Double.MAX_VALUE;
-                for(Player player : game.getAlivePlayers()) {
-                    double distance = player.getLocation().distance(l);
-                    if(distance < nearestDistance) {
-                        nearestDistance = distance;
-                    }
-                }
-
-                distances.put(l, nearestDistance);
-            }
-
-            for(Map.Entry<Location, Double> entry : distances.entrySet()) {
-                if(Objects.equals(entry.getValue(), Collections.max(distances.values()))) {
-                    return entry.getKey();
-                }
-            }
-        }
-
-        return spawnLocation;
     }
 
     public GameTeam.Color getTeamColor() {

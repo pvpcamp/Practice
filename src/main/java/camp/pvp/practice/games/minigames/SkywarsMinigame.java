@@ -12,6 +12,11 @@ public class SkywarsMinigame extends QueueableMinigame{
     }
 
     @Override
+    public GameParticipant determineWinner() {
+        return null;
+    }
+
+    @Override
     public GameParticipant getWinner() {
         return null;
     }

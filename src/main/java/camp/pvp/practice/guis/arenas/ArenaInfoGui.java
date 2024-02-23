@@ -165,6 +165,19 @@ public class ArenaInfoGui extends ArrangedGui {
             addButton(loot);
         }
 
+        if(arena.getType().isRandomSpawnLocation()) {
+            GuiButton randomSpawns = new GuiButton(Material.ENDER_PEARL, "&5&lRandom Spawns");
+            randomSpawns.setLore(
+                    "&6Current Random Spawns: &f" + arena.getRandomSpawnLocations().size(),
+                    " ",
+                    "&7Click to view random spawns."
+            );
+
+            randomSpawns.setAction((player, button, gui, click) -> {
+                new ArenaRandomSpawnsGui(arenaManager, arena).open(player);
+            });
+        }
+
         GuiButton queueable = new GuiButton(Material.REDSTONE, "&a&lQueueable");
 
         queueable.setButtonUpdater((button, gui) -> {

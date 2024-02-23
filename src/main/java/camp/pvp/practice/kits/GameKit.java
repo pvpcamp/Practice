@@ -91,7 +91,7 @@ public enum GameKit {
     }
 
     public boolean isDuelKit() {
-        return true;
+        return !this.equals(ONE_IN_THE_CHAMBER);
     }
 
     public boolean isRanked() {
@@ -244,7 +244,7 @@ public enum GameKit {
     }
 
     public ItemStack getIcon() {
-        ItemStack item = null;
+        ItemStack item = new ItemStack(Material.GLASS);
         switch(this) {
             case NO_DEBUFF:
                 Potion potion = new Potion(PotionType.INSTANT_HEAL);
@@ -283,6 +283,9 @@ public enum GameKit {
                 break;
             case BED_FIGHT:
                 item = new ItemStack(Material.BED);
+                break;
+            case ONE_IN_THE_CHAMBER:
+                item = new ItemStack(Material.ARROW);
                 break;
         }
 

@@ -86,7 +86,6 @@ public abstract class Game {
 
     public abstract void initialize();
 
-
     public void startingTimer(int delay) {
         startingTimer = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
             int timer = delay;
@@ -807,6 +806,31 @@ public abstract class Game {
             return minX <= x && maxX >= x && minZ <= z && maxZ >= z;
         }
         return true;
+    }
+
+    public Location getRespawnLocation(GameParticipant participant) {
+        if(getArena().getType().isRandomSpawnLocation()) {
+            Map<Location, Double> distances = new HashMap<>();
+            for(Location l : getArena().getRandomSpawnLocations()) {
+                double nearestDistance = Double.MAX_VALUE;
+                for(Player player : getAlivePlayers()) {
+                    double distance = player.getLocation().distance(l);
+                    if(distance < nearestDistance) {
+                        nearestDistance = distance;
+                    }
+                }
+
+                distances.put(l, nearestDistance);
+            }
+
+            for(Map.Entry<Location, Double> entry : distances.entrySet()) {
+                if(Objects.equals(entry.getValue(), Collections.max(distances.values()))) {
+                    return entry.getKey();
+                }
+            }
+        }
+
+        return participant.getSpawnLocation();
     }
 
     public void addEntity(Entity entity) {
