@@ -53,6 +53,7 @@ public class SidebarAdapter implements AssembleAdapter {
 
         switch(profile.getState()) {
             case IN_GAME, SPECTATING -> {
+                sb.append(" &7❘ ");
                 sb.append(profile.getGame().getScoreboardTitle());
             }
         }
