@@ -353,6 +353,7 @@ public abstract class Game {
 
         if(participant == null || victimParticipant == null) {
             event.setCancelled(true);
+            return;
         }
 
         if(!getState().equals(State.ACTIVE)) event.setCancelled(true);
