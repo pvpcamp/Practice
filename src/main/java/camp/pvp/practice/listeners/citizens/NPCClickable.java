@@ -4,7 +4,7 @@ import camp.pvp.practice.Practice;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public enum NPCClickable {
-    UNRANKED, RANKED, STATISTICS, LEADERBOARDS;
+    DUEL_QUEUE, MINIGAME_QUEUE, STATISTICS, LEADERBOARDS;
 
     public static NPCClickable getForId(int i) {
         FileConfiguration config = Practice.instance.getConfig();

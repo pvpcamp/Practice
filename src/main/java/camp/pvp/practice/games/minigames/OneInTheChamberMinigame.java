@@ -12,10 +12,13 @@ import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
@@ -106,6 +109,13 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
 
         if(getCurrentPlaying().size() < 2) {
             end();
+        } else {
+            GameParticipant participant = getParticipants().get(player.getUniqueId());
+            GameParticipant killer = getCurrentPlaying().get(participant.getAttacker());
+
+            if(killer == null) return;
+
+            killer.getPlayer().getInventory().addItem(new ItemStack(Material.ARROW));
         }
     }
 

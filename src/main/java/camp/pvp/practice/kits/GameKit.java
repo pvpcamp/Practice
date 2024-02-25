@@ -20,6 +20,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -233,6 +234,10 @@ public enum GameKit {
             default:
                 return true;
         }
+    }
+
+    public boolean isItemDurability() {
+        return !this.equals(BED_FIGHT);
     }
 
     public boolean isFallDamage() {
@@ -652,15 +657,15 @@ public enum GameKit {
             LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) armor[1].getItemMeta();
             LeatherArmorMeta bootsMeta = (LeatherArmorMeta) armor[0].getItemMeta();
 
-            if(color.equals(GameTeam.Color.BLUE)) {
+            if (color.equals(GameTeam.Color.BLUE)) {
                 helmetMeta.setColor(Color.BLUE);
                 chestplateMeta.setColor(Color.BLUE);
                 leggingsMeta.setColor(Color.BLUE);
                 bootsMeta.setColor(Color.BLUE);
 
-                for(ItemStack item : pi.getContents()) {
-                    if(item == null) continue;
-                    if(!item.getType().equals(Material.WOOL)) continue;
+                for (ItemStack item : pi.getContents()) {
+                    if (item == null) continue;
+                    if (!item.getType().equals(Material.WOOL)) continue;
 
                     item.setDurability((short) 11);
                 }
@@ -670,9 +675,9 @@ public enum GameKit {
                 leggingsMeta.setColor(Color.RED);
                 bootsMeta.setColor(Color.RED);
 
-                for(ItemStack item : pi.getContents()) {
-                    if(item == null) continue;
-                    if(!item.getType().equals(Material.WOOL)) continue;
+                for (ItemStack item : pi.getContents()) {
+                    if (item == null) continue;
+                    if (!item.getType().equals(Material.WOOL)) continue;
 
                     item.setDurability((short) 14);
                 }
@@ -682,6 +687,27 @@ public enum GameKit {
             armor[2].setItemMeta(chestplateMeta);
             armor[1].setItemMeta(leggingsMeta);
             armor[0].setItemMeta(bootsMeta);
+        }
+
+        if(!this.isItemDurability()) {
+
+            for (ItemStack item : pi.getContents()) {
+
+                if(item == null) continue;
+
+                ItemMeta meta = item.getItemMeta();
+                meta.spigot().setUnbreakable(true);
+                item.setItemMeta(meta);
+            }
+
+            for (ItemStack item : pi.getArmorContents()) {
+
+                if(item == null) continue;
+
+                ItemMeta meta = item.getItemMeta();
+                meta.spigot().setUnbreakable(true);
+                item.setItemMeta(meta);
+            }
         }
 
         player.updateInventory();

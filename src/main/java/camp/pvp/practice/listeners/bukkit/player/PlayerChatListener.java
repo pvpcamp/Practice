@@ -1,7 +1,7 @@
 package camp.pvp.practice.listeners.bukkit.player;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.CustomDuelKit;
+import camp.pvp.practice.kits.CustomGameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import org.bukkit.entity.Player;
@@ -24,7 +24,7 @@ public class PlayerChatListener implements Listener {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
         if(profile != null) {
-            CustomDuelKit cdk  = profile.getEditingCustomKit();
+            CustomGameKit cdk  = profile.getEditingCustomKit();
             if(cdk != null) {
                 player.sendMessage(Colors.get("&aKit " + cdk.getName() + " &ahas been renamed to " + event.getMessage() + "&a."));
                 cdk.setName(event.getMessage());

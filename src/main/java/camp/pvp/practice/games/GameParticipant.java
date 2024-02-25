@@ -1,6 +1,6 @@
 package camp.pvp.practice.games;
 
-import camp.pvp.practice.kits.CustomDuelKit;
+import camp.pvp.practice.kits.CustomGameKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.Practice;
@@ -50,7 +50,7 @@ public class GameParticipant {
     private PostGameInventory postGameInventory;
     private Location spawnLocation;
     private GameKit gameKit;
-    private CustomDuelKit appliedCustomKit;
+    private CustomGameKit appliedCustomKit;
 
     private BukkitTask respawnTask;
 

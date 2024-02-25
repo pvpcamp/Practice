@@ -24,6 +24,7 @@ import camp.pvp.practice.interactables.impl.party.*;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public enum InteractableItems {
             // LOBBY
             case QUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.DIAMOND_SWORD, "&6Play").create(), 0, new QueueInteract());
+                        new ItemBuilder(Material.GOLD_SWORD, "&6Play").create(), 0, new QueueInteract());
             case PARTY_CREATE:
                 return new InteractableItem(
                         new ItemBuilder(Material.NAME_TAG, "&6Create a Party").create(), 1, new PartyCreateInteract());

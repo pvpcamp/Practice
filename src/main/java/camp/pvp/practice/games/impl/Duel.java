@@ -439,4 +439,9 @@ public class Duel extends Game {
 
         return lines;
     }
+
+    @Override
+    public String getScoreboardTitle() {
+        return "&fDuel";
+    }
 }

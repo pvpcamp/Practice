@@ -34,6 +34,11 @@ public abstract class QueueableMinigame extends Game {
 
     public abstract GameParticipant determineWinner();
 
+    @Override
+    public String getScoreboardTitle() {
+        return "&fMinigame";
+    }
+
     public enum Type {
         SKYWARS, ONE_IN_THE_CHAMBER;
 

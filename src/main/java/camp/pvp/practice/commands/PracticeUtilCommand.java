@@ -61,7 +61,7 @@ public class PracticeUtilCommand implements CommandExecutor {
                             try {
                                 clickable = NPCClickable.valueOf(args[1].toUpperCase());
                             } catch (IllegalArgumentException ignored) {
-                                player.sendMessage(ChatColor.RED + "Invalid clickable type. Valid options: UNRANKED, RANKED, HOST_EVENT, STATISTICS, LEADERBOARDS");
+                                player.sendMessage(ChatColor.RED + "Invalid clickable type. Valid options: DUEL_QUEUE, MINIGAME_QUEUE, STATISTICS, LEADERBOARDS");
                                 return true;
                             }
 

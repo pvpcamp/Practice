@@ -15,6 +15,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 
@@ -22,14 +23,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Getter @Setter
-public class CustomDuelKit {
+public class CustomGameKit {
 
     private final GameKit gameKit;
     private final int slot;
     private ItemStack[] items;
     private String name;
 
-    public CustomDuelKit(GameKit gameKit, int slot, boolean existing) {
+    public CustomGameKit(GameKit gameKit, int slot, boolean existing) {
         this.gameKit = gameKit;
         this.slot = slot;
         this.name = "&f" + gameKit.getDisplayName() + " Kit " + slot;
@@ -148,6 +149,27 @@ public class CustomDuelKit {
             armor[2].setItemMeta(chestplateMeta);
             armor[1].setItemMeta(leggingsMeta);
             armor[0].setItemMeta(bootsMeta);
+        }
+
+        if(!gameKit.isItemDurability()) {
+
+            for (ItemStack item : pi.getContents()) {
+
+                if(item == null) continue;
+
+                ItemMeta meta = item.getItemMeta();
+                meta.spigot().setUnbreakable(true);
+                item.setItemMeta(meta);
+            }
+
+            for (ItemStack item : pi.getArmorContents()) {
+
+                if(item == null) continue;
+
+                ItemMeta meta = item.getItemMeta();
+                meta.spigot().setUnbreakable(true);
+                item.setItemMeta(meta);
+            }
         }
 
         player.updateInventory();

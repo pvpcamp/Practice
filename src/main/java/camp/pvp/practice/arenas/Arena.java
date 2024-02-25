@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -23,7 +22,7 @@ public class Arena implements Comparable<Arena>{
     private String parentName;
     private int xDifference, zDifference, buildLimit, voidLevel;
 
-    private @Getter List<Location> beds, blocks, chests;
+    private @Getter List<Location> beds, allBlocks, blocks, chests;
     private @Getter Queue<StoredBlock> blockQueue;
 
     public Arena(String name) {
@@ -35,6 +34,7 @@ public class Arena implements Comparable<Arena>{
         this.lootChests = new ArrayList<>();
 
         this.beds = new ArrayList<>();
+        this.allBlocks = new ArrayList<>();
         this.blocks = new ArrayList<>();
         this.chests = new ArrayList<>();
         this.blockQueue = new LinkedList<>();
@@ -134,7 +134,7 @@ public class Arena implements Comparable<Arena>{
 
             getBeds().clear();
             getChests().clear();
-            getBlocks().clear();
+            getAllBlocks().clear();
 
             int minX, minY, minZ, maxX, maxY, maxZ;
             Location c1 = corner1.getLocation(), c2 = corner2.getLocation();
@@ -162,6 +162,8 @@ public class Arena implements Comparable<Arena>{
 
                             getBlocks().add(location);
                         }
+
+                        getAllBlocks().add(location);
                     }
                 }
             }
@@ -170,7 +172,7 @@ public class Arena implements Comparable<Arena>{
 
     public void clearBlocks() {
         scanArena();
-        for(Location location : getBlocks()) {
+        for(Location location : getAllBlocks()) {
             location.getBlock().setType(Material.AIR);
         }
     }
@@ -182,13 +184,13 @@ public class Arena implements Comparable<Arena>{
         if (!getType().isResetAfterGame()) return;
         if (!isCopy()) return;
 
-        for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParentName()).getBlocks()) {
+        for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParentName()).getAllBlocks()) {
             Location location = parentLocation.clone().add(xDifference, 0, zDifference);
 
             Block parentBlock = parentLocation.getBlock();
             Block block = location.getBlock();
 
-            if(parentBlock.getType() != block.getType() || !parentBlock.getState().equals(block.getState())) {
+            if(parentBlock.getType() != block.getType()) {
                 StoredBlock storedBlock = new StoredBlock(parentBlock, location);
                 blockQueue.add(storedBlock);
             }

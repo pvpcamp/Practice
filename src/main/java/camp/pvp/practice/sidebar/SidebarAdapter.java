@@ -3,7 +3,9 @@ package camp.pvp.practice.sidebar;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameManager;
+import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.sumo.SumoEvent;
+import camp.pvp.practice.games.sumo.SumoEventDuel;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.parties.Party;
@@ -24,11 +26,17 @@ import java.util.List;
 
 public class SidebarAdapter implements AssembleAdapter {
 
+    public static String TITLE;
+    public static String LINE;
+
     private Practice plugin;
     private GameManager gameManager;
     private GameProfileManager gameProfileManager;
     private GameQueueManager gameQueueManager;
     public SidebarAdapter(Practice plugin) {
+        TITLE = plugin.getConfig().getString("scoreboard.title");
+        LINE = "&7&m------------------";
+
         this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.gameProfileManager = plugin.getGameProfileManager();
@@ -37,7 +45,19 @@ public class SidebarAdapter implements AssembleAdapter {
 
     @Override
     public String getTitle(Player player) {
-        return plugin.getConfig().getString("scoreboard.title");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(TITLE);
+
+        GameProfile profile = gameProfileManager.getLoadedProfile(player.getUniqueId());
+
+        switch(profile.getState()) {
+            case IN_GAME, SPECTATING -> {
+                sb.append(profile.getGame().getScoreboardTitle());
+            }
+        }
+
+        return sb.toString();
     }
 
     @Override
@@ -52,7 +72,7 @@ public class SidebarAdapter implements AssembleAdapter {
                     staff = player.hasPermission("practice.staff");
 
             if(showLines) {
-                lines.add("&7&m------------------");
+                lines.add(LINE);
             } else {
                 lines.add(" ");
             }
@@ -165,7 +185,7 @@ public class SidebarAdapter implements AssembleAdapter {
             lines.add(plugin.getConfig().getString("scoreboard.ip") + (profile.isDebugMode() ? " &8&o(Debug)" : ""));
 
             if(showLines) {
-                lines.add("&7&m------------------");
+                lines.add(LINE);
             }
         }
 
