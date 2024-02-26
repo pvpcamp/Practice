@@ -79,6 +79,10 @@ public class Arena implements Comparable<Arena>{
 
         Arena parent = Practice.getInstance().getArenaManager().getArenaFromName(getParentName());
 
+        positions.clear();
+        lootChests.clear();
+        randomSpawnLocations.clear();
+
         for(ArenaPosition position : parent.getPositions().values()) {
             Location location = position.getLocation();
             Location newLocation = location.clone();

@@ -1,9 +1,11 @@
 package camp.pvp.practice.arenas;
 
+import camp.pvp.practice.Practice;
 import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -24,48 +26,50 @@ public class LootChest {
     }
 
     public boolean hasItem(ItemStack item) {
-        if(getLocation().getBlock() == null || !(getLocation().getBlock() instanceof Chest chest)) return false;
+        if(getLocation().getBlock() == null || !(getLocation().getBlock().getState() instanceof Chest chest)) return false;
 
-        return chest.getBlockInventory().contains(item);
+        return chest.getInventory().contains(item);
     }
 
     public void addItemToChest(ItemStack item, int slot) {
-        if(getLocation().getBlock() == null || !(getLocation().getBlock() instanceof Chest chest)) return;
+        if(getLocation().getBlock() == null || !(getLocation().getBlock().getState() instanceof Chest chest)) return;
 
-        chest.getBlockInventory().setItem(slot, item);
+        chest.getInventory().setItem(slot, item);
     }
 
     public void generateLoot(List<LootChest> nearbyChests) {
         Random random = new Random();
         Set<Integer> usedSlots = new HashSet<>();
+
+        Block block = this.getLocation().getBlock();
+        block.setType(Material.CHEST);
+        block.getState().setType(Material.CHEST);
+        block.getState().update(true, false);
+
+        List<ItemStack> itemsToAdd = new ArrayList<>();
+
         for(LootType type : LootType.values()) {
             List<ItemStack> items = type.getItems(lootCategory);
+
+            for(LootChest c : nearbyChests) {
+                if(c.equals(this) || !c.getLootCategory().equals(lootCategory) || c.getLocation().distance(getLocation()) > 20) continue;
+
+                items.removeIf(c::hasItem);
+            }
+
             Collections.shuffle(items);
 
-            while(!items.isEmpty()) {
-                ItemStack i = items.get(0);
+            items.stream().findFirst().ifPresent(itemsToAdd::add);
+        }
 
-                boolean hasItem = false;
-                for(LootChest c : nearbyChests) {
-                    if(!c.equals(this) && c.getLootCategory().equals(lootCategory) && c.hasItem(i) && c.getLocation().distance(getLocation()) < 20) {
-                        items.remove(i);
-                        hasItem = true;
-                    }
-                }
-
-                if(hasItem) continue;
-
-                int slot = random.nextInt(27);
-                usedSlots.add(slot);
-                while(usedSlots.contains(slot)) {
-                    slot = random.nextInt(27);
-                    usedSlots.add(slot);
-                }
-
-                addItemToChest(i, slot);
-
-                break;
+        for(ItemStack i : itemsToAdd) {
+            int slot = random.nextInt(27);
+            while(usedSlots.contains(slot)) {
+                slot = random.nextInt(27);
             }
+
+            usedSlots.add(slot);
+            addItemToChest(i, slot);
         }
     }
 
@@ -160,11 +164,13 @@ public class LootChest {
                             items.add(bow);
                         case ENHANCED:
                             items.add(new ItemStack(Material.BOW));
-                            items.add(new ItemStack(Material.ARROW, 4));
+                            items.add(new ItemStack(Material.ARROW, 8));
                         default:
                             items.add(new ItemStack(Material.FISHING_ROD));
                             items.add(new ItemStack(Material.SNOW_BALL, 8));
                             items.add(new ItemStack(Material.EGG, 8));
+                            items.add(new ItemStack(Material.ARROW, 4));
+                            items.add(new ItemStack(Material.ARROW, 2));
                             break;
                     }
                     break;

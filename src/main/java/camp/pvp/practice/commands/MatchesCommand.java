@@ -52,12 +52,14 @@ public class MatchesCommand implements CommandExecutor {
         CompletableFuture<GameProfile> profileFuture = plugin.getGameProfileManager().findAsync(targetName);
 
         profileFuture.thenAccept(profile -> {
-           if(profile == null || profile.getMatchRecords().isEmpty()) {
-               player.sendMessage(ChatColor.RED + "The target you specified does not have any match records.");
-               return;
-           }
+            if(profile == null || profile.getMatchRecords().isEmpty()) {
+                player.sendMessage(ChatColor.RED + "The target you specified does not have any match records.");
+                return;
+            }
 
-            PaginatedGui gui = new PaginatedGui("&6Matches &7- &6" + targetName, 36);
+
+            PaginatedGui gui = new PaginatedGui("&6Matches &7- &6" + targetName, 45);
+            gui.setBorder(true);
 
             if(targetName.equalsIgnoreCase(sender.getName())) {
                 GuiButton myProfile = new GuiButton(Material.SKULL_ITEM, "&6&lGo to My Profile");

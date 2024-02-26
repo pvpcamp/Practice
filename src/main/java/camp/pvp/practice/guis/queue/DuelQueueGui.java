@@ -174,7 +174,7 @@ public class DuelQueueGui extends ArrangedGui {
                 }
             });
 
-            buttons.add(button);
+            addButton(button);
         }
     }
 }

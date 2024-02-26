@@ -482,6 +482,8 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         help.append("\n&6/arena info <name> &7- &fView, toggle, and update an arena's settings.");
         help.append("\n&6/arena positions <name> &7- &fUpdate an arena's positions.");
         help.append("\n&6/arena teleport <name> &7- &fTeleport to an arena.");
+        help.append("\n&6/arena addchest <name> &7- &fAdd a loot chest to an arena.");
+        help.append("\n&6/arena removechest <name> &7- &fRemove a loot chest from an arena.");
         help.append("\n&6/arena displayname <name> <display name> &7- &fSets an arena's display name.");
         help.append("\n&6/arena rename <name> <new name> &7- &fRenames an arena.");
         help.append("\n&6/arena buildlimit <name> <limit> &7- &fSets the build limit for an arena.");
