@@ -45,6 +45,7 @@ public class Party {
 
         this.members.put(member.getUuid(), member);
 
+        profile.getPartyInvites().clear();
         profile.setParty(this);
         profile.playerUpdate(false);
 

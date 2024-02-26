@@ -158,6 +158,9 @@ public class CustomGameKit {
                 if(item == null) continue;
 
                 ItemMeta meta = item.getItemMeta();
+
+                if(meta == null) continue;
+
                 meta.spigot().setUnbreakable(true);
                 item.setItemMeta(meta);
             }
@@ -167,6 +170,9 @@ public class CustomGameKit {
                 if(item == null) continue;
 
                 ItemMeta meta = item.getItemMeta();
+
+                if(meta == null) continue;
+
                 meta.spigot().setUnbreakable(true);
                 item.setItemMeta(meta);
             }

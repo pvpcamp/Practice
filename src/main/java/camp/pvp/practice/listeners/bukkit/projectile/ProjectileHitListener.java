@@ -13,6 +13,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,12 +32,13 @@ public class ProjectileHitListener implements Listener {
     public void onProjectileHit(ProjectileHitEvent event) {
         if(!(event.getEntity().getShooter() instanceof Player)) return;
 
+        Entity entity = event.getEntity();
         Player player = (Player) event.getEntity().getShooter();
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         Game game = profile.getGame();
 
         if(game != null) {
-            game.addEntity(event.getEntity());
+            game.addEntity(entity);
 
             if(game.getKit().equals(GameKit.SPLEEF)) {
                 Location location = event.getEntity().getLocation();
@@ -46,6 +49,10 @@ public class ProjectileHitListener implements Listener {
                 if(block != null && block.getType().equals(Material.SNOW_BLOCK)) {
                     block.setType(Material.AIR);
                 }
+            }
+
+            if(entity instanceof Arrow arrow && !game.getKit().isArrowPickup()) {
+                arrow.remove();
             }
         }
 

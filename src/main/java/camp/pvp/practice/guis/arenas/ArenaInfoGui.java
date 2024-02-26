@@ -176,6 +176,8 @@ public class ArenaInfoGui extends ArrangedGui {
             randomSpawns.setAction((player, button, gui, click) -> {
                 new ArenaRandomSpawnsGui(arenaManager, arena).open(player);
             });
+
+            addButton(randomSpawns);
         }
 
         GuiButton queueable = new GuiButton(Material.REDSTONE, "&a&lQueueable");

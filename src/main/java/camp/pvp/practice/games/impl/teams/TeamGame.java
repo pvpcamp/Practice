@@ -47,6 +47,7 @@ public abstract class TeamGame extends Game {
                 if(victimParticipant.getTeam().equals(participant.getTeam())) {
                     attacker.sendMessage(ChatColor.RED + victim.getName() + " is your teammate.");
                     event.setCancelled(true);
+                    return;
                 }
 
                 victimParticipant.setAttacker(attacker.getUniqueId());

@@ -44,6 +44,10 @@ public class EntityDamageByEntityListener implements Listener {
             }
         }
 
+        if(event.getDamager() instanceof Arrow arrow && arrow.getShooter() instanceof Player) {
+            attacker = (Player) arrow.getShooter();
+        }
+
         if(attacker != null) {
             GameProfile playerProfile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
             GameProfile attackerProfile = plugin.getGameProfileManager().getLoadedProfiles().get(attacker.getUniqueId());

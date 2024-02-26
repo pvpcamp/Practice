@@ -141,6 +141,7 @@ public enum GameKit {
             case INVADED:
             case SPLEEF:
             case BED_FIGHT:
+            case ONE_IN_THE_CHAMBER:
                 return false;
             default:
                 return true;
@@ -230,6 +231,7 @@ public enum GameKit {
             case BED_FIGHT:
             case SUMO:
             case SPLEEF:
+            case ONE_IN_THE_CHAMBER:
                 return false;
             default:
                 return true;
@@ -237,7 +239,23 @@ public enum GameKit {
     }
 
     public boolean isItemDurability() {
-        return !this.equals(BED_FIGHT);
+        switch(this) {
+            case BED_FIGHT:
+            case SUMO:
+            case SPLEEF:
+            case ONE_IN_THE_CHAMBER:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    public boolean isArrowOneShot() {
+        return this.equals(ONE_IN_THE_CHAMBER);
+    }
+
+    public boolean isArrowPickup() {
+        return !this.equals(ONE_IN_THE_CHAMBER);
     }
 
     public boolean isFallDamage() {
@@ -609,6 +627,11 @@ public enum GameKit {
                 inv[3] = new ItemStack(Material.SHEARS);
                 inv[4] = new ItemStack(Material.WOOL, 64);
                 break;
+            case ONE_IN_THE_CHAMBER:
+                inv[0] = new ItemStack(Material.WOOD_SWORD);
+                inv[1] = new ItemStack(Material.BOW);
+                inv[2] = new ItemStack(Material.ARROW, 1);
+                break;
             default:
                 break;
 
@@ -696,6 +719,9 @@ public enum GameKit {
                 if(item == null) continue;
 
                 ItemMeta meta = item.getItemMeta();
+
+                if(meta == null) continue;
+
                 meta.spigot().setUnbreakable(true);
                 item.setItemMeta(meta);
             }
@@ -705,6 +731,9 @@ public enum GameKit {
                 if(item == null) continue;
 
                 ItemMeta meta = item.getItemMeta();
+
+                if(meta == null) continue;
+
                 meta.spigot().setUnbreakable(true);
                 item.setItemMeta(meta);
             }

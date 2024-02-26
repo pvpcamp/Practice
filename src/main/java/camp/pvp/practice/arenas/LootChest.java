@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -40,11 +41,6 @@ public class LootChest {
     public void generateLoot(List<LootChest> nearbyChests) {
         Random random = new Random();
         Set<Integer> usedSlots = new HashSet<>();
-
-        Block block = this.getLocation().getBlock();
-        block.setType(Material.CHEST);
-        block.getState().setType(Material.CHEST);
-        block.getState().update(true, false);
 
         List<ItemStack> itemsToAdd = new ArrayList<>();
 

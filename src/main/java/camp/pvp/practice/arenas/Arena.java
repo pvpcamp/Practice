@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 
 import java.util.*;
 
@@ -119,11 +121,22 @@ public class Arena implements Comparable<Arena>{
         }
 
         if(getType().isGenerateLoot()) {
+
             for(LootChest lootChest : lootChests) {
                 Location l = lootChest.getLocation();
-                l.getBlock().setType(Material.CHEST);
-                l.getBlock().getState().update(true);
+                Block block = l.getBlock();
+                BlockState state = block.getState();
 
+                block.setType(Material.CHEST);
+                state.setType(Material.CHEST);
+                state.update(true, false);
+
+                if(l.getBlock().getState() instanceof Chest chest) {
+                    chest.getInventory().clear();
+                }
+            }
+
+            for(LootChest lootChest : lootChests) {
                 lootChest.generateLoot(lootChests);
             }
         }

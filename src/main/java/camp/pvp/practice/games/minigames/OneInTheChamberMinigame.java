@@ -18,6 +18,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -93,7 +94,8 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
         for(GameParticipant participant : getParticipants().values()) {
             Player p = Bukkit.getPlayer(participant.getUuid());
             p.teleport(getRespawnLocation(participant));
-            p.sendMessage(startingMessage);
+            p.sendMessage(Colors.get(startingMessage));
+            participant.getProfile().givePlayerItems();
         }
 
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
@@ -115,30 +117,22 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
 
             if(killer == null) return;
 
-            killer.getPlayer().getInventory().addItem(new ItemStack(Material.ARROW));
-        }
-    }
+            Player killerPlayer = killer.getPlayer();
+            if(!killerPlayer.getInventory().contains(Material.ARROW)) killerPlayer.getInventory().addItem(new ItemStack(Material.ARROW));
 
-    @Override
-    public void handleHit(Player victim, Player attacker, EntityDamageByEntityEvent event) {
-        super.handleHit(victim, attacker, event);
+            killerPlayer.setHealth(killerPlayer.getMaxHealth());
 
-        GameParticipant victimParticipant = getParticipants().get(victim.getUniqueId());
-        GameParticipant attackerParticipant = getParticipants().get(attacker.getUniqueId());
-
-        if(!victimParticipant.isAlive()) return;
-
-        if(event.getDamager() instanceof Arrow) {
-            eliminate(victim.getPlayer(), false);
-        }
-
-        if(attackerParticipant.getKills() > 19) {
-            end();
+            if(killer.getKills() > 19) {
+                end();
+            }
         }
     }
 
     @Override
     public void end() {
+
+        if(getState() == State.ENDED) return;
+
         GameParticipant winner = determineWinner();
 
         GameProfileManager gpm = getPlugin().getGameProfileManager();
@@ -151,40 +145,22 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
         }
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(Colors.get(" \n&6&lMatch ended."));
+        stringBuilder.append(" \n&6&lMatch ended.");
         stringBuilder.append("\n &7● &6Winner: &f" + winner.getName());
         stringBuilder.append(" \n");
-        stringBuilder.append("\n&6&lKills:");
+        stringBuilder.append(" \n&6&lKills:");
 
         List<GameParticipant> sortedParticipants = new ArrayList<>(this.getParticipants().values());
         sortedParticipants.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
 
         for(GameParticipant p : sortedParticipants) {
+            if(p.getRespawnTask() != null) p.getRespawnTask().cancel();
+
             stringBuilder.append("\n &f" + p.getName() + " &7- &f" + p.getKills() + " Kill(s)");
         }
 
-        StringBuilder sortedNames = new StringBuilder();
-        List<Player> players = new ArrayList<>(this.getAlivePlayers());
-        players.sort(Comparator.comparing(HumanEntity::getName));
-
-        int s = 0;
-        while(s != this.getAlive().size()) {
-            Player p = players.get(0);
-            sortedNames.append(ChatColor.WHITE + p.getName());
-
-            players.remove(p);
-            s++;
-            if(s == this.getAlivePlayers().size()) {
-                sortedNames.append(ChatColor.GRAY + ".");
-            } else {
-                sortedNames.append(ChatColor.GRAY + ", ");
-            }
-        }
-
-        sortedNames.append(" ");
-
         for(Player player : this.getAllPlayers()) {
-            player.sendMessage(sortedNames.toString());
+            player.sendMessage(Colors.get(stringBuilder.toString()));
         }
 
         cleanup(3);
@@ -201,10 +177,11 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
                 lines.add("&6Minigame: &fOITC");
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
                 lines.add("&7&oFirst to 20 kills wins!");
+                lines.add(" ");
 
                 lines.add("&6Players:");
                 for(GameParticipant p : this.getCurrentPlaying().values()) {
-                    if(p.getUuid() != profile.getUuid()) lines.add("&f" + p.getName());
+                    lines.add("&f" + p.getName());
                 }
             }
             case ACTIVE -> {

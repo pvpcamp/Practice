@@ -155,6 +155,8 @@ public abstract class Game {
                             cooldown.remove();
                         }
 
+                        if(participant.getRespawnTask() != null) participant.getRespawnTask().cancel();
+
                         if(Apollo.getPlayerManager().hasSupport(player.getUniqueId())) {
 
                             CooldownModule cooldownModule = Apollo.getModuleManager().getModule(CooldownModule.class);
@@ -367,11 +369,16 @@ public abstract class Game {
             return;
         }
 
-        if(event.getDamager() instanceof Arrow && getKit().isShowArrowDamage()) {
+        if(event.getDamager() instanceof Arrow) {
             Arrow arrow = (Arrow) event.getDamager();
             if(arrow.getShooter() instanceof Player) {
                 attacker = (Player) arrow.getShooter();
-                if(attacker != victim) {
+
+                if(attacker != victim && getKit().isArrowOneShot()) {
+                    event.setDamage(100);
+                }
+
+                if(attacker != victim && getKit().isShowArrowDamage()) {
                     attacker.sendMessage(Colors.get("&f" + victim.getName() + " &6is now at &c" + Math.round(victim.getHealth()) + " ❤"));
                 }
             }
