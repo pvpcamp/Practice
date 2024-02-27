@@ -183,7 +183,7 @@ public abstract class Game {
 
             setState(State.INACTIVE);
 
-            plugin.getGameManager().getGames().remove(getUuid());e
+            plugin.getGameManager().getGames().remove(getUuid());
         }, delay * 20L);
     }
 
