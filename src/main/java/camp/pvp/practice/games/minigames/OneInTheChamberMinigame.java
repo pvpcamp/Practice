@@ -7,6 +7,7 @@ import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.GameProfileManager;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
@@ -29,6 +30,7 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
         super(plugin, uuid);
 
         setKit(GameKit.ONE_IN_THE_CHAMBER);
+        this.setType(Type.ONE_IN_THE_CHAMBER);
     }
 
     @Override
@@ -155,6 +157,7 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
 
         for(GameParticipant p : sortedParticipants) {
             if(p.getRespawnTask() != null) p.getRespawnTask().cancel();
+            p.setAlive(true);
 
             stringBuilder.append("\n &f" + p.getName() + " &7- &f" + p.getKills() + " Kill(s)");
         }
@@ -190,6 +193,54 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
                     addSpace = true;
                     lines.add("&6Ping: &f" + PlayerUtils.getPing(profile.getPlayer()));
                 }
+
+                if(profile.isSidebarShowDuration()) {
+                    addSpace = true;
+                    lines.add("&6Duration: &f" + TimeUtil.get(getStarted()));
+                }
+
+                if(addSpace) lines.add(" ");
+
+                lines.add("&6Kills:");
+
+                List<GameParticipant> sp = new ArrayList<>(this.getCurrentPlaying().values());
+                sp.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
+
+                for(GameParticipant p : sp) {
+                    lines.add(p.getName() + " &7" + p.getKills());
+                }
+            }
+            case ENDED -> {
+                lines.add("&6Winner: &f" + getWinner().getName());
+
+                if(profile.isSidebarShowDuration()) {
+                    lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
+                }
+            }
+        }
+
+        return lines;
+    }
+
+    @Override
+    public List<String> getSpectatorScoreboard(GameProfile profile) {
+
+        List<String> lines = new ArrayList<>();
+
+        switch(this.getState()) {
+            case STARTING -> {
+                lines.add("&6Minigame: &fOITC");
+                lines.add("&6Arena: &f" + getArena().getDisplayName());
+                lines.add("&7&oFirst to 20 kills wins!");
+                lines.add(" ");
+
+                lines.add("&6Players:");
+                for(GameParticipant p : this.getCurrentPlaying().values()) {
+                    lines.add("&f" + p.getName());
+                }
+            }
+            case ACTIVE -> {
+                boolean addSpace = false;
 
                 if(profile.isSidebarShowDuration()) {
                     addSpace = true;
