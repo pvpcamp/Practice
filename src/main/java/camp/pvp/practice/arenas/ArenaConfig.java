@@ -8,8 +8,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -65,19 +63,12 @@ public class ArenaConfig {
             arena.setParentName(config.getString(path + "parent"));
         }
 
-        if(config.isSet(path + "positions")) {
-            for (String s : config.getConfigurationSection(path + "positions").getKeys(false)) {
-                String p = path + "positions." + s;
+        for(String s : config.getConfigurationSection(path + "positions").getKeys(false)) {
+            String p = path + "positions." + s;
 
-                ArenaPosition pos = new ArenaPosition(s, (Location) config.get(p, Location.class));
+            ArenaPosition pos = new ArenaPosition(s, (Location) config.get(p, Location.class));
 
-                arena.getPositions().put(pos.getPosition(), pos);
-            }
-        }
-
-        List<String> serializedChests = config.getStringList(path + "loot_chests");
-        for(String serializedChest : serializedChests) {
-            arena.getLootChests().add(LootChest.deserialize(serializedChest));
+            arena.getPositions().put(pos.getPosition(), pos);
         }
 
         if(!arena.hasValidPositions()) {
@@ -92,6 +83,7 @@ public class ArenaConfig {
         String path = "arenas." + arena.getName();
 
         config.set(path, " ");
+
         config.set(path + ".type", arena.getType().name());
         config.set(path + ".display_name", arena.getDisplayName());
         config.set(path + ".enabled", arena.isEnabled());
@@ -109,13 +101,6 @@ public class ArenaConfig {
             String p = path + ".positions." + position.getPosition();
             config.set(p, location);
         }
-
-        List<String> serializedChests = new ArrayList<>();
-        for(LootChest chest : arena.getLootChests()) {
-            serializedChests.add(chest.serialize());
-        }
-
-        config.set(path + ".loot_chests", serializedChests);
     }
 
     public void shutdown() {

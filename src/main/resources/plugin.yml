@@ -1,6 +1,6 @@
 main: camp.pvp.practice.Practice
-name: ${project.name}
-version: ${project.version} ${git.branch}-${git.commit.id.abbrev}
+name: Practice
+version: ${git.branch}-${git.commit.id.abbrev}
 author: leuo
 depend:
   - Citizens

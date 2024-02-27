@@ -35,7 +35,9 @@ public class TeamDuel extends TeamGame {
         List<String> lines = new ArrayList<>();
 
         GameParticipant self = getParticipants().get(profile.getUuid());
+
         GameTeam friendlyTeam = self.getTeam();
+        GameTeam enemyTeam = friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? getBlue() : getRed();
 
         boolean showInGame = profile.isSidebarInGame(),
                 showCps = profile.isSidebarShowCps(),
@@ -47,8 +49,8 @@ public class TeamDuel extends TeamGame {
             String red = "&cR &fRed: ";
 
             if (getKit().equals(DuelKit.BED_FIGHT)) {
-                blue = blue + "&9&l" + (getBlue().isRespawn() ? "✓" : getBlue().getCurrentParticipants().size());
-                red = red + "&c&l" + (getRed().isRespawn() ? "✓" : getRed().getCurrentParticipants().size());
+                blue = blue + "&9&l" + (getBlue().isRespawn() ? "✓" : "✗");
+                red = red + "&c&l" + (getRed().isRespawn() ? "✓" : "✗");
             } else {
                 blue = blue + "&9" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size();
                 red = red + "&c" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size();
@@ -145,8 +147,8 @@ public class TeamDuel extends TeamGame {
         String red = "&cR &fRed: ";
 
         if (getKit().equals(DuelKit.BED_FIGHT)) {
-            lines.add(blue + "&9&l" + (getBlue().isRespawn() ? "✓" : getBlue().getCurrentParticipants().size()));
-            lines.add(red + "&c&l" + (getRed().isRespawn() ? "✓" : getRed().getCurrentParticipants().size()));
+            lines.add(blue + "&9&l" + (getBlue().isRespawn() ? "✓" : "✗"));
+            lines.add(red + "&c&l" + (getRed().isRespawn() ? "✓" : "✗"));
         } else {
             lines.add(blue + "&f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
             lines.add(red + "&f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
@@ -295,10 +297,7 @@ public class TeamDuel extends TeamGame {
         }
 
         List<TextComponent> components = new ArrayList<>();
-        List<GameParticipant> sortedParticipants = new ArrayList<>(this.getParticipants().values());
-        sortedParticipants.sort(Comparator.comparing(GameParticipant::getName));
-
-        for(GameParticipant p : sortedParticipants) {
+        for(GameParticipant p : this.getParticipants().values()) {
             TextComponent text = new TextComponent(ChatColor.WHITE + p.getName());
             text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/postgameinventory " + p.getPostGameInventory().getUuid().toString()));
             text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GREEN + "Click to view " + ChatColor.WHITE + p.getName() + "'s " + ChatColor.GREEN + "inventory.").create()));

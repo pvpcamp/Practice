@@ -151,12 +151,7 @@ public class DuelQueueGui extends ArrangedGui {
                         lines.add(" ");
                     }
 
-                    if(queue.isAvailable()) {
-                        lines.add("&7Click to join the");
-                        lines.add(color + queueType.toString() + " " + kit.getDisplayName() + " &7queue.");
-                    } else {
-                        lines.add("&c&lThis queue is disabled.");
-                    }
+                    lines.add("&7Click to join the " + color + queueType.toString() + " " + kit.getDisplayName() + " &7queue.");
 
                     guiButton.setLore(lines);
 
@@ -166,11 +161,9 @@ public class DuelQueueGui extends ArrangedGui {
             });
 
             button.setAction((p, b, g, clickType) -> {
-                if(queue.isAvailable()) {
-                    gqm.addToQueue(p, queue);
-                    p.closeInventory();
-                }
+                gqm.addToQueue(p, queue);
             });
+            button.setCloseOnClick(true);
 
             buttons.add(button);
         }

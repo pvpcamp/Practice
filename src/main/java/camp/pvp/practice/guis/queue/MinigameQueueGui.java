@@ -32,17 +32,13 @@ public class MinigameQueueGui extends ArrangedGui {
             button.setCloseOnClick(true);
             button.setButtonUpdater((b, g) -> {
                 GameQueue queue = Practice.getInstance().getGameQueueManager().getQueue(minigame, GameQueue.Type.UNRANKED);
-                int playing = queue.getPlaying();
                 List<String> lore = new ArrayList<>(minigame.getDescription());
                 lore.add(" ");
                 lore.add("&6In Queue: &f" + queue.getQueueMembers().size());
-                lore.add("&6Playing: &f" + playing);
+                lore.add("&6Playing: &f" + queue.getPlaying());
                 lore.add(" ");
                 lore.add("&7Click to join the queue.");
                 b.setLore(lore);
-
-                int stack = playing > 1 ? (Math.min(playing, 64)) : 1;
-                b.setAmount(stack);
             });
             button.setAction((p, b, g, click) -> {
                 Practice.getInstance().getGameQueueManager().addToQueue(p, minigame, GameQueue.Type.UNRANKED);
