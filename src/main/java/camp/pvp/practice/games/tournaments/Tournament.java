@@ -3,7 +3,7 @@ package camp.pvp.practice.games.tournaments;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.impl.Duel;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.queue.GameQueue;
@@ -45,7 +45,7 @@ public class Tournament {
     }
 
     private Practice plugin;
-    private final DuelKit duelKit;
+    private final GameKit gameKit;
     private final int teamSize, maxPlayers;
     private int currentRound, timer;
     private State state;
@@ -53,13 +53,13 @@ public class Tournament {
     private List<TournamentMatch> queuedGames;
     private Map<UUID, TournamentParticipant> tournamentParticipants;
     private BukkitTask startingTimer, roundStartingTimer;
-    public Tournament(Practice plugin, DuelKit duelKit, int teamSize, int maxPlayers) {
+    public Tournament(Practice plugin, GameKit gameKit, int teamSize, int maxPlayers) {
         this.plugin = plugin;
         plugin.getGameManager().setTournament(this);
 
         this.currentRound = 0;
         this.timer = 0;
-        this.duelKit = duelKit;
+        this.gameKit = gameKit;
         this.teamSize = teamSize;
         this.maxPlayers = maxPlayers;
         this.games = new ArrayList<>();
@@ -202,7 +202,7 @@ public class Tournament {
                 switch(teamSize) {
                     case 1:
                         Duel duel = new Duel(plugin, UUID.randomUUID());
-                        duel.setKit(duelKit);
+                        duel.setKit(gameKit);
                         duel.setTournament(this);
                         duel.setQueueType(GameQueue.Type.TOURNAMENT);
 
@@ -404,7 +404,7 @@ public class Tournament {
                         " ",
                         Colors.get("&6&lTournament"),
                         Colors.get(" &7● &6Starting In: &f" + timer + "s"),
-                        Colors.get(" &7● &6Kit: &f" + getDuelKit().getDisplayName()),
+                        Colors.get(" &7● &6Kit: &f" + getGameKit().getDisplayName()),
                         Colors.get(" &7● &6Players: &f" + getTournamentParticipants().size())
                 };
 

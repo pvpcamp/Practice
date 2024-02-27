@@ -2,7 +2,7 @@ package camp.pvp.practice.guis.statistics;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.guis.profile.MyProfileGui;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import camp.pvp.utils.buttons.GuiButton;
@@ -47,8 +47,8 @@ public class StatisticsGui extends ArrangedGui {
         globalStats.setOverrideGuiArrangement(true);
         addButton(globalStats);
 
-        for(DuelKit kit : DuelKit.values()) {
-            if(!kit.isQueueable()) continue;
+        for(GameKit kit : GameKit.values()) {
+            if(!kit.isDuelKit()) continue;
 
             List<String> lines = new ArrayList<>();
             lines.add("&e&lUnranked:");

@@ -1,7 +1,7 @@
 package camp.pvp.practice.games;
 
-import camp.pvp.practice.kits.CustomDuelKit;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.CustomGameKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
@@ -44,12 +44,13 @@ public class GameParticipant {
     public long health, maxHealth, hunger,
             hits, currentCombo, longestCombo,
             thrownPotions, missedPotions;
+    private int kills, deaths;
 
     private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
     private Location spawnLocation;
-    private DuelKit duelKit;
-    private CustomDuelKit appliedCustomKit;
+    private GameKit gameKit;
+    private CustomGameKit appliedCustomKit;
 
     private BukkitTask respawnTask;
 
@@ -97,9 +98,18 @@ public class GameParticipant {
         }
     }
 
-    public void eliminate() {
+    public void kill() {
         alive = false;
         invincible = true;
+        deaths++;
+
+        clearCooldowns();
+
+        if(attacker != null) {
+            GameParticipant a = game.getParticipants().get(attacker);
+
+            if(a != null) a.setKills(a.getKills() + 1);
+        }
 
         if(!isRespawn()) {
             currentlyPlaying = false;
@@ -123,10 +133,10 @@ public class GameParticipant {
                     if(getAppliedCustomKit() != null) {
                         getAppliedCustomKit().apply(GameParticipant.this);
                     } else {
-                        getDuelKit().apply(GameParticipant.this);
+                        getGameKit().apply(GameParticipant.this);
                     }
 
-                    getPlayer().teleport(getSpawnLocation());
+                    getPlayer().teleport(GameParticipant.this.game.getRespawnLocation(GameParticipant.this));
                     setAlive(true);
 
                     setLastDamageCause(null);
@@ -140,7 +150,7 @@ public class GameParticipant {
 
                     getRespawnTask().cancel();
                 } else {
-                    getPlayer().sendMessage(ChatColor.GREEN + "Respawning in " + time + " second(s).");
+                    getPlayer().sendMessage(ChatColor.GREEN + "Respawning in " + time + " second" + (time == 1 ? "" : "s") + ".");
                     time--;
                 }
             }

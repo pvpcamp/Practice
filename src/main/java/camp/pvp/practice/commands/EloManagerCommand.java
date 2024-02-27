@@ -1,7 +1,7 @@
 package camp.pvp.practice.commands;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.utils.Colors;
@@ -81,23 +81,23 @@ public class EloManagerCommand implements CommandExecutor {
                 return;
             }
 
-            DuelKit duelKit = null;
-            for(DuelKit k : DuelKit.values()) {
+            GameKit gameKit = null;
+            for(GameKit k : GameKit.values()) {
                 if(k.name().equalsIgnoreCase(kit)) {
-                    duelKit = k;
+                    gameKit = k;
                 }
             }
 
-            if(duelKit == null) {
+            if(gameKit == null) {
                 sender.sendMessage(ChatColor.RED + "The kit you specified does not exist.");
                 return;
             }
 
             ProfileELO profileELO = profile.getProfileElo();
 
-            profileELO.setElo(duelKit, elo);
+            profileELO.setElo(gameKit, elo);
             plugin.getGameProfileManager().exportElo(profileELO);
-            sender.sendMessage(ChatColor.GREEN + "ELO for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + " for kit " + ChatColor.WHITE + duelKit.getDisplayName() + ChatColor.GREEN + " has been set to " + elo + ".");
+            sender.sendMessage(ChatColor.GREEN + "ELO for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + " for kit " + ChatColor.WHITE + gameKit.getDisplayName() + ChatColor.GREEN + " has been set to " + elo + ".");
         });
     }
 }

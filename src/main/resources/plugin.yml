@@ -1,6 +1,6 @@
 main: camp.pvp.practice.Practice
-name: Practice
-version: ${git.branch}-${git.commit.id.abbrev}
+name: ${project.name}
+version: ${project.version} ${git.branch}-${git.commit.id.abbrev}
 author: leuo
 depend:
   - Citizens
@@ -75,3 +75,24 @@ commands:
   whereami:
     description: Shows debug information about your player.
     permission: practice.commands.whereami
+
+permissions:
+  practice.donator.explorer:
+    description: Explorer donator rank permissions for the Practice plugin.
+      practice.cosmetics
+  practice.donator.adventurer:
+    description: Adventurer donator rank permissions for the Practice plugin.
+  practice.donator.voyager:
+    description: Voyager donator rank permissions for the Practice plugin.
+  practice.staff:
+    description: Staff permissions for Practice.
+  practice.admin:
+    description: Admin permissions for Practice.
+    children:
+      practice.*: true
+  practice.commands.arena:
+    description: Allows the player to use the arena command.
+  practice.commands.arenaposition:
+    description: Allows the player to use the arenaposition command.
+  practice.commands.explode:
+    description: Allows the player to use the explode command.

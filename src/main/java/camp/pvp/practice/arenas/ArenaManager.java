@@ -1,12 +1,11 @@
 package camp.pvp.practice.arenas;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Sign;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -47,7 +46,7 @@ public class ArenaManager {
         return null;
     }
 
-    public Arena selectRandomArena(DuelKit kit) {
+    public Arena selectRandomArena(GameKit kit) {
         List<Arena> arenas = new ArrayList<>();
         if(kit.isBuild()) {
             for(Arena a : getOriginalArenas()) {

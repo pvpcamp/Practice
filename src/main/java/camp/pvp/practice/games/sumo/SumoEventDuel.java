@@ -4,14 +4,13 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.tasks.TeleportFix;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.GameProfileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -23,7 +22,7 @@ public class SumoEventDuel extends Duel {
         super(plugin, UUID.randomUUID());
         this.sumoEvent = event;
         this.setArena(event.getArena());
-        this.setKit(DuelKit.SUMO);
+        this.setKit(GameKit.SUMO);
     }
 
     @Override

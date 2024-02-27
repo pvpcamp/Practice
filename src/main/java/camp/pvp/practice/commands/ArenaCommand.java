@@ -5,10 +5,14 @@ import camp.pvp.practice.guis.arenas.ArenaInfoGui;
 import camp.pvp.practice.guis.arenas.ArenaListChooseTypeGui;
 import camp.pvp.practice.guis.arenas.ArenaPositionsGui;
 import camp.pvp.practice.guis.arenas.ArenaTeleportGui;
+import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
+import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.ArrangedGui;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -55,7 +59,7 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
                 positions(player, args);
             }
             case "displayname" -> {
-                displayname(player, args);
+                displayName(player, args);
             }
             case "buildlimit", "bl" -> {
                 buildlimit(player, args);
@@ -65,6 +69,12 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
             }
             case "teleport", "tp" -> {
                 teleport(player, args);
+            }
+            case "addchest" -> {
+                addChest(player, args);
+            }
+            case "removechest", "delchest" -> {
+                removeChest(player, args);
             }
             case "copy", "duplicate" -> {
                 copy(player, args);
@@ -276,7 +286,7 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         }
     }
 
-    private void displayname(Player player, String[] args) {
+    private void displayName(Player player, String[] args) {
         if(args.length < 3) {
             player.sendMessage(ChatColor.RED + "Usage: /arena displayname <arena> <name>");
             return;
@@ -308,6 +318,94 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         } else {
             player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " and its " + copies + " copies now have the display name " + Colors.get(arena.getDisplayName()) + ChatColor.GREEN + ".");
         }
+    }
+
+    private void addChest(Player player, String[] args) {
+        if(args.length < 2) {
+            player.sendMessage(ChatColor.RED + "Usage: /arena " + args[0].toLowerCase() + " <arena>");
+            return;
+        }
+
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId());
+
+        if(profile.getSelectedLocation() == null) {
+            player.sendMessage(ChatColor.RED + "You must select a location first.");
+            return;
+        }
+
+        Arena arena = plugin.getArenaManager().getArenaFromName(args[1]);
+        if(arena == null) {
+            player.sendMessage(ChatColor.RED + "The arena you specified does not exist.");
+            return;
+        }
+
+        if(!arena.getType().isGenerateLoot()) {
+            player.sendMessage(ChatColor.RED + "This arena type does not support loot chests.");
+            return;
+        }
+
+        for(LootChest lootChest : arena.getLootChests()) {
+            if(lootChest.getLocation().equals(profile.getSelectedLocation())) {
+                player.sendMessage(ChatColor.RED + "A loot chest already exists at this location.");
+                return;
+            }
+        }
+
+        ArrangedGui gui = new ArrangedGui("&6Loot Chest Category");
+        for(LootChest.Category c : LootChest.Category.values()) {
+            GuiButton categoryButton = new GuiButton(Material.CHEST, "&6&l" + c.name());
+            categoryButton.setCloseOnClick(true);
+            categoryButton.setLore("&7Click to set chest", "&7category to &f" + c.name() + "&7.");
+            categoryButton.setAction((p, b, g, click) -> {
+                LootChest chest = new LootChest(profile.getSelectedLocation(), c);
+                arena.getLootChests().add(chest);
+                player.sendMessage(ChatColor.GREEN + "Loot chest added to arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + ".");
+            });
+            gui.addButton(categoryButton);
+        }
+
+        gui.open(player);
+    }
+
+    private void removeChest(Player player, String[] args) {
+        if(args.length < 2) {
+            player.sendMessage(ChatColor.RED + "Usage: /arena " + args[0].toLowerCase() + " <arena>");
+            return;
+        }
+
+        GameProfile profile = plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId());
+
+        if(profile.getSelectedLocation() == null) {
+            player.sendMessage(ChatColor.RED + "You must select a location first.");
+            return;
+        }
+
+        Arena arena = plugin.getArenaManager().getArenaFromName(args[1]);
+        if(arena == null) {
+            player.sendMessage(ChatColor.RED + "The arena you specified does not exist.");
+            return;
+        }
+
+        if(!arena.getType().isGenerateLoot()) {
+            player.sendMessage(ChatColor.RED + "This arena type does not support loot chests.");
+            return;
+        }
+
+        LootChest chest = null;
+        for(LootChest lootChest : arena.getLootChests()) {
+            if(lootChest.getLocation().equals(profile.getSelectedLocation())) {
+                chest = lootChest;
+                break;
+            }
+        }
+
+        if(chest == null) {
+            player.sendMessage(ChatColor.RED + "There is no loot chest at this location.");
+            return;
+        }
+
+        arena.getLootChests().remove(chest);
+        player.sendMessage(ChatColor.GREEN + "Loot chest removed from arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + ".");
     }
 
     private void teleport(Player player, String[] args) {
@@ -384,6 +482,8 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         help.append("\n&6/arena info <name> &7- &fView, toggle, and update an arena's settings.");
         help.append("\n&6/arena positions <name> &7- &fUpdate an arena's positions.");
         help.append("\n&6/arena teleport <name> &7- &fTeleport to an arena.");
+        help.append("\n&6/arena addchest <name> &7- &fAdd a loot chest to an arena.");
+        help.append("\n&6/arena removechest <name> &7- &fRemove a loot chest from an arena.");
         help.append("\n&6/arena displayname <name> <display name> &7- &fSets an arena's display name.");
         help.append("\n&6/arena rename <name> <new name> &7- &fRenames an arena.");
         help.append("\n&6/arena buildlimit <name> <limit> &7- &fSets the build limit for an arena.");

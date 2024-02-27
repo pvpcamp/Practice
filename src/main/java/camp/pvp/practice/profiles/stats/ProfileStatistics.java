@@ -1,6 +1,6 @@
 package camp.pvp.practice.profiles.stats;
 
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.queue.GameQueue;
 import lombok.Data;
 import org.bson.Document;
@@ -13,8 +13,8 @@ import java.util.UUID;
 public class ProfileStatistics {
 
     private final UUID uuid;
-    private Map<DuelKit, ProfileIndividualStatistics> unranked;
-    private Map<DuelKit, ProfileIndividualStatistics> ranked;
+    private Map<GameKit, ProfileIndividualStatistics> unranked;
+    private Map<GameKit, ProfileIndividualStatistics> ranked;
     private ProfileIndividualStatistics global;
 
     public ProfileStatistics(UUID uuid) {
@@ -23,7 +23,7 @@ public class ProfileStatistics {
         this.ranked = new HashMap<>();
         this.global = new ProfileIndividualStatistics();
 
-        for (DuelKit kit : DuelKit.values()) {
+        for (GameKit kit : GameKit.values()) {
             unranked.put(kit, new ProfileIndividualStatistics());
 
             if(kit.isRanked()) {
@@ -32,7 +32,7 @@ public class ProfileStatistics {
         }
     }
 
-    public void incrementKills(DuelKit kit, GameQueue.Type type) {
+    public void incrementKills(GameKit kit, GameQueue.Type type) {
         switch(type) {
             case UNRANKED:
                 unranked.get(kit).incrementKills();
@@ -45,7 +45,7 @@ public class ProfileStatistics {
         global.incrementKills();
     }
 
-    public void incrementDeaths(DuelKit kit, GameQueue.Type type) {
+    public void incrementDeaths(GameKit kit, GameQueue.Type type) {
         switch(type) {
             case UNRANKED:
                 unranked.get(kit).incrementDeaths();
@@ -58,7 +58,7 @@ public class ProfileStatistics {
         global.incrementDeaths();
     }
 
-    public void incrementWins(DuelKit kit, GameQueue.Type type) {
+    public void incrementWins(GameKit kit, GameQueue.Type type) {
         switch(type) {
             case UNRANKED:
                 unranked.get(kit).incrementWins();
@@ -71,7 +71,7 @@ public class ProfileStatistics {
         global.incrementWins();
     }
 
-    public void resetWinStreak(DuelKit kit, GameQueue.Type type) {
+    public void resetWinStreak(GameKit kit, GameQueue.Type type) {
         switch(type) {
             case UNRANKED:
                 unranked.get(kit).resetWinStreak();
@@ -85,7 +85,7 @@ public class ProfileStatistics {
     }
 
     public void importFromDocument(Document doc) {
-        for (DuelKit kit : DuelKit.values()) {
+        for (GameKit kit : GameKit.values()) {
             if (doc.containsKey("unranked_" + kit.name())) {
                 Map<String, Object> map = (Map<String, Object>) doc.get("unranked_" + kit.name());
                 ProfileIndividualStatistics stats = new ProfileIndividualStatistics();
@@ -108,7 +108,7 @@ public class ProfileStatistics {
 
     public Map<String, Object> export() {
         Map<String, Object> map = new HashMap<>();
-        for (DuelKit kit : DuelKit.values()) {
+        for (GameKit kit : GameKit.values()) {
             map.put("unranked_" + kit.name(), unranked.get(kit).export());
 
             if(kit.isRanked()) {

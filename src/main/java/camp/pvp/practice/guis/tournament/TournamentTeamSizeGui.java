@@ -2,7 +2,7 @@ package camp.pvp.practice.guis.tournament;
 
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
@@ -14,10 +14,10 @@ import org.bukkit.event.inventory.ClickType;
 
 public class TournamentTeamSizeGui extends StandardGui {
 
-    public TournamentTeamSizeGui(Practice plugin, DuelKit duelKit) {
+    public TournamentTeamSizeGui(Practice plugin, GameKit gameKit) {
         super("Choose a Team Size", 27);
 
-        GuiButton selectedKit = new GuiButton(duelKit.getIcon(), "&aSelected Kit: &f" + duelKit.getDisplayName());
+        GuiButton selectedKit = new GuiButton(gameKit.getIcon(), "&aSelected Kit: &f" + gameKit.getDisplayName());
         selectedKit.setSlot(13);
         this.addButton(selectedKit, false);
 
@@ -27,7 +27,7 @@ public class TournamentTeamSizeGui extends StandardGui {
             @Override
             public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 if(plugin.getGameManager().getTournament() == null || plugin.getGameManager().getTournament().getState().equals(Tournament.State.ENDED)) {
-                    Tournament tournament = new Tournament(plugin, duelKit, 1, 64);
+                    Tournament tournament = new Tournament(plugin, gameKit, 1, 64);
                     plugin.getGameManager().setTournament(tournament);
 
                     player.sendMessage(ChatColor.GREEN + "You have started a new tournament.");

@@ -2,7 +2,7 @@ package camp.pvp.practice.games.impl.teams;
 
 import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.TeleportFix;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
@@ -20,7 +20,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -35,9 +34,7 @@ public class TeamDuel extends TeamGame {
         List<String> lines = new ArrayList<>();
 
         GameParticipant self = getParticipants().get(profile.getUuid());
-
         GameTeam friendlyTeam = self.getTeam();
-        GameTeam enemyTeam = friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? getBlue() : getRed();
 
         boolean showInGame = profile.isSidebarInGame(),
                 showCps = profile.isSidebarShowCps(),
@@ -48,9 +45,9 @@ public class TeamDuel extends TeamGame {
             String blue = "&9B &fBlue: ";
             String red = "&cR &fRed: ";
 
-            if (getKit().equals(DuelKit.BED_FIGHT)) {
-                blue = blue + "&9&l" + (getBlue().isRespawn() ? "✓" : "✗");
-                red = red + "&c&l" + (getRed().isRespawn() ? "✓" : "✗");
+            if (getKit().equals(GameKit.BED_FIGHT)) {
+                blue = blue + "&9&l" + (getBlue().isRespawn() ? "✓" : getBlue().getCurrentParticipants().size());
+                red = red + "&c&l" + (getRed().isRespawn() ? "✓" : getRed().getCurrentParticipants().size());
             } else {
                 blue = blue + "&9" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size();
                 red = red + "&c" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size();
@@ -146,9 +143,9 @@ public class TeamDuel extends TeamGame {
         String blue = "&9B &fBlue: ";
         String red = "&cR &fRed: ";
 
-        if (getKit().equals(DuelKit.BED_FIGHT)) {
-            lines.add(blue + "&9&l" + (getBlue().isRespawn() ? "✓" : "✗"));
-            lines.add(red + "&c&l" + (getRed().isRespawn() ? "✓" : "✗"));
+        if (getKit().equals(GameKit.BED_FIGHT)) {
+            lines.add(blue + "&9&l" + (getBlue().isRespawn() ? "✓" : getBlue().getCurrentParticipants().size()));
+            lines.add(red + "&c&l" + (getRed().isRespawn() ? "✓" : getRed().getCurrentParticipants().size()));
         } else {
             lines.add(blue + "&f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
             lines.add(red + "&f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
@@ -162,12 +159,14 @@ public class TeamDuel extends TeamGame {
                 break;
             case ACTIVE:
                 if(showDuration) {
+                    lines.add(" ");
                     lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
                 }
 
                 break;
             case ENDED:
                 if(showDuration) {
+                    lines.add(" ");
                     lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
                 }
                 break;
@@ -207,7 +206,7 @@ public class TeamDuel extends TeamGame {
 
         StringBuilder sb = new StringBuilder();
         sb.append(" ");
-        sb.append("\n&6&lTeam duel starting in 5 seconds.");
+        sb.append("\n&6&lTeam Duel starting in 5 seconds.");
         sb.append("\n &7● &6Kit: &f" + getKit().getDisplayName());
         sb.append("\n &7● &6Map: &f" + arena.getDisplayName());
 
@@ -297,7 +296,10 @@ public class TeamDuel extends TeamGame {
         }
 
         List<TextComponent> components = new ArrayList<>();
-        for(GameParticipant p : this.getParticipants().values()) {
+        List<GameParticipant> sortedParticipants = new ArrayList<>(this.getParticipants().values());
+        sortedParticipants.sort(Comparator.comparing(GameParticipant::getName));
+
+        for(GameParticipant p : sortedParticipants) {
             TextComponent text = new TextComponent(ChatColor.WHITE + p.getName());
             text.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/postgameinventory " + p.getPostGameInventory().getUuid().toString()));
             text.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GREEN + "Click to view " + ChatColor.WHITE + p.getName() + "'s " + ChatColor.GREEN + "inventory.").create()));

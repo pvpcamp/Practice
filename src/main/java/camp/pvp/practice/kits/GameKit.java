@@ -20,13 +20,13 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public enum DuelKit {
-    NO_DEBUFF, BOXING, BED_FIGHT, SUMO, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, STRATEGY;
+public enum GameKit {
+    NO_DEBUFF, BOXING, BED_FIGHT, SUMO, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, STRATEGY, ONE_IN_THE_CHAMBER;
 
     public String getDisplayName() {
         switch(this) {
@@ -58,6 +58,8 @@ public enum DuelKit {
                 return Collections.singletonList(Arena.Type.SPLEEF);
             case BED_FIGHT:
                 return Collections.singletonList(Arena.Type.DUEL_BED_FIGHT);
+            case ONE_IN_THE_CHAMBER:
+                return Collections.singletonList(Arena.Type.MINIGAME_OITC);
             default:
                 return Arrays.asList(Arena.Type.DUEL, Arena.Type.DUEL_FLAT);
         }
@@ -77,7 +79,7 @@ public enum DuelKit {
     }
 
     public boolean isRespawn() {
-        return this.equals(BED_FIGHT);
+        return this.equals(BED_FIGHT) || this.equals(ONE_IN_THE_CHAMBER);
     }
 
     public boolean isRegen() {
@@ -89,8 +91,8 @@ public enum DuelKit {
         }
     }
 
-    public boolean isQueueable () {
-        return true;
+    public boolean isDuelKit() {
+        return !this.equals(ONE_IN_THE_CHAMBER);
     }
 
     public boolean isRanked() {
@@ -139,6 +141,7 @@ public enum DuelKit {
             case INVADED:
             case SPLEEF:
             case BED_FIGHT:
+            case ONE_IN_THE_CHAMBER:
                 return false;
             default:
                 return true;
@@ -152,6 +155,7 @@ public enum DuelKit {
             case STRATEGY:
             case INVADED:
             case CLASSIC:
+            case ONE_IN_THE_CHAMBER:
                 return true;
             default:
                 return false;
@@ -174,6 +178,7 @@ public enum DuelKit {
             case BED_FIGHT:
             case SUMO:
             case SKYWARS:
+            case ONE_IN_THE_CHAMBER:
                 return false;
             default:
                 return true;
@@ -226,18 +231,50 @@ public enum DuelKit {
             case BED_FIGHT:
             case SUMO:
             case SPLEEF:
+            case ONE_IN_THE_CHAMBER:
                 return false;
             default:
                 return true;
         }
     }
 
+    public boolean isItemDurability() {
+        switch(this) {
+            case BED_FIGHT:
+            case SUMO:
+            case SPLEEF:
+            case ONE_IN_THE_CHAMBER:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    public boolean isArrowOneShot() {
+        return this.equals(ONE_IN_THE_CHAMBER);
+    }
+
+    public boolean isArrowPickup() {
+        return !this.equals(ONE_IN_THE_CHAMBER);
+    }
+
     public boolean isFallDamage() {
-        return !this.equals(BED_FIGHT);
+        switch (this) {
+            case BED_FIGHT, ONE_IN_THE_CHAMBER, SUMO -> {
+                return false;
+            }
+            default -> {
+                return true;
+            }
+        }
+    }
+
+    public boolean isShowArrowDamage() {
+        return !this.equals(ONE_IN_THE_CHAMBER);
     }
 
     public ItemStack getIcon() {
-        ItemStack item = null;
+        ItemStack item = new ItemStack(Material.GLASS);
         switch(this) {
             case NO_DEBUFF:
                 Potion potion = new Potion(PotionType.INSTANT_HEAL);
@@ -276,6 +313,9 @@ public enum DuelKit {
                 break;
             case BED_FIGHT:
                 item = new ItemStack(Material.BED);
+                break;
+            case ONE_IN_THE_CHAMBER:
+                item = new ItemStack(Material.ARROW);
                 break;
         }
 
@@ -594,6 +634,11 @@ public enum DuelKit {
                 inv[3] = new ItemStack(Material.SHEARS);
                 inv[4] = new ItemStack(Material.WOOL, 64);
                 break;
+            case ONE_IN_THE_CHAMBER:
+                inv[0] = new ItemStack(Material.WOOD_SWORD);
+                inv[1] = new ItemStack(Material.BOW);
+                inv[2] = new ItemStack(Material.ARROW, 1);
+                break;
             default:
                 break;
 
@@ -642,15 +687,15 @@ public enum DuelKit {
             LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) armor[1].getItemMeta();
             LeatherArmorMeta bootsMeta = (LeatherArmorMeta) armor[0].getItemMeta();
 
-            if(color.equals(GameTeam.Color.BLUE)) {
+            if (color.equals(GameTeam.Color.BLUE)) {
                 helmetMeta.setColor(Color.BLUE);
                 chestplateMeta.setColor(Color.BLUE);
                 leggingsMeta.setColor(Color.BLUE);
                 bootsMeta.setColor(Color.BLUE);
 
-                for(ItemStack item : pi.getContents()) {
-                    if(item == null) continue;
-                    if(!item.getType().equals(Material.WOOL)) continue;
+                for (ItemStack item : pi.getContents()) {
+                    if (item == null) continue;
+                    if (!item.getType().equals(Material.WOOL)) continue;
 
                     item.setDurability((short) 11);
                 }
@@ -660,9 +705,9 @@ public enum DuelKit {
                 leggingsMeta.setColor(Color.RED);
                 bootsMeta.setColor(Color.RED);
 
-                for(ItemStack item : pi.getContents()) {
-                    if(item == null) continue;
-                    if(!item.getType().equals(Material.WOOL)) continue;
+                for (ItemStack item : pi.getContents()) {
+                    if (item == null) continue;
+                    if (!item.getType().equals(Material.WOOL)) continue;
 
                     item.setDurability((short) 14);
                 }
@@ -672,6 +717,33 @@ public enum DuelKit {
             armor[2].setItemMeta(chestplateMeta);
             armor[1].setItemMeta(leggingsMeta);
             armor[0].setItemMeta(bootsMeta);
+        }
+
+        if(!this.isItemDurability()) {
+
+            for (ItemStack item : pi.getContents()) {
+
+                if(item == null) continue;
+
+                ItemMeta meta = item.getItemMeta();
+
+                if(meta == null) continue;
+
+                meta.spigot().setUnbreakable(true);
+                item.setItemMeta(meta);
+            }
+
+            for (ItemStack item : pi.getArmorContents()) {
+
+                if(item == null) continue;
+
+                ItemMeta meta = item.getItemMeta();
+
+                if(meta == null) continue;
+
+                meta.spigot().setUnbreakable(true);
+                item.setItemMeta(meta);
+            }
         }
 
         player.updateInventory();

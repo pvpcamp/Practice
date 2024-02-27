@@ -1,10 +1,11 @@
 package camp.pvp.practice.sidebar;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.arenas.*;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameManager;
+import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.sumo.SumoEvent;
+import camp.pvp.practice.games.sumo.SumoEventDuel;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.parties.Party;
@@ -22,15 +23,20 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Queue;
 
 public class SidebarAdapter implements AssembleAdapter {
+
+    public static String TITLE;
+    public static String LINE;
 
     private Practice plugin;
     private GameManager gameManager;
     private GameProfileManager gameProfileManager;
     private GameQueueManager gameQueueManager;
     public SidebarAdapter(Practice plugin) {
+        TITLE = plugin.getConfig().getString("scoreboard.title");
+        LINE = "&7&m------------------";
+
         this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.gameProfileManager = plugin.getGameProfileManager();
@@ -39,7 +45,20 @@ public class SidebarAdapter implements AssembleAdapter {
 
     @Override
     public String getTitle(Player player) {
-        return plugin.getConfig().getString("scoreboard.title");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(TITLE);
+
+        GameProfile profile = gameProfileManager.getLoadedProfile(player.getUniqueId());
+
+        switch(profile.getState()) {
+            case IN_GAME, SPECTATING -> {
+                sb.append(" &7❘ ");
+                sb.append(profile.getGame().getScoreboardTitle());
+            }
+        }
+
+        return sb.toString();
     }
 
     @Override
@@ -54,7 +73,7 @@ public class SidebarAdapter implements AssembleAdapter {
                     staff = player.hasPermission("practice.staff");
 
             if(showLines) {
-                lines.add("&7&m------------------");
+                lines.add(LINE);
             } else {
                 lines.add(" ");
             }
@@ -91,10 +110,10 @@ public class SidebarAdapter implements AssembleAdapter {
                     switch(queue.getGameType()) {
                         case DUEL -> {
                             lines.add("&6In Duel Queue:");
-                            lines.add(" &7● " + queue.getType().getColor() + queue.getDuelKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
+                            lines.add(" &7● " + queue.getType().getColor() + queue.getGameKit().getDisplayName() + (ranked ? " &f&l(R)" : " &f(U)"));
 
                             if(queue.getType().equals(GameQueue.Type.RANKED)) {
-                                lines.add(" &7● &6ELO: &f" + profile.getProfileElo().getRatings().get(queue.getDuelKit()));
+                                lines.add(" &7● &6ELO: &f" + profile.getProfileElo().getRatings().get(queue.getGameKit()));
                                 lines.add(" &7● &6Range: &f" + queueMember.getEloLow() + " - " + queueMember.getEloHigh());
                             }
                         }
@@ -167,7 +186,7 @@ public class SidebarAdapter implements AssembleAdapter {
             lines.add(plugin.getConfig().getString("scoreboard.ip") + (profile.isDebugMode() ? " &8&o(Debug)" : ""));
 
             if(showLines) {
-                lines.add("&7&m------------------");
+                lines.add(LINE);
             }
         }
 

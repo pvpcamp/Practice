@@ -2,7 +2,7 @@ package camp.pvp.practice.nametags;
 
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.impl.teams.TeamGame;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
@@ -50,7 +50,7 @@ public class NameColorRunnable implements Runnable{
                 boolean showHealth = false;
                 if(profile.getGame() != null) {
                     Game game = profile.getGame();
-                    DuelKit kit = game.getKit();
+                    GameKit kit = game.getKit();
 
                     if(kit.showHealthBar() && game.getCurrentPlaying().containsKey(player.getUniqueId())) {
                         showHealth = true;

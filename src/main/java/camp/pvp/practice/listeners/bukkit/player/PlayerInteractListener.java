@@ -9,8 +9,8 @@ import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import camp.pvp.practice.kits.CustomDuelKit;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.CustomGameKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
@@ -120,11 +120,11 @@ public class PlayerInteractListener implements Listener {
                                 break;
                         }
                     } else {
-                        DuelKit kit = game.getKit();
+                        GameKit kit = game.getKit();
                         switch(player.getItemInHand().getType()) {
                             case ENCHANTED_BOOK:
                                 int slot = player.getInventory().getHeldItemSlot() + 1;
-                                CustomDuelKit cdk = profile.getCustomDuelKits().get(kit).get(slot);
+                                CustomGameKit cdk = profile.getCustomDuelKits().get(kit).get(slot);
                                 if(cdk != null) {
                                     cdk.apply(participant);
                                     participant.setAppliedCustomKit(cdk);
@@ -163,7 +163,7 @@ public class PlayerInteractListener implements Listener {
                 }
             } else if(profile.getState().equals(GameProfile.State.KIT_EDITOR)) {
                 if(block != null) {
-                    DuelKit editingKit = profile.getEditingKit();
+                    GameKit editingKit = profile.getEditingKit();
                     switch (block.getType()) {
                         case CHEST:
                             if(editingKit.getMoreItems() != null) {
@@ -179,10 +179,10 @@ public class PlayerInteractListener implements Listener {
                             break;
                         case ANVIL:
                             StandardGui gui = new StandardGui("Editing " + editingKit.getDisplayName(), 36);
-                            Map<Integer, CustomDuelKit> customKits = profile.getCustomDuelKits().get(editingKit);
+                            Map<Integer, CustomGameKit> customKits = profile.getCustomDuelKits().get(editingKit);
                             int x = 1;
                             while (x < 6) {
-                                CustomDuelKit cdk = customKits.get(x);
+                                CustomGameKit cdk = customKits.get(x);
                                 if (cdk == null) {
                                     GuiButton createButton = new GuiButton(Material.CHEST, "&6Create new " + editingKit.getDisplayName() + " kit.");
                                     createButton.setSlot(1 + x);
@@ -192,7 +192,7 @@ public class PlayerInteractListener implements Listener {
                                     createButton.setAction(new GuiAction() {
                                         @Override
                                         public void run(Player player, GuiButton button, Gui gui, ClickType click) {
-                                            CustomDuelKit cdk = new CustomDuelKit(editingKit, finalX, false);
+                                            CustomGameKit cdk = new CustomGameKit(editingKit, finalX, false);
                                             cdk.setItems(player.getInventory().getContents());
                                             customKits.put(finalX, cdk);
                                             player.sendMessage(Colors.get("&aYour &f" + editingKit.getDisplayName() + "&a has been created and saved as " + cdk.getName() + "&a."));

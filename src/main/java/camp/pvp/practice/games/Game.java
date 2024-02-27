@@ -5,7 +5,7 @@ import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.tournaments.Tournament;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.PreviousQueue;
@@ -24,6 +24,7 @@ import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -56,7 +57,7 @@ public abstract class Game {
 
     private State state;
     private Arena arena;
-    private DuelKit kit;
+    private GameKit kit;
 
     public int round, timer;
     private Date created, started, ended;
@@ -85,7 +86,6 @@ public abstract class Game {
 
     public abstract void initialize();
 
-
     public void startingTimer(int delay) {
         startingTimer = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
             int timer = delay;
@@ -96,12 +96,12 @@ public abstract class Game {
                     startingTimer.cancel();
                 } else {
                     if(timer == 30 || timer == 15 || timer == 10 || timer <= 5) {
-                        announce("&aGame starting in &f" + timer + " &aseconds.");
+                        announce("&aGame starting in &f" + timer + " &asecond" + (timer == 1 ? "" : "s") + ".");
                     }
                     timer--;
                 }
             }
-        }, 0, 20);
+        }, 20, 20);
     }
 
     public void start() {
@@ -117,9 +117,6 @@ public abstract class Game {
         setState(Game.State.ACTIVE);
     }
 
-    /***
-     *
-     */
     public abstract void end();
 
     /***
@@ -158,6 +155,8 @@ public abstract class Game {
                             cooldown.remove();
                         }
 
+                        if(participant.getRespawnTask() != null) participant.getRespawnTask().cancel();
+
                         if(Apollo.getPlayerManager().hasSupport(player.getUniqueId())) {
 
                             CooldownModule cooldownModule = Apollo.getModuleManager().getModule(CooldownModule.class);
@@ -178,11 +177,13 @@ public abstract class Game {
                 spectateEnd(player, true);
             }
 
-            Practice.getInstance().getGameProfileManager().updateGlobalPlayerVisibility();
+            plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
             getArena().resetArena();
 
             setState(State.INACTIVE);
+
+            plugin.getGameManager().getGames().remove(getUuid());e
         }, delay * 20L);
     }
 
@@ -247,8 +248,7 @@ public abstract class Game {
 
         profile.getDeathAnimation().playAnimation(this, player, location, velocity);
 
-        participant.eliminate();
-        participant.clearCooldowns();
+        participant.kill();
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
@@ -277,11 +277,9 @@ public abstract class Game {
             spectateStart(player);
             announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
         }
-
-
     }
 
-    public void handleDamage(Player victim, EntityDamageEvent event) {
+    public boolean handleDamage(Player victim, EntityDamageEvent event) {
         GameParticipant participant = this.getParticipants().get(victim.getUniqueId());
         participant.setLastDamageCause(event.getCause());
         if(this.getState().equals(State.ACTIVE)) {
@@ -290,14 +288,14 @@ public abstract class Game {
 
             if(participant.isInvincible()) {
                 event.setCancelled(true);
-                return;
+                return false;
             }
 
             int currentTick = plugin.getTickNumberCounter().getCurrentTick();
 
             if(participant.getLastInvalidHitTick() == currentTick && participant.getLastValidHitTick() != currentTick && event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
                 event.setCancelled(true);
-                return;
+                return false;
             }
 
             if(event.getCause().equals(EntityDamageEvent.DamageCause.FIRE) || event.getCause().equals(EntityDamageEvent.DamageCause.LAVA) || event.getCause().equals(EntityDamageEvent.DamageCause.FIRE_TICK)) {
@@ -341,11 +339,14 @@ public abstract class Game {
                 if(canDie && getState().equals(State.ACTIVE)) {
                     this.eliminate(victim, false);
                     Bukkit.getScheduler().runTaskLater(plugin, () -> victim.setHealth(20), 1);
+                    return true;
                 }
             }
         } else {
             event.setCancelled(true);
         }
+
+        return false;
     }
 
     public void handleHit(Player victim, Player attacker, EntityDamageByEntityEvent event) {
@@ -368,6 +369,21 @@ public abstract class Game {
         if(event.isCancelled()) {
             victimParticipant.setLastInvalidHitTick(currentTick);
             return;
+        }
+
+        if(event.getDamager() instanceof Arrow) {
+            Arrow arrow = (Arrow) event.getDamager();
+            if(arrow.getShooter() instanceof Player) {
+                attacker = (Player) arrow.getShooter();
+
+                if(attacker != victim && getKit().isArrowOneShot()) {
+                    event.setDamage(100);
+                }
+
+                if(attacker != victim && getKit().isShowArrowDamage()) {
+                    attacker.sendMessage(Colors.get("&f" + victim.getName() + " &6is now at &c" + Math.round(victim.getHealth()) + " ❤"));
+                }
+            }
         }
 
         if(participant.getAttacking() != null && !participant.getAttacking().equals(victim.getUniqueId())) {
@@ -410,18 +426,18 @@ public abstract class Game {
             }
         }
 
+        if (participant.currentCombo > participant.longestCombo) {
+            participant.longestCombo = participant.currentCombo;
+        }
+
         if(kit != null) {
             if (!kit.isTakeDamage()) {
                 event.setDamage(0);
                 victim.setHealth(victim.getMaxHealth());
-                if (kit.equals(DuelKit.BOXING) && participant.getHits() > 99) {
+                if (kit.equals(GameKit.BOXING) && participant.getHits() > 99) {
                     this.eliminate(victim, false);
                 }
             }
-        }
-
-        if (participant.currentCombo > participant.longestCombo) {
-            participant.longestCombo = participant.currentCombo;
         }
     }
 
@@ -440,7 +456,7 @@ public abstract class Game {
         GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
         participant.setGame(this);
         participant.setComboMessages(profile.isComboMessages());
-        participant.setDuelKit(kit);
+        participant.setGameKit(kit);
 
         if(kit.isRespawn()) {
             participant.setRespawn(true);
@@ -802,6 +818,31 @@ public abstract class Game {
         return true;
     }
 
+    public Location getRespawnLocation(GameParticipant participant) {
+        if(getArena().getType().isRandomSpawnLocation()) {
+            Map<Location, Double> distances = new HashMap<>();
+            for(Location l : getArena().getRandomSpawnLocations()) {
+                double nearestDistance = Double.MAX_VALUE;
+                for(Player player : getAlivePlayers()) {
+                    double distance = player.getLocation().distance(l);
+                    if(distance < nearestDistance) {
+                        nearestDistance = distance;
+                    }
+                }
+
+                distances.put(l, nearestDistance);
+            }
+
+            for(Map.Entry<Location, Double> entry : distances.entrySet()) {
+                if(Objects.equals(entry.getValue(), Collections.max(distances.values()))) {
+                    return entry.getKey();
+                }
+            }
+        }
+
+        return participant.getSpawnLocation();
+    }
+
     public void addEntity(Entity entity) {
         getEntities().add(entity);
         updateEntities();
@@ -846,5 +887,9 @@ public abstract class Game {
                 p.sendMessage(Colors.get(s));
             }
         }
+    }
+
+    public String getScoreboardTitle() {
+        return "&fGame";
     }
 }

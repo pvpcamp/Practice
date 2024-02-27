@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class PartyCommand implements CommandExecutor {
@@ -206,11 +207,13 @@ public class PartyCommand implements CommandExecutor {
 
     public StringBuilder info(Party party) {
         StringBuilder sb = new StringBuilder();
-        sb.append("&6&lParty &7(" + party.getMembers().size() + ")");
+        sb.append("&6&lParty &7(" + party.getMembers().size() + "/" + party.getMaxMembers() + ")");
         sb.append("\n&6Leader: &f" + party.getLeader().getName());
         sb.append("\n&6Members: &f");
 
         List<PartyMember> members = new ArrayList<>(party.getMembers().values());
+        members.sort(Comparator.comparing(PartyMember::getName));
+
         for(int x = 0; x < members.size(); x++) {
             sb.append(members.get(x).getName());
 

@@ -2,6 +2,8 @@ package camp.pvp.practice.games.minigames;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
+import camp.pvp.practice.games.GameParticipant;
+import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,9 +14,11 @@ import java.util.List;
 import java.util.UUID;
 
 
-public class QueueableMinigame extends Game {
+public abstract class QueueableMinigame extends Game {
 
     @Getter @Setter private Type type;
+    @Getter @Setter private GameParticipant winner;
+    @Getter @Setter private Party party;
 
     protected QueueableMinigame(Practice plugin, UUID uuid) {
         super(plugin, uuid);
@@ -30,19 +34,15 @@ public class QueueableMinigame extends Game {
         return null;
     }
 
-    @Override
-    public void initialize() {
-
-    }
+    public abstract GameParticipant determineWinner();
 
     @Override
-    public void end() {
-
+    public String getScoreboardTitle() {
+        return "&fMinigame";
     }
 
     public enum Type {
         SKYWARS, ONE_IN_THE_CHAMBER;
-
 
         @Override
         public String toString() {
@@ -84,11 +84,37 @@ public class QueueableMinigame extends Game {
                             "&7COD-Style One in the Chamber.",
                             "&7One shot, one kill.",
                             "&7First player that gets",
-                            "&7to 20 kills wins.");
+                            "&7to 15 kills wins.");
                 }
             }
 
             return null;
+        }
+
+        public int getMinPlayers() {
+            switch(this) {
+                case SKYWARS -> {
+                    return 4;
+                }
+                case ONE_IN_THE_CHAMBER -> {
+                    return 2;
+                }
+            }
+
+            return 0;
+        }
+
+        public int getMaxPlayers() {
+            switch(this) {
+                case SKYWARS -> {
+                    return 4;
+                }
+                case ONE_IN_THE_CHAMBER -> {
+                    return 8;
+                }
+            }
+
+            return 0;
         }
     }
 }

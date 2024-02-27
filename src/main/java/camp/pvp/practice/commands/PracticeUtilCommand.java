@@ -52,18 +52,8 @@ public class PracticeUtilCommand implements CommandExecutor {
                         sb.append("\n\n&6In Game: &f" + plugin.getGameManager().getTotalInGame());
                         sb.append(" &7- &6In Queue: &f" + plugin.getGameQueueManager().getTotalInQueue());
                         sb.append(" &7- &6Active Games: &f" + plugin.getGameManager().getActiveGames().size());
-                        sb.append("\n\n&6Queues:");
-
-                        for(GameQueue gameQueue : plugin.getGameQueueManager().getGameQueues()) {
-                            sb.append("\n&6" + gameQueue.getDuelKit().name() + " &7(" + gameQueue.getType().toString() + ")&6: &f" + gameQueue.getQueueMembers().size() + " in queue, " + gameQueue.getPlaying() + " playing.");
-                        }
 
                         player.sendMessage(Colors.get(sb.toString()));
-                        return true;
-                    case "scanner":
-                        player.sendMessage(ChatColor.GREEN + "Starting arena scanner, check console for updates.");
-                        plugin.getArenaManager().scanBlocks();
-
                         return true;
                     case "setnpcid":
                         if(args.length > 2) {
@@ -71,7 +61,7 @@ public class PracticeUtilCommand implements CommandExecutor {
                             try {
                                 clickable = NPCClickable.valueOf(args[1].toUpperCase());
                             } catch (IllegalArgumentException ignored) {
-                                player.sendMessage(ChatColor.RED + "Invalid clickable type. Valid options: UNRANKED, RANKED, HOST_EVENT, STATISTICS, LEADERBOARDS");
+                                player.sendMessage(ChatColor.RED + "Invalid clickable type. Valid options: DUEL_QUEUE, MINIGAME_QUEUE, STATISTICS, LEADERBOARDS");
                                 return true;
                             }
 
@@ -89,6 +79,15 @@ public class PracticeUtilCommand implements CommandExecutor {
                             return true;
                         }
                         break;
+                    case "togglerankedqueues":
+                        for(GameQueue queue : plugin.getGameQueueManager().getGameQueues()) {
+                            if(queue.getType().equals(GameQueue.Type.RANKED)) {
+                                queue.setAvailable(!queue.isAvailable());
+                            }
+                        }
+
+                        player.sendMessage(ChatColor.GREEN + "All ranked queues have been toggled.");
+                        return true;
                 }
             }
 
@@ -96,11 +95,10 @@ public class PracticeUtilCommand implements CommandExecutor {
             sb.append("&6&lPractice Utilities");
             sb.append("\n&6/" + label + " debug &7- &fShows a bunch of useful information.");
             sb.append("\n&6/" + label + " reset &7- &fResets your player.");
-            sb.append("\n&6/" + label + " scanner &7- &fRescan all arenas for important blocks.");
-            sb.append("\n&6/" + label + " schedulereboot &7- &fSchedule the daily server restart for right now.");
             sb.append("\n&6/" + label + " setkiteditor &7- &fSets the kit editor location.");
             sb.append("\n&6/" + label + " setlobby &7- &fSets the lobby location.");
             sb.append("\n&6/" + label + " setnpcid <clickable type> <npc id> &7- &fAssign a clickable type to an NPC.");
+            sb.append("\n&6/" + label + " togglerankedqueues &7- &fToggles all ranked queues on or off.");
 
             player.sendMessage(Colors.get(sb.toString()));
         }

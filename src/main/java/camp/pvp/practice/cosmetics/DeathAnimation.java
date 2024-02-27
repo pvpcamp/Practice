@@ -6,6 +6,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.MaterialData;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -56,21 +57,21 @@ public enum DeathAnimation {
 
                 List<Item> items = new ArrayList<>();
 
-                for(int i = 0; i < 8; i++) {
+                for(int i = 0; i < 4; i++) {
                     Item bloodItem = location.getWorld().dropItemNaturally(l, woolItem);
                     bloodItem.setPickupDelay(Integer.MAX_VALUE);
                     game.addEntity(bloodItem);
                     items.add(bloodItem);
                 }
 
-                for(int i = 0; i < 10; i++) {
+                for(int i = 0; i < 5; i++) {
                     Item bloodItem = location.getWorld().dropItemNaturally(l, dyeItem);
                     bloodItem.setPickupDelay(Integer.MAX_VALUE);
                     game.addEntity(bloodItem);
                     items.add(bloodItem);
                 }
 
-                for(int i = 0; i < 6; i++) {
+                for(int i = 0; i < 5; i++) {
                     Item bloodItem = location.getWorld().dropItemNaturally(l, boneItem);
                     bloodItem.setPickupDelay(Integer.MAX_VALUE);
                     game.addEntity(bloodItem);

@@ -5,6 +5,7 @@ import camp.pvp.practice.arenas.ArenaManager;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.utils.buttons.GuiButton;
+import camp.pvp.utils.guis.ArrangedGui;
 import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.ClickType;
@@ -12,32 +13,24 @@ import org.bukkit.event.inventory.ClickType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArenaInfoGui extends StandardGui {
+public class ArenaInfoGui extends ArrangedGui {
     public ArenaInfoGui(ArenaManager arenaManager, Arena arena) {
-        super("&6" + arena.getDisplayName() + " Info", 45);
+        super("&6" + arena.getDisplayName() + " Info");
 
-        setDefaultBackground();
+        setDefaultBorder();
+
+        GuiButton list = new GuiButton(Material.BOOK, "&c&lGo to Arena List");
+        list.setSlot(0);
+        list.setAction((player, button, gui, click) -> {
+            new ArenaListGui(arenaManager, arena.getType()).open(player);
+        });
+
+        list.setOverrideGuiArrangement(true);
+        addButton(list);
 
         boolean hasCopies = !arenaManager.getArenaCopies(arena).isEmpty();
 
-        GuiButton type = new GuiButton(arena.getType().getGuiMaterial(), "&d&lSelected Type");
-        type.setSlot(11);
-
-        List<String> typeLore = new ArrayList<>();
-        typeLore.add("&6Current Type: &f" + arena.getType());
-        if(!arena.isCopy()) {
-            typeLore.add(" ");
-            typeLore.add("&7Click to customize type.");
-            type.setAction((player, button, gui, click) -> {
-                new ArenaTypeGui(arenaManager, arena).open(player);
-            });
-        }
-
-        type.setLore(typeLore);
-        addButton(type);
-
         GuiButton info = new GuiButton(Material.NETHER_STAR, "&6&l" + arena.getDisplayName());
-        info.setSlot(13);
 
         List<String> infoLore = new ArrayList<>();
         infoLore.add("&6Name: &f" + arena.getName());
@@ -57,9 +50,21 @@ public class ArenaInfoGui extends StandardGui {
         info.setLore(infoLore);
         addButton(info);
 
-        GuiButton copies = new GuiButton(Material.PAPER, "&e&lCopies");
-        copies.setSlot(31);
+        GuiButton type = new GuiButton(arena.getType().getGuiMaterial(), "&d&lSelected Type");
+        List<String> typeLore = new ArrayList<>();
+        typeLore.add("&6Current Type: &f" + arena.getType());
+        if(!arena.isCopy()) {
+            typeLore.add(" ");
+            typeLore.add("&7Click to customize type.");
+            type.setAction((player, button, gui, click) -> {
+                new ArenaTypeGui(arenaManager, arena).open(player);
+            });
+        }
 
+        type.setLore(typeLore);
+        addButton(type);
+
+        GuiButton copies = new GuiButton(Material.PAPER, "&e&lCopies");
         copies.setButtonUpdater((button, gui) -> {
 
             if(!arena.getType().isBuild()) {
@@ -116,7 +121,6 @@ public class ArenaInfoGui extends StandardGui {
         addButton(copies);
 
         GuiButton positions = new GuiButton(Material.BEACON, "&c&lPositions");
-        positions.setSlot(15);
 
         List<String> positionsLore = new ArrayList<>();
 
@@ -146,15 +150,44 @@ public class ArenaInfoGui extends StandardGui {
 
         addButton(positions);
 
+        if(arena.getType().isGenerateLoot()) {
+            GuiButton loot = new GuiButton(Material.CHEST, "&6&lLoot");
+            loot.setLore(
+                    "&6Chests: &f" + arena.getLootChests().size(),
+                    " ",
+                    "&7Click to view loot chests."
+            );
+
+            loot.setAction((player, button, gui, click) -> {
+                new ArenaLootGui(arena).open(player);
+            });
+
+            addButton(loot);
+        }
+
+        if(arena.getType().isRandomSpawnLocation()) {
+            GuiButton randomSpawns = new GuiButton(Material.ENDER_PEARL, "&5&lRandom Spawns");
+            randomSpawns.setLore(
+                    "&6Current Random Spawns: &f" + arena.getRandomSpawnLocations().size(),
+                    " ",
+                    "&7Click to view random spawns."
+            );
+
+            randomSpawns.setAction((player, button, gui, click) -> {
+                new ArenaRandomSpawnsGui(arenaManager, arena).open(player);
+            });
+
+            addButton(randomSpawns);
+        }
+
         GuiButton queueable = new GuiButton(Material.REDSTONE, "&a&lQueueable");
-        queueable.setSlot(29);
 
         queueable.setButtonUpdater((button, gui) -> {
             button.setLore(
                     "&7Queueable arenas are also",
                     "&7used for duel requests.",
                     " ",
-                    "&6Current Setting: &f" + (arena.isEnabled() ? "Yes" : "No"));
+                    "&aCurrent Setting: &f" + (arena.isEnabled() ? "Yes" : "No"));
             button.setType(arena.isEnabled() ? Material.EMERALD : Material.REDSTONE);
         });
 
@@ -171,7 +204,6 @@ public class ArenaInfoGui extends StandardGui {
         addButton(queueable);
 
         GuiButton delete = new GuiButton(Material.TNT, "&4&lDelete Arena");
-        delete.setSlot(33);
 
         List<String> deleteLore = new ArrayList<>();
 
@@ -219,13 +251,6 @@ public class ArenaInfoGui extends StandardGui {
             confirm.open(player);
         });
         addButton(delete);
-
-        GuiButton list = new GuiButton(Material.BOOK, "&c&lGo to Arena List");
-        list.setSlot(36);
-        list.setAction((player, button, gui, click) -> {
-            new ArenaListGui(arenaManager, arena.getType()).open(player);
-        });
-        addButton(list);
 
     }
 }

@@ -7,7 +7,7 @@ import camp.pvp.practice.games.minigames.SkywarsMinigame;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
@@ -61,17 +61,19 @@ public class GameQueue {
     private final Practice plugin;
     private final GameType gameType;
     private final Type type;
-    private DuelKit duelKit;
+    private GameKit gameKit;
     private QueueableMinigame.Type minigameType;
     private Queue<GameQueueMember> queueMembers;
     private BukkitTask queueTask;
+    private boolean available;
 
-    public GameQueue(Practice plugin, DuelKit duelKit, Type type) {
+    public GameQueue(Practice plugin, GameKit gameKit, Type type) {
         this.plugin = plugin;
         this.gameType = GameType.DUEL;
-        this.duelKit = duelKit;
+        this.gameKit = gameKit;
         this.type = type;
         this.queueMembers = new LinkedList<>();
+        this.available = true;
     }
 
     public GameQueue(Practice plugin, QueueableMinigame.Type minigameType, Type type) {
@@ -80,6 +82,7 @@ public class GameQueue {
         this.minigameType = minigameType;
         this.type = type;
         this.queueMembers = new LinkedList<>();
+        this.available = true;
     }
 
     public GameType getGameType() {
@@ -92,7 +95,7 @@ public class GameQueue {
         switch(gameType) {
             case DUEL -> {
                 for(Game game : getPlugin().getGameManager().getActiveGames()) {
-                    if(game instanceof Duel && game.getKit().equals(duelKit) && ((Duel) game).getQueueType().equals(getType())) {
+                    if(game instanceof Duel && game.getKit().equals(gameKit) && ((Duel) game).getQueueType().equals(getType())) {
                         i += game.getAlive().size();
                     }
                 }
@@ -115,61 +118,65 @@ public class GameQueue {
                 switch(type) {
                     case UNRANKED:
                         queueTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
-                            if (queueMembers.size() > 1) {
-                                final GameQueueMember member1, member2;
-                                member1 = queueMembers.poll();
-                                member2 = queueMembers.poll();
-
-                                Duel duel = new Duel(plugin, UUID.randomUUID());
-
-                                duel.setQueueType(type);
-                                duel.setKit(duelKit);
-
-                                duel.join(member1.getPlayer());
-                                duel.join(member2.getPlayer());
-
-                                String message = Colors.get("&6&lMATCH FOUND! &r&f" + member1.getName() + " &cvs. &f" + member2.getName());
-                                member1.getPlayer().sendMessage(message);
-                                member2.getPlayer().sendMessage(message);
-
-                                duel.initialize();
+                            if(queueMembers.size() < 2) {
+                                return;
                             }
-                        }, 5, 5);
+
+                            final GameQueueMember member1, member2;
+                            member1 = queueMembers.poll();
+                            member2 = queueMembers.poll();
+
+                            Duel duel = new Duel(plugin, UUID.randomUUID());
+
+                            duel.setQueueType(type);
+                            duel.setKit(gameKit);
+
+                            duel.join(member1.getPlayer());
+                            duel.join(member2.getPlayer());
+
+                            String message = Colors.get("&6&lMATCH FOUND! &r&f" + member1.getName() + " &cvs. &f" + member2.getName());
+                            member1.getPlayer().sendMessage(message);
+                            member2.getPlayer().sendMessage(message);
+
+                            duel.initialize();
+                        }, 0, 5);
                         break;
                     case RANKED:
                         queueTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
-                            if (queueMembers.size() > 1) {
-                                for (GameQueueMember member1 : queueMembers) {
-                                    for (GameQueueMember member2 : queueMembers) {
-                                        if (member1 == member2) continue;
+                            if(queueMembers.size() < 2) {
+                                return;
+                            }
 
-                                        if (member2.getEloLow() <= member1.getElo() && member2.getEloHigh() >= member1.getElo()) {
-                                            if (member1.getEloLow() <= member2.getElo() && member1.getEloHigh() >= member2.getElo()) {
-                                                queueMembers.remove(member1);
-                                                queueMembers.remove(member2);
-                                                member1.getQueueUpdater().cancel();
-                                                member2.getQueueUpdater().cancel();
+                            for (GameQueueMember member1 : queueMembers) {
+                                for (GameQueueMember member2 : queueMembers) {
+                                    if (member1 == member2) continue;
 
-                                                Duel duel = new Duel(plugin, UUID.randomUUID());
+                                    if (member2.getEloLow() <= member1.getElo() && member2.getEloHigh() >= member1.getElo()) {
+                                        if (member1.getEloLow() <= member2.getElo() && member1.getEloHigh() >= member2.getElo()) {
+                                            queueMembers.remove(member1);
+                                            queueMembers.remove(member2);
+                                            member1.getQueueUpdater().cancel();
+                                            member2.getQueueUpdater().cancel();
 
-                                                duel.setQueueType(type);
-                                                duel.setKit(duelKit);
+                                            Duel duel = new Duel(plugin, UUID.randomUUID());
 
-                                                duel.join(member1.getPlayer());
-                                                duel.join(member2.getPlayer());
+                                            duel.setQueueType(type);
+                                            duel.setKit(gameKit);
 
-                                                String message = Colors.get("&6&lMATCH FOUND! &r&f" + member1.getName() + " &7(" + member1.getElo() + ") &cvs. &f" + member2.getName() + " &7(" + member2.getElo() + " ELO)");
-                                                member1.getPlayer().sendMessage(message);
-                                                member2.getPlayer().sendMessage(message);
+                                            duel.join(member1.getPlayer());
+                                            duel.join(member2.getPlayer());
 
-                                                duel.initialize();
-                                                return;
-                                            }
+                                            String message = Colors.get("&6&lMATCH FOUND! &r&f" + member1.getName() + " &7(" + member1.getElo() + ") &cvs. &f" + member2.getName() + " &7(" + member2.getElo() + " ELO)");
+                                            member1.getPlayer().sendMessage(message);
+                                            member2.getPlayer().sendMessage(message);
+
+                                            duel.initialize();
+                                            return;
                                         }
                                     }
                                 }
                             }
-                        }, 5, 5);
+                        }, 0, 5);
                     }
                 }
             case MINIGAME -> {

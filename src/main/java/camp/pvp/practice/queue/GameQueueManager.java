@@ -1,10 +1,9 @@
 package camp.pvp.practice.queue;
 
-import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.minigames.QueueableMinigame;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -36,7 +35,7 @@ public class GameQueueManager {
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
             if(gameQueue.getType().equals(GameQueue.Type.RANKED)) {
-                gqm = new GameQueueMember(player.getUniqueId(), player.getName(), profile.getProfileElo().getRatings().get(gameQueue.getDuelKit()));
+                gqm = new GameQueueMember(player.getUniqueId(), player.getName(), profile.getProfileElo().getRatings().get(gameQueue.getGameKit()));
             } else {
                 gqm = new GameQueueMember(player.getUniqueId(), player.getName());
             }
@@ -44,7 +43,7 @@ public class GameQueueManager {
             gqm.setQueue(gameQueue);
             gameQueue.getQueueMembers().add(gqm);
 
-            DuelKit kit = gameQueue.getDuelKit();
+            GameKit kit = gameQueue.getGameKit();
             profile.playerUpdate(false);
             player.sendMessage(ChatColor.GREEN + "You have joined the queue for " + gameQueue.getType().name().toLowerCase() + " " + ChatColor.WHITE + kit.getDisplayName() + ChatColor.GREEN + ".");
 
@@ -73,7 +72,7 @@ public class GameQueueManager {
         return gqm;
     }
 
-    public GameQueueMember addToQueue(Player player, DuelKit kit, GameQueue.Type queueType) {
+    public GameQueueMember addToQueue(Player player, GameKit kit, GameQueue.Type queueType) {
         GameQueue queue = getQueue(kit, queueType);
         return addToQueue(player, queue);
     }
@@ -121,9 +120,9 @@ public class GameQueueManager {
         return null;
     }
 
-    public GameQueue getQueue(DuelKit kit, GameQueue.Type queueType) {
+    public GameQueue getQueue(GameKit kit, GameQueue.Type queueType) {
         for(GameQueue q : getGameQueues()) {
-            if(q.getDuelKit() != null && q.getDuelKit().equals(kit) && q.getType().equals(queueType)) {
+            if(q.getGameKit() != null && q.getGameKit().equals(kit) && q.getType().equals(queueType)) {
                 return q;
             }
         }
@@ -176,17 +175,17 @@ public class GameQueueManager {
 
         int queues = 0;
 
-        for(DuelKit duelKit : DuelKit.values()) {
-            if(duelKit.isQueueable()) {
-                GameQueue queue = new GameQueue(plugin, duelKit, GameQueue.Type.UNRANKED);
+        for(GameKit gameKit : GameKit.values()) {
+            if(gameKit.isDuelKit()) {
+                GameQueue queue = new GameQueue(plugin, gameKit, GameQueue.Type.UNRANKED);
                 addQueue(queue);
 
                 queue.startQueue();
 
                 queues++;
 
-                if(duelKit.isRanked()) {
-                    GameQueue rankedQueue = new GameQueue(plugin, duelKit, GameQueue.Type.RANKED);
+                if(gameKit.isRanked()) {
+                    GameQueue rankedQueue = new GameQueue(plugin, gameKit, GameQueue.Type.RANKED);
                     addQueue(rankedQueue);
 
                     rankedQueue.startQueue();

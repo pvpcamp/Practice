@@ -10,8 +10,8 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.interactables.InteractableItem;
 import camp.pvp.practice.interactables.InteractableItems;
-import camp.pvp.practice.kits.CustomDuelKit;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.CustomGameKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.PartyInvite;
 import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
@@ -30,6 +30,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
@@ -87,7 +88,7 @@ public class GameProfile {
     private int noDropHotbarSlot;
     private DeathAnimation deathAnimation;
     private GameQueue.Type lastSelectedQueueType;
-    private Map<DuelKit, Map<Integer, CustomDuelKit>> customDuelKits;
+    private Map<GameKit, Map<Integer, CustomGameKit>> customDuelKits;
 
     private Game game;
     private Tournament tournament;
@@ -103,8 +104,8 @@ public class GameProfile {
     private Party party;
     private Map<UUID, PartyInvite> partyInvites;
 
-    private DuelKit editingKit;
-    private CustomDuelKit editingCustomKit;
+    private GameKit editingKit;
+    private CustomGameKit editingCustomKit;
 
     private ProfileELO profileElo;
     private ProfileStatistics profileStatistics;
@@ -140,7 +141,7 @@ public class GameProfile {
         this.sidebarShowLines = true;
         this.sidebarShowPing = true;
 
-        for(DuelKit kit : DuelKit.values()) {
+        for(GameKit kit : GameKit.values()) {
             if(kit.isEditable()) {
                 customDuelKits.put(kit, new HashMap<>());
             }
@@ -233,20 +234,25 @@ public class GameProfile {
                     ii.getItemUpdater().onUpdate(ii, this);
                 }
 
-                pi.setItem(ii.getSlot(), ii.getItem().clone());
+                ItemStack item = ii.getItem();
+                ItemMeta meta = item.getItemMeta();
+                meta.spigot().setUnbreakable(true);
+                item.setItemMeta(meta);
+
+                pi.setItem(ii.getSlot(), item);
             }
 
             if(game != null && game.getAlive().get(this.getUuid()) != null) {
-                DuelKit kit = game.getKit();
+                GameKit kit = game.getKit();
 
-                Map<Integer, CustomDuelKit> customKits = getCustomDuelKits().get(kit);
+                Map<Integer, CustomGameKit> customKits = getCustomDuelKits().get(kit);
                 if(customKits == null || customKits.isEmpty()) {
                     GameParticipant participant = game.getParticipants().get(uuid);
                     kit.apply(participant);
                     return;
                 }
 
-                for(Map.Entry<Integer, CustomDuelKit> entry : customKits.entrySet()) {
+                for(Map.Entry<Integer, CustomGameKit> entry : customKits.entrySet()) {
                     String name = entry.getValue().getName();
                     ItemStack i = new ItemBuilder(Material.ENCHANTED_BOOK, name).create();
                     pi.setItem(entry.getKey() - 1, i);
@@ -435,7 +441,7 @@ public class GameProfile {
 
         for(Map.Entry<String, Map<String, Map<String, Object>>> kitEntry : ck.entrySet()) {
 
-            DuelKit kit = DuelKit.valueOf(kitEntry.getKey());
+            GameKit kit = GameKit.valueOf(kitEntry.getKey());
 
             for(Map.Entry<String, Map<String, Object>> customKitEntry : kitEntry.getValue().entrySet()) {
 
@@ -443,10 +449,10 @@ public class GameProfile {
 
                 Map<String, Object> map = customKitEntry.getValue();
 
-                CustomDuelKit customDuelKit = new CustomDuelKit(kit, i, true);
-                getCustomDuelKits().get(kit).put(i, customDuelKit);
+                CustomGameKit customGameKit = new CustomGameKit(kit, i, true);
+                getCustomDuelKits().get(kit).put(i, customGameKit);
 
-                customDuelKit.importFromMap(map);
+                customGameKit.importFromMap(map);
             }
         }
     }
@@ -473,10 +479,10 @@ public class GameProfile {
 
         // Convert CustomDuelKits to serialized form for DB storage.
         Map<String, Map<String, Map<String, Object>>> ck = new HashMap<>();
-        for(Map.Entry<DuelKit, Map<Integer, CustomDuelKit>> kitEntry : getCustomDuelKits().entrySet()) {
-            DuelKit kit = kitEntry.getKey();
-            for(Map.Entry<Integer, CustomDuelKit> customKitEntry : kitEntry.getValue().entrySet()) {
-                CustomDuelKit cdk = customKitEntry.getValue();
+        for(Map.Entry<GameKit, Map<Integer, CustomGameKit>> kitEntry : getCustomDuelKits().entrySet()) {
+            GameKit kit = kitEntry.getKey();
+            for(Map.Entry<Integer, CustomGameKit> customKitEntry : kitEntry.getValue().entrySet()) {
+                CustomGameKit cdk = customKitEntry.getValue();
                 ck.computeIfAbsent(kit.toString(), v -> new HashMap<>());
                 ck.get(kit.toString()).put(String.valueOf(cdk.getSlot()), cdk.exportItems());
             }

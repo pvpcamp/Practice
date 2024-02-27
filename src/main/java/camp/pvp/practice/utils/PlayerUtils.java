@@ -43,24 +43,6 @@ public class PlayerUtils {
         player.setFlying(allowFlight);
     }
 
-    public static void giveInteractableItems(Player player) {
-        PlayerInventory pi = player.getInventory();
-        GameProfile profile = Practice.instance.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-
-        pi.clear();
-        for(InteractableItems i : InteractableItems.getInteractableItems(Practice.instance.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId()))) {
-            InteractableItem ii = i.getItem();
-
-            if(ii.getItemUpdater() != null) {
-                ii.getItemUpdater().onUpdate(ii, profile);
-            }
-
-            pi.setItem(ii.getSlot(), ii.getItem().clone());
-        }
-
-        player.updateInventory();
-    }
-
     public static int getPing(Player player) {
         try {
             Object entityPlayer = player.getClass().getMethod("getHandle").invoke(player);

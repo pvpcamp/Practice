@@ -1,22 +1,19 @@
 package camp.pvp.practice.guis.tournament;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
-import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-
-import java.util.Arrays;
 
 public class TournamentHostGui extends ArrangedGui {
     public TournamentHostGui(Practice plugin) {
         super("&6Host a Tournament");
 
-        for(DuelKit kit : DuelKit.values()) {
+        for(GameKit kit : GameKit.values()) {
 
             if(!kit.isTournament()) continue;
 

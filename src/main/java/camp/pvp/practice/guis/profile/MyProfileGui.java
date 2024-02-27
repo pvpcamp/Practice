@@ -1,6 +1,7 @@
 package camp.pvp.practice.guis.profile;
 
 import camp.pvp.practice.guis.profile.cosmetics.CosmeticsGui;
+import camp.pvp.practice.guis.statistics.StatisticsGui;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.StandardGui;
@@ -26,7 +27,7 @@ public class MyProfileGui extends StandardGui {
         statistics.setCloseOnClick(true);
         statistics.setLore("&7Click to view your statistics.");
         statistics.setAction((player, button, gui, click) -> {
-            player.performCommand("stats");
+            new StatisticsGui(player, profile.getProfileElo(), profile.getProfileStatistics()).open(player);
         });
         addButton(statistics);
 

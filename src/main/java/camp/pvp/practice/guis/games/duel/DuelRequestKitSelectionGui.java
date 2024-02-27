@@ -1,27 +1,21 @@
 package camp.pvp.practice.guis.games.duel;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.DuelRequest;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
-import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 
 public class DuelRequestKitSelectionGui extends ArrangedGui {
     public DuelRequestKitSelectionGui(Practice plugin, DuelRequest duelRequest) {
         super("&6Duel " + duelRequest.getOpponent().getName());
 
-        for(DuelKit duelKit : DuelKit.values()) {
-            if(!duelKit.isQueueable()) continue;
+        for(GameKit gameKit : GameKit.values()) {
+            if(!gameKit.isDuelKit()) continue;
 
-            ItemStack item = duelKit.getIcon();
-            GuiButton button = new GuiButton(item, "&6&l" + duelKit.getDisplayName());
+            ItemStack item = gameKit.getIcon();
+            GuiButton button = new GuiButton(item, "&6&l" + gameKit.getDisplayName());
 
             boolean hasPermission = duelRequest.getSender().getPlayer().hasPermission("practice.duel_requests.map_selection");
 
@@ -39,7 +33,7 @@ public class DuelRequestKitSelectionGui extends ArrangedGui {
             }
 
             button.setAction((pl, b, igui, click) -> {
-                duelRequest.setKit(duelKit);
+                duelRequest.setKit(gameKit);
                 if(hasPermission) {
                     new DuelRequestArenaSelectionGui(plugin, duelRequest, this).open(pl);
                 } else {

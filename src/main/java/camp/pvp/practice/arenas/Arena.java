@@ -1,12 +1,13 @@
 package camp.pvp.practice.arenas;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.loot.LootChest;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
 
 import java.util.*;
 
@@ -16,11 +17,14 @@ public class Arena implements Comparable<Arena>{
     private String name, displayName;
     private Arena.Type type;
     private Map<String, ArenaPosition> positions;
+    private List<Location> randomSpawnLocations;
+    private List<LootChest> lootChests;
+
     private boolean enabled, inUse;
     private String parentName;
     private int xDifference, zDifference, buildLimit, voidLevel;
 
-    private @Getter List<Location> beds, blocks, chests;
+    private @Getter List<Location> beds, allBlocks, blocks, chests;
     private @Getter Queue<StoredBlock> blockQueue;
 
     public Arena(String name) {
@@ -28,8 +32,11 @@ public class Arena implements Comparable<Arena>{
         this.displayName = name;
         this.type = Type.DUEL;
         this.positions = new HashMap<>();
+        this.randomSpawnLocations = new ArrayList<>();
+        this.lootChests = new ArrayList<>();
 
         this.beds = new ArrayList<>();
+        this.allBlocks = new ArrayList<>();
         this.blocks = new ArrayList<>();
         this.chests = new ArrayList<>();
         this.blockQueue = new LinkedList<>();
@@ -59,6 +66,9 @@ public class Arena implements Comparable<Arena>{
             }
         }
 
+        if(getType().isGenerateLoot() && lootChests.isEmpty()) return false;
+        if(getType().isRandomSpawnLocation() && randomSpawnLocations.isEmpty()) return false;
+
         return true;
     }
 
@@ -71,11 +81,23 @@ public class Arena implements Comparable<Arena>{
 
         Arena parent = Practice.getInstance().getArenaManager().getArenaFromName(getParentName());
 
+        positions.clear();
+        lootChests.clear();
+        randomSpawnLocations.clear();
+
         for(ArenaPosition position : parent.getPositions().values()) {
             Location location = position.getLocation();
             Location newLocation = location.clone();
             newLocation.add(xDifference, 0, zDifference);
             positions.put(position.getPosition(), new ArenaPosition(position.getPosition(), newLocation));
+        }
+
+        for(LootChest lootChest : parent.getLootChests()) {
+            Location location = lootChest.getLocation();
+            Location newLocation = location.clone();
+            newLocation.add(xDifference, 0, zDifference);
+            lootChests.add(new LootChest(newLocation, lootChest.getLootCategory()
+            ));
         }
 
         setEnabled(parent.isEnabled());
@@ -99,7 +121,24 @@ public class Arena implements Comparable<Arena>{
         }
 
         if(getType().isGenerateLoot()) {
-            LootChest.generateLoot(this);
+
+            for(LootChest lootChest : lootChests) {
+                Location l = lootChest.getLocation();
+                Block block = l.getBlock();
+                BlockState state = block.getState();
+
+                block.setType(Material.CHEST);
+                state.setType(Material.CHEST);
+                state.update(true, false);
+
+                if(l.getBlock().getState() instanceof Chest chest) {
+                    chest.getInventory().clear();
+                }
+            }
+
+            for(LootChest lootChest : lootChests) {
+                lootChest.generateLoot(lootChests);
+            }
         }
     }
 
@@ -112,7 +151,7 @@ public class Arena implements Comparable<Arena>{
 
             getBeds().clear();
             getChests().clear();
-            getBlocks().clear();
+            getAllBlocks().clear();
 
             int minX, minY, minZ, maxX, maxY, maxZ;
             Location c1 = corner1.getLocation(), c2 = corner2.getLocation();
@@ -140,6 +179,8 @@ public class Arena implements Comparable<Arena>{
 
                             getBlocks().add(location);
                         }
+
+                        getAllBlocks().add(location);
                     }
                 }
             }
@@ -148,7 +189,7 @@ public class Arena implements Comparable<Arena>{
 
     public void clearBlocks() {
         scanArena();
-        for(Location location : getBlocks()) {
+        for(Location location : getAllBlocks()) {
             location.getBlock().setType(Material.AIR);
         }
     }
@@ -160,7 +201,7 @@ public class Arena implements Comparable<Arena>{
         if (!getType().isResetAfterGame()) return;
         if (!isCopy()) return;
 
-        for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParentName()).getBlocks()) {
+        for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParentName()).getAllBlocks()) {
             Location location = parentLocation.clone().add(xDifference, 0, zDifference);
 
             Block parentBlock = parentLocation.getBlock();
@@ -179,18 +220,18 @@ public class Arena implements Comparable<Arena>{
 
     public boolean isOriginalBlock(Location location) {
 
-        if(!type.equals(Type.DUEL_BED_FIGHT)) return blocks.contains(location);
+        if (!type.equals(Type.DUEL_BED_FIGHT)) return blocks.contains(location);
 
-        for(ArenaPosition position : positions.values()) {
-            if(position.getPosition().equalsIgnoreCase("bluebed") || position.getPosition().equalsIgnoreCase("redbed")) {
+        for (ArenaPosition position : positions.values()) {
+            if (position.getPosition().equalsIgnoreCase("bluebed") || position.getPosition().equalsIgnoreCase("redbed")) {
                 Location l = position.getLocation();
 
-                for(int x = l.getBlockX() - 3; x < l.getBlockX() + 3; x++) {
-                    for(int y = l.getBlockY(); y < l.getBlockY() + 3; y++) {
-                        for(int z = l.getBlockZ() - 3; z < l.getBlockZ() + 3; z++) {
+                for (int x = l.getBlockX() - 4; x < l.getBlockX() + 4; x++) {
+                    for (int y = l.getBlockY(); y < l.getBlockY() + 3; y++) {
+                        for (int z = l.getBlockZ() - 4; z < l.getBlockZ() + 4; z++) {
                             Location blockLocation = new Location(l.getWorld(), x, y, z);
                             Block block = blockLocation.getBlock();
-                            if(block.equals(location.getBlock())) {
+                            if (block.equals(location.getBlock())) {
                                 return false;
                             }
                         }
@@ -212,20 +253,15 @@ public class Arena implements Comparable<Arena>{
         MINIGAME_SKYWARS, MINIGAME_OITC;
 
         public List<String> getValidPositions() {
-            switch(this) {
-                case DUEL_BED_FIGHT:
-                    return Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluebed", "redbed");
-                case DUEL_BUILD:
-                case DUEL_SKYWARS:
-                case SPLEEF:
-                    return Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
-                case EVENT_SUMO:
-                    return Arrays.asList("spawn1", "spawn2", "lobby");
-                case FFA:
-                    return Arrays.asList("spawn");
-                default:
-                    return Arrays.asList("spawn1", "spawn2", "center");
-            }
+            return switch (this) {
+                case DUEL_BED_FIGHT -> Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluebed", "redbed");
+                case DUEL_BUILD, DUEL_SKYWARS, SPLEEF -> Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
+                case EVENT_SUMO -> Arrays.asList("spawn1", "spawn2", "lobby");
+                case FFA -> Arrays.asList("spawn");
+                case MINIGAME_OITC -> Arrays.asList("center");
+                case MINIGAME_SKYWARS -> Arrays.asList("spawn1", "spawn2", "spawn3", "spawn4", "center");
+                default -> Arrays.asList("spawn1", "spawn2", "center");
+            };
         }
 
 

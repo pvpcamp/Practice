@@ -20,6 +20,7 @@ public class Party {
     private Map<UUID, PartyMember> members;
     private List<PartyGameRequest> partyGameRequests;
     private Game game;
+    private int maxMembers;
     private boolean chooseKits, open;
     public Party(Practice plugin) {
         this.plugin = plugin;
@@ -27,17 +28,24 @@ public class Party {
         this.partyGameRequests = new ArrayList<>();
         this.chooseKits = false;
         this.open = false;
+        this.maxMembers = 8;
     }
 
     public PartyMember join(Player player) {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
-        PartyMember member = new PartyMember(player.getUniqueId(), player.getName());
-        if(getLeader() == null) {
-            member.setLeader(true);
+
+        if(members.size() >= maxMembers) {
+            player.sendMessage(ChatColor.RED + "This party is full.");
+            return null;
         }
+
+        PartyMember member = new PartyMember(player.getUniqueId(), player.getName());
+
+        if(getLeader() == null) member.setLeader(true);
 
         this.members.put(member.getUuid(), member);
 
+        profile.getPartyInvites().clear();
         profile.setParty(this);
         profile.playerUpdate(false);
 

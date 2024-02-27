@@ -1,8 +1,7 @@
 package camp.pvp.practice.guis.queue;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.games.Game;
-import camp.pvp.practice.kits.DuelKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.leaderboard.LeaderboardEntry;
 import camp.pvp.practice.queue.GameQueue;
@@ -105,7 +104,10 @@ public class DuelQueueGui extends ArrangedGui {
         rankedQueue.setSlot(5);
         addButton(rankedQueue);
 
-        for(DuelKit kit : DuelKit.values()) {
+        for(GameKit kit : GameKit.values()) {
+
+            if(!kit.isDuelKit()) continue;
+
             GameQueue queue = gqm.getQueue(kit, queueType);
             GuiButton button = new GuiButton(kit.getIcon(), color + "&l" + kit.getDisplayName());
 
@@ -151,7 +153,12 @@ public class DuelQueueGui extends ArrangedGui {
                         lines.add(" ");
                     }
 
-                    lines.add("&7Click to join the " + color + queueType.toString() + " " + kit.getDisplayName() + " &7queue.");
+                    if(queue.isAvailable()) {
+                        lines.add("&7Click to join the");
+                        lines.add(color + queueType.toString() + " " + kit.getDisplayName() + " &7queue.");
+                    } else {
+                        lines.add("&c&lThis queue is disabled.");
+                    }
 
                     guiButton.setLore(lines);
 
@@ -161,11 +168,13 @@ public class DuelQueueGui extends ArrangedGui {
             });
 
             button.setAction((p, b, g, clickType) -> {
-                gqm.addToQueue(p, queue);
+                if(queue.isAvailable()) {
+                    gqm.addToQueue(p, queue);
+                    p.closeInventory();
+                }
             });
-            button.setCloseOnClick(true);
 
-            buttons.add(button);
+            addButton(button);
         }
     }
 }

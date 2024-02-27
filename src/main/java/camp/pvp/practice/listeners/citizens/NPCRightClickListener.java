@@ -2,10 +2,10 @@ package camp.pvp.practice.listeners.citizens;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.guis.queue.DuelQueueGui;
+import camp.pvp.practice.guis.queue.MinigameQueueGui;
 import camp.pvp.practice.guis.statistics.LeaderboardsGui;
 import camp.pvp.practice.guis.statistics.StatisticsGui;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.queue.GameQueue;
 import net.citizensnpcs.api.event.NPCRightClickEvent;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.ChatColor;
@@ -33,14 +33,14 @@ public class NPCRightClickListener implements Listener {
 
             if (clickable != null) {
                 switch (clickable) {
-                    case UNRANKED:
+                    case DUEL_QUEUE:
                         if(profile.getState().equals(GameProfile.State.LOBBY)) {
-                            new DuelQueueGui(GameQueue.Type.UNRANKED, profile).open(player);
+                            new DuelQueueGui(profile.getLastSelectedQueueType(), profile).open(player);
                         }
                         break;
-                    case RANKED:
+                    case MINIGAME_QUEUE:
                         if(profile.getState().equals(GameProfile.State.LOBBY)) {
-                            new DuelQueueGui(GameQueue.Type.RANKED, profile).open(player);
+                            new MinigameQueueGui(profile).open(player);
                         }
                         break;
                     case LEADERBOARDS:
