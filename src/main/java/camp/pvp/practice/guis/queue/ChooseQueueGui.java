@@ -32,12 +32,12 @@ public class ChooseQueueGui extends StandardGui {
                     "&71v1 matches.",
                     " ",
                     GameQueue.Type.UNRANKED.getColor() + "&lUnranked Queue",
-                    GameQueue.Type.UNRANKED.getColor() + "Playing: &f" + plugin.getGameManager().getTotalInGame(GameQueue.Type.UNRANKED),
-                    GameQueue.Type.UNRANKED.getColor() + "In Queue: &f" + plugin.getGameQueueManager().getTotalInQueue(GameQueue.Type.UNRANKED),
+                    GameQueue.Type.UNRANKED.getColor() + "Playing: &f" + plugin.getGameManager().getTotalInGame(GameQueue.GameType.DUEL, GameQueue.Type.UNRANKED),
+                    GameQueue.Type.UNRANKED.getColor() + "In Queue: &f" + plugin.getGameQueueManager().getTotalInQueue(GameQueue.GameType.DUEL, GameQueue.Type.UNRANKED),
                     " ",
                     GameQueue.Type.RANKED.getColor() + "&lRanked Queue",
-                    GameQueue.Type.RANKED.getColor() + "Playing: &f" + plugin.getGameManager().getTotalInGame(GameQueue.Type.RANKED),
-                    GameQueue.Type.RANKED.getColor() + "In Queue: &f" + plugin.getGameQueueManager().getTotalInQueue(GameQueue.Type.RANKED),
+                    GameQueue.Type.RANKED.getColor() + "Playing: &f" + plugin.getGameManager().getTotalInGame(GameQueue.GameType.DUEL, GameQueue.Type.RANKED),
+                    GameQueue.Type.RANKED.getColor() + "In Queue: &f" + plugin.getGameQueueManager().getTotalInQueue(GameQueue.GameType.DUEL, GameQueue.Type.RANKED),
                     " ",
                     "&7Click to view duel queues.");
         });
@@ -126,6 +126,24 @@ public class ChooseQueueGui extends StandardGui {
         rematch.setSlot(13);
         addButton(rematch);
 
+        GuiButton minigames = new GuiButton(Material.BOW, "&6&lMinigame Queues");
+        minigames.setAction((player, guiButton, gui, clickType) -> {
+            new MinigameQueueGui(gameProfile).open(player);
+        });
+        minigames.setButtonUpdater((guiButton, gui) -> {
+            guiButton.setLore(
+                    "&7Casual 4 player minigames.",
+                    " ",
+                    "&6In Queue: &f" + plugin.getGameQueueManager().getTotalInQueue(GameQueue.GameType.MINIGAME, GameQueue.Type.UNRANKED),
+                    "&6Playing: &f" + plugin.getGameManager().getTotalInGame(GameQueue.GameType.MINIGAME, GameQueue.Type.UNRANKED),
+                    " ",
+                    "&7Click to view minigame queues.");
+            guiButton.setLore("&7Click to view minigame queues.");
+        });
+
+        minigames.setSlot(14);
+        addButton(minigames);
+
         GuiButton events = new GuiButton(Material.NETHER_STAR, "&6&lHost an Event");
         events.setAction((player, guiButton, gui, clickType) -> {
 
@@ -167,19 +185,8 @@ public class ChooseQueueGui extends StandardGui {
             guiButton.setLore("&7Click to host an event.");
         });
 
-        events.setSlot(14);
+        events.setSlot(15);
         addButton(events);
-
-        GuiButton minigames = new GuiButton(Material.BOW, "&6&lMinigame Queues");
-        minigames.setAction((player, guiButton, gui, clickType) -> {
-            new MinigameQueueGui(gameProfile).open(player);
-        });
-        minigames.setButtonUpdater((guiButton, gui) -> {
-                guiButton.setLore("&7Click to view minigame queues.");
-        });
-
-        minigames.setSlot(15);
-        addButton(minigames);
 
     }
 }

@@ -120,6 +120,8 @@ public enum DeathAnimation {
                     victim.setVelocity(new Vector(0, 0.5, 0));
                 }
 
+                game.playSound(location, Sound.HURT_FLESH, 1F, 1F);
+
                 game.playLightning(l);
                 break;
         }

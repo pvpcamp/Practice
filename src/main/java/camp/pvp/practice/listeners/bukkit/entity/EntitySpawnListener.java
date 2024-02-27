@@ -27,6 +27,7 @@ public class EntitySpawnListener implements Listener {
                         || item.getItemStack().getType().equals(Material.BOWL)
                         || item.getItemStack().getType().equals(Material.BED)) {
                     item.remove();
+                    return;
                 }
 
                 new BukkitRunnable() {

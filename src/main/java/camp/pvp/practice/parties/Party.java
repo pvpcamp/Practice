@@ -39,6 +39,10 @@ public class Party {
             return null;
         }
 
+        if(members.isEmpty() && player.hasPermission("practice.party.no_member_cap")) {
+            maxMembers = 100;
+        }
+
         PartyMember member = new PartyMember(player.getUniqueId(), player.getName());
 
         if(getLeader() == null) member.setLeader(true);

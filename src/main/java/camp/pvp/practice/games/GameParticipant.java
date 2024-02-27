@@ -26,7 +26,8 @@ public class GameParticipant {
     private final String name;
     private Game game;
     private GameTeam team;
-    private boolean alive, respawn, invincible, currentlyPlaying, kitApplied, comboMessages;
+    private LivingState livingState;
+    private boolean respawn, invincible, kitApplied, comboMessages;
 
     // HCFTEAMS ONLY
     private HCFKit appliedHcfKit;
@@ -44,7 +45,7 @@ public class GameParticipant {
     public long health, maxHealth, hunger,
             hits, currentCombo, longestCombo,
             thrownPotions, missedPotions;
-    private int kills, deaths;
+    private int kills, killStreak, deaths;
 
     private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
@@ -57,11 +58,9 @@ public class GameParticipant {
     public GameParticipant(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
-        this.alive = true;
+        this.livingState = LivingState.ALIVE;
         this.previousEffects = new ArrayList<>();
         this.cooldowns = new HashMap<>();
-
-        this.currentlyPlaying = true;
 
         this.appliedHcfKit = null;
         this.energy = 0;
@@ -99,29 +98,37 @@ public class GameParticipant {
     }
 
     public void kill() {
-        alive = false;
+        livingState = isRespawn() ? LivingState.AWAITING_RESPAWN : LivingState.DEAD;
         invincible = true;
         deaths++;
+        killStreak = 0;
 
         clearCooldowns();
 
         if(attacker != null) {
             GameParticipant a = game.getParticipants().get(attacker);
 
-            if(a != null) a.setKills(a.getKills() + 1);
+            if(a != null) {
+                a.setKills(a.getKills() + 1);
+                a.setKillStreak(a.getKillStreak() + 1);
+            }
         }
 
-        if(!isRespawn()) {
-            currentlyPlaying = false;
-
-            if(respawnTask != null) respawnTask.cancel();
-        }
+        if(!isRespawn() && respawnTask != null) respawnTask.cancel();
     }
 
     public boolean isRespawn() {
         if(team != null) return team.isRespawn();
 
         return respawn;
+    }
+
+    public boolean isAlive() {
+        return getLivingState().equals(LivingState.ALIVE);
+    }
+
+    public boolean isCurrentlyPlaying() {
+        return getLivingState().equals(LivingState.ALIVE) || getLivingState().equals(LivingState.AWAITING_RESPAWN);
     }
 
     public void respawn(int delay) {
@@ -137,7 +144,7 @@ public class GameParticipant {
                     }
 
                     getPlayer().teleport(GameParticipant.this.game.getRespawnLocation(GameParticipant.this));
-                    setAlive(true);
+                    setLivingState(LivingState.ALIVE);
 
                     setLastDamageCause(null);
                     setAttacker(null);
@@ -175,7 +182,7 @@ public class GameParticipant {
     public void applyPreviousEffects(int duration) {
 
         if(previousHcfKit == appliedHcfKit) {
-            if (getPlayer() != null && alive && postGameInventory == null) {
+            if (getPlayer() != null && getLivingState().equals(LivingState.ALIVE) && postGameInventory == null) {
                 for (PotionEffect pe : getPlayer().getActivePotionEffects()) {
                     getPlayer().removePotionEffect(pe.getType());
                 }
@@ -208,5 +215,9 @@ public class GameParticipant {
         } else {
             return GameTeam.Color.RED;
         }
+    }
+
+    public enum LivingState {
+        ALIVE, AWAITING_RESPAWN, DEAD;
     }
 }

@@ -45,13 +45,13 @@ public class DuelQueueGui extends ArrangedGui {
             public void update(GuiButton guiButton, Gui gui) {
                 if(queueType.equals(GameQueue.Type.UNRANKED)) {
                     guiButton.setLore(
-                            GameQueue.Type.UNRANKED.getColor() + "Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.Type.UNRANKED),
-                            GameQueue.Type.UNRANKED.getColor() + "In Queue: &f" + gqm.getTotalInQueue(GameQueue.Type.UNRANKED)
+                            GameQueue.Type.UNRANKED.getColor() + "Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.GameType.DUEL, GameQueue.Type.UNRANKED),
+                            GameQueue.Type.UNRANKED.getColor() + "In Queue: &f" + gqm.getTotalInQueue(GameQueue.GameType.DUEL, GameQueue.Type.UNRANKED)
                             );
                 } else {
                     guiButton.setLore(
-                            GameQueue.Type.UNRANKED.getColor() + "Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.Type.UNRANKED),
-                            GameQueue.Type.UNRANKED.getColor() + "In Queue: &f" + gqm.getTotalInQueue(GameQueue.Type.UNRANKED),
+                            GameQueue.Type.UNRANKED.getColor() + "Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.GameType.DUEL, GameQueue.Type.UNRANKED),
+                            GameQueue.Type.UNRANKED.getColor() + "In Queue: &f" + gqm.getTotalInQueue(GameQueue.GameType.DUEL, GameQueue.Type.UNRANKED),
                             " ",
                             "&7Click to view" + GameQueue.Type.UNRANKED.getColor() + " Unranked Queues&7."
                     );
@@ -80,13 +80,13 @@ public class DuelQueueGui extends ArrangedGui {
             public void update(GuiButton guiButton, Gui gui) {
                 if(queueType.equals(GameQueue.Type.RANKED)) {
                     guiButton.setLore(
-                            GameQueue.Type.RANKED.getColor() + "Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.Type.RANKED),
-                            GameQueue.Type.RANKED.getColor() + "In Queue: &f" + gqm.getTotalInQueue(GameQueue.Type.RANKED)
+                            GameQueue.Type.RANKED.getColor() + "Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.GameType.DUEL, GameQueue.Type.RANKED),
+                            GameQueue.Type.RANKED.getColor() + "In Queue: &f" + gqm.getTotalInQueue(GameQueue.GameType.DUEL, GameQueue.Type.RANKED)
                     );
                 } else {
                     guiButton.setLore(
-                            GameQueue.Type.RANKED.getColor() + "Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.Type.RANKED),
-                            GameQueue.Type.RANKED.getColor() + "In Queue: &f" + gqm.getTotalInQueue(GameQueue.Type.RANKED),
+                            GameQueue.Type.RANKED.getColor() + "Playing: &f" + Practice.getInstance().getGameManager().getTotalInGame(GameQueue.GameType.DUEL, GameQueue.Type.RANKED),
+                            GameQueue.Type.RANKED.getColor() + "In Queue: &f" + gqm.getTotalInQueue(GameQueue.GameType.DUEL, GameQueue.Type.RANKED),
                             " ",
                             "&7Click to view " + GameQueue.Type.RANKED.getColor() + "Ranked Queues&7."
                     );

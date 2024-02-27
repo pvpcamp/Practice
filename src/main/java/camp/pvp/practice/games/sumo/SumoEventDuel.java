@@ -108,7 +108,7 @@ public class SumoEventDuel extends Duel {
 
         if(this.getState().equals(State.ENDED)) return;
 
-        participant.setAlive(false);
+        participant.setLivingState(GameParticipant.LivingState.DEAD);
 
         GameProfile profile = participant.getProfile();
         Location location = player.getLocation();

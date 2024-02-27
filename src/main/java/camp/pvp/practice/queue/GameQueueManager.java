@@ -149,10 +149,10 @@ public class GameQueueManager {
         return i;
     }
 
-    public int getTotalInQueue(GameQueue.Type queueType) {
+    public int getTotalInQueue(GameQueue.GameType gameType, GameQueue.Type queueType) {
         int i = 0;
         for(GameQueue q : gameQueues) {
-            if(queueType.equals(q.getType())) {
+            if(queueType.equals(q.getType()) && gameType.equals(q.getGameType())) {
                 i += q.getQueueMembers().size();
             }
         }

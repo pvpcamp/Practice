@@ -2,6 +2,7 @@ package camp.pvp.practice.games;
 
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.impl.teams.tasks.HCFEffectUpdater;
+import camp.pvp.practice.games.minigames.QueueableMinigame;
 import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.Practice;
@@ -69,14 +70,18 @@ public class GameManager {
         return i;
     }
 
-    public int getTotalInGame(GameQueue.Type queueType) {
+    public int getTotalInGame(GameQueue.GameType gameType, GameQueue.Type queueType) {
         int i = 0;
         for(Game game : getActiveGames()) {
-            if(game instanceof Duel) {
+            if(game instanceof Duel && gameType.equals(GameQueue.GameType.DUEL)) {
                 Duel duel = (Duel) game;
                 if(duel.getQueueType() != null && duel.getQueueType().equals(queueType)) {
-                    i += game.getAlive().size();
+                    i += game.getCurrentPlaying().size();
                 }
+            }
+
+            if(game instanceof QueueableMinigame && gameType.equals(GameQueue.GameType.MINIGAME)) {
+                i += game.getCurrentPlaying().size();
             }
         }
 

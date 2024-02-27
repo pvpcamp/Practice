@@ -2,6 +2,7 @@ package camp.pvp.practice;
 
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaManager;
+import camp.pvp.practice.commands.*;
 import camp.pvp.practice.cooldowns.CooldownRunnable;
 import camp.pvp.practice.games.GameManager;
 import camp.pvp.practice.kits.EnergyRunnable;
@@ -12,6 +13,7 @@ import camp.pvp.practice.listeners.bukkit.block.BlockPlaceListener;
 import camp.pvp.practice.listeners.bukkit.entity.*;
 import camp.pvp.practice.listeners.bukkit.inventory.InventoryClickListener;
 import camp.pvp.practice.listeners.bukkit.inventory.InventoryMoveItemListener;
+import camp.pvp.practice.listeners.bukkit.player.*;
 import camp.pvp.practice.listeners.bukkit.potion.PotionSplashListener;
 import camp.pvp.practice.listeners.bukkit.projectile.ProjectileHitListener;
 import camp.pvp.practice.listeners.bukkit.projectile.ProjectileLaunchListener;
@@ -21,14 +23,12 @@ import camp.pvp.practice.listeners.packets.EnderpearlSound;
 import camp.pvp.practice.nametags.NameColorRunnable;
 import camp.pvp.practice.parties.PartyManager;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.queue.GameQueueManager;
 import camp.pvp.practice.sidebar.SidebarAdapter;
 import camp.pvp.practice.tasks.TickNumberCounter;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EntityHider;
-import camp.pvp.practice.profiles.GameProfileManager;
-import camp.pvp.practice.commands.*;
-import camp.pvp.practice.listeners.bukkit.player.*;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import io.github.thatkawaiisam.assemble.Assemble;
@@ -157,6 +157,7 @@ public class Practice extends JavaPlugin {
         new SettingsCommand(this);
         new SpectateCommand(this);
         new StatisticsCommand(this);
+        new SurrenderCommand(this);
         new TournamentCommand(this);
         new WhereAmICommand(this);
     }
@@ -178,7 +179,6 @@ public class Practice extends JavaPlugin {
         new InventoryMoveItemListener(this);
 
         new FoodLevelChangeListener(this);
-        new HCFPlayerInteractListener(this);
         new PlayerBucketEmptyListener(this);
         new PlayerChatListener(this);
         new PlayerCommandPreprocessListener(this);

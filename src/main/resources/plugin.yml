@@ -70,6 +70,9 @@ commands:
   statistics:
     aliases: [stats]
     description: View the statistics of yourself or another player.
+  surrender:
+    description: Surrender a game.
+    aliases: [forfeit, suicide, giveup, imdone]
   tournament:
     description: Join, leave, or host a tournament.
   whereami:
@@ -77,13 +80,6 @@ commands:
     permission: practice.commands.whereami
 
 permissions:
-  practice.donator.explorer:
-    description: Explorer donator rank permissions for the Practice plugin.
-      practice.cosmetics
-  practice.donator.adventurer:
-    description: Adventurer donator rank permissions for the Practice plugin.
-  practice.donator.voyager:
-    description: Voyager donator rank permissions for the Practice plugin.
   practice.staff:
     description: Staff permissions for Practice.
   practice.admin:

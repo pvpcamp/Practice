@@ -23,8 +23,7 @@ public class PlayerInteractEntityListener implements Listener {
         Player player = event.getPlayer();
         Entity entity = event.getRightClicked();
 
-        if (!entity.hasMetadata("NPC") && entity instanceof Player) {
-            Player target = (Player) entity;
+        if (!entity.hasMetadata("NPC") && entity instanceof Player target) {
             GameProfileManager gpm = plugin.getGameProfileManager();
             GameProfile profile = gpm.getLoadedProfiles().get(player.getUniqueId());
             GameProfile targetProfile = gpm.getLoadedProfiles().get(target.getUniqueId());

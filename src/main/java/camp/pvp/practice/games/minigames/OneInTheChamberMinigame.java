@@ -14,6 +14,7 @@ import camp.pvp.practice.utils.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
@@ -21,6 +22,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
@@ -30,7 +34,7 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
         super(plugin, uuid);
 
         setKit(GameKit.ONE_IN_THE_CHAMBER);
-        this.setType(Type.ONE_IN_THE_CHAMBER);
+        setType(Type.ONE_IN_THE_CHAMBER);
     }
 
     @Override
@@ -124,6 +128,24 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
 
             killerPlayer.setHealth(killerPlayer.getMaxHealth());
 
+            String message = "&f&l" + killer.getName() + " &6is on a &f&l%s Kill Streak&6!";
+
+            switch(killer.getKillStreak()) {
+                case 3 -> {
+                    announce(message.formatted(killer.getKillStreak()));
+                    playSound(null, Sound.FIREWORK_BLAST, 1F, 1F);
+                    playSound(null, Sound.FIREWORK_TWINKLE, 1F, 1F);
+                    killerPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 80, 1));
+                }
+                case 5, 10, 15 -> {
+                    announce(message.formatted(killer.getKillStreak()));
+                    playSound(null, Sound.FIREWORK_LARGE_BLAST, 1F, 1F);
+                    playSound(null, Sound.FIREWORK_TWINKLE, 1F, 1F);
+                    killerPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40 * killer.getKillStreak(), 1));
+                    killerPlayer.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40 * killer.getKillStreak(), 4));
+                }
+            }
+
             if(killer.getKills() > 14) {
                 end();
             }
@@ -152,7 +174,7 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
 
         for(GameParticipant p : sortedParticipants) {
             if(p.getRespawnTask() != null) p.getRespawnTask().cancel();
-            p.setAlive(true);
+            p.setLivingState(GameParticipant.LivingState.ALIVE);
         }
 
         for(int i = 0; i < Math.min(sortedParticipants.size(), 3); i++) {

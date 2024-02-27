@@ -207,10 +207,8 @@ public class GameProfile {
                         slot = 1;
                         break;
                     case LOBBY:
-                        slot = 2;
-                        break;
                     case LOBBY_PARTY:
-                        slot = 3;
+                        slot = 2;
                         break;
                     default:
                         break;

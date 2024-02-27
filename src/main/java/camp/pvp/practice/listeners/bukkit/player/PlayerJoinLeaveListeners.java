@@ -31,6 +31,13 @@ public class PlayerJoinLeaveListeners implements Listener {
 
         if(name == null) event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "Invalid username.");
 
+        Player player = Bukkit.getPlayer(event.getUniqueId());
+        if(player != null && player.isOnline()) {
+            player.kickPlayer(ChatColor.RED + "You have connected from another location.");
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "You have connected from another location, please re-login.");
+            return;
+        }
+
         plugin.getGameProfileManager().preLogin(uuid, name);
     }
 

@@ -5,6 +5,7 @@ import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.tournaments.Tournament;
+import camp.pvp.practice.kits.CustomGameKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
@@ -22,16 +23,22 @@ import com.lunarclient.apollo.player.ApolloPlayer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
+import org.bukkit.block.*;
+import org.bukkit.block.Chest;
+import org.bukkit.block.Dispenser;
+import org.bukkit.block.Furnace;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -149,7 +156,7 @@ public abstract class Game {
                         }
                     }
 
-                    if(entry.getValue().isAlive()) {
+                    if(entry.getValue().isCurrentlyPlaying()) {
 
                         for(PlayerCooldown cooldown : participant.getCooldowns().values()) {
                             cooldown.remove();
@@ -238,9 +245,17 @@ public abstract class Game {
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
-        if(participant == null || !participant.isAlive()) return;
+        if(participant == null || this.getState().equals(State.ENDED)) return;
 
-        if(this.getState().equals(State.ENDED)) return;
+        if(!participant.isAlive()) {
+            if(leftGame) {
+                participant.setLivingState(GameParticipant.LivingState.DEAD);
+
+                if(participant.getRespawnTask() != null) participant.getRespawnTask().cancel();
+            }
+
+            return;
+        }
 
         Location location = player.getLocation();
 
@@ -271,8 +286,7 @@ public abstract class Game {
         }
 
         if(leftGame) {
-            participant.setCurrentlyPlaying(false);
-            announce("&f" + player.getName() + "&a disconnected.");
+            participant.setLivingState(GameParticipant.LivingState.DEAD);
         } else {
             spectateStart(player);
             announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
@@ -441,6 +455,110 @@ public abstract class Game {
         }
     }
 
+    public void handleInteract(Player player, PlayerInteractEvent event) {
+        GameParticipant participant = getCurrentPlaying().get(player.getUniqueId());
+        ItemStack item = event.getItem();
+        Block block = event.getClickedBlock();
+
+        if(participant == null) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if(participant.isKitApplied()) {
+            switch(player.getItemInHand().getType()) {
+                case MUSHROOM_SOUP:
+                    if(player.getHealth() != player.getMaxHealth()) {
+                        double d = player.getMaxHealth() - player.getHealth() < 7 ? player.getMaxHealth() - player.getHealth() : 7;
+                        player.setHealth(player.getHealth() + d);
+                        player.setFoodLevel(20);
+                        player.setSaturation(20);
+                        item.setType(Material.BOWL);
+                        event.setCancelled(true);
+                    }
+                    break;
+                default:
+                    handleRightClickedItem(player, item);
+            }
+        } else {
+            GameKit kit = getKit();
+            switch(player.getItemInHand().getType()) {
+                case ENCHANTED_BOOK:
+                    int slot = player.getInventory().getHeldItemSlot() + 1;
+                    CustomGameKit cdk = participant.getProfile().getCustomDuelKits().get(kit).get(slot);
+                    if(cdk != null) {
+                        cdk.apply(participant);
+                        participant.setAppliedCustomKit(cdk);
+                        player.updateInventory();
+                    }
+                    break;
+                case BOOK:
+                    kit.apply(participant);
+                    player.updateInventory();
+                    break;
+            }
+        }
+
+        if(getKit().isIssueCooldowns()) {
+            switch (player.getItemInHand().getType()) {
+                case ENDER_PEARL:
+                    PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
+                    if (cooldown != null) {
+                        if (!cooldown.isExpired()) {
+                            player.sendMessage(cooldown.getBlockedMessage());
+                            event.setCancelled(true);
+                            player.updateInventory();
+                        }
+                    }
+                    break;
+            }
+        }
+
+        if(block != null) {
+
+            if(!getState().equals(State.ACTIVE)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if(arena.getType().canModifyArena()) return;
+
+            Material material = block.getType();
+
+            if (material.equals(Material.CHEST) ||
+                    material.equals(Material.TRAPPED_CHEST) ||
+                    material.equals(Material.ENDER_CHEST) ||
+                    material.equals(Material.FURNACE) ||
+                    material.equals(Material.BURNING_FURNACE) ||
+                    material.equals(Material.DISPENSER) ||
+                    material.equals(Material.DROPPER) ||
+                    material.equals(Material.HOPPER) ||
+                    material.equals(Material.BREWING_STAND) ||
+                    material.equals(Material.BEACON) ||
+                    material.equals(Material.ANVIL) ||
+                    material.equals(Material.ENDER_PORTAL_FRAME) ||
+                    material.equals(Material.ENDER_PORTAL) ||
+                    material.equals(Material.BED_BLOCK) ||
+                    material.equals(Material.TRAP_DOOR) ||
+                    material.equals(Material.WOODEN_DOOR) ||
+                    material.equals(Material.WOOD_DOOR) ||
+                    material.equals(Material.NOTE_BLOCK) ||
+                    material.equals(Material.JUKEBOX) ||
+                    material.equals(Material.CAKE_BLOCK) ||
+                    material.equals(Material.WORKBENCH) ||
+                    material.equals(Material.WOOD_BUTTON) ||
+                    material.equals(Material.STONE_BUTTON)
+            )
+            {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    public void handleRightClickedItem(Player player, ItemStack item) {
+        // Implement for games that have ability items.
+    }
+
     public GameParticipant join(Player player) {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
@@ -491,7 +609,9 @@ public abstract class Game {
 
         spectators.put(player.getUniqueId(), new GameSpectator(player.getUniqueId(), player.getName()));
 
-        if(!participants.containsKey(player.getUniqueId())) {
+        GameParticipant participant = participants.get(player.getUniqueId());
+
+        if(participant == null) {
 
             sendSpectateStartMessage(player);
 
@@ -547,7 +667,8 @@ public abstract class Game {
     }
 
     public void leave(Player player) {
-        if(getAlive().containsKey(player.getUniqueId())) {
+        if(getCurrentPlaying().containsKey(player.getUniqueId())) {
+            announce("&f" + player.getName() + "&a disconnected.");
             eliminate(player, true);
         } else {
             spectateEnd(player, true);
@@ -821,7 +942,11 @@ public abstract class Game {
     public Location getRespawnLocation(GameParticipant participant) {
         if(getArena().getType().isRandomSpawnLocation()) {
             Map<Location, Double> distances = new HashMap<>();
-            for(Location l : getArena().getRandomSpawnLocations()) {
+
+            List<Location> locations = new ArrayList<>(getArena().getRandomSpawnLocations());
+            Collections.shuffle(locations);
+
+            for(Location l : locations) {
                 double nearestDistance = Double.MAX_VALUE;
                 for(Player player : getAlivePlayers()) {
                     double distance = player.getLocation().distance(l);

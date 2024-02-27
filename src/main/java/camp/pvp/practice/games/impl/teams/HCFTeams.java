@@ -3,6 +3,7 @@ package camp.pvp.practice.games.impl.teams;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
+import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.TeleportFix;
@@ -15,6 +16,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -130,6 +133,156 @@ public class HCFTeams extends TeamDuel {
     public void handleHit(Player victim, Player attacker, EntityDamageByEntityEvent event) {
         super.handleHit(victim, attacker, event);
         event.setDamage(event.getDamage() * 0.75D);
+    }
+
+    @Override
+    public void handleInteract(Player player, PlayerInteractEvent event) {
+        GameParticipant participant = getCurrentPlaying().get(player.getUniqueId());
+        PlayerCooldown cooldown;
+
+        if(participant.getAppliedHcfKit() == null) {
+            return;
+        }
+
+        switch(participant.getAppliedHcfKit()) {
+            case BARD:
+                switch (player.getItemInHand().getType()) {
+                    case BLAZE_POWDER:
+                        cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENERGY_STRENGTH);
+                        if (cooldown == null || cooldown.isExpired()) {
+
+                            if(participant.getEnergy() < 45) {
+                                player.sendMessage(ChatColor.RED + "You must have 45 energy to use this ability.");
+                                return;
+                            }
+
+                            participant.setEnergy(participant.getEnergy() - 45);
+
+                            for (GameParticipant p : participant.getTeam().getAliveParticipants().values()) {
+                                Player teamPlayer = p.getPlayer();
+                                if (teamPlayer != player && teamPlayer.getLocation().distance(player.getLocation()) < 20) {
+                                    p.applyTemporaryEffect(PotionEffectType.INCREASE_DAMAGE, 6, 1);
+                                }
+                            }
+
+                            participant.getCooldowns().put(PlayerCooldown.Type.ENERGY_STRENGTH, new PlayerCooldown(PlayerCooldown.Type.ENERGY_STRENGTH, participant, player));
+                        } else {
+                            player.sendMessage(cooldown.getBlockedMessage());
+                        }
+                        break;
+                    case GHAST_TEAR:
+                        cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENERGY_REGEN);
+                        if (cooldown == null || cooldown.isExpired()) {
+
+                            if(participant.getEnergy() < 40) {
+                                player.sendMessage(ChatColor.RED + "You must have 40 energy to use this ability.");
+                                return;
+                            }
+
+                            participant.setEnergy(participant.getEnergy() - 40);
+
+                            for (GameParticipant p : participant.getTeam().getAliveParticipants().values()) {
+                                Player teamPlayer = p.getPlayer();
+                                if (teamPlayer.getLocation().distance(player.getLocation()) < 20) {
+                                    p.applyTemporaryEffect(PotionEffectType.REGENERATION, 5, 2);
+                                }
+                            }
+                            participant.getCooldowns().put(PlayerCooldown.Type.ENERGY_REGEN, new PlayerCooldown(PlayerCooldown.Type.ENERGY_REGEN, participant, player));
+                        } else {
+                            player.sendMessage(cooldown.getBlockedMessage());
+                        }
+                        break;
+                    case SUGAR:
+                        cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENERGY_SPEED);
+                        if (cooldown == null || cooldown.isExpired()) {
+
+                            if(participant.getEnergy() < 25) {
+                                player.sendMessage(ChatColor.RED + "You must have 25 energy to use this ability.");
+                                return;
+                            }
+
+                            for (GameParticipant p : participant.getTeam().getAliveParticipants().values()) {
+                                Player teamPlayer = p.getPlayer();
+                                if (teamPlayer.getLocation().distance(player.getLocation()) < 20) {
+                                    p.applyTemporaryEffect(PotionEffectType.SPEED, 10, 2);
+                                }
+                            }
+
+                            participant.getCooldowns().put(PlayerCooldown.Type.ENERGY_SPEED, new PlayerCooldown(PlayerCooldown.Type.ENERGY_SPEED, participant, player));
+                        } else {
+                            player.sendMessage(cooldown.getBlockedMessage());
+                        }
+                        break;
+                    case IRON_INGOT:
+                        cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENERGY_RESISTANCE);
+                        if (cooldown == null || cooldown.isExpired()) {
+
+                            if(participant.getEnergy() < 35) {
+                                player.sendMessage(ChatColor.RED + "You must have 35 energy to use this ability.");
+                                return;
+                            }
+
+                            participant.setEnergy(participant.getEnergy() - 35);
+
+                            for (GameParticipant p : participant.getTeam().getAliveParticipants().values()) {
+                                Player teamPlayer = p.getPlayer();
+                                if (teamPlayer.getLocation().distance(player.getLocation()) < 20) {
+                                    p.applyTemporaryEffect(PotionEffectType.DAMAGE_RESISTANCE, 5, 2);
+                                }
+                            }
+
+                            participant.getCooldowns().put(PlayerCooldown.Type.ENERGY_RESISTANCE, new PlayerCooldown(PlayerCooldown.Type.ENERGY_RESISTANCE, participant, player));
+                        } else {
+                            player.sendMessage(cooldown.getBlockedMessage());
+                        }
+                        break;
+                    case FEATHER:
+                        cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENERGY_JUMP);
+                        if (cooldown == null || cooldown.isExpired()) {
+
+                            if(participant.getEnergy() < 35) {
+                                player.sendMessage(ChatColor.RED + "You must have 35 energy to use this ability.");
+                                return;
+                            }
+
+                            participant.setEnergy(participant.getEnergy() - 35);
+
+                            for (GameParticipant p : participant.getTeam().getAliveParticipants().values()) {
+                                Player teamPlayer = p.getPlayer();
+                                if (teamPlayer.getLocation().distance(player.getLocation()) < 20) {
+                                    p.applyTemporaryEffect(PotionEffectType.JUMP, 10, 5);
+                                }
+                            }
+
+                            participant.getCooldowns().put(PlayerCooldown.Type.ENERGY_JUMP, new PlayerCooldown(PlayerCooldown.Type.ENERGY_JUMP, participant, player));
+                        } else {
+                            player.sendMessage(cooldown.getBlockedMessage());
+                        }
+                        break;
+                }
+                break;
+            case ARCHER:
+                switch(player.getItemInHand().getType()) {
+                    case SUGAR:
+                        cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENERGY_SPEED);
+                        if (cooldown == null || cooldown.isExpired()) {
+
+                            if(participant.getEnergy() < 25) {
+                                player.sendMessage(ChatColor.RED + "You must have 25 energy to use this ability.");
+                                return;
+                            }
+
+                            participant.setEnergy(participant.getEnergy() - 25);
+
+                            participant.applyTemporaryEffect(PotionEffectType.SPEED, 10, 3);
+
+                            participant.getCooldowns().put(PlayerCooldown.Type.ENERGY_SPEED, new PlayerCooldown(PlayerCooldown.Type.ENERGY_SPEED, participant, player));
+                        } else {
+                            player.sendMessage(cooldown.getBlockedMessage());
+                        }
+                        break;
+                }
+        }
     }
 
     @Override
