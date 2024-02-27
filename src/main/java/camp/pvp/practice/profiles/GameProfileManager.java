@@ -30,7 +30,7 @@ public class GameProfileManager {
     private @Getter Map<UUID, MatchRecord> matchRecords;
 
     private @Getter MongoManager mongoManager;
-    private @Getter MongoCollection<Document> profilesCollection, eloCollection, statisticsCollection, matchRecordsCollection;
+    private @Getter String profilesCollectionName, eloCollectionName, statisticsCollectionName, matchRecordsCollectionName;
 
     private BukkitTask leaderboardUpdaterTask, playerVisibilityUpdaterTask;
     private @Getter LeaderboardUpdater leaderboardUpdater;
@@ -45,10 +45,10 @@ public class GameProfileManager {
         FileConfiguration config = plugin.getConfig();
 
         this.mongoManager = new MongoManager(plugin, config.getString("networking.mongo.uri"), config.getString("networking.mongo.database"));
-        this.profilesCollection = mongoManager.getDatabase().getCollection(config.getString("networking.mongo.profiles_collection"));
-        this.eloCollection = mongoManager.getDatabase().getCollection(config.getString("networking.mongo.elo_collection"));
-        this.statisticsCollection = mongoManager.getDatabase().getCollection(config.getString("networking.mongo.statistics_collection"));
-        this.matchRecordsCollection = mongoManager.getDatabase().getCollection(config.getString("networking.mongo.match_records_collection"));
+        this.profilesCollectionName = config.getString("networking.mongo.profiles_collection");
+        this.eloCollectionName = config.getString("networking.mongo.elo_collection");
+        this.statisticsCollectionName = config.getString("networking.mongo.statistics_collection");
+        this.matchRecordsCollectionName = config.getString("networking.mongo.match_records_collection");
 
         this.leaderboardUpdater = new LeaderboardUpdater(this);
         this.leaderboardUpdaterTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, leaderboardUpdater, 0, 6000);
@@ -68,11 +68,12 @@ public class GameProfileManager {
 
         CompletableFuture<GameProfile> profileFuture = CompletableFuture.supplyAsync(() -> {
 
-            Document doc = profilesCollection.find(Filters.regex("name", "(?i)" + name)).first();
+            Document doc = getProfilesCollection().find(Filters.regex("name", "(?i)" + name)).first();
             if(doc != null) {
                 GameProfile p = new GameProfile(doc.get("_id", UUID.class));
                 p.importFromDocument(doc);
 
+                MongoCollection<Document> eloCollection = getEloCollection();
                 eloCollection.find(Filters.eq("_id", p.getUuid())).forEach(document -> {
                     ProfileELO profileELO = new ProfileELO(document.get("_id", UUID.class));
                     profileELO.importFromDocument(document);
@@ -92,6 +93,8 @@ public class GameProfileManager {
                     profileELO.export().forEach((key, value) -> eloCollection.updateOne(Filters.eq("_id", profileELO.getUuid()), Updates.set(key, value)));
                 }
 
+                MongoCollection<Document> statisticsCollection = getStatisticsCollection();
+
                 statisticsCollection.find(Filters.eq("_id", p.getUuid())).forEach(document -> {
                     ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class));
                     profileStatistics.importFromDocument(document);
@@ -109,6 +112,8 @@ public class GameProfileManager {
 
                     profileStatistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", profileStatistics.getUuid()), Updates.set(key, value)));
                 }
+
+                MongoCollection<Document> matchRecordsCollection = getMatchRecordsCollection();
 
                 matchRecordsCollection.find(Filters.or(Filters.eq("winner", p.getUuid()), Filters.eq("loser", p.getUuid()))).forEach(document -> {
                     MatchRecord record = new MatchRecord(document.get("_id", UUID.class));
@@ -138,11 +143,12 @@ public class GameProfileManager {
 
         CompletableFuture<GameProfile> profileFuture = CompletableFuture.supplyAsync(() -> {
 
-            Document doc = profilesCollection.find(new Document("_id", uuid)).first();
+            Document doc = getProfilesCollection().find(new Document("_id", uuid)).first();
             if(doc != null) {
                 GameProfile p = new GameProfile(uuid);
                 p.importFromDocument(doc);
 
+                MongoCollection<Document> eloCollection = getEloCollection();
                 eloCollection.find(Filters.eq("_id", p.getUuid())).forEach(document -> {
                     ProfileELO profileELO = new ProfileELO(document.get("_id", UUID.class));
                     profileELO.importFromDocument(document);
@@ -162,6 +168,7 @@ public class GameProfileManager {
                     profileELO.export().forEach((key, value) -> eloCollection.updateOne(Filters.eq("_id", profileELO.getUuid()), Updates.set(key, value)));
                 }
 
+                MongoCollection<Document> statisticsCollection = getStatisticsCollection();
                 statisticsCollection.find(Filters.eq("_id", p.getUuid())).forEach(document -> {
                     ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class));
                     profileStatistics.importFromDocument(document);
@@ -180,6 +187,7 @@ public class GameProfileManager {
                     profileStatistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", profileStatistics.getUuid()), Updates.set(key, value)));
                 }
 
+                MongoCollection<Document> matchRecordsCollection = getMatchRecordsCollection();
                 matchRecordsCollection.find(Filters.or(Filters.eq("winner", p.getUuid()), Filters.eq("loser", p.getUuid()))).forEach(document -> {
                     MatchRecord record = new MatchRecord(document.get("_id", UUID.class));
                     record.importFromDocument(document);
@@ -242,6 +250,7 @@ public class GameProfileManager {
     public void preLogin(UUID uuid, String name) {
         GameProfile profile = null;
 
+        MongoCollection<Document> profilesCollection = getProfilesCollection();
         Document doc = profilesCollection.find().filter(new Document("_id", uuid)).first();
         if(doc != null) {
             profile = new GameProfile(uuid);
@@ -261,6 +270,8 @@ public class GameProfileManager {
         }
 
         final GameProfile fProfile = profile;
+
+        MongoCollection<Document> eloCollection = getEloCollection();
         eloCollection.find(Filters.eq("_id", uuid)).forEach(document -> {
             ProfileELO profileELO = new ProfileELO(document.get("_id", UUID.class));
             profileELO.importFromDocument(document);
@@ -277,7 +288,7 @@ public class GameProfileManager {
             exportElo(profileELO);
         }
 
-        statisticsCollection.find(Filters.eq("_id", uuid)).forEach(document -> {
+        getStatisticsCollection().find(Filters.eq("_id", uuid)).forEach(document -> {
             ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class));
             profileStatistics.importFromDocument(document);
             fProfile.setProfileStatistics(profileStatistics);
@@ -290,7 +301,7 @@ public class GameProfileManager {
             exportStatistics(profileStatistics, true);
         }
 
-        matchRecordsCollection.find(Filters.or(Filters.eq("winner", uuid), Filters.eq("loser", uuid))).forEach(document -> {
+        getMatchRecordsCollection().find(Filters.or(Filters.eq("winner", uuid), Filters.eq("loser", uuid))).forEach(document -> {
             MatchRecord record = new MatchRecord(document.get("_id", UUID.class));
             record.importFromDocument(document);
             matchRecords.put(record.getUuid(), record);
@@ -313,15 +324,16 @@ public class GameProfileManager {
 
         if(async) {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                profile.export().forEach((key, value) -> profilesCollection.updateOne(Filters.eq("_id", uuid), Updates.set(key, value)));
+                profile.export().forEach((key, value) -> getProfilesCollection().updateOne(Filters.eq("_id", uuid), Updates.set(key, value)));
             });
         } else {
-            profile.export().forEach((key, value) -> profilesCollection.updateOne(Filters.eq("_id", uuid), Updates.set(key, value)));
+            profile.export().forEach((key, value) -> getProfilesCollection().updateOne(Filters.eq("_id", uuid), Updates.set(key, value)));
         }
     }
 
     public void exportElo(ProfileELO elo) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            MongoCollection<Document> eloCollection = getEloCollection();
             Document doc = eloCollection.find().filter(Filters.eq("_id", elo.getUuid())).first();
             if(doc == null) {
                 eloCollection.insertOne(new Document("_id", elo.getUuid()));
@@ -334,7 +346,7 @@ public class GameProfileManager {
     public void exportStatistics(ProfileStatistics statistics, boolean async) {
         if(async) {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-
+                MongoCollection<Document> statisticsCollection = getStatisticsCollection();
                 Document doc = statisticsCollection.find().filter(Filters.eq("_id", statistics.getUuid())).first();
                 if(doc == null) {
                     statisticsCollection.insertOne(new Document("_id", statistics.getUuid()));
@@ -344,6 +356,7 @@ public class GameProfileManager {
             });
         } else {
 
+            MongoCollection<Document> statisticsCollection = getStatisticsCollection();
             Document doc = statisticsCollection.find().filter(Filters.eq("_id", statistics.getUuid())).first();
             if(doc == null) {
                 statisticsCollection.insertOne(new Document("_id", statistics.getUuid()));
@@ -357,6 +370,7 @@ public class GameProfileManager {
         matchRecords.put(record.getUuid(), record);
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 
+            MongoCollection<Document> matchRecordsCollection = getMatchRecordsCollection();
             Document doc = matchRecordsCollection.find().filter(Filters.eq("_id", record.getUuid())).first();
             if(doc == null) {
                 matchRecordsCollection.insertOne(new Document("_id", record.getUuid()));
@@ -366,10 +380,26 @@ public class GameProfileManager {
         });
     }
 
+    public MongoCollection<Document> getProfilesCollection() {
+        return mongoManager.getDatabase().getCollection(profilesCollectionName);
+    }
+
+    public MongoCollection<Document> getEloCollection() {
+        return mongoManager.getDatabase().getCollection(eloCollectionName);
+    }
+
+    public MongoCollection<Document> getStatisticsCollection() {
+        return mongoManager.getDatabase().getCollection(statisticsCollectionName);
+    }
+
+    public MongoCollection<Document> getMatchRecordsCollection() {
+        return mongoManager.getDatabase().getCollection(matchRecordsCollectionName);
+    }
+
     public void shutdown() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             GameProfile profile = loadedProfiles.get(player.getUniqueId());
-            profile.getProfileStatistics().export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", player.getUniqueId()), Updates.set(key, value)));
+            profile.getProfileStatistics().export().forEach((key, value) -> getStatisticsCollection().updateOne(Filters.eq("_id", player.getUniqueId()), Updates.set(key, value)));
             exportToDatabase(player.getUniqueId(), false);
         }
 

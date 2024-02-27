@@ -138,7 +138,6 @@ public class ChooseQueueGui extends StandardGui {
                     "&6Playing: &f" + plugin.getGameManager().getTotalInGame(GameQueue.GameType.MINIGAME, GameQueue.Type.UNRANKED),
                     " ",
                     "&7Click to view minigame queues.");
-            guiButton.setLore("&7Click to view minigame queues.");
         });
 
         minigames.setSlot(14);
