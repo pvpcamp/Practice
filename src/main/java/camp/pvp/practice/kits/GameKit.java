@@ -259,7 +259,14 @@ public enum GameKit {
     }
 
     public boolean isFallDamage() {
-        return !this.equals(BED_FIGHT);
+        switch (this) {
+            case BED_FIGHT, ONE_IN_THE_CHAMBER, SUMO -> {
+                return false;
+            }
+            default -> {
+                return true;
+            }
+        }
     }
 
     public boolean isShowArrowDamage() {

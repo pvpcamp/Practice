@@ -177,11 +177,13 @@ public abstract class Game {
                 spectateEnd(player, true);
             }
 
-            Practice.getInstance().getGameProfileManager().updateGlobalPlayerVisibility();
+            plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
             getArena().resetArena();
 
             setState(State.INACTIVE);
+
+            plugin.getGameManager().getGames().remove(getUuid());e
         }, delay * 20L);
     }
 

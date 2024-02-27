@@ -150,7 +150,7 @@ public class GameParticipant {
 
                     getRespawnTask().cancel();
                 } else {
-                    getPlayer().sendMessage(ChatColor.GREEN + "Respawning in " + time + " second(s).");
+                    getPlayer().sendMessage(ChatColor.GREEN + "Respawning in " + time + " second" + (time == 1 ? "" : "s") + ".");
                     time--;
                 }
             }

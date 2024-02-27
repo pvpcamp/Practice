@@ -90,7 +90,7 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
                  &7● &6Minigame: &fOne In The Chamber
                  &7● &6Arena: &f%s
                  &7● &6Participants: &f%s
-                 
+                 \n
                  """.formatted(arena.getDisplayName(), sb);
 
         for(GameParticipant participant : getParticipants().values()) {
@@ -124,7 +124,7 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
 
             killerPlayer.setHealth(killerPlayer.getMaxHealth());
 
-            if(killer.getKills() > 19) {
+            if(killer.getKills() > 14) {
                 end();
             }
         }
@@ -146,24 +146,31 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
             getStartingTimer().cancel();
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(" \n&6&lMatch ended.");
-        stringBuilder.append("\n &7● &6Winner: &f" + winner.getName());
-        stringBuilder.append(" \n");
-        stringBuilder.append(" \n&6&lKills:");
-
+        StringBuilder topPlayers = new StringBuilder();
         List<GameParticipant> sortedParticipants = new ArrayList<>(this.getParticipants().values());
         sortedParticipants.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
 
         for(GameParticipant p : sortedParticipants) {
             if(p.getRespawnTask() != null) p.getRespawnTask().cancel();
             p.setAlive(true);
-
-            stringBuilder.append("\n &f" + p.getName() + " &7- &f" + p.getKills() + " Kill(s)");
         }
 
+        for(int i = 0; i < Math.min(sortedParticipants.size(), 3); i++) {
+            GameParticipant p = sortedParticipants.get(i);
+            topPlayers.append("\n &7● &6" + (i + 1) + ": &f" + p.getName() + " &7- &f" + p.getKills() + " Kill" + (p.getKills() == 1 ? "" : "s"));
+        }
+
+        String endMessage = """
+                
+                &6&lMinigame finished.
+                 &7● &6Winner: &f%s
+                 \n
+                &6&lTop Players: %s
+                 \n
+                """.formatted(winner.getName(), topPlayers.toString());
+
         for(Player player : this.getAllPlayers()) {
-            player.sendMessage(Colors.get(stringBuilder.toString()));
+            player.sendMessage(Colors.get(endMessage));
         }
 
         cleanup(3);
@@ -179,39 +186,37 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
             case STARTING -> {
                 lines.add("&6Minigame: &fOITC");
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
-                lines.add("&7&oFirst to 20 kills wins!");
+                lines.add("&6Players: &f" + this.getCurrentPlaying().size());
                 lines.add(" ");
-
-                lines.add("&6Players:");
-                for(GameParticipant p : this.getCurrentPlaying().values()) {
-                    lines.add("&f" + p.getName());
-                }
+                lines.add("&7&oFirst to 15 kills wins!");
             }
             case ACTIVE -> {
-                boolean addSpace = false;
-                if(profile.isSidebarShowPing()) {
-                    addSpace = true;
-                    lines.add("&6Ping: &f" + PlayerUtils.getPing(profile.getPlayer()));
-                }
 
-                if(profile.isSidebarShowDuration()) {
-                    addSpace = true;
-                    lines.add("&6Duration: &f" + TimeUtil.get(getStarted()));
-                }
-
-                if(addSpace) lines.add(" ");
-
-                lines.add("&6Kills:");
+                lines.add("&6Top Players:");
 
                 List<GameParticipant> sp = new ArrayList<>(this.getCurrentPlaying().values());
                 sp.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
 
-                for(GameParticipant p : sp) {
-                    lines.add(p.getName() + " &7" + p.getKills());
+                for(int i = 0; i < Math.min(sp.size(), 3); i++) {
+                    GameParticipant p = sp.get(i);
+                    lines.add((p.equals(self) ? "&a&o" : "&c") + p.getName() + " &7" + p.getKills());
+                }
+
+                lines.add(" ");
+
+                lines.add("&6Kills: &f" + self.getKills());
+
+                if(profile.isSidebarShowPing()) {
+                    lines.add("&6Ping: &f" + PlayerUtils.getPing(profile.getPlayer()) + " ms");
+                }
+
+                if(profile.isSidebarShowDuration()) {
+                    lines.add("&6Duration: &f" + TimeUtil.get(getStarted()));
                 }
             }
             case ENDED -> {
                 lines.add("&6Winner: &f" + getWinner().getName());
+                lines.add("&6Kills: &f" + self.getKills());
 
                 if(profile.isSidebarShowDuration()) {
                     lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
@@ -231,31 +236,24 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
             case STARTING -> {
                 lines.add("&6Minigame: &fOITC");
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
-                lines.add("&7&oFirst to 20 kills wins!");
+                lines.add("&6Players: &f" + this.getCurrentPlaying().size());
                 lines.add(" ");
-
-                lines.add("&6Players:");
-                for(GameParticipant p : this.getCurrentPlaying().values()) {
-                    lines.add("&f" + p.getName());
-                }
+                lines.add("&7&oFirst to 15 kills wins!");
             }
             case ACTIVE -> {
-                boolean addSpace = false;
-
-                if(profile.isSidebarShowDuration()) {
-                    addSpace = true;
-                    lines.add("&6Duration: &f" + TimeUtil.get(getStarted()));
-                }
-
-                if(addSpace) lines.add(" ");
-
-                lines.add("&6Kills:");
+                lines.add("&6Top Players:");
 
                 List<GameParticipant> sp = new ArrayList<>(this.getCurrentPlaying().values());
                 sp.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
 
-                for(GameParticipant p : sp) {
+                for(int i = 0; i < Math.min(sp.size(), 3); i++) {
+                    GameParticipant p = sp.get(i);
                     lines.add(p.getName() + " &7" + p.getKills());
+                }
+
+                if(profile.isSidebarShowDuration()) {
+                    lines.add(" ");
+                    lines.add("&6Duration: &f" + TimeUtil.get(getStarted()));
                 }
             }
             case ENDED -> {

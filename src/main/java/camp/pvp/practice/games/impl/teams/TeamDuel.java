@@ -159,12 +159,14 @@ public class TeamDuel extends TeamGame {
                 break;
             case ACTIVE:
                 if(showDuration) {
+                    lines.add(" ");
                     lines.add("&6Duration: &f" + TimeUtil.get(new Date(), getStarted()));
                 }
 
                 break;
             case ENDED:
                 if(showDuration) {
+                    lines.add(" ");
                     lines.add("&6Duration: &f&n" + TimeUtil.get(getEnded(), getStarted()));
                 }
                 break;
@@ -204,7 +206,7 @@ public class TeamDuel extends TeamGame {
 
         StringBuilder sb = new StringBuilder();
         sb.append(" ");
-        sb.append("\n&6&lTeam duel starting in 5 seconds.");
+        sb.append("\n&6&lTeam Duel starting in 5 seconds.");
         sb.append("\n &7● &6Kit: &f" + getKit().getDisplayName());
         sb.append("\n &7● &6Map: &f" + arena.getDisplayName());
 
