@@ -5,6 +5,7 @@ import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfileManager;
 import lombok.Getter;
 import org.bson.Document;
+import org.bukkit.Bukkit;
 
 import java.util.*;
 
@@ -19,6 +20,10 @@ public class LeaderboardUpdater implements Runnable{
 
     @Override
     public void run() {
+
+        if(Bukkit.getOnlinePlayers().isEmpty()) {
+            return;
+        }
 
         long start = System.currentTimeMillis();
 
