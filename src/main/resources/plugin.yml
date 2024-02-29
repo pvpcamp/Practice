@@ -80,12 +80,24 @@ commands:
     permission: practice.commands.whereami
 
 permissions:
+  # General Staff Permissions
   practice.staff:
     description: Staff permissions for Practice.
   practice.admin:
     description: Admin permissions for Practice.
     children:
       practice.*: true
+  # Donator Permissions
+  practice.cosmetics.death_animation:
+    description: Allows a player to change their death animation.
+  practice.cosmetics.sidebar_settings:
+    description: Allows a player to customize their sidebar settings.
+  practice.duel_requests.map_selection:
+    description: Allows a player to select a map for duel requests.
+  practice.lobby.fly:
+    description: Allows a player to fly in the lobby.
+
+  # Commands
   practice.commands.arena:
     description: Allows the player to use the arena command.
   practice.commands.arenaposition:

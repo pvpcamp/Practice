@@ -71,16 +71,26 @@ public class ArenaManager {
             }
         }
 
+        arenas.forEach(arena -> {
+            if(!arena.hasValidPositions()) {
+                arenas.remove(arena);
+            }
+        });
+
         Collections.shuffle(arenas);
-        if(arenas.isEmpty()) {
-            return null;
-        } else {
-            return arenas.get(0);
-        }
+
+        return arenas.isEmpty() ? null : arenas.get(0);
     }
 
     public Arena selectRandomArena(Arena.Type type) {
-        List<Arena> arenas = new ArrayList<>(getArenaForType(type));
+        List<Arena> arenas = getArenaForType(type);
+
+        arenas.forEach(arena -> {
+            if(!arena.hasValidPositions()) {
+                arenas.remove(arena);
+            }
+        });
+
         Collections.shuffle(arenas);
 
         return arenas.isEmpty() ? null : arenas.get(0);
@@ -98,9 +108,25 @@ public class ArenaManager {
 
     public List<Arena> getArenaForType(Arena.Type type) {
         List<Arena> arenas = new ArrayList<>();
-        for(Arena arena : getArenas()) {
-            if(arena.isEnabled() && !arena.isInUse() && !arena.isCopy() && arena.getType().equals(type)) {
-                arenas.add(arena);
+
+        if(type.isBuild()) {
+            for(Arena a : getOriginalArenas()) {
+
+                if(!a.isEnabled()) continue;
+
+                if(!a.getType().equals(type)) continue;
+
+                for (Arena copy : getArenaCopies(a)) {
+                    if (copy.isEnabled() && !copy.isInUse()) {
+                        arenas.add(copy);
+                    }
+                }
+            }
+        } else {
+            for (Arena arena : getArenas()) {
+                if (arena.isEnabled() && !arena.isInUse() && !arena.isCopy() && arena.getType().equals(type)) {
+                    arenas.add(arena);
+                }
             }
         }
 

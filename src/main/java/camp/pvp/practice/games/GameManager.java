@@ -2,7 +2,7 @@ package camp.pvp.practice.games;
 
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.impl.teams.tasks.HCFEffectUpdater;
-import camp.pvp.practice.games.minigames.QueueableMinigame;
+import camp.pvp.practice.games.minigames.Minigame;
 import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.Practice;
@@ -80,7 +80,7 @@ public class GameManager {
                 }
             }
 
-            if(game instanceof QueueableMinigame && gameType.equals(GameQueue.GameType.MINIGAME)) {
+            if(game instanceof Minigame && gameType.equals(GameQueue.GameType.MINIGAME)) {
                 i += game.getCurrentPlaying().size();
             }
         }

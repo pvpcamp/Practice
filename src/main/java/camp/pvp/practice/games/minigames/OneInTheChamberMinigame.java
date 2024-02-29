@@ -7,7 +7,6 @@ import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.GameProfileManager;
-import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
@@ -15,20 +14,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
-public class OneInTheChamberMinigame extends QueueableMinigame{
+public class OneInTheChamberMinigame extends Minigame {
 
     public OneInTheChamberMinigame(Practice plugin, UUID uuid) {
         super(plugin, uuid);
@@ -56,16 +50,6 @@ public class OneInTheChamberMinigame extends QueueableMinigame{
         Arena arena = getArena();
 
         arena.prepare();
-
-        if(!arena.hasValidPositions()) {
-            for(Player p : getAlivePlayers()) {
-                GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
-                p.sendMessage(ChatColor.RED + "The arena " + arena.getName() + " does not have valid spawn points, please notify a staff member.");
-                profile.setGame(null);
-                profile.playerUpdate(true);
-            }
-            return;
-        }
 
         this.setState(State.STARTING);
 

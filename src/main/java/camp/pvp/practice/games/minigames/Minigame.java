@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.UUID;
 
 
-public abstract class QueueableMinigame extends Game {
+public abstract class Minigame extends Game {
 
     @Getter @Setter private Type type;
     @Getter @Setter private GameParticipant winner;
     @Getter @Setter private Party party;
 
-    protected QueueableMinigame(Practice plugin, UUID uuid) {
+    protected Minigame(Practice plugin, UUID uuid) {
         super(plugin, uuid);
     }
 

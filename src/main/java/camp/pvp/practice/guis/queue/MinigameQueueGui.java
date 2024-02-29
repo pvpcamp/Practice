@@ -1,8 +1,7 @@
 package camp.pvp.practice.guis.queue;
 
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.games.GameManager;
-import camp.pvp.practice.games.minigames.QueueableMinigame;
+import camp.pvp.practice.games.minigames.Minigame;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.utils.buttons.GuiButton;
@@ -27,7 +26,7 @@ public class MinigameQueueGui extends ArrangedGui {
         back.setOverrideGuiArrangement(true);
         addButton(back);
 
-        for(QueueableMinigame.Type minigame : QueueableMinigame.Type.values()) {
+        for(Minigame.Type minigame : Minigame.Type.values()) {
             GuiButton button = new GuiButton(minigame.getMaterial(), "&6&l" + minigame.toString());
             button.setCloseOnClick(true);
             button.setButtonUpdater((b, g) -> {

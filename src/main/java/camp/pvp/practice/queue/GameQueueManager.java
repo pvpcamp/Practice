@@ -1,6 +1,6 @@
 package camp.pvp.practice.queue;
 
-import camp.pvp.practice.games.minigames.QueueableMinigame;
+import camp.pvp.practice.games.minigames.Minigame;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.GameKit;
@@ -53,7 +53,7 @@ public class GameQueueManager {
         return null;
     }
 
-    public GameQueueMember addToQueue(Player player, QueueableMinigame.Type minigameType, GameQueue.Type queueType) {
+    public GameQueueMember addToQueue(Player player, Minigame.Type minigameType, GameQueue.Type queueType) {
         GameQueue queue = getQueue(minigameType, queueType);
 
         if(getQueue(player) != null) return null;
@@ -130,7 +130,7 @@ public class GameQueueManager {
         return null;
     }
 
-    public GameQueue getQueue(QueueableMinigame.Type minigameType, GameQueue.Type queueType) {
+    public GameQueue getQueue(Minigame.Type minigameType, GameQueue.Type queueType) {
         for(GameQueue q : getGameQueues()) {
             if(q.getMinigameType() != null && q.getMinigameType().equals(minigameType) && q.getType().equals(queueType)) {
                 return q;
@@ -195,7 +195,7 @@ public class GameQueueManager {
             }
         }
 
-        for(QueueableMinigame.Type minigameType : QueueableMinigame.Type.values()) {
+        for(Minigame.Type minigameType : Minigame.Type.values()) {
             GameQueue queue = new GameQueue(plugin, minigameType, GameQueue.Type.UNRANKED);
             queue.startQueue();
             addQueue(queue);

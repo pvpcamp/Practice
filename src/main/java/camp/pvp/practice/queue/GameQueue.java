@@ -2,7 +2,7 @@ package camp.pvp.practice.queue;
 
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.minigames.OneInTheChamberMinigame;
-import camp.pvp.practice.games.minigames.QueueableMinigame;
+import camp.pvp.practice.games.minigames.Minigame;
 import camp.pvp.practice.games.minigames.SkywarsMinigame;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
@@ -62,7 +62,7 @@ public class GameQueue {
     private final GameType gameType;
     private final Type type;
     private GameKit gameKit;
-    private QueueableMinigame.Type minigameType;
+    private Minigame.Type minigameType;
     private Queue<GameQueueMember> queueMembers;
     private BukkitTask queueTask;
     private boolean available;
@@ -76,7 +76,7 @@ public class GameQueue {
         this.available = true;
     }
 
-    public GameQueue(Practice plugin, QueueableMinigame.Type minigameType, Type type) {
+    public GameQueue(Practice plugin, Minigame.Type minigameType, Type type) {
         this.plugin = plugin;
         this.gameType = GameType.MINIGAME;
         this.minigameType = minigameType;
@@ -102,7 +102,7 @@ public class GameQueue {
             }
             case MINIGAME -> {
                 for(Game game : getPlugin().getGameManager().getActiveGames()) {
-                    if(game instanceof QueueableMinigame && ((QueueableMinigame) game).getType().equals(minigameType)) {
+                    if(game instanceof Minigame && ((Minigame) game).getType().equals(minigameType)) {
                         i += game.getAlive().size();
                     }
                 }
@@ -192,7 +192,7 @@ public class GameQueue {
                     member3 = queueMembers.poll();
                     member4 = queueMembers.poll();
 
-                    QueueableMinigame minigame;
+                    Minigame minigame;
 
                     switch(getMinigameType()) {
                         case SKYWARS:
