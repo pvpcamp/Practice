@@ -92,16 +92,7 @@ public abstract class Minigame extends Game {
         }
 
         public int getMinPlayers() {
-            switch(this) {
-                case SKYWARS -> {
-                    return 4;
-                }
-                case ONE_IN_THE_CHAMBER -> {
-                    return 2;
-                }
-            }
-
-            return 0;
+            return 2;
         }
 
         public int getMaxPlayers() {
