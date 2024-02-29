@@ -35,12 +35,12 @@ public class MinigameHostGui extends PaginatedGui {
         final Minigame.Type skywarsType = Minigame.Type.SKYWARS;
         GuiButton skywars = new GuiButton(skywarsType.getMaterial(), "&6&l" + skywarsType.toString());
 
-        List<String> lore = new ArrayList<>(skywarsType.getDescription());
-        lore.add(" ");
-        lore.add("&6Min/Max Players: &f" + skywarsType.getMinPlayers() + "&7/&f" + skywarsType.getMaxPlayers());
-        lore.add(" ");
-        lore.add("&7Click to host this minigame.");
-        skywars.setLore(lore);
+        List<String> skywarsLore = new ArrayList<>(skywarsType.getDescription());
+        skywarsLore.add(" ");
+        skywarsLore.add("&6Min/Max Players: &f" + skywarsType.getMinPlayers() + "&7/&f" + skywarsType.getMaxPlayers());
+        skywarsLore.add(" ");
+        skywarsLore.add("&7Click to host this minigame.");
+        skywars.setLore(skywarsLore);
 
         skywars.setAction((player, button, gui, clickType) -> {
             if(party.getMembers().size() < skywarsType.getMinPlayers()) {
@@ -86,12 +86,12 @@ public class MinigameHostGui extends PaginatedGui {
         final Minigame.Type oitcType = Minigame.Type.ONE_IN_THE_CHAMBER;
         GuiButton oitc = new GuiButton(oitcType.getMaterial(), "&6&l" + oitcType.toString());
 
-        List<String> lore = new ArrayList<>(oitcType.getDescription());
-        lore.add(" ");
-        lore.add("&6Min/Max Players: &f" + oitcType.getMinPlayers() + "&7/&f" + oitcType.getMaxPlayers());
-        lore.add(" ");
-        lore.add("&7Click to host this minigame.");
-        oitc.setLore(lore);
+        List<String> oitcLore = new ArrayList<>(oitcType.getDescription());
+        oitcLore.add(" ");
+        oitcLore.add("&6Min/Max Players: &f" + oitcType.getMinPlayers() + "&7/&f" + oitcType.getMaxPlayers());
+        oitcLore.add(" ");
+        oitcLore.add("&7Click to host this minigame.");
+        oitc.setLore(oitcLore);
 
         oitc.setAction((player, button, gui, clickType) -> {
             if(party.getMembers().size() < oitcType.getMinPlayers()) {
