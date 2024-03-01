@@ -79,6 +79,16 @@ public class CustomGameKit {
         return map;
     }
 
+    public void setItems(ItemStack[] items) {
+        for(ItemStack i : items) {
+            if (i == null) continue;
+            if (i.getType().equals(Material.AIR)) continue;
+            if (i.getAmount() == 0) i.setAmount(1);
+        }
+
+        this.items = items;
+    }
+
     public void apply(Player player) {
         PlayerInventory pi = player.getInventory();
         GameInventory gi = gameKit.getGameInventory();
