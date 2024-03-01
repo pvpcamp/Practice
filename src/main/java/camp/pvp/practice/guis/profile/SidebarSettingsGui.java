@@ -36,7 +36,7 @@ public class SidebarSettingsGui extends StandardGui {
             }
         });
         visibilityInGame.setSlot(11);
-        this.addButton(visibilityInGame, false);
+        addButton(visibilityInGame);
 
         GuiButton sidebarShowDuration = new GuiButton(Material.WATCH, "&a&lShow Game Duration");
         sidebarShowDuration.setAction(new GuiAction() {
@@ -58,7 +58,7 @@ public class SidebarSettingsGui extends StandardGui {
             }
         });
         sidebarShowDuration.setSlot(12);
-        this.addButton(sidebarShowDuration, false);
+        addButton(sidebarShowDuration);
 
         GuiButton sidebarShowCps = new GuiButton(Material.LEASH, "&a&lShow CPS");
         sidebarShowCps.setAction(new GuiAction() {
@@ -80,7 +80,7 @@ public class SidebarSettingsGui extends StandardGui {
             }
         });
         sidebarShowCps.setSlot(13);
-        this.addButton(sidebarShowCps, false);
+        addButton(sidebarShowCps);
 
         GuiButton sidebarShowLines = new GuiButton(Material.EMPTY_MAP, "&a&lShow Lines");
         sidebarShowLines.setAction(new GuiAction() {
@@ -102,7 +102,7 @@ public class SidebarSettingsGui extends StandardGui {
             }
         });
         sidebarShowLines.setSlot(14);
-        this.addButton(sidebarShowLines, false);
+        addButton(sidebarShowLines);
 
         GuiButton sidebarShowPing = new GuiButton(Material.BEACON, "&a&lShow Ping");
         sidebarShowPing.setAction(new GuiAction() {
@@ -124,16 +124,16 @@ public class SidebarSettingsGui extends StandardGui {
             }
         });
         sidebarShowPing.setSlot(15);
-        this.addButton(sidebarShowPing, false);
+        addButton(sidebarShowPing);
 
-        GuiButton back = new GuiButton(Material.ARROW, "&cBack to Settings");
+        GuiButton back = new GuiButton(Material.ARROW, "&c&lBack");
         back.setAction(new GuiAction() {
             @Override
             public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 new SettingsGui(profile).open(player);
             }
         });
-        back.setSlot(18);
-        this.addButton(back, false);
+        back.setSlot(0);
+        addButton(back);
     }
 }

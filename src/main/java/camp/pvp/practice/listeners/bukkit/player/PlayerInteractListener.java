@@ -107,6 +107,7 @@ public class PlayerInteractListener implements Listener {
             } else if(profile.getState().equals(GameProfile.State.KIT_EDITOR)) {
 
                 if(block == null) {
+                    event.setCancelled(true);
                     return;
                 }
 

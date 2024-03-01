@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 public enum GameKit {
-    NO_DEBUFF, BOXING, BED_FIGHT, SUMO, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, STRATEGY, ONE_IN_THE_CHAMBER;
+    NO_DEBUFF, BOXING, BED_FIGHT, SUMO, DEBUFF, ARCHER, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, STRATEGY, ONE_IN_THE_CHAMBER;
 
     public String getDisplayName() {
         switch(this) {
@@ -142,6 +142,7 @@ public enum GameKit {
             case SPLEEF:
             case BED_FIGHT:
             case ONE_IN_THE_CHAMBER:
+            case ARCHER:
                 return false;
             default:
                 return true;
@@ -156,6 +157,8 @@ public enum GameKit {
             case INVADED:
             case CLASSIC:
             case ONE_IN_THE_CHAMBER:
+            case SKYWARS:
+            case ARCHER:
                 return true;
             default:
                 return false;
@@ -232,6 +235,7 @@ public enum GameKit {
             case SUMO:
             case SPLEEF:
             case ONE_IN_THE_CHAMBER:
+            case ARCHER:
                 return false;
             default:
                 return true;
@@ -244,6 +248,7 @@ public enum GameKit {
             case SUMO:
             case SPLEEF:
             case ONE_IN_THE_CHAMBER:
+            case ARCHER:
                 return false;
             default:
                 return true;
@@ -255,7 +260,12 @@ public enum GameKit {
     }
 
     public boolean isArrowPickup() {
-        return !this.equals(ONE_IN_THE_CHAMBER);
+        switch(this) {
+            case ARCHER, ONE_IN_THE_CHAMBER:
+                return false;
+            default:
+                return true;
+        }
     }
 
     public boolean isFallDamage() {
@@ -286,6 +296,14 @@ public enum GameKit {
                 break;
             case HCF:
                 item = new ItemStack(Material.FENCE);
+                break;
+            case DEBUFF:
+                potion = new Potion(PotionType.POISON);
+                potion.setSplash(true);
+                item = potion.toItemStack(1);
+                break;
+            case ARCHER:
+                item = new ItemStack(Material.BOW);
                 break;
             case CLASSIC:
                 item = new ItemStack(Material.DIAMOND_SWORD);
@@ -326,6 +344,19 @@ public enum GameKit {
         GameInventory inventory = new GameInventory();
         ItemStack[] armor = inventory.getArmor(), inv = inventory.getInventory();
         switch(this) {
+            case DEBUFF:
+                Potion poison = new Potion(PotionType.POISON, 1);
+                poison.setSplash(true);
+
+                Potion slowness = new Potion(PotionType.SLOWNESS, 1);
+                slowness.setSplash(true);
+
+                inv[9] = poison.toItemStack(1);
+                inv[10] = slowness.toItemStack(1);
+                inv[18] = poison.toItemStack(1);
+                inv[19] = slowness.toItemStack(1);
+                inv[27] = poison.toItemStack(1);
+                inv[28] = slowness.toItemStack(1);
             case NO_DEBUFF:
                 armor[3] = new ItemStack(Material.DIAMOND_HELMET);
                 armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
@@ -420,6 +451,21 @@ public enum GameKit {
                 inv[1] = new ItemStack(Material.IRON_PICKAXE);
                 inv[2] = new ItemStack(Material.IRON_AXE);
 
+                break;
+            case ARCHER:
+                armor[3] = new ItemStack(Material.LEATHER_HELMET);
+                armor[2] = new ItemStack(Material.LEATHER_CHESTPLATE);
+                armor[1] = new ItemStack(Material.LEATHER_LEGGINGS);
+                armor[0] = new ItemStack(Material.LEATHER_BOOTS);
+
+                inv[0] = new ItemStack(Material.BOW);
+                inv[0].addEnchantment(Enchantment.ARROW_INFINITE, 1);
+
+                Potion nightVision = new Potion(PotionType.NIGHT_VISION, 1);
+                nightVision.setHasExtendedDuration(true);
+                inv[1] = nightVision.toItemStack(1);
+
+                inv[9] = new ItemStack(Material.ARROW);
                 break;
             case HCF:
                 armor[3] = new ItemStack(Material.DIAMOND_HELMET);
@@ -591,7 +637,7 @@ public enum GameKit {
                 inv[3] = new ItemStack(Material.WOOD, 64);
                 inv[4] = new ItemStack(Material.ENDER_PEARL, 2);
 
-                Potion slowness = new Potion(PotionType.SLOWNESS, 1);
+                slowness = new Potion(PotionType.SLOWNESS, 1);
                 slowness.setSplash(true);
 
                 inv[5] = slowness.toItemStack(1);

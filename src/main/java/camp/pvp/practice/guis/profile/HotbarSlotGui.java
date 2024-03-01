@@ -42,6 +42,12 @@ public class HotbarSlotGui extends StandardGui {
                     guiButton.setLore(lore);
 
                     guiButton.setType(isSlot ? Material.DIAMOND_SWORD : Material.WOOD_SWORD);
+
+                    if(isSlot) {
+                        guiButton.addGlowing();
+                    } else {
+                        guiButton.removeGlowing();
+                    }
                 }
             });
 
@@ -59,7 +65,7 @@ public class HotbarSlotGui extends StandardGui {
             addButton(hotbarSlot, false);
         }
 
-        GuiButton back = new GuiButton(Material.ARROW, "&cBack to Settings");
+        GuiButton back = new GuiButton(Material.ARROW, "&c&lBack");
         back.setAction((player, button, gui, click) -> new SettingsGui(profile).open(player));
         back.setSlot(9);
         addButton(back, false);

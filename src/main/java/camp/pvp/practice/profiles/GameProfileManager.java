@@ -51,7 +51,7 @@ public class GameProfileManager {
         this.matchRecordsCollectionName = config.getString("networking.mongo.match_records_collection");
 
         this.leaderboardUpdater = new LeaderboardUpdater(this);
-        this.leaderboardUpdaterTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, leaderboardUpdater, 0, 6000);
+        this.leaderboardUpdaterTask = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, leaderboardUpdater, 0, 20 * 120);
         this.playerVisibilityUpdaterTask = Bukkit.getScheduler().runTaskTimer(plugin, new PlayerVisibilityUpdater(this), 0, 1);
     }
 

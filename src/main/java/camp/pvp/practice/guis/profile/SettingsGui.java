@@ -207,10 +207,11 @@ public class SettingsGui extends StandardGui {
                     guiButton.setLore("&7Click to customize your sidebar.");
                 } else {
                     guiButton.setLore(
-                            "&7This feature is only available",
-                            "&7to players that have &5&lPremium Rank &7.",
+                            "&7This feature is only",
+                            "&7available to donators.",
                             " ",
-                            "&6Purchase here: &fstore.pvp.camp");
+                            "&6Purchase a rank here: ",
+                            "&fstore.pvp.camp");
                 }
             }
         });

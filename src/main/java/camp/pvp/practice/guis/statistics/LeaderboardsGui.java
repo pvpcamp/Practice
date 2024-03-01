@@ -19,6 +19,7 @@ public class LeaderboardsGui extends ArrangedGui {
             if(!kit.isRanked()) continue;
 
             List<LeaderboardEntry> entries = leaderboard.get(kit);
+
             List<String> lines = new ArrayList<>();
 
             for(int i = 0; i < entries.size(); i++) {
@@ -45,7 +46,7 @@ public class LeaderboardsGui extends ArrangedGui {
 
             GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
             button.setLore(lines);
-            getButtons().add(button);
+            addButton(button);
         }
     }
 }

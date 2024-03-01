@@ -21,7 +21,7 @@ public class LeaderboardUpdater implements Runnable{
     @Override
     public void run() {
 
-        if(Bukkit.getOnlinePlayers().isEmpty()) {
+        if(Bukkit.getOnlinePlayers().isEmpty() && !leaderboard.isEmpty()) {
             return;
         }
 
@@ -30,6 +30,8 @@ public class LeaderboardUpdater implements Runnable{
         for(GameKit kit : GameKit.values()) {
             if(kit.isDuelKit() && kit.isRanked()) {
                 List<LeaderboardEntry> entries = new ArrayList<>();
+
+                leaderboard.put(kit, entries);
 
                 gpm.getEloCollection().find().sort(new Document("kit_" + kit.name(), -1)).limit(10).forEach(
                         document ->  {
@@ -42,8 +44,6 @@ public class LeaderboardUpdater implements Runnable{
                 );
 
                 Collections.sort(entries);
-
-                leaderboard.put(kit, entries);
             }
         }
 
