@@ -129,7 +129,7 @@ public class DuelQueueGui extends ArrangedGui {
                         lines.add(" ");
                         List<LeaderboardEntry> leaderboardEntries = Practice.getInstance().getGameProfileManager().getLeaderboardUpdater().getLeaderboard().get(kit);
                         for(int i = 0; i < 3; i++) {
-                            if(leaderboardEntries.size() < i) break;
+                            if(leaderboardEntries.size() <= i) break;
 
                             LeaderboardEntry entry = leaderboardEntries.get(i);
 

@@ -378,8 +378,6 @@ public abstract class Game {
 
         if(!participant.isAlive() || !victimParticipant.isAlive()) event.setCancelled(true);
 
-        if(victim.getNoDamageTicks() > 0 && event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) event.setCancelled(true);
-
         if(event.isCancelled()) {
             victimParticipant.setLastInvalidHitTick(currentTick);
             return;
@@ -417,25 +415,23 @@ public abstract class Game {
         victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
 
         if(event.getDamager() instanceof Player) {
-            if (victim.getNoDamageTicks() == 0) {
-                participant.hits++;
-                participant.currentCombo++;
+            participant.hits++;
+            participant.currentCombo++;
 
-                if (participant.isComboMessages()) {
-                    switch ((int) participant.getCurrentCombo()) {
-                        case 5:
-                            attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
-                            attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
-                            break;
-                        case 10:
-                            attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
-                            attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
-                            break;
-                        case 20:
-                            attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
-                            attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
-                            break;
-                    }
+            if (participant.isComboMessages()) {
+                switch ((int) participant.getCurrentCombo()) {
+                    case 5:
+                        attacker.playSound(attacker.getLocation(), Sound.FIREWORK_LAUNCH, 1F, 1F);
+                        attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
+                        break;
+                    case 10:
+                        attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
+                        attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
+                        break;
+                    case 20:
+                        attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
+                        attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
+                        break;
                 }
             }
         }
