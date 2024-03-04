@@ -88,6 +88,8 @@ public class SkywarsMinigame extends Minigame {
             p.teleport(position.getLocation());
             p.sendMessage(Colors.get(startingMessage));
             participant.getProfile().givePlayerItems();
+
+            i++;
         }
 
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();

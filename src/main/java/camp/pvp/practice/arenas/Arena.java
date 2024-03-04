@@ -198,7 +198,7 @@ public class Arena implements Comparable<Arena>{
      * Resets the arena.
      */
     public void resetArena() {
-        if (!getType().isResetAfterGame()) return;
+        if (!getType().isBuild()) return;
         if (!isCopy()) return;
 
         for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParentName()).getAllBlocks()) {
@@ -259,7 +259,7 @@ public class Arena implements Comparable<Arena>{
                 case EVENT_SUMO -> Arrays.asList("spawn1", "spawn2", "lobby");
                 case FFA -> Arrays.asList("spawn");
                 case MINIGAME_OITC -> Arrays.asList("center");
-                case MINIGAME_SKYWARS -> Arrays.asList("spawn1", "spawn2", "spawn3", "spawn4", "center");
+                case MINIGAME_SKYWARS -> Arrays.asList("spawn1", "spawn2", "spawn3", "spawn4", "center", "corner1", "corner2");
                 default -> Arrays.asList("spawn1", "spawn2", "center");
             };
         }
@@ -269,6 +269,7 @@ public class Arena implements Comparable<Arena>{
         public boolean isGenerateLoot() {
             switch(this) {
                 case DUEL_SKYWARS:
+                case MINIGAME_SKYWARS:
                     return true;
                 default:
                     return false;
@@ -278,6 +279,7 @@ public class Arena implements Comparable<Arena>{
         public boolean canModifyArena() {
             switch(this) {
                 case DUEL_SKYWARS:
+                case MINIGAME_SKYWARS:
                 case SPLEEF:
                     return true;
                 default:
@@ -299,18 +301,7 @@ public class Arena implements Comparable<Arena>{
                 case DUEL_SKYWARS:
                 case DUEL_BUILD:
                 case DUEL_BED_FIGHT:
-                case SPLEEF:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        public boolean isResetAfterGame() {
-            switch(this) {
-                case DUEL_SKYWARS:
-                case DUEL_BUILD:
-                case DUEL_BED_FIGHT:
+                case MINIGAME_SKYWARS:
                 case SPLEEF:
                     return true;
                 default:
@@ -341,6 +332,7 @@ public class Arena implements Comparable<Arena>{
                 case HCF_TEAMFIGHT: return Material.DIAMOND_SWORD;
                 case FFA: return Material.DIAMOND;
                 case EVENT_SUMO: return Material.SLIME_BALL;
+                case MINIGAME_SKYWARS: return Material.ENDER_PEARL;
                 case MINIGAME_OITC: return Material.ARROW;
                 default: return Material.STONE;
             }

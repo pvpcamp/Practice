@@ -186,7 +186,7 @@ public abstract class Game {
 
             plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
-            getArena().resetArena();
+            if(getArena() != null) getArena().resetArena();
 
             setState(State.INACTIVE);
 
@@ -393,7 +393,13 @@ public abstract class Game {
                 }
 
                 if(attacker != victim && getKit().isShowArrowDamage()) {
-                    attacker.sendMessage(Colors.get("&f" + victim.getName() + " &6is now at &c" + Math.round(victim.getHealth()) + " ❤"));
+                    int distance = (int) Math.round(attacker.getLocation().distance(victim.getLocation()));
+
+                    if(victim.getHealth() - event.getFinalDamage() > 0) {
+                        attacker.sendMessage(Colors.get("&f" + victim.getName() + " &6is now at &c" + Math.round(victim.getHealth() - event.getFinalDamage()) + " ❤ &7(" + distance + " blocks)"));
+                    } else {
+                        attacker.sendMessage(Colors.get("&6You shot and killed &f" + victim.getName() + " &6from &f" + distance + " blocks &6away!"));
+                    }
                 }
             }
         }
