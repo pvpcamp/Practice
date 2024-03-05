@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -46,6 +47,12 @@ public class EntityDamageByEntityListener implements Listener {
 
         if(event.getDamager() instanceof Arrow arrow && arrow.getShooter() instanceof Player) {
             attacker = (Player) arrow.getShooter();
+        }
+
+        if(event.getDamager() instanceof Fireball fireball) {
+            if(fireball.getTicksLived() < 20) {
+                event.setDamage(0);
+            }
         }
 
         if(attacker != null) {

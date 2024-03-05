@@ -28,10 +28,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -480,7 +477,7 @@ public abstract class Game {
                     }
                     break;
                 default:
-                    handleRightClickedItem(player, item);
+                    handleRightClickedItem(player, item, event);
             }
         } else {
             GameKit kit = getKit();
@@ -557,8 +554,19 @@ public abstract class Game {
         }
     }
 
-    public void handleRightClickedItem(Player player, ItemStack item) {
-        // Implement for games that have ability items.
+    public void handleRightClickedItem(Player player, ItemStack item, PlayerInteractEvent event) {
+
+        if(!getState().equals(State.ACTIVE)) return;
+
+        if(item.getType().equals(Material.FIREBALL) && getArena().getType().isBuild()) {
+            Fireball fireball = player.launchProjectile(Fireball.class);
+            fireball.setIsIncendiary(false);
+            fireball.setVelocity(fireball.getDirection().multiply(2.5));
+            addEntity(fireball);
+
+            player.getInventory().removeItem(new ItemStack(Material.FIREBALL, 1));
+            event.setCancelled(true);
+        }
     }
 
     public GameParticipant join(Player player) {
@@ -702,7 +710,7 @@ public abstract class Game {
             player.getInventory().addItem(new ItemStack(Material.SNOW_BALL));
         } else {
             for (ItemStack item : block.getDrops()) {
-                Item i = block.getLocation().getWorld().dropItem(block.getLocation().add(0, 0.5, 0), item);
+                Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
                 addEntity(i);
             }
         }

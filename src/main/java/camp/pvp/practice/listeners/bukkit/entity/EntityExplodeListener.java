@@ -1,12 +1,15 @@
 package camp.pvp.practice.listeners.bukkit.entity;
 
 import camp.pvp.practice.Practice;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.TNTPrimed;
+import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.map.MapView;
+
+import java.net.InetSocketAddress;
 
 public class EntityExplodeListener implements Listener {
 
@@ -18,10 +21,13 @@ public class EntityExplodeListener implements Listener {
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
-        Entity entity = event.getEntity();
 
         if(event.getEntityType().equals(EntityType.PRIMED_TNT)) {
-            TNTPrimed tnt = (TNTPrimed) entity;
+            event.blockList().clear();
+            return;
+        }
+
+        if(event.getEntityType().equals(EntityType.FIREBALL)) {
             event.blockList().clear();
         }
     }

@@ -120,7 +120,7 @@ public class CustomGameKit {
 
         participant.setKitApplied(true);
 
-        if(gameKit.equals(GameKit.BED_FIGHT)) {
+        if(gameKit.equals(GameKit.BED_FIGHT) || gameKit.equals(GameKit.FIREBALL_FIGHT)) {
             ItemStack[] armor = pi.getArmorContents();
             GameTeam.Color color = participant.getTeamColor();
 
@@ -129,30 +129,33 @@ public class CustomGameKit {
             LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) armor[1].getItemMeta();
             LeatherArmorMeta bootsMeta = (LeatherArmorMeta) armor[0].getItemMeta();
 
-            if(color.equals(GameTeam.Color.BLUE)) {
-                helmetMeta.setColor(Color.BLUE);
-                chestplateMeta.setColor(Color.BLUE);
-                leggingsMeta.setColor(Color.BLUE);
-                bootsMeta.setColor(Color.BLUE);
+            switch(color) {
+                case BLUE:
+                    helmetMeta.setColor(Color.BLUE);
+                    chestplateMeta.setColor(Color.BLUE);
+                    leggingsMeta.setColor(Color.BLUE);
+                    bootsMeta.setColor(Color.BLUE);
 
-                for(ItemStack item : pi.getContents()) {
-                    if(item == null) continue;
-                    if(!item.getType().equals(Material.WOOL)) continue;
+                    for(ItemStack item : pi.getContents()) {
+                        if(item == null) continue;
+                        if(!item.getType().equals(Material.WOOL)) continue;
 
-                    item.setDurability((short) 11);
-                }
-            } else {
-                helmetMeta.setColor(Color.RED);
-                chestplateMeta.setColor(Color.RED);
-                leggingsMeta.setColor(Color.RED);
-                bootsMeta.setColor(Color.RED);
+                        item.setDurability((short) 11);
+                    }
+                    break;
+                case RED:
+                    helmetMeta.setColor(Color.RED);
+                    chestplateMeta.setColor(Color.RED);
+                    leggingsMeta.setColor(Color.RED);
+                    bootsMeta.setColor(Color.RED);
 
-                for(ItemStack item : pi.getContents()) {
-                    if(item == null) continue;
-                    if(!item.getType().equals(Material.WOOL)) continue;
+                    for(ItemStack item : pi.getContents()) {
+                        if(item == null) continue;
+                        if(!item.getType().equals(Material.WOOL)) continue;
 
-                    item.setDurability((short) 14);
-                }
+                        item.setDurability((short) 14);
+                    }
+                    break;
             }
 
             armor[3].setItemMeta(helmetMeta);

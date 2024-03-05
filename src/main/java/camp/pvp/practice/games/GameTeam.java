@@ -3,6 +3,7 @@ package camp.pvp.practice.games;
 import camp.pvp.practice.games.impl.teams.TeamGame;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
@@ -14,24 +15,16 @@ import java.util.UUID;
 public class GameTeam {
 
     public enum Color {
-        BLUE, RED;
+        BLUE, RED, YELLOW, WHITE;
 
         public ChatColor getChatColor() {
-            switch(this) {
-                case BLUE:
-                    return ChatColor.BLUE;
-                default:
-                    return ChatColor.RED;
-            }
+            return ChatColor.valueOf(this.name());
         }
 
         public String getName() {
-            switch(this) {
-                case BLUE:
-                    return "Blue";
-                default:
-                    return "Red";
-            }
+            String name = this.name();
+            name = name.replace("_", " ");
+            return WordUtils.capitalizeFully(name);
         }
     }
 
