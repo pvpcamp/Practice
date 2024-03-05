@@ -338,4 +338,9 @@ public class TeamDuel extends TeamGame {
 
         cleanup(3);
     }
+
+    @Override
+    public String getScoreboardTitle() {
+        return "Teams";
+    }
 }

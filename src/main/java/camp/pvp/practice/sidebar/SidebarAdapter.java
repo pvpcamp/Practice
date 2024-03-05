@@ -26,8 +26,8 @@ import java.util.List;
 
 public class SidebarAdapter implements AssembleAdapter {
 
-    public static String TITLE;
-    public static String LINE;
+    private static String TITLE;
+    private static String LINE;
 
     private Practice plugin;
     private GameManager gameManager;
@@ -53,7 +53,7 @@ public class SidebarAdapter implements AssembleAdapter {
 
         switch(profile.getState()) {
             case IN_GAME, SPECTATING -> {
-                sb.append(" &7❘ ");
+                sb.append(" &7❘ &f");
                 sb.append(profile.getGame().getScoreboardTitle());
             }
         }

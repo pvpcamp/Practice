@@ -1,9 +1,7 @@
 package camp.pvp.practice.queue;
 
 import camp.pvp.practice.games.impl.Duel;
-import camp.pvp.practice.games.minigames.OneInTheChamberMinigame;
 import camp.pvp.practice.games.minigames.Minigame;
-import camp.pvp.practice.games.minigames.SkywarsMinigame;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
@@ -14,9 +12,7 @@ import lombok.Setter;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.*;
 
 @Getter @Setter
 public class GameQueue {
@@ -182,38 +178,22 @@ public class GameQueue {
             case MINIGAME -> {
                 queueTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
 
-                    if(queueMembers.size() < 4) {
+                    if(queueMembers.size() < minigameType.getQueueSizeBeforeStart()) {
                         return;
                     }
 
-                    final GameQueueMember member1, member2, member3, member4;
-                    member1 = queueMembers.poll();
-                    member2 = queueMembers.poll();
-                    member3 = queueMembers.poll();
-                    member4 = queueMembers.poll();
+                    List<GameQueueMember> members = new ArrayList<>(queueMembers);
 
-                    Minigame minigame;
-
-                    switch(getMinigameType()) {
-                        case SKYWARS:
-                            minigame = new SkywarsMinigame(plugin, UUID.randomUUID());
-                            break;
-                        case ONE_IN_THE_CHAMBER:
-                            minigame = new OneInTheChamberMinigame(plugin, UUID.randomUUID());
-                            break;
-                        default:
-                            minigame = null;
-                            break;
+                    for(int i = 0; i < minigameType.getQueueSizeBeforeStart(); i++) {
+                        members.add(queueMembers.poll());
                     }
 
-                    if(minigame == null) {
-                        return;
-                    }
+                    Minigame minigame = minigameType.createGame(plugin, UUID.randomUUID());
+                    assert minigame != null;
 
-                    minigame.join(member1.getPlayer());
-                    minigame.join(member2.getPlayer());
-                    minigame.join(member3.getPlayer());
-                    minigame.join(member4.getPlayer());
+                    for(GameQueueMember member : members) {
+                        minigame.join(member.getPlayer());
+                    }
 
                     minigame.initialize();
                 }, 5, 5);

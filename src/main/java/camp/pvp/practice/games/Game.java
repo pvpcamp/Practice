@@ -1025,6 +1025,6 @@ public abstract class Game {
     }
 
     public String getScoreboardTitle() {
-        return "&fGame";
+        return "Game";
     }
 }

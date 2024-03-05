@@ -410,4 +410,9 @@ public class HCFTeams extends TeamDuel {
 
         return lines;
     }
+
+    @Override
+    public String getScoreboardTitle() {
+        return "HCT";
+    }
 }

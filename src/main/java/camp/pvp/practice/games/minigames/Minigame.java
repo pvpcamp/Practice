@@ -38,11 +38,11 @@ public abstract class Minigame extends Game {
 
     @Override
     public String getScoreboardTitle() {
-        return "&fMinigame";
+        return "Minigame";
     }
 
     public enum Type {
-        SKYWARS, ONE_IN_THE_CHAMBER;
+        FIREBALL_BLITZ, SKYWARS, ONE_IN_THE_CHAMBER;
 
         @Override
         public String toString() {
@@ -60,6 +60,9 @@ public abstract class Minigame extends Game {
 
         public Material getMaterial() {
             switch(this) {
+                case FIREBALL_BLITZ -> {
+                    return Material.FIREBALL;
+                }
                 case SKYWARS -> {
                     return Material.EYE_OF_ENDER;
                 }
@@ -73,6 +76,12 @@ public abstract class Minigame extends Game {
 
         public List<String> getDescription() {
             switch(this) {
+                case FIREBALL_BLITZ -> {
+                    return List.of(
+                            "&74 Player Fireball Fight.",
+                            "&7Be the last player standing",
+                            "&7to win.");
+                }
                 case SKYWARS -> {
                     return List.of(
                             "&74 Player FFA Skywars.",
@@ -97,7 +106,7 @@ public abstract class Minigame extends Game {
 
         public int getMaxPlayers() {
             switch(this) {
-                case SKYWARS -> {
+                case FIREBALL_BLITZ, SKYWARS -> {
                     return 4;
                 }
                 case ONE_IN_THE_CHAMBER -> {
@@ -106,6 +115,26 @@ public abstract class Minigame extends Game {
             }
 
             return 0;
+        }
+
+        public int getQueueSizeBeforeStart() {
+            return 4;
+        }
+
+        public Minigame createGame(Practice plugin, UUID uuid) {
+            switch(this) {
+                case FIREBALL_BLITZ -> {
+                    return new FireballBlitzMinigame(plugin, uuid);
+                }
+                case SKYWARS -> {
+                    return new SkywarsMinigame(plugin, uuid);
+                }
+                case ONE_IN_THE_CHAMBER -> {
+                    return new OneInTheChamberMinigame(plugin, uuid);
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -111,6 +111,9 @@ public enum GameKit {
     }
 
     public boolean isTournament() {
+
+        if(!isDuelKit()) return false;
+
         switch(this) {
             case HCF:
             case SUMO:

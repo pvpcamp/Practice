@@ -456,6 +456,6 @@ public class Duel extends Game {
 
     @Override
     public String getScoreboardTitle() {
-        return "&fDuel";
+        return "Duel";
     }
 }
