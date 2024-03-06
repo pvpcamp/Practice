@@ -556,6 +556,8 @@ public abstract class Game {
 
     public void handleRightClickedItem(Player player, ItemStack item, PlayerInteractEvent event) {
 
+        if(item == null) return;
+
         if(!getState().equals(State.ACTIVE)) return;
 
         if(item.getType().equals(Material.FIREBALL) && getArena().getType().isBuild()) {

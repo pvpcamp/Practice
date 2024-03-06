@@ -15,7 +15,7 @@ public class TournamentHostGui extends ArrangedGui {
 
         for(GameKit kit : GameKit.values()) {
 
-            if(!kit.isDuelKit() || !kit.isTournament()) continue;
+            if(!kit.isTournament()) continue;
 
             GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
 
