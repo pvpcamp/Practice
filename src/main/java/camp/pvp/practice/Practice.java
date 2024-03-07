@@ -11,7 +11,6 @@ import camp.pvp.practice.listeners.bukkit.block.BlockBurnListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockFromToListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockPlaceListener;
 import camp.pvp.practice.listeners.bukkit.entity.*;
-import camp.pvp.practice.listeners.bukkit.explosion.ExplosionPrimeListener;
 import camp.pvp.practice.listeners.bukkit.inventory.InventoryClickListener;
 import camp.pvp.practice.listeners.bukkit.inventory.InventoryMoveItemListener;
 import camp.pvp.practice.listeners.bukkit.player.*;
@@ -175,8 +174,6 @@ public class Practice extends JavaPlugin {
         new EntityExplodeListener(this);
         new EntityRegainHealthListener(this);
         new EntitySpawnListener(this);
-
-        new ExplosionPrimeListener(this);
 
         new InventoryClickListener(this);
         new InventoryMoveItemListener(this);

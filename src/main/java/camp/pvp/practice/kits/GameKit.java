@@ -251,6 +251,7 @@ public enum GameKit {
         switch(this) {
             case ARCHER:
             case BED_FIGHT:
+            case FIREBALL_FIGHT:
             case ONE_IN_THE_CHAMBER:
             case SPLEEF:
             case SUMO:
@@ -290,6 +291,7 @@ public enum GameKit {
     public boolean isFallDamage() {
         switch (this) {
             case BED_FIGHT:
+            case FIREBALL_FIGHT:
             case ONE_IN_THE_CHAMBER:
             case SUMO:
                 return false;
@@ -828,7 +830,7 @@ public enum GameKit {
 
             for (ItemStack item : pi.getContents()) {
 
-                if(item == null) continue;
+                if(item == null || item.getType().isBlock()) continue;
 
                 ItemMeta meta = item.getItemMeta();
 

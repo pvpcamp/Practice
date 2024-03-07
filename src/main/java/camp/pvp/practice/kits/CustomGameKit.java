@@ -168,7 +168,7 @@ public class CustomGameKit {
 
             for (ItemStack item : pi.getContents()) {
 
-                if(item == null) continue;
+                if(item == null || item.getType().isBlock()) continue;
 
                 ItemMeta meta = item.getItemMeta();
 

@@ -1,5 +1,6 @@
 package camp.pvp.practice.listeners.bukkit.entity;
 
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
@@ -7,10 +8,7 @@ import camp.pvp.practice.utils.Colors;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -34,6 +32,15 @@ public class EntityDamageByEntityListener implements Listener {
             return;
         }
 
+        if(event.getEntity() instanceof Fireball && event.getDamager() instanceof Player player) {
+            GameProfile profile = plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId());
+            Game game = profile.getGame();
+            if(!game.getAlive().containsKey(player.getUniqueId())) {
+                event.setCancelled(true);
+            }
+            return;
+        }
+
         if(!(event.getEntity() instanceof Player player)) return;
 
         if(event.getDamager() instanceof Player) attacker = (Player) event.getDamager();
@@ -49,9 +56,33 @@ public class EntityDamageByEntityListener implements Listener {
             attacker = (Player) arrow.getShooter();
         }
 
-        if(event.getDamager() instanceof Fireball fireball) {
-            if(fireball.getTicksLived() < 20) {
-                event.setDamage(0);
+        if(event.getDamager() instanceof Fireball || event.getDamager() instanceof TNTPrimed) {
+
+            GameProfile profile = plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId());
+            Game game = profile.getGame();
+            if(game != null && game.getKit().equals(GameKit.FIREBALL_FIGHT)) {
+
+                if (event.getDamager().getTicksLived() < 20) {
+                    player.damage(0);
+                } else {
+                    player.damage(event.getFinalDamage());
+                }
+
+                Vector dirToExplosion = event.getDamager().getLocation().toVector().subtract(player.getLocation().toVector());
+
+                // Invert direction.
+                dirToExplosion.multiply(-1);
+                // Normalize the vector.
+                dirToExplosion.setY(0).normalize();
+
+                // Multiply the vector to get desired explosion strength.
+                dirToExplosion.multiply(1.25);
+                // Set Y to make the player fly up.
+                dirToExplosion.setY(1.25);
+
+                player.setVelocity(dirToExplosion);
+
+                event.setCancelled(true);
             }
         }
 

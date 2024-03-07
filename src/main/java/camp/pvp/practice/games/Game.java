@@ -297,7 +297,7 @@ public abstract class Game {
             double damage = event.getFinalDamage();
             boolean canDie = true;
 
-            if(participant.isInvincible()) {
+            if(participant.isInvincible() || !participant.isAlive()) {
                 event.setCancelled(true);
                 return false;
             }
@@ -562,11 +562,16 @@ public abstract class Game {
 
         if(item.getType().equals(Material.FIREBALL) && getArena().getType().isBuild()) {
             Fireball fireball = player.launchProjectile(Fireball.class);
+            fireball.setVelocity(fireball.getVelocity().multiply(3));
             fireball.setIsIncendiary(false);
-            fireball.setVelocity(fireball.getDirection().multiply(2.5));
             addEntity(fireball);
 
-            player.getInventory().removeItem(new ItemStack(Material.FIREBALL, 1));
+            if(item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else {
+                player.getInventory().remove(item);
+            }
+
             event.setCancelled(true);
         }
     }
@@ -725,7 +730,7 @@ public abstract class Game {
 
         if(!block.getType().equals(Material.BED_BLOCK)) block.setType(Material.AIR);
 
-        if(!arena.getType().equals(Arena.Type.DUEL_BED_FIGHT)) return;
+        if(!(arena.getType().equals(Arena.Type.DUEL_BED_FIGHT) || arena.getType().equals(Arena.Type.DUEL_FIREBALL_FIGHT))) return;
 
         if(!material.equals(Material.BED_BLOCK)) return;
 

@@ -250,7 +250,7 @@ public class Arena implements Comparable<Arena>{
 
     public enum Type {
         DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, DUEL_BED_FIGHT, DUEL_FIREBALL_FIGHT, DUEL_BRIDGE, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO,
-        MINIGAME_SKYWARS, MINIGAME_OITC;
+        MINIGAME_FIREBALL_BLITZ, MINIGAME_SKYWARS, MINIGAME_OITC;
 
         public List<String> getValidPositions() {
             return switch (this) {
