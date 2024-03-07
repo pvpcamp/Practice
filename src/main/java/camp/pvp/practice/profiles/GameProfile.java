@@ -274,13 +274,13 @@ public class GameProfile {
 
             if(updateLocation) {
 
-                Location location = null;
+                Location location;
                 State state = getState();
                 location = switch (state) {
                     case LOBBY_QUEUE, LOBBY_PARTY, LOBBY_TOURNAMENT, LOBBY -> Practice.instance.getLobbyLocation();
                     case KIT_EDITOR -> Practice.instance.getKitEditorLocation();
                     case LOBBY_EVENT -> sumoEvent.getArena().getPositions().get("lobby").getLocation();
-                    default -> location;
+                    default -> null;
                 };
 
                 if (location == null) {

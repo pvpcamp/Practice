@@ -206,6 +206,7 @@ public class SumoEvent {
             case IN_GAME -> {
                 lines.add("&7● &6Players: &f" + getAliveCount() + "/" + getTotalParticipants());
                 lines.add("&7● &6Round: &f" + round);
+
                 if(getCurrentDuel() != null) {
 
                     if(profile.isSidebarShowDuration() && getCurrentDuel().getState().equals(Game.State.ACTIVE)) {

@@ -266,4 +266,9 @@ public class FreeForAll extends Game {
 
         cleanup(3);
     }
+
+    @Override
+    public String getScoreboardTitle() {
+        return "FFA";
+    }
 }

@@ -25,6 +25,8 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.*;
 
@@ -265,6 +267,18 @@ public class Duel extends Game {
     }
 
     @Override
+    public void handleHit(Player victim, Player attacker, EntityDamageByEntityEvent event) {
+
+        // TODO: Add blocked hit capping.
+//        victim.sendMessage(event.getDamage() + " damage");
+//        if(victim.isBlocking()) {
+//            victim.sendMessage(event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) + " block reduction");
+//        }
+
+        super.handleHit(victim, attacker, event);
+    }
+
+    @Override
     public List<String> getScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
         GameParticipant self = getParticipants().get(profile.getUuid());
@@ -295,7 +309,7 @@ public class Duel extends Game {
 
                     boolean show = false;
 
-                    if(getKit().equals(GameKit.BED_FIGHT)) {
+                    if(getKit().equals(GameKit.BED_FIGHT) || getKit().equals(GameKit.FIREBALL_FIGHT)) {
                         List<GameParticipant> pList = new ArrayList<>(getCurrentPlaying().values());
                         GameParticipant blue = pList.get(0);
                         GameParticipant red = pList.get(1);
@@ -380,7 +394,7 @@ public class Duel extends Game {
 
         if(!getState().equals(State.ENDED)) {
 
-            if(getKit().equals(GameKit.BED_FIGHT)) {
+            if(getKit().equals(GameKit.BED_FIGHT) || getKit().equals(GameKit.FIREBALL_FIGHT)) {
                 List<GameParticipant> pList = new ArrayList<>(getCurrentPlaying().values());
                 GameParticipant blue = pList.get(0);
                 GameParticipant red = pList.get(1);
@@ -442,6 +456,6 @@ public class Duel extends Game {
 
     @Override
     public String getScoreboardTitle() {
-        return "&fDuel";
+        return "Duel";
     }
 }

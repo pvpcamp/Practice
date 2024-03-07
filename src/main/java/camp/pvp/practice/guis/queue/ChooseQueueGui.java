@@ -17,7 +17,7 @@ public class ChooseQueueGui extends StandardGui {
     private final static Practice plugin = Practice.getInstance();
 
     public ChooseQueueGui(GameProfile gameProfile) {
-        super("&6Choose a Queue", 27);
+        super("&6Welcome to &lPvP Camp", 27);
 
         this.setDefaultBackground();
         this.setAutoUpdate(true);

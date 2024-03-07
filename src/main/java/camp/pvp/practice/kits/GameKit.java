@@ -7,6 +7,7 @@ import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -26,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 public enum GameKit {
-    NO_DEBUFF, BOXING, BED_FIGHT, SUMO, DEBUFF, ARCHER, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, STRATEGY, ONE_IN_THE_CHAMBER;
+    FIREBALL_FIGHT, NO_DEBUFF, BOXING, BED_FIGHT, SUMO, DEBUFF, ARCHER, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, STRATEGY, ONE_IN_THE_CHAMBER;
 
     public String getDisplayName() {
         switch(this) {
@@ -58,6 +59,8 @@ public enum GameKit {
                 return Collections.singletonList(Arena.Type.SPLEEF);
             case BED_FIGHT:
                 return Collections.singletonList(Arena.Type.DUEL_BED_FIGHT);
+            case FIREBALL_FIGHT:
+                return Collections.singletonList(Arena.Type.DUEL_FIREBALL_FIGHT);
             case ONE_IN_THE_CHAMBER:
                 return Collections.singletonList(Arena.Type.MINIGAME_OITC);
             default:
@@ -70,6 +73,7 @@ public enum GameKit {
             case BUILD_UHC:
             case SKYWARS:
             case BED_FIGHT:
+            case FIREBALL_FIGHT:
             case SPLEEF:
             case STRATEGY:
                 return true;
@@ -79,7 +83,14 @@ public enum GameKit {
     }
 
     public boolean isRespawn() {
-        return this.equals(BED_FIGHT) || this.equals(ONE_IN_THE_CHAMBER);
+        switch(this) {
+            case BED_FIGHT:
+            case FIREBALL_FIGHT:
+            case ONE_IN_THE_CHAMBER:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public boolean isRegen() {
@@ -100,6 +111,9 @@ public enum GameKit {
     }
 
     public boolean isTournament() {
+
+        if(!isDuelKit()) return false;
+
         switch(this) {
             case HCF:
             case SUMO:
@@ -135,14 +149,15 @@ public enum GameKit {
 
     public boolean isHunger() {
         switch(this) {
-            case SOUP:
-            case BOXING:
-            case SUMO:
-            case INVADED:
-            case SPLEEF:
-            case BED_FIGHT:
-            case ONE_IN_THE_CHAMBER:
             case ARCHER:
+            case BED_FIGHT:
+            case BOXING:
+            case FIREBALL_FIGHT:
+            case INVADED:
+            case ONE_IN_THE_CHAMBER:
+            case SOUP:
+            case SPLEEF:
+            case SUMO:
                 return false;
             default:
                 return true;
@@ -151,14 +166,15 @@ public enum GameKit {
 
     public boolean showHealthBar() {
         switch(this) {
+            case ARCHER:
             case BED_FIGHT:
             case BUILD_UHC:
-            case STRATEGY:
-            case INVADED:
             case CLASSIC:
+            case FIREBALL_FIGHT:
+            case INVADED:
             case ONE_IN_THE_CHAMBER:
             case SKYWARS:
-            case ARCHER:
+            case STRATEGY:
                 return true;
             default:
                 return false;
@@ -179,9 +195,10 @@ public enum GameKit {
     public boolean isMoveOnStart() {
         switch(this) {
             case BED_FIGHT:
-            case SUMO:
-            case SKYWARS:
+            case FIREBALL_FIGHT:
             case ONE_IN_THE_CHAMBER:
+            case SKYWARS:
+            case SUMO:
                 return false;
             default:
                 return true;
@@ -190,8 +207,8 @@ public enum GameKit {
 
     public boolean isDieInWater() {
         switch(this) {
-            case SUMO:
             case SPLEEF:
+            case SUMO:
                 return true;
             default:
                 return false;
@@ -206,6 +223,7 @@ public enum GameKit {
             case BOXING:
             case SKYWARS:
             case BED_FIGHT:
+            case FIREBALL_FIGHT:
                 return false;
         }
     }
@@ -231,11 +249,12 @@ public enum GameKit {
 
     public boolean isDropItemsOnDeath() {
         switch(this) {
-            case BED_FIGHT:
-            case SUMO:
-            case SPLEEF:
-            case ONE_IN_THE_CHAMBER:
             case ARCHER:
+            case BED_FIGHT:
+            case FIREBALL_FIGHT:
+            case ONE_IN_THE_CHAMBER:
+            case SPLEEF:
+            case SUMO:
                 return false;
             default:
                 return true;
@@ -244,11 +263,12 @@ public enum GameKit {
 
     public boolean isItemDurability() {
         switch(this) {
-            case BED_FIGHT:
-            case SUMO:
-            case SPLEEF:
-            case ONE_IN_THE_CHAMBER:
             case ARCHER:
+            case BED_FIGHT:
+            case FIREBALL_FIGHT:
+            case ONE_IN_THE_CHAMBER:
+            case SPLEEF:
+            case SUMO:
                 return false;
             default:
                 return true;
@@ -270,12 +290,13 @@ public enum GameKit {
 
     public boolean isFallDamage() {
         switch (this) {
-            case BED_FIGHT, ONE_IN_THE_CHAMBER, SUMO -> {
+            case BED_FIGHT:
+            case FIREBALL_FIGHT:
+            case ONE_IN_THE_CHAMBER:
+            case SUMO:
                 return false;
-            }
-            default -> {
+            default:
                 return true;
-            }
         }
     }
 
@@ -286,6 +307,9 @@ public enum GameKit {
     public ItemStack getIcon() {
         ItemStack item = new ItemStack(Material.GLASS);
         switch(this) {
+            case FIREBALL_FIGHT:
+                item = new ItemStack(Material.FIREBALL);
+                break;
             case NO_DEBUFF:
                 Potion potion = new Potion(PotionType.INSTANT_HEAL);
                 potion.setSplash(true);
@@ -344,6 +368,40 @@ public enum GameKit {
         GameInventory inventory = new GameInventory();
         ItemStack[] armor = inventory.getArmor(), inv = inventory.getInventory();
         switch(this) {
+            case FIREBALL_FIGHT:
+                armor[3] = new ItemStack(Material.LEATHER_HELMET);
+                armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+                armor[3].addEnchantment(Enchantment.DURABILITY, 3);
+
+                armor[2] = new ItemStack(Material.LEATHER_CHESTPLATE);
+                armor[2].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+                armor[2].addEnchantment(Enchantment.DURABILITY, 3);
+
+                armor[1] = new ItemStack(Material.LEATHER_LEGGINGS);
+                armor[1].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+                armor[1].addEnchantment(Enchantment.DURABILITY, 3);
+
+                armor[0] = new ItemStack(Material.LEATHER_BOOTS);
+                armor[0].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+                armor[0].addEnchantment(Enchantment.DURABILITY, 3);
+
+                inv[0] = new ItemStack(Material.STONE_SWORD);
+                inv[1] = new ItemStack(Material.WOOL, 64);
+                inv[2] = new ItemStack(Material.ENDER_STONE, 8);
+                inv[3] = new ItemStack(Material.FIREBALL, 6);
+
+                ItemMeta fireballMeta = inv[3].getItemMeta();
+                fireballMeta.setDisplayName(ChatColor.GOLD + "Fireball");
+                inv[3].setItemMeta(fireballMeta);
+
+                inv[4] = new ItemStack(Material.WOOD_PICKAXE);
+                inv[4].addEnchantment(Enchantment.DIG_SPEED, 1);
+
+                inv[5] = new ItemStack(Material.WOOD_AXE);
+                inv[5].addEnchantment(Enchantment.DIG_SPEED, 1);
+
+                inv[6] = new ItemStack(Material.SHEARS);
+                break;
             case DEBUFF:
                 Potion poison = new Potion(PotionType.POISON, 1);
                 poison.setSplash(true);
@@ -724,7 +782,7 @@ public enum GameKit {
 
         participant.setKitApplied(true);
 
-        if(this.equals(BED_FIGHT)) {
+        if(this.equals(BED_FIGHT) || this.equals(FIREBALL_FIGHT)) {
             ItemStack[] armor = pi.getArmorContents();
             GameTeam.Color color = participant.getTeamColor();
 
@@ -733,30 +791,33 @@ public enum GameKit {
             LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) armor[1].getItemMeta();
             LeatherArmorMeta bootsMeta = (LeatherArmorMeta) armor[0].getItemMeta();
 
-            if (color.equals(GameTeam.Color.BLUE)) {
-                helmetMeta.setColor(Color.BLUE);
-                chestplateMeta.setColor(Color.BLUE);
-                leggingsMeta.setColor(Color.BLUE);
-                bootsMeta.setColor(Color.BLUE);
+            switch(color) {
+                case BLUE:
+                    helmetMeta.setColor(Color.BLUE);
+                    chestplateMeta.setColor(Color.BLUE);
+                    leggingsMeta.setColor(Color.BLUE);
+                    bootsMeta.setColor(Color.BLUE);
 
-                for (ItemStack item : pi.getContents()) {
-                    if (item == null) continue;
-                    if (!item.getType().equals(Material.WOOL)) continue;
+                    for(ItemStack item : pi.getContents()) {
+                        if(item == null) continue;
+                        if(!item.getType().equals(Material.WOOL)) continue;
 
-                    item.setDurability((short) 11);
-                }
-            } else {
-                helmetMeta.setColor(Color.RED);
-                chestplateMeta.setColor(Color.RED);
-                leggingsMeta.setColor(Color.RED);
-                bootsMeta.setColor(Color.RED);
+                        item.setDurability((short) 11);
+                    }
+                    break;
+                case RED:
+                    helmetMeta.setColor(Color.RED);
+                    chestplateMeta.setColor(Color.RED);
+                    leggingsMeta.setColor(Color.RED);
+                    bootsMeta.setColor(Color.RED);
 
-                for (ItemStack item : pi.getContents()) {
-                    if (item == null) continue;
-                    if (!item.getType().equals(Material.WOOL)) continue;
+                    for(ItemStack item : pi.getContents()) {
+                        if(item == null) continue;
+                        if(!item.getType().equals(Material.WOOL)) continue;
 
-                    item.setDurability((short) 14);
-                }
+                        item.setDurability((short) 14);
+                    }
+                    break;
             }
 
             armor[3].setItemMeta(helmetMeta);
@@ -769,7 +830,7 @@ public enum GameKit {
 
             for (ItemStack item : pi.getContents()) {
 
-                if(item == null) continue;
+                if(item == null || item.getType().isBlock()) continue;
 
                 ItemMeta meta = item.getItemMeta();
 

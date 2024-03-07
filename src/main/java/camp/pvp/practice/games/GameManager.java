@@ -10,6 +10,8 @@ import camp.pvp.practice.queue.GameQueue;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -22,6 +24,7 @@ public class GameManager {
     private Map<UUID, Game> games;
     private Tournament tournament;
     private SumoEvent sumoEvent;
+    private BukkitTask borderTask;
 
     private Map<UUID, PostGameInventory> postGameInventories;
 
@@ -31,9 +34,19 @@ public class GameManager {
         this.games = new HashMap<>();
         this.postGameInventories = new HashMap<>();
 
-        this.logger.info("Initialized GameManager.");
+        this.borderTask = Bukkit.getScheduler().runTaskTimer(plugin, ()-> {
+            for(Game game : getActiveGames()) {
+                for(Entity entity : game.getEntities()) {
+                    if(!game.isInBorder(entity.getLocation()) && entity.getTicksLived() > 100) {
+                        entity.remove();
+                    }
+                }
+            }
+        }, 0, 20);
 
         Bukkit.getScheduler().runTaskTimer(plugin, new HCFEffectUpdater(this), 0, 2);
+
+        this.logger.info("Initialized GameManager.");
     }
 
     public SumoEvent getActiveEvent() {

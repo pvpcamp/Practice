@@ -28,10 +28,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -300,7 +297,7 @@ public abstract class Game {
             double damage = event.getFinalDamage();
             boolean canDie = true;
 
-            if(participant.isInvincible()) {
+            if(participant.isInvincible() || !participant.isAlive()) {
                 event.setCancelled(true);
                 return false;
             }
@@ -480,7 +477,7 @@ public abstract class Game {
                     }
                     break;
                 default:
-                    handleRightClickedItem(player, item);
+                    handleRightClickedItem(player, item, event);
             }
         } else {
             GameKit kit = getKit();
@@ -557,8 +554,26 @@ public abstract class Game {
         }
     }
 
-    public void handleRightClickedItem(Player player, ItemStack item) {
-        // Implement for games that have ability items.
+    public void handleRightClickedItem(Player player, ItemStack item, PlayerInteractEvent event) {
+
+        if(item == null) return;
+
+        if(!getState().equals(State.ACTIVE)) return;
+
+        if(item.getType().equals(Material.FIREBALL) && getArena().getType().isBuild()) {
+            Fireball fireball = player.launchProjectile(Fireball.class);
+            fireball.setVelocity(fireball.getVelocity().multiply(3));
+            fireball.setIsIncendiary(false);
+            addEntity(fireball);
+
+            if(item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else {
+                player.getInventory().remove(item);
+            }
+
+            event.setCancelled(true);
+        }
     }
 
     public GameParticipant join(Player player) {
@@ -702,7 +717,7 @@ public abstract class Game {
             player.getInventory().addItem(new ItemStack(Material.SNOW_BALL));
         } else {
             for (ItemStack item : block.getDrops()) {
-                Item i = block.getLocation().getWorld().dropItem(block.getLocation().add(0, 0.5, 0), item);
+                Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
                 addEntity(i);
             }
         }
@@ -715,7 +730,7 @@ public abstract class Game {
 
         if(!block.getType().equals(Material.BED_BLOCK)) block.setType(Material.AIR);
 
-        if(!arena.getType().equals(Arena.Type.DUEL_BED_FIGHT)) return;
+        if(!(arena.getType().equals(Arena.Type.DUEL_BED_FIGHT) || arena.getType().equals(Arena.Type.DUEL_FIREBALL_FIGHT))) return;
 
         if(!material.equals(Material.BED_BLOCK)) return;
 
@@ -1017,6 +1032,6 @@ public abstract class Game {
     }
 
     public String getScoreboardTitle() {
-        return "&fGame";
+        return "Game";
     }
 }

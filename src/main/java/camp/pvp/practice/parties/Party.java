@@ -71,7 +71,9 @@ public class Party {
 
         this.members.remove(member.getUuid());
 
-        if(member.isLeader() && members.size() > 0) {
+        if(!members.isEmpty()) {
+            if(!member.isLeader()) return;
+
             List<PartyMember> members = new ArrayList<>(getMembers().values());
             Collections.shuffle(members);
 

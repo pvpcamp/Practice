@@ -32,106 +32,58 @@ public class MinigameHostGui extends PaginatedGui {
     public void refreshButtons() {
         getButtons().clear();
 
-        final Minigame.Type skywarsType = Minigame.Type.SKYWARS;
-        GuiButton skywars = new GuiButton(skywarsType.getMaterial(), "&6&l" + skywarsType.toString());
+        for(Minigame.Type type : Minigame.Type.values()) {
+            GuiButton button = new GuiButton(type.getMaterial(), "&6&l" + type.toString());
 
-        List<String> skywarsLore = new ArrayList<>(skywarsType.getDescription());
-        skywarsLore.add(" ");
-        skywarsLore.add("&6Min/Max Players: &f" + skywarsType.getMinPlayers() + "&7/&f" + skywarsType.getMaxPlayers());
-        skywarsLore.add(" ");
-        skywarsLore.add("&7Click to host this minigame.");
-        skywars.setLore(skywarsLore);
+            List<String> lore = new ArrayList<>(type.getDescription());
+            lore.add(" ");
+            lore.add("&6Min/Max Players: &f" + type.getMinPlayers() + "&7/&f" + type.getMaxPlayers());
+            lore.add(" ");
+            lore.add("&7Click to host this minigame.");
+            button.setLore(lore);
 
-        skywars.setAction((player, button, gui, clickType) -> {
-            if(party.getMembers().size() < skywarsType.getMinPlayers()) {
-                player.sendMessage(Colors.get("&cYou need at least " + skywarsType.getMinPlayers() + " players in your party to host this minigame."));
-                return;
-            }
-
-            if(party.getMembers().size() > skywarsType.getMaxPlayers()) {
-                player.sendMessage(Colors.get("&cYou have too many players in your party to host this minigame."));
-                return;
-            }
-
-            List<PartyMember> members = new ArrayList<>(), kickedMembers = new ArrayList<>();
-            GameProfileManager gpm = Practice.getInstance().getGameProfileManager();
-            for (PartyMember member : party.getMembers().values()) {
-                if (gpm.getLoadedProfiles().get(member.getUuid()).getGame() == null) {
-                    members.add(member);
-                } else {
-                    kickedMembers.add(member);
+            button.setAction((player, button1, gui, clickType) -> {
+                if(party.getMembers().size() < type.getMinPlayers()) {
+                    player.sendMessage(Colors.get("&cYou need at least " + type.getMinPlayers() + " players in your party to host this minigame."));
+                    return;
                 }
-            }
 
-            SkywarsMinigame minigame = new SkywarsMinigame(Practice.getInstance(), UUID.randomUUID());
-            minigame.setParty(party);
-
-            for (PartyMember member : kickedMembers) {
-                Player p = member.getPlayer();
-                p.sendMessage(ChatColor.RED + "You have been kicked from the party since you were not able to play in the event.");
-                party.leave(member.getPlayer());
-            }
-
-            for (PartyMember member : members) {
-                minigame.join(member.getPlayer());
-            }
-
-            minigame.initialize();
-
-            player.closeInventory();
-        });
-
-        addButton(skywars);
-
-        final Minigame.Type oitcType = Minigame.Type.ONE_IN_THE_CHAMBER;
-        GuiButton oitc = new GuiButton(oitcType.getMaterial(), "&6&l" + oitcType.toString());
-
-        List<String> oitcLore = new ArrayList<>(oitcType.getDescription());
-        oitcLore.add(" ");
-        oitcLore.add("&6Min/Max Players: &f" + oitcType.getMinPlayers() + "&7/&f" + oitcType.getMaxPlayers());
-        oitcLore.add(" ");
-        oitcLore.add("&7Click to host this minigame.");
-        oitc.setLore(oitcLore);
-
-        oitc.setAction((player, button, gui, clickType) -> {
-            if(party.getMembers().size() < oitcType.getMinPlayers()) {
-                player.sendMessage(Colors.get("&cYou need at least " + oitcType.getMinPlayers() + " players in your party to host this minigame."));
-                return;
-            }
-
-            if(party.getMembers().size() > oitcType.getMaxPlayers()) {
-                player.sendMessage(Colors.get("&cYou have too many players in your party to host this minigame."));
-                return;
-            }
-
-            List<PartyMember> members = new ArrayList<>(), kickedMembers = new ArrayList<>();
-            GameProfileManager gpm = Practice.getInstance().getGameProfileManager();
-            for (PartyMember member : party.getMembers().values()) {
-                if (gpm.getLoadedProfiles().get(member.getUuid()).getGame() == null) {
-                    members.add(member);
-                } else {
-                    kickedMembers.add(member);
+                if(party.getMembers().size() > type.getMaxPlayers()) {
+                    player.sendMessage(Colors.get("&cYou have too many players in your party to host this minigame."));
+                    return;
                 }
-            }
 
-            OneInTheChamberMinigame minigame = new OneInTheChamberMinigame(Practice.getInstance(), UUID.randomUUID());
-            minigame.setParty(party);
+                List<PartyMember> members = new ArrayList<>(), kickedMembers = new ArrayList<>();
+                GameProfileManager gpm = Practice.getInstance().getGameProfileManager();
+                for (PartyMember member : party.getMembers().values()) {
+                    if (gpm.getLoadedProfiles().get(member.getUuid()).getGame() == null) {
+                        members.add(member);
+                    } else {
+                        kickedMembers.add(member);
+                    }
+                }
 
-            for (PartyMember member : kickedMembers) {
-                Player p = member.getPlayer();
-                p.sendMessage(ChatColor.RED + "You have been kicked from the party since you were not able to play in the event.");
-                party.leave(member.getPlayer());
-            }
+                Minigame minigame = type.createGame(Practice.getInstance(), UUID.randomUUID());
+                assert minigame != null;
 
-            for (PartyMember member : members) {
-                minigame.join(member.getPlayer());
-            }
+                minigame.setParty(party);
 
-            minigame.initialize();
+                for (PartyMember member : kickedMembers) {
+                    Player p = member.getPlayer();
+                    p.sendMessage(ChatColor.RED + "You have been kicked from the party since you were not able to play in the event.");
+                    party.leave(member.getPlayer());
+                }
 
-            player.closeInventory();
-        });
+                for (PartyMember member : members) {
+                    minigame.join(member.getPlayer());
+                }
 
-        addButton(oitc);
+                minigame.initialize();
+
+                player.closeInventory();
+            });
+
+            addButton(button);
+        }
     }
 }

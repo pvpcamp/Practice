@@ -220,7 +220,7 @@ public class Arena implements Comparable<Arena>{
 
     public boolean isOriginalBlock(Location location) {
 
-        if (!type.equals(Type.DUEL_BED_FIGHT)) return blocks.contains(location);
+        if (!type.isBedRespawn()) return blocks.contains(location);
 
         for (ArenaPosition position : positions.values()) {
             if (position.getPosition().equalsIgnoreCase("bluebed") || position.getPosition().equalsIgnoreCase("redbed")) {
@@ -249,12 +249,12 @@ public class Arena implements Comparable<Arena>{
     }
 
     public enum Type {
-        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, DUEL_BED_FIGHT, DUEL_BRIDGE, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO,
-        MINIGAME_SKYWARS, MINIGAME_OITC;
+        DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, DUEL_BED_FIGHT, DUEL_FIREBALL_FIGHT, DUEL_BRIDGE, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO,
+        MINIGAME_FIREBALL_BLITZ, MINIGAME_SKYWARS, MINIGAME_OITC;
 
         public List<String> getValidPositions() {
             return switch (this) {
-                case DUEL_BED_FIGHT -> Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluebed", "redbed");
+                case DUEL_BED_FIGHT, DUEL_FIREBALL_FIGHT -> Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluebed", "redbed");
                 case DUEL_BUILD, DUEL_SKYWARS, SPLEEF -> Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
                 case EVENT_SUMO -> Arrays.asList("spawn1", "spawn2", "lobby");
                 case FFA -> Arrays.asList("spawn");
@@ -301,6 +301,7 @@ public class Arena implements Comparable<Arena>{
                 case DUEL_SKYWARS:
                 case DUEL_BUILD:
                 case DUEL_BED_FIGHT:
+                case DUEL_FIREBALL_FIGHT:
                 case MINIGAME_SKYWARS:
                 case SPLEEF:
                     return true;
@@ -318,6 +319,13 @@ public class Arena implements Comparable<Arena>{
             }
         }
 
+        public boolean isBedRespawn() {
+            return switch (this) {
+                case DUEL_BED_FIGHT, DUEL_FIREBALL_FIGHT -> true;
+                default -> false;
+            };
+        }
+
         public Material getGuiMaterial() {
             switch(this) {
                 case DUEL: return Material.GRASS;
@@ -328,6 +336,7 @@ public class Arena implements Comparable<Arena>{
                 case DUEL_SKYWARS: return Material.EYE_OF_ENDER;
                 case DUEL_BED_FIGHT: return Material.BED;
                 case DUEL_BRIDGE: return Material.STAINED_CLAY;
+                case DUEL_FIREBALL_FIGHT: return Material.FIREBALL;
                 case SPLEEF: return Material.SNOW_BLOCK;
                 case HCF_TEAMFIGHT: return Material.DIAMOND_SWORD;
                 case FFA: return Material.DIAMOND;
