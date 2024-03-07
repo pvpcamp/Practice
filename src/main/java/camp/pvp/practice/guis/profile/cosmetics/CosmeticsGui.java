@@ -92,8 +92,8 @@ public class CosmeticsGui extends StandardGui {
             public void run(Player player, GuiButton button, Gui gui, ClickType click) {
 
                 if(!player.hasPermission("practice.cosmetics.death_animation")) {
-                    player.sendMessage(Colors.get("&aThis feature is only available to players that have &5&lPlus Rank &aor higher." ));
-                    player.sendMessage(Colors.get("&aIf you would like to support us, you can buy a rank here: &fstore.pvp.camp" ));
+                    player.sendMessage(Colors.get("&aThis feature is only available to players that have &b&lAdventurer Rank &aor higher." ));
+                    player.sendMessage(Colors.get("&6If you would like to support us, you can buy a rank here: &fstore.pvp.camp" ));
                     return;
                 }
 

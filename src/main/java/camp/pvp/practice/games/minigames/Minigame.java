@@ -8,10 +8,12 @@ import camp.pvp.practice.profiles.GameProfile;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 public abstract class Minigame extends Game {
@@ -24,21 +26,90 @@ public abstract class Minigame extends Game {
         super(plugin, uuid);
     }
 
-    @Override
-    public List<String> getScoreboard(GameProfile profile) {
-        return null;
-    }
-
-    @Override
-    public List<String> getSpectatorScoreboard(GameProfile profile) {
-        return null;
-    }
-
     public abstract GameParticipant determineWinner();
 
     @Override
     public String getScoreboardTitle() {
         return "Minigame";
+    }
+
+    @Override
+    public void end() {
+        if(getState() == State.ENDED) return;
+
+        determineWinner();
+
+        setEnded(new Date());
+        setState(State.ENDED);
+
+        if(getStarted() == null) {
+            setStarted(new Date());
+            getStartingTimer().cancel();
+        }
+
+        for(GameParticipant p : getCurrentPlaying().values()) {
+            if(p.getRespawnTask() != null) p.getRespawnTask().cancel();
+            p.setLivingState(GameParticipant.LivingState.ALIVE);
+        }
+
+        sendEndingMessage();
+
+        cleanup(3);
+    }
+
+    @Override
+    public void sendStartingMessage() {
+        List<GameParticipant> sortedParticipants = new ArrayList<>(this.getAlive().values());
+        sortedParticipants.sort(Comparator.comparing(GameParticipant::getName));
+
+        StringBuilder sb = new StringBuilder();
+
+        int s = 0;
+        while(s != this.getAlive().size()) {
+            GameParticipant participant = sortedParticipants.get(0);
+            sb.append(ChatColor.WHITE + participant.getName());
+
+            sortedParticipants.remove(participant);
+            s++;
+            if(s == this.getAlive().size()) {
+                sb.append(ChatColor.GRAY + ".");
+            } else {
+                sb.append(ChatColor.GRAY + ", ");
+            }
+        }
+
+        String startingMessage = """
+                
+                &6&lMinigame starting in 5 seconds.
+                 &7● &6Minigame: &f%s
+                 &7● &6Arena: &f%s
+                 &7● &6Participants: &f%s
+                 \n
+                 """.formatted(getType().toString(), getArena().getDisplayName(), sb);
+
+        this.announce(startingMessage);
+    }
+
+    @Override
+    public void sendEndingMessage() {
+        StringBuilder topPlayers = new StringBuilder();
+        List<GameParticipant> sortedParticipants = new ArrayList<>(this.getParticipants().values());
+        sortedParticipants.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
+
+        for(int i = 0; i < Math.min(sortedParticipants.size(), 3); i++) {
+            GameParticipant p = sortedParticipants.get(i);
+            topPlayers.append("\n &7● &6" + (i + 1) + ": &f" + p.getName() + " &7- &f" + p.getKills() + " Kill" + (p.getKills() == 1 ? "" : "s"));
+        }
+
+        String endMessage = """
+                
+                &6&lMinigame finished.
+                 &7● &6Winner: &f%s
+                 \n
+                &6&lTop Players: %s
+                 \n
+                """.formatted(winner.getName(), topPlayers.toString());
+        announce(endMessage);
     }
 
     public enum Type {

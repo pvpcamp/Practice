@@ -210,11 +210,7 @@ public class GameParticipant {
             x++;
         }
 
-        if(x == 0) {
-            return GameTeam.Color.BLUE;
-        } else {
-            return GameTeam.Color.RED;
-        }
+        return GameTeam.Color.values()[x];
     }
 
     public enum LivingState {

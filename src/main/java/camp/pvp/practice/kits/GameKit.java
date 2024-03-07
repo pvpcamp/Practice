@@ -818,6 +818,25 @@ public enum GameKit {
                         item.setDurability((short) 14);
                     }
                     break;
+                case YELLOW:
+                    helmetMeta.setColor(Color.YELLOW);
+                    chestplateMeta.setColor(Color.YELLOW);
+                    leggingsMeta.setColor(Color.YELLOW);
+                    bootsMeta.setColor(Color.YELLOW);
+
+                    for(ItemStack item : pi.getContents()) {
+                        if(item == null) continue;
+                        if(!item.getType().equals(Material.WOOL)) continue;
+
+                        item.setDurability((short) 4);
+                    }
+                    break;
+                case WHITE:
+                    helmetMeta.setColor(Color.WHITE);
+                    chestplateMeta.setColor(Color.WHITE);
+                    leggingsMeta.setColor(Color.WHITE);
+                    bootsMeta.setColor(Color.WHITE);
+                    break;
             }
 
             armor[3].setItemMeta(helmetMeta);

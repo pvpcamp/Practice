@@ -223,17 +223,17 @@ public class Arena implements Comparable<Arena>{
         if (!type.isBedRespawn()) return blocks.contains(location);
 
         for (ArenaPosition position : positions.values()) {
-            if (position.getPosition().equalsIgnoreCase("bluebed") || position.getPosition().equalsIgnoreCase("redbed")) {
-                Location l = position.getLocation();
+            if(!position.getPosition().contains("bed")) continue;
 
-                for (int x = l.getBlockX() - 4; x < l.getBlockX() + 4; x++) {
-                    for (int y = l.getBlockY(); y < l.getBlockY() + 3; y++) {
-                        for (int z = l.getBlockZ() - 4; z < l.getBlockZ() + 4; z++) {
-                            Location blockLocation = new Location(l.getWorld(), x, y, z);
-                            Block block = blockLocation.getBlock();
-                            if (block.equals(location.getBlock())) {
-                                return false;
-                            }
+            Location l = position.getLocation();
+
+            for (int x = l.getBlockX() - 4; x < l.getBlockX() + 4; x++) {
+                for (int y = l.getBlockY(); y < l.getBlockY() + 3; y++) {
+                    for (int z = l.getBlockZ() - 4; z < l.getBlockZ() + 4; z++) {
+                        Location blockLocation = new Location(l.getWorld(), x, y, z);
+                        Block block = blockLocation.getBlock();
+                        if (block.equals(location.getBlock())) {
+                            return false;
                         }
                     }
                 }
@@ -258,6 +258,7 @@ public class Arena implements Comparable<Arena>{
                 case DUEL_BUILD, DUEL_SKYWARS, SPLEEF -> Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
                 case EVENT_SUMO -> Arrays.asList("spawn1", "spawn2", "lobby");
                 case FFA -> Arrays.asList("spawn");
+                case MINIGAME_FIREBALL_BLITZ -> Arrays.asList("bluespawn", "redspawn", "yellowspawn", "whitespawn", "bluebed", "redbed", "yellowbed", "whitebed", "corner1", "corner2");
                 case MINIGAME_OITC -> Arrays.asList("center");
                 case MINIGAME_SKYWARS -> Arrays.asList("spawn1", "spawn2", "spawn3", "spawn4", "center", "corner1", "corner2");
                 default -> Arrays.asList("spawn1", "spawn2", "center");
@@ -302,6 +303,7 @@ public class Arena implements Comparable<Arena>{
                 case DUEL_BUILD:
                 case DUEL_BED_FIGHT:
                 case DUEL_FIREBALL_FIGHT:
+                case MINIGAME_FIREBALL_BLITZ:
                 case MINIGAME_SKYWARS:
                 case SPLEEF:
                     return true;
@@ -321,7 +323,7 @@ public class Arena implements Comparable<Arena>{
 
         public boolean isBedRespawn() {
             return switch (this) {
-                case DUEL_BED_FIGHT, DUEL_FIREBALL_FIGHT -> true;
+                case DUEL_BED_FIGHT, DUEL_FIREBALL_FIGHT, MINIGAME_FIREBALL_BLITZ -> true;
                 default -> false;
             };
         }
@@ -341,6 +343,7 @@ public class Arena implements Comparable<Arena>{
                 case HCF_TEAMFIGHT: return Material.DIAMOND_SWORD;
                 case FFA: return Material.DIAMOND;
                 case EVENT_SUMO: return Material.SLIME_BALL;
+                case MINIGAME_FIREBALL_BLITZ: return Material.FLINT_AND_STEEL;
                 case MINIGAME_SKYWARS: return Material.ENDER_PEARL;
                 case MINIGAME_OITC: return Material.ARROW;
                 default: return Material.STONE;

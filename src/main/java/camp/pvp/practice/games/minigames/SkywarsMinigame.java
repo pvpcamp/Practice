@@ -4,9 +4,13 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.games.GameParticipant;
+import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.GameKit;
+import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
+import camp.pvp.practice.utils.PlayerUtils;
+import camp.pvp.practice.utils.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.HumanEntity;
@@ -21,6 +25,63 @@ public class SkywarsMinigame extends Minigame {
 
         setType(Type.SKYWARS);
         setKit(GameKit.SKYWARS);
+    }
+
+    @Override
+    public List<String> getScoreboard(GameProfile profile) {
+        GameParticipant self = getParticipants().get(profile.getUuid());
+        List<String> lines = new ArrayList<>();
+
+        switch(getState()) {
+            case STARTING:
+                lines.add("&6Minigame: &fSkywars");
+                lines.add("&6Arena: &f" + getArena().getDisplayName());
+                lines.add("&6Players: &f" + this.getCurrentPlaying().size());
+                break;
+            case ACTIVE:
+                lines.add("&6Players Alive: &f" + this.getCurrentPlaying().size() + "/" + this.getParticipants().size());
+                lines.add("&6Kills: &f" + self.getKills());
+
+                if(profile.isSidebarShowPing()) {
+                    lines.add("&6Ping: &f" + PlayerUtils.getPing(profile.getPlayer()) + " ms");
+                }
+
+                if(profile.isSidebarShowDuration()) {
+                    lines.add("&6Duration: &f" + TimeUtil.get(getStarted()));
+                }
+                break;
+            case ENDED:
+                lines.add("&6Winner: &f" + getWinner().getName());
+                break;
+        }
+
+        return lines;
+    }
+
+    @Override
+    public List<String> getSpectatorScoreboard(GameProfile profile) {
+        List<String> lines = new ArrayList<>();
+
+        switch(getState()) {
+            case STARTING:
+                lines.add("&6Minigame: &fSkywars");
+                lines.add("&6Arena: &f" + getArena().getDisplayName());
+                lines.add("&6Players: &f" + this.getCurrentPlaying().size());
+                break;
+            case ACTIVE:
+                lines.add("&6Players Alive: &f" + this.getCurrentPlaying().size() + "/" + this.getParticipants().size());
+
+                if(profile.isSidebarShowDuration()) {
+                    lines.add(" ");
+                    lines.add("&6Duration: &f" + TimeUtil.get(getStarted()));
+                }
+                break;
+            case ENDED:
+                lines.add("&6Winner: &f" + getWinner().getName());
+                break;
+        }
+
+        return lines;
     }
 
     @Override
@@ -50,33 +111,7 @@ public class SkywarsMinigame extends Minigame {
 
         this.setState(State.STARTING);
 
-        List<Player> players = new ArrayList<>(this.getAlivePlayers());
-        players.sort(Comparator.comparing(HumanEntity::getName));
-
-        StringBuilder sb = new StringBuilder();
-
-        int s = 0;
-        while(s != this.getAlive().size()) {
-            Player p = players.get(0);
-            sb.append(ChatColor.WHITE + p.getName());
-
-            players.remove(p);
-            s++;
-            if(s == this.getAlivePlayers().size()) {
-                sb.append(ChatColor.GRAY + ".");
-            } else {
-                sb.append(ChatColor.GRAY + ", ");
-            }
-        }
-
-        String startingMessage = """
-                
-                &6&lMinigame starting in 5 seconds.
-                 &7● &6Minigame: &fSkywars
-                 &7● &6Arena: &f%s
-                 &7● &6Participants: &f%s
-                 \n
-                 """.formatted(arena.getDisplayName(), sb);
+        sendStartingMessage();
 
         int i = 1;
         for(GameParticipant participant : getParticipants().values()) {
@@ -86,7 +121,6 @@ public class SkywarsMinigame extends Minigame {
             participant.setSpawnLocation(position.getLocation());
 
             p.teleport(position.getLocation());
-            p.sendMessage(Colors.get(startingMessage));
             participant.getProfile().givePlayerItems();
 
             i++;
@@ -106,45 +140,5 @@ public class SkywarsMinigame extends Minigame {
         if(getCurrentPlaying().size() < 2) {
             end();
         }
-    }
-
-    @Override
-    public void end() {
-
-        if(getState() == State.ENDED) return;
-
-        GameParticipant winner = determineWinner();
-
-        setEnded(new Date());
-        setState(State.ENDED);
-
-        if(getStarted() == null) {
-            setStarted(new Date());
-            getStartingTimer().cancel();
-        }
-
-        StringBuilder topPlayers = new StringBuilder();
-        List<GameParticipant> sortedParticipants = new ArrayList<>(this.getParticipants().values());
-        sortedParticipants.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
-
-        for(int i = 0; i < Math.min(sortedParticipants.size(), 3); i++) {
-            GameParticipant p = sortedParticipants.get(i);
-            topPlayers.append("\n &7● &6" + (i + 1) + ": &f" + p.getName() + " &7- &f" + p.getKills() + " Kill" + (p.getKills() == 1 ? "" : "s"));
-        }
-
-        String endMessage = """
-                
-                &6&lMinigame finished.
-                 &7● &6Winner: &f%s
-                 \n
-                &6&lTop Players: %s
-                 \n
-                """.formatted(winner.getName(), topPlayers.toString());
-
-        for(Player player : this.getAllPlayers()) {
-            player.sendMessage(Colors.get(endMessage));
-        }
-
-        cleanup(3);
     }
 }

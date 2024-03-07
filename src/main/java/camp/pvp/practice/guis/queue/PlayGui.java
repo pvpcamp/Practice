@@ -12,11 +12,11 @@ import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.StandardGui;
 import org.bukkit.Material;
 
-public class ChooseQueueGui extends StandardGui {
+public class PlayGui extends StandardGui {
 
     private final static Practice plugin = Practice.getInstance();
 
-    public ChooseQueueGui(GameProfile gameProfile) {
+    public PlayGui(GameProfile gameProfile) {
         super("&6Welcome to &lPvP Camp", 27);
 
         this.setDefaultBackground();
@@ -132,7 +132,7 @@ public class ChooseQueueGui extends StandardGui {
         });
         minigames.setButtonUpdater((guiButton, gui) -> {
             guiButton.setLore(
-                    "&7Casual 4 player minigames.",
+                    "&7Casual minigames.",
                     " ",
                     "&6In Queue: &f" + plugin.getGameQueueManager().getTotalInQueue(GameQueue.GameType.MINIGAME, GameQueue.Type.UNRANKED),
                     "&6Playing: &f" + plugin.getGameManager().getTotalInGame(GameQueue.GameType.MINIGAME, GameQueue.Type.UNRANKED),
