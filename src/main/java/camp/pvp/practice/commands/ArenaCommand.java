@@ -52,7 +52,7 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
             case "info" -> {
                 info(player, args);
             }
-            case "name" -> {
+            case "rename", "name" -> {
                 rename(player, args);
             }
             case "positions" -> {
