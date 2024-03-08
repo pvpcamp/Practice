@@ -71,7 +71,8 @@ public class EntityDamageByEntityListener implements Listener {
 
                 player.damage(damage);
 
-                Vector dirToExplosion = event.getDamager().getLocation().toVector().subtract(player.getLocation().toVector());
+                Location location = event.getDamager().getLocation().subtract(0, -1, 0);
+                Vector dirToExplosion = location.toVector().subtract(player.getLocation().toVector());
 
                 // Invert direction.
                 dirToExplosion.multiply(-1);
