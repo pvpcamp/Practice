@@ -16,6 +16,10 @@
 
     <repositories>
         <repository>
+            <id>refine-public</id>
+            <url>https://maven.refinedev.xyz/repository/public-repo/</url>
+        </repository>
+        <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
@@ -92,6 +96,12 @@
             <groupId>com.lunarclient</groupId>
             <artifactId>apollo-api</artifactId>
             <version>1.0.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>xyz.refinedev.spigot</groupId>
+            <artifactId>CarbonSpigotAPI</artifactId>
+            <version>1.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

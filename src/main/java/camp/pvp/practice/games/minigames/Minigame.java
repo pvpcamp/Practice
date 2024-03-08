@@ -30,7 +30,7 @@ public abstract class Minigame extends Game {
 
     @Override
     public String getScoreboardTitle() {
-        return "Minigame";
+        return getType().getScoreboardTitle();
     }
 
     @Override
@@ -126,6 +126,19 @@ public abstract class Minigame extends Game {
                     name = name.replace("_", " ");
                     return WordUtils.capitalizeFully(name);
                 }
+            }
+        }
+
+        public String getScoreboardTitle() {
+            switch(this) {
+                case FIREBALL_BLITZ:
+                    return "Blitz";
+                case ONE_IN_THE_CHAMBER:
+                    return "OITC";
+                default:
+                    String name = this.name();
+                    name = name.replace("_", " ");
+                    return WordUtils.capitalizeFully(name);
             }
         }
 

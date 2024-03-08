@@ -126,13 +126,13 @@ public class PlayGui extends StandardGui {
         rematch.setSlot(13);
         addButton(rematch);
 
-        GuiButton minigames = new GuiButton(Material.BOW, "&6&lMinigame Queues");
+        GuiButton minigames = new GuiButton(Material.BOW, "&6&lMinigame Queue");
         minigames.setAction((player, guiButton, gui, clickType) -> {
             new MinigameQueueGui(gameProfile).open(player);
         });
         minigames.setButtonUpdater((guiButton, gui) -> {
             guiButton.setLore(
-                    "&7Casual minigames.",
+                    "&7Casual, but exciting minigames.",
                     " ",
                     "&6In Queue: &f" + plugin.getGameQueueManager().getTotalInQueue(GameQueue.GameType.MINIGAME, GameQueue.Type.UNRANKED),
                     "&6Playing: &f" + plugin.getGameManager().getTotalInGame(GameQueue.GameType.MINIGAME, GameQueue.Type.UNRANKED),
@@ -143,7 +143,7 @@ public class PlayGui extends StandardGui {
         minigames.setSlot(14);
         addButton(minigames);
 
-        GuiButton events = new GuiButton(Material.NETHER_STAR, "&6&lHost an Event");
+        GuiButton events = new GuiButton(Material.NETHER_STAR, "events");
         events.setAction((player, guiButton, gui, clickType) -> {
 
             if(plugin.getGameManager().isEventRunning()) {
@@ -166,6 +166,7 @@ public class PlayGui extends StandardGui {
             if(plugin.getGameManager().isEventRunning()) {
                 Tournament tournament = plugin.getGameManager().getTournament();
                 if(tournament != null) {
+                    guiButton.updateName("&6&lJoin Tournament");
                     guiButton.setType(Material.DIAMOND_HELMET);
                     guiButton.setLore(
                             "&7Click to join the active tournament.");
@@ -173,6 +174,7 @@ public class PlayGui extends StandardGui {
                 }
 
                 if(plugin.getGameManager().getActiveEvent() != null) {
+                    guiButton.updateName("&6&lJoin Sumo Event");
                     guiButton.setType(Material.SLIME_BALL);
                     guiButton.setLore(
                             "&7Click to join the active Sumo event.");
@@ -180,6 +182,7 @@ public class PlayGui extends StandardGui {
                 }
             }
 
+            guiButton.updateName("&6&lHost an Event");
             guiButton.setType(Material.NETHER_STAR);
             guiButton.setLore("&7Click to host an event.");
         });

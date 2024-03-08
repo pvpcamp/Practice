@@ -22,12 +22,14 @@ import java.util.concurrent.TimeUnit;
 public class PlayerCooldown {
 
     public enum Type {
-        ENDER_PEARL, ENERGY_JUMP, ENERGY_REGEN, ENERGY_RESISTANCE, ENERGY_SPEED, ENERGY_STRENGTH;
+        ENDER_PEARL, FIREBALL, ENERGY_JUMP, ENERGY_REGEN, ENERGY_RESISTANCE, ENERGY_SPEED, ENERGY_STRENGTH;
 
-        public int getDuration() {
+        public double getDuration() {
             switch(this) {
                 case ENDER_PEARL:
                     return 16;
+                case FIREBALL:
+                    return 0.5;
                 case ENERGY_JUMP:
                     return 30;
                 case ENERGY_STRENGTH:
@@ -45,6 +47,8 @@ public class PlayerCooldown {
             switch(this) {
                 case ENDER_PEARL:
                     return Colors.get("&cYou must wait <time> second(s) before pearling again.");
+                case FIREBALL:
+                    return Colors.get("&cYou are on fireball cooldown.");
                 case ENERGY_JUMP:
                     return Colors.get("&cYou must wait <time> second(s) before using your Jump Boost ability again.");
                 case ENERGY_REGEN:
@@ -87,7 +91,15 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("ENDER_PEARL")
                                     .build())
-                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .duration(Duration.ofSeconds(Math.round(this.getDuration() * 1000)))
+                            .build();
+                case FIREBALL:
+                    return Cooldown.builder()
+                            .name("fireball")
+                            .icon(ItemStackIcon.builder()
+                                    .itemName("FIREBALL")
+                                    .build())
+                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
                             .build();
                 case ENERGY_JUMP:
                     return Cooldown.builder()
@@ -95,7 +107,7 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("FEATHER")
                                     .build())
-                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .duration(Duration.ofSeconds(Math.round(this.getDuration() * 1000)))
                             .build();
                 case ENERGY_REGEN:
                     return Cooldown.builder()
@@ -103,7 +115,7 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("GHAST_TEAR")
                                     .build())
-                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .duration(Duration.ofSeconds(Math.round(this.getDuration() * 1000)))
                             .build();
                 case ENERGY_RESISTANCE:
                     return Cooldown.builder()
@@ -111,7 +123,7 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("IRON_INGOT")
                                     .build())
-                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .duration(Duration.ofSeconds(Math.round(this.getDuration() * 1000)))
                             .build();
                 case ENERGY_STRENGTH:
                     return Cooldown.builder()
@@ -119,7 +131,7 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("BLAZE_POWDER")
                                     .build())
-                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
                             .build();
                 case ENERGY_SPEED:
                     return Cooldown.builder()
@@ -127,7 +139,7 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("SUGAR")
                                     .build())
-                            .duration(Duration.ofSeconds(this.getDuration()))
+                            .duration(Duration.ofSeconds(Math.round(this.getDuration() * 1000)))
                             .build();
                 default:
                     return null;
@@ -148,7 +160,7 @@ public class PlayerCooldown {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        calendar.add(Calendar.SECOND, type.getDuration());
+        calendar.add(Calendar.MILLISECOND, (int) Math.round(type.getDuration() * 1000));
         this.issued = calendar.getTime();
 
         issueLunarCooldown();
@@ -199,7 +211,12 @@ public class PlayerCooldown {
     }
 
     public void expire() {
-        player.sendMessage(Colors.get(getType().expireMessage()));
+        String message = getType().expireMessage();
+
+        if(message != null) {
+            player.sendMessage(Colors.get(message));
+        }
+
         remove();
     }
 

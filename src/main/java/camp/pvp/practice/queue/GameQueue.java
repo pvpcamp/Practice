@@ -92,14 +92,14 @@ public class GameQueue {
             case DUEL -> {
                 for(Game game : getPlugin().getGameManager().getActiveGames()) {
                     if(game instanceof Duel && game.getKit().equals(gameKit) && ((Duel) game).getQueueType().equals(getType())) {
-                        i += game.getAlive().size();
+                        i += game.getCurrentPlaying().size();
                     }
                 }
             }
             case MINIGAME -> {
                 for(Game game : getPlugin().getGameManager().getActiveGames()) {
                     if(game instanceof Minigame && ((Minigame) game).getType().equals(minigameType)) {
-                        i += game.getAlive().size();
+                        i += game.getCurrentPlaying().size();
                     }
                 }
             }

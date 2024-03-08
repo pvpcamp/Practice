@@ -8,6 +8,8 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import xyz.refinedev.spigot.api.chunk.ChunkAPI;
+import xyz.refinedev.spigot.api.chunk.ChunkSnapshot;
 
 import java.util.*;
 
@@ -25,7 +27,8 @@ public class Arena implements Comparable<Arena>{
     private int xDifference, zDifference, buildLimit, voidLevel;
 
     private @Getter List<Location> beds, allBlocks, blocks, chests;
-    private @Getter Queue<StoredBlock> blockQueue;
+    private @Getter List<StoredChunk> storedChunks;
+    private @Getter Map<StoredChunk, ChunkSnapshot> snapshots;
 
     public Arena(String name) {
         this.name = name;
@@ -39,7 +42,8 @@ public class Arena implements Comparable<Arena>{
         this.allBlocks = new ArrayList<>();
         this.blocks = new ArrayList<>();
         this.chests = new ArrayList<>();
-        this.blockQueue = new LinkedList<>();
+        this.snapshots = new HashMap<>();
+        this.storedChunks = new ArrayList<>();
 
         this.buildLimit = 256;
         this.voidLevel = 0;
@@ -75,11 +79,9 @@ public class Arena implements Comparable<Arena>{
     /**
      * Copies positions from the parent arena to this arena, based on X and Z differences.
      */
-    public void updateCopy(boolean reset) {
+    public void updateCopy(Arena parent, boolean reset) {
 
         if(!isCopy()) return;
-
-        Arena parent = Practice.getInstance().getArenaManager().getArenaFromName(getParentName());
 
         positions.clear();
         lootChests.clear();
@@ -107,9 +109,7 @@ public class Arena implements Comparable<Arena>{
 
         scanArena();
 
-        if(reset) {
-            resetArena();
-        }
+        if(reset) resetArena(true);
     }
 
     /**
@@ -152,6 +152,8 @@ public class Arena implements Comparable<Arena>{
             getBeds().clear();
             getChests().clear();
             getAllBlocks().clear();
+            getSnapshots().clear();
+            getStoredChunks().clear();
 
             int minX, minY, minZ, maxX, maxY, maxZ;
             Location c1 = corner1.getLocation(), c2 = corner2.getLocation();
@@ -181,9 +183,28 @@ public class Arena implements Comparable<Arena>{
                         }
 
                         getAllBlocks().add(location);
+
+                        Chunk chunk = block.getChunk();
+
+                        StoredChunk storedChunk = new StoredChunk(chunk.getX(), chunk.getZ(), location.getWorld());
+                        if(!storedChunks.contains(storedChunk)) {
+                            storedChunks.add(storedChunk);
+                        }
                     }
                 }
             }
+
+            refreshChunkSnapshots();
+        }
+    }
+
+    public void refreshChunkSnapshots() {
+        getSnapshots().clear();
+
+        ChunkAPI api = ChunkAPI.getInstance();
+
+        for(StoredChunk sc : storedChunks) {
+            getSnapshots().put(sc, api.takeSnapshot(sc.world().getChunkAt(sc.x(), sc.z())));
         }
     }
 
@@ -197,25 +218,58 @@ public class Arena implements Comparable<Arena>{
     /***
      * Resets the arena.
      */
-    public void resetArena() {
+    public void resetArena(boolean hardReset) {
         if (!getType().isBuild()) return;
         if (!isCopy()) return;
 
-        for(Location parentLocation : Practice.getInstance().getArenaManager().getArenaFromName(getParentName()).getAllBlocks()) {
-            Location location = parentLocation.clone().add(xDifference, 0, zDifference);
+        setInUse(true);
 
-            Block parentBlock = parentLocation.getBlock();
-            Block block = location.getBlock();
+        if(hardReset) {
+            int i = 0;
+            for(Location location : getParent().getAllBlocks()) {
+                Block block = location.getBlock();
+                BlockState oldState = block.getState();
 
-            if(parentBlock.getType() != block.getType()) {
-                StoredBlock storedBlock = new StoredBlock(parentBlock, location);
-                blockQueue.add(storedBlock);
+                Location newLocation = location.clone().add(getXDifference(), 0, getZDifference());
+
+                Block newBlock = newLocation.getBlock();
+
+                if(block.getType().equals(newBlock.getType())) continue;
+
+                Chunk chunk = newBlock.getChunk();
+                if(!chunk.isLoaded()) {
+                    chunk.load();
+                }
+
+                if(oldState != null && oldState.getData() != newBlock.getState().getData()) {
+
+                    newBlock.setType(Material.AIR);
+
+                    newBlock.setType(oldState.getType());
+
+                    BlockState bs = newBlock.getState();
+                    bs.setType(oldState.getType());
+                    bs.setData(oldState.getData());
+                    bs.update(true, true);
+                } else {
+                    newBlock.setType(block.getType());
+                }
+                i++;
             }
+
+            Practice.getInstance().sendDebugMessage("Hard reset " + i + " blocks for arena " + getName() + ".");
+        } else {
+            ChunkAPI api = ChunkAPI.getInstance();
+
+            for (Map.Entry<StoredChunk, ChunkSnapshot> entry : getSnapshots().entrySet()) {
+                StoredChunk sc = entry.getKey();
+                api.restoreSnapshot(sc.world().getChunkAt(sc.x(), sc.z()), entry.getValue());
+            }
+
+            refreshChunkSnapshots();
         }
 
-        Practice.getInstance().sendDebugMessage("Resetting arena " + getName() + " with " + blockQueue.size() + " blocks.");
-
-        Practice.getInstance().getArenaManager().getBlockRestorer().addArena(this);
+        setInUse(false);
     }
 
     public boolean isOriginalBlock(Location location) {

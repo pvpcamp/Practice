@@ -6,6 +6,8 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -17,8 +19,6 @@ public class ArenaManager {
     private Logger logger;
     private ArenaConfig arenaConfig;
     private @Getter Set<Arena> arenas;
-    private @Getter ArenaBlockRestorer blockRestorer;
-    private BukkitTask arenaBlockRestorerTask;
     public ArenaManager(Practice plugin) {
         this.plugin = plugin;
         this.logger = plugin.getLogger();
@@ -27,9 +27,6 @@ public class ArenaManager {
         logger.info("Initialized ArenaManager.");
 
         arenaConfig = new ArenaConfig(plugin, this);
-
-        blockRestorer = new ArenaBlockRestorer();
-        arenaBlockRestorerTask = Bukkit.getScheduler().runTaskTimer(plugin, blockRestorer, 0, 1);
 
         scanBlocks();
 
@@ -145,9 +142,7 @@ public class ArenaManager {
     }
 
     public void scanBlocks() {
-        String m = "Scanning arenas for all blocks.";
-
-        this.logger.info(m);
+        this.logger.info("Scanning arenas for all blocks.");
 
         int arenas = 0;
         for(Arena arena : getArenas()) {
@@ -192,13 +187,6 @@ public class ArenaManager {
         return null;
     }
 
-    public void updateAndResetCopies() {
-
-        for(Arena arena : getArenas()) {
-            arena.resetArena();
-        }
-    }
-
     public void deleteArena(Arena arena) {
         this.arenas.remove(arena);
 
@@ -241,7 +229,7 @@ public class ArenaManager {
         copy.setZDifference(fromZ + zD);
         copy.setParentName(arena.getName());
         copy.setType(arena.getType());
-        copy.updateCopy(true);
+        copy.updateCopy(arena, true);
 
         return copy;
     }
@@ -259,7 +247,7 @@ public class ArenaManager {
 
     public void updateArenaCopies(Arena arena, boolean reset) {
         for(Arena a : getArenaCopies(arena)) {
-            a.updateCopy(reset);
+            a.updateCopy(arena, reset);
         }
     }
 

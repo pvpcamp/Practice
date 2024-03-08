@@ -77,9 +77,13 @@ public class Practice extends JavaPlugin {
         this.gameProfileManager = new GameProfileManager(this);
         this.arenaManager = new ArenaManager(this);
 
+        getLogger().info("Resetting all blocks for arena copies.");
+
         for(Arena arena : arenaManager.getArenas()) {
-            arena.resetArena();
+            arena.resetArena(true);
         }
+
+        getLogger().info("Finished resetting all blocks for arena copies, continuing startup.");
 
         this.gameManager = new GameManager(this);
         this.gameQueueManager = new GameQueueManager(this);
@@ -137,6 +141,7 @@ public class Practice extends JavaPlugin {
 
     public void registerCommands() {
         new AcceptCommand(this);
+        new AnnounceCommand(this);
         new ArenaCommand(this);
         new ArenaPositionCommand(this);
         new BuildCommand(this);

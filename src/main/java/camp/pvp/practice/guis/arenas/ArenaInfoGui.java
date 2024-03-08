@@ -93,7 +93,7 @@ public class ArenaInfoGui extends ArrangedGui {
 
         copies.setAction((player, button, gui, click) -> {
             if(arena.isCopy() && click.isRightClick()) {
-                arena.resetArena();
+                arena.resetArena(true);
                 player.sendMessage(Colors.get("&aReset arena &f" + arena.getName() + "&a."));
                 return;
             }

@@ -12,6 +12,9 @@ depend:
 commands:
   accept:
     description: Accepts a duel from a player or team.
+  announce:
+    permission: practice.commands.announce
+    description: Announce to the server that you are looking to play a game.
   arena:
     permission: practice.commands.arena
     description: Arena configuration utility.

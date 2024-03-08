@@ -17,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
@@ -139,13 +140,16 @@ public class FireballBlitzMinigame extends Minigame{
         GameParticipant attacker = getAlive().get(participant.getAttacker());
         if(attacker == null) return;
 
-        ItemStack fireball = new ItemStack(Material.FIREBALL, 4);
+        PlayerInventory inventory = attacker.getPlayer().getInventory();
+
+        ItemStack fireball = new ItemStack(Material.FIREBALL, 2);
         ItemMeta meta = fireball.getItemMeta();
         meta.setDisplayName(ChatColor.GOLD + "Fireball");
         meta.spigot().setUnbreakable(true);
         fireball.setItemMeta(meta);
 
-        attacker.getPlayer().getInventory().addItem(fireball);
+        inventory.addItem(fireball);
+        inventory.addItem(new ItemStack(Material.TNT));
     }
 
     @Override
@@ -192,10 +196,5 @@ public class FireballBlitzMinigame extends Minigame{
         GameParticipant winner = getCurrentPlaying().values().stream().findFirst().orElse(null);
         setWinner(winner);
         return winner;
-    }
-
-    @Override
-    public String getScoreboardTitle() {
-        return "Blitz";
     }
 }
