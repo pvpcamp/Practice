@@ -49,8 +49,8 @@ public class TeamDuel extends TeamGame {
                 blue = blue + "&9&l" + (getBlue().isRespawn() ? "✔" : getBlue().getCurrentParticipants().size());
                 red = red + "&c&l" + (getRed().isRespawn() ? "✔" : getRed().getCurrentParticipants().size());
             } else {
-                blue = blue + "&9" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size();
-                red = red + "&c" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size();
+                blue = blue + "&9&l" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size();
+                red = red + "&c&l" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size();
             }
 
             blue = blue + (friendlyTeam.getColor().equals(GameTeam.Color.BLUE) ? " &7YOU" : "");
@@ -147,8 +147,8 @@ public class TeamDuel extends TeamGame {
             lines.add(blue + "&9&l" + (getBlue().isRespawn() ? "✓" : getBlue().getCurrentParticipants().size()));
             lines.add(red + "&c&l" + (getRed().isRespawn() ? "✓" : getRed().getCurrentParticipants().size()));
         } else {
-            lines.add(blue + "&f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
-            lines.add(red + "&f" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
+            lines.add(blue + "&9&l" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());
+            lines.add(red + "&c&l" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size());
         }
 
         switch(getState()) {

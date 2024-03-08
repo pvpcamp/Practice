@@ -43,7 +43,9 @@ public class GameParticipant {
     private long lastInvalidHitTick, lastValidHitTick;
 
     public long health, maxHealth, hunger,
-            hits, currentCombo, longestCombo,
+            hits, currentCombo, longestCombo, blockedHits,
+            arrowShots, arrowHits,
+            fireballShots,
             thrownPotions, missedPotions;
     private int kills, killStreak, deaths;
 

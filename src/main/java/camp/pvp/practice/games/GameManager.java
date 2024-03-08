@@ -24,7 +24,7 @@ public class GameManager {
     private Map<UUID, Game> games;
     private Tournament tournament;
     private SumoEvent sumoEvent;
-    private BukkitTask borderTask;
+    private BukkitTask borderTask, inventoryRemoverTask;
 
     private Map<UUID, PostGameInventory> postGameInventories;
 
@@ -43,6 +43,15 @@ public class GameManager {
                 }
             }
         }, 0, 20);
+
+        this.inventoryRemoverTask = Bukkit.getScheduler().runTaskTimer(plugin, ()-> {
+            final long time = System.currentTimeMillis();
+            for(PostGameInventory inventory : new ArrayList<>(postGameInventories.values())) {
+                if(time - inventory.getCreated() > 300 * 1000) {
+                    postGameInventories.remove(inventory.getUuid());
+                }
+            }
+        }, 0, 100);
 
         Bukkit.getScheduler().runTaskTimer(plugin, new HCFEffectUpdater(this), 0, 2);
 
@@ -112,6 +121,14 @@ public class GameManager {
     public void shutdown() {
         for(Game game : getActiveGames()) {
             game.forceEnd(false);
+        }
+
+        if(borderTask != null) {
+            borderTask.cancel();
+        }
+
+        if(inventoryRemoverTask != null) {
+            inventoryRemoverTask.cancel();
         }
     }
 }

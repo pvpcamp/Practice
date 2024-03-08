@@ -26,6 +26,7 @@ public class PlayerUtils {
         player.setFlySpeed(0.1F);
         player.setFireTicks(0);
         player.setSaturation(13);
+        player.setFallDistance(0F);
         player.setItemOnCursor(null);
         player.closeInventory();
         player.eject();

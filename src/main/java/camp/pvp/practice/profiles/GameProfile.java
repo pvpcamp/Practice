@@ -3,6 +3,7 @@ package camp.pvp.practice.profiles;
 import camp.pvp.core.Core;
 import camp.pvp.practice.cosmetics.DeathAnimation;
 import camp.pvp.practice.games.GameParticipant;
+import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.parties.Party;
@@ -323,60 +324,113 @@ public class GameProfile {
         Player player = getPlayer();
         GameProfileManager gpm = Practice.instance.getGameProfileManager();
 
+        List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+        players.remove(player);
+
         getHiddenPlayers().clear();
 
-        if(player != null) {
-            if(game != null) {
-                if(game.seeEveryone()) {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        if(!game.getAllPlayers().contains(p)) {
-                            getHiddenPlayers().add(p.getUniqueId());
-                        }
+        if(player == null) return;
+
+        if(game != null) {
+
+            if(game.seeEveryone()) {
+                players.forEach(p -> {
+                    if(!game.getAllPlayers().contains(p)) {
+                        getHiddenPlayers().add(p.getUniqueId());
                     }
-                } else {
-                    if(game.getCurrentPlayersPlaying().contains(player)) {
-                        for (Player p : Bukkit.getOnlinePlayers()) {
-                            if(!game.getAlivePlayers().contains(p)) {
-                                if (game.getSpectators().get(p.getUniqueId()) == null || !game.getSpectators().get(p.getUniqueId()).isVisibleToPlayers()) {
-                                    getHiddenPlayers().add(p.getUniqueId());
-                                }
-                            }
-                        }
-                    } else {
-                        boolean seeSpectators = this.isSpectatorVisibility();
-                        for (Player p : Bukkit.getOnlinePlayers()) {
-                            GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
-                            boolean spectating = game.getSpectators().containsKey(p.getUniqueId());
-                            boolean playing = game.getCurrentPlayersPlaying().contains(p);
-                            if(!playing) {
-                                if (spectating) {
-                                    if (seeSpectators) {
-                                        if (profile.isStaffMode() && !player.hasPermission("practice.staff")) {
-                                            getHiddenPlayers().add(p.getUniqueId());
-                                        }
-                                    } else {
-                                        getHiddenPlayers().add(p.getUniqueId());
-                                    }
-                                } else {
-                                    getHiddenPlayers().add(p.getUniqueId());
-                                }
-                            }
-                        }
+                });
+                return;
+            }
+
+            if(game.getAlive().containsKey(player.getUniqueId())) {
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    GameSpectator spectator = game.getSpectators().get(p.getUniqueId());
+                    if (spectator != null && !spectator.isVisibleToPlayers()) {
+                        getHiddenPlayers().add(p.getUniqueId());
                     }
                 }
             } else {
-                for(Player p : Bukkit.getOnlinePlayers()) {
-                    GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
-                    if((profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) || !this.isLobbyVisibility() || this.getState().equals(State.KIT_EDITOR)) {
-                        getHiddenPlayers().add(p.getUniqueId());
-                    } else {
-                        if(profile.isStaffMode() && !player.hasPermission("practice.staff")) {
-                            getHiddenPlayers().add(p.getUniqueId());
-                        }
-                    }
+                boolean seeSpectators = this.isSpectatorVisibility();
+                for (Player p : Bukkit.getOnlinePlayers()) {
+                    GameProfile pProfile = gpm.getLoadedProfiles().get(p.getUniqueId());
+
+                    if(!game.getAllPlayers().contains(player)) { getHiddenPlayers().add(p.getUniqueId()); continue; }
+
+                    if (pProfile.isStaffMode() && !player.hasPermission("practice.staff")) { getHiddenPlayers().add(p.getUniqueId()); return; }
+
+                    if(!seeSpectators) getHiddenPlayers().add(p.getUniqueId());
+                }
+            }
+
+            return;
+        }
+
+
+        for(Player p : Bukkit.getOnlinePlayers()) {
+            GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
+            if((profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) || !this.isLobbyVisibility() || this.getState().equals(State.KIT_EDITOR)) {
+                getHiddenPlayers().add(p.getUniqueId());
+            } else {
+                if(profile.isStaffMode() && !player.hasPermission("practice.staff")) {
+                    getHiddenPlayers().add(p.getUniqueId());
                 }
             }
         }
+
+
+//      OLD VISIBILITY CODE
+//        if(player != null) {
+//            if(game != null) {
+//                if(game.seeEveryone()) {
+//                    for (Player p : Bukkit.getOnlinePlayers()) {
+//                        if(!game.getAllPlayers().contains(p)) {
+//                            getHiddenPlayers().add(p.getUniqueId());
+//                        }
+//                    }
+//                } else {
+//                    if(game.getAlive().containsKey(player.getUniqueId())) {
+//                        for (Player p : Bukkit.getOnlinePlayers()) {
+//                            if(!game.getAlivePlayers().contains(p)) {
+//                                if (game.getSpectators().get(p.getUniqueId()) == null || !game.getSpectators().get(p.getUniqueId()).isVisibleToPlayers()) {
+//                                    getHiddenPlayers().add(p.getUniqueId());
+//                                }
+//                            }
+//                        }
+//                    } else {
+//                        boolean seeSpectators = this.isSpectatorVisibility();
+//                        for (Player p : Bukkit.getOnlinePlayers()) {
+//                            GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
+//                            boolean spectating = game.getSpectators().containsKey(p.getUniqueId());
+//                            boolean playing = game.getCurrentPlayersPlaying().contains(p);
+//                            if(!playing) {
+//                                if (spectating) {
+//                                    if (seeSpectators) {
+//                                        if (profile.isStaffMode() && !player.hasPermission("practice.staff")) {
+//                                            getHiddenPlayers().add(p.getUniqueId());
+//                                        }
+//                                    } else {
+//                                        getHiddenPlayers().add(p.getUniqueId());
+//                                    }
+//                                } else {
+//                                    getHiddenPlayers().add(p.getUniqueId());
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            } else {
+//                for(Player p : Bukkit.getOnlinePlayers()) {
+//                    GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
+//                    if((profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) || !this.isLobbyVisibility() || this.getState().equals(State.KIT_EDITOR)) {
+//                        getHiddenPlayers().add(p.getUniqueId());
+//                    } else {
+//                        if(profile.isStaffMode() && !player.hasPermission("practice.staff")) {
+//                            getHiddenPlayers().add(p.getUniqueId());
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
     public boolean isValid() {

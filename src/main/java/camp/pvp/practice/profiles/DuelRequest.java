@@ -13,6 +13,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.Calendar;
@@ -69,6 +70,8 @@ public class DuelRequest {
 
                 opponentPlayer.spigot().sendMessage(msg);
                 opponentPlayer.sendMessage(" ");
+
+                opponentPlayer.playSound(opponentPlayer.getLocation(), Sound.LAVA_POP, 1, 1);
             } else {
                 senderPlayer.sendMessage(ChatColor.RED + "This player is currently busy.");
             }

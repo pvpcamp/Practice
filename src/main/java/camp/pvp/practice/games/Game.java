@@ -95,6 +95,7 @@ public abstract class Game {
                     startingTimer.cancel();
                 } else {
                     if(timer == 30 || timer == 15 || timer == 10 || timer <= 5) {
+                        playSound(null, Sound.CLICK, 1F, 1F);
                         announce("&aGame starting in &f" + timer + " &asecond" + (timer == 1 ? "" : "s") + ".");
                     }
                     timer--;
@@ -398,6 +399,8 @@ public abstract class Game {
                     event.setDamage(100);
                 }
 
+                participant.arrowHits++;
+
                 if(attacker != victim && getKit().isShowArrowDamage()) {
                     int distance = (int) Math.round(attacker.getLocation().distance(victim.getLocation()));
 
@@ -429,6 +432,10 @@ public abstract class Game {
         if(event.getDamager() instanceof Player) {
             participant.hits++;
             participant.currentCombo++;
+
+            if(victim.isBlocking()) {
+                victimParticipant.blockedHits++;
+            }
 
             if (participant.isComboMessages()) {
                 switch ((int) participant.getCurrentCombo()) {

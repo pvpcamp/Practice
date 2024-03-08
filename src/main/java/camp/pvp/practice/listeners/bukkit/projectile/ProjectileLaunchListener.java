@@ -7,12 +7,15 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.EnderPearl;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 
 public class ProjectileLaunchListener implements Listener {
 
@@ -36,35 +39,61 @@ public class ProjectileLaunchListener implements Listener {
                 }
             }
 
-            if(game != null) {
+            if(game == null) return;
 
-                game.addEntity(event.getEntity());
-                GameParticipant participant = game.getAlive().get(player.getUniqueId());
+            game.addEntity(event.getEntity());
+            GameParticipant participant = game.getAlive().get(player.getUniqueId());
 
-                if(event.getEntity() instanceof EnderPearl && participant != null) {
+            if(participant == null) {
+                event.setCancelled(true);
+                return;
+            }
 
-                    if(game.getState().equals(Game.State.ACTIVE)) {
+            if(event.getEntity() instanceof EnderPearl) {
 
-                        PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
+                if(game.getState().equals(Game.State.ACTIVE)) {
 
-                        if (cooldown != null && !cooldown.isExpired()) {
+                    PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.ENDER_PEARL);
 
-                            event.setCancelled(true);
-                            player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
-
-                        } else {
-
-                            cooldown = new PlayerCooldown(PlayerCooldown.Type.ENDER_PEARL, participant, player);
-                            participant.getCooldowns().put(PlayerCooldown.Type.ENDER_PEARL, cooldown);
-
-                        }
-                    } else {
+                    if (cooldown != null && !cooldown.isExpired()) {
 
                         event.setCancelled(true);
                         player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
 
+                    } else {
+
+                        cooldown = new PlayerCooldown(PlayerCooldown.Type.ENDER_PEARL, participant, player);
+                        participant.getCooldowns().put(PlayerCooldown.Type.ENDER_PEARL, cooldown);
+
+                    }
+                } else {
+
+                    event.setCancelled(true);
+                    player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
+
+                }
+
+                return;
+            }
+
+            if(event.getEntity() instanceof ThrownPotion potion) {
+                for(PotionEffect effect : potion.getEffects()) {
+                    if(effect.getType().equals(PotionEffectType.HEAL)) {
+                        participant.thrownPotions++;
+                        return;
                     }
                 }
+                return;
+            }
+
+            if(event.getEntity() instanceof Arrow) {
+                participant.arrowShots++;
+                return;
+            }
+
+            if(event.getEntity() instanceof Fireball) {
+                participant.fireballShots++;
+                return;
             }
         }
     }

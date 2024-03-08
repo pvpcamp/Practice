@@ -46,19 +46,19 @@ public class PlayerCooldown {
         public String blockedMessage() {
             switch(this) {
                 case ENDER_PEARL:
-                    return Colors.get("&cYou must wait <time> second(s) before pearling again.");
+                    return Colors.get("&cYou must wait <time> before pearling again.");
                 case FIREBALL:
                     return Colors.get("&cYou are on fireball cooldown.");
                 case ENERGY_JUMP:
-                    return Colors.get("&cYou must wait <time> second(s) before using your Jump Boost ability again.");
+                    return Colors.get("&cYou must wait <time> before using your Jump Boost ability again.");
                 case ENERGY_REGEN:
-                    return Colors.get("&cYou must wait <time> second(s) before using your Regeneration ability again.");
+                    return Colors.get("&cYou must wait <time> before using your Regeneration ability again.");
                 case ENERGY_RESISTANCE:
-                    return Colors.get("&cYou must wait <time> second(s) before using your Resistance ability again.");
+                    return Colors.get("&cYou must wait <time> before using your Resistance ability again.");
                 case ENERGY_STRENGTH:
-                    return Colors.get("&cYou must wait <time> second(s) before using your Strength ability again.");
+                    return Colors.get("&cYou must wait <time> before using your Strength ability again.");
                 case ENERGY_SPEED:
-                    return Colors.get("&cYou must wait <time> second(s) before using your Speed ability again.");
+                    return Colors.get("&cYou must wait <time> before using your Speed ability again.");
                 default:
                     return null;
             }
@@ -91,7 +91,7 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("ENDER_PEARL")
                                     .build())
-                            .duration(Duration.ofSeconds(Math.round(this.getDuration() * 1000)))
+                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
                             .build();
                 case FIREBALL:
                     return Cooldown.builder()
@@ -107,7 +107,7 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("FEATHER")
                                     .build())
-                            .duration(Duration.ofSeconds(Math.round(this.getDuration() * 1000)))
+                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
                             .build();
                 case ENERGY_REGEN:
                     return Cooldown.builder()
@@ -115,7 +115,7 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("GHAST_TEAR")
                                     .build())
-                            .duration(Duration.ofSeconds(Math.round(this.getDuration() * 1000)))
+                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
                             .build();
                 case ENERGY_RESISTANCE:
                     return Cooldown.builder()
@@ -123,7 +123,7 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("IRON_INGOT")
                                     .build())
-                            .duration(Duration.ofSeconds(Math.round(this.getDuration() * 1000)))
+                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
                             .build();
                 case ENERGY_STRENGTH:
                     return Cooldown.builder()
@@ -139,7 +139,7 @@ public class PlayerCooldown {
                             .icon(ItemStackIcon.builder()
                                     .itemName("SUGAR")
                                     .build())
-                            .duration(Duration.ofSeconds(Math.round(this.getDuration() * 1000)))
+                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
                             .build();
                 default:
                     return null;
@@ -191,8 +191,8 @@ public class PlayerCooldown {
     }
 
     public String getBlockedMessage() {
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(getRemaining()) % 60;
-        return Colors.get(type.blockedMessage().replace("<time>", String.valueOf(seconds + 1)));
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(getRemaining()) % 60 + 1;
+        return Colors.get(type.blockedMessage().replace("<time>", String.valueOf(seconds)) + " " + (seconds == 1 ? "second" : "seconds"));
     }
 
     public void check() {

@@ -16,6 +16,8 @@ import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,17 +43,26 @@ public class PotionSplashListener implements Listener {
 
             if(game != null) {
                 if(game.getParticipants().containsKey(player.getUniqueId())) {
-                    GameParticipant participant = game.getParticipants().get(player.getUniqueId());
-                    participant.thrownPotions++;
-                    if(event.getIntensity(player) < 0.5) {
-                        participant.missedPotions++;
+
+                    boolean healPot = false;
+                    for (PotionEffect effect : event.getPotion().getEffects()) {
+                        if (effect.getType().equals(PotionEffectType.HEAL)) {
+                            healPot = true;
+                            break;
+                        }
+                    }
+
+                    if(healPot) {
+                        GameParticipant participant = game.getParticipants().get(player.getUniqueId());
+                        if (event.getIntensity(player) < 0.5) {
+                            participant.missedPotions++;
+                        }
                     }
                 }
             }
 
             for(LivingEntity entity : event.getAffectedEntities()) {
-                if(entity instanceof Player) {
-                    Player p = (Player) entity;
+                if(entity instanceof Player p) {
                     GameProfile pr = gpm.getLoadedProfiles().get(p.getUniqueId());;
                     Game g = pr.getGame();
 
@@ -80,6 +91,7 @@ public class PotionSplashListener implements Listener {
                     event.setCancelled(!p.canSee(player));
                 }
             };
+
             plugin.getProtocolManager().addPacketListener(particleListener);
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> plugin.getProtocolManager().removePacketListener(particleListener), 2L);
         }

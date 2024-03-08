@@ -256,7 +256,8 @@ public class Tournament {
 
         announceAll(
                 " ",
-                "&6[Tournament] &6Winner: &f" + participant.getName(),
+                "&6&lTournament",
+                " &7● &6Winner: &f" + participant.getName(),
                 " ");
 
 
@@ -275,6 +276,10 @@ public class Tournament {
         plugin.getGameManager().setTournament(null);
 
         setState(State.ENDED);
+
+        if(getStartingTimer() != null) getStartingTimer().cancel();
+
+        if(getRoundStartingTimer() != null) getRoundStartingTimer().cancel();
 
         plugin.getGameProfileManager().refreshLobbyItems();
     }
