@@ -178,7 +178,7 @@ public abstract class Game {
 
             plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
-            if(getArena() != null) getArena().resetArena(false);
+            if(getArena() != null) getArena().resetArena();
 
             setState(State.INACTIVE);
 
@@ -219,7 +219,7 @@ public abstract class Game {
         setEnded(new Date());
         setState(State.ENDED);
 
-        arena.resetArena(true);
+        arena.resetArena();
     }
 
     private void killRespawn(Player player, GameParticipant participant) {

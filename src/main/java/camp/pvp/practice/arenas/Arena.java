@@ -11,7 +11,11 @@ import org.bukkit.block.Chest;
 import xyz.refinedev.spigot.api.chunk.ChunkAPI;
 import xyz.refinedev.spigot.api.chunk.ChunkSnapshot;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.*;
+import java.util.logging.Logger;
 
 @Getter @Setter
 public class Arena implements Comparable<Arena>{
@@ -26,7 +30,7 @@ public class Arena implements Comparable<Arena>{
     private String parentName;
     private int xDifference, zDifference, buildLimit, voidLevel;
 
-    private @Getter List<Location> beds, allBlocks, blocks, chests;
+    private @Getter List<Location> solidBlocks;
     private @Getter List<StoredChunk> storedChunks;
     private @Getter Map<StoredChunk, ChunkSnapshot> snapshots;
 
@@ -38,10 +42,7 @@ public class Arena implements Comparable<Arena>{
         this.randomSpawnLocations = new ArrayList<>();
         this.lootChests = new ArrayList<>();
 
-        this.beds = new ArrayList<>();
-        this.allBlocks = new ArrayList<>();
-        this.blocks = new ArrayList<>();
-        this.chests = new ArrayList<>();
+        this.solidBlocks = new ArrayList<>();
         this.snapshots = new HashMap<>();
         this.storedChunks = new ArrayList<>();
 
@@ -107,11 +108,8 @@ public class Arena implements Comparable<Arena>{
         setBuildLimit(parent.getBuildLimit());
         setVoidLevel(parent.getVoidLevel());
 
-        scanArena();
-
         if(reset) {
-            scanArena();
-            resetArena(true);
+            copyBlocks();
         }
     }
 
@@ -152,10 +150,8 @@ public class Arena implements Comparable<Arena>{
 
         if(corner1 != null && corner2 != null) {
 
-            getBeds().clear();
-            getChests().clear();
-            getAllBlocks().clear();
             getSnapshots().clear();
+            getSolidBlocks().clear();
             getStoredChunks().clear();
 
             int minX, minY, minZ, maxX, maxY, maxZ;
@@ -172,22 +168,11 @@ public class Arena implements Comparable<Arena>{
                     for (int z = minZ; z < maxZ; z++) {
                         Location location = new Location(c1.getWorld(), x, y, z);
                         Block block = location.getBlock();
-                        if(!block.isEmpty()) {
-                            switch(block.getType()) {
-                                case BED_BLOCK:
-                                    getBeds().add(block.getLocation());
-                                    break;
-                                case CHEST:
-                                case TRAPPED_CHEST:
-                                    getChests().add(block.getLocation());
-                            }
-
-                            getBlocks().add(location);
-                        }
-
-                        getAllBlocks().add(location);
-
                         Chunk chunk = block.getChunk();
+
+                        if(!block.isEmpty()) {
+                            solidBlocks.add(location);
+                        }
 
                         StoredChunk storedChunk = new StoredChunk(chunk.getX(), chunk.getZ(), location.getWorld());
                         if(!storedChunks.contains(storedChunk)) {
@@ -213,7 +198,7 @@ public class Arena implements Comparable<Arena>{
 
     public void clearBlocks() {
         scanArena();
-        for(Location location : getAllBlocks()) {
+        for(Location location : getSolidBlocks()) {
             location.getBlock().setType(Material.AIR);
         }
     }
@@ -221,63 +206,129 @@ public class Arena implements Comparable<Arena>{
     /***
      * Resets the arena.
      */
-    public void resetArena(boolean hardReset) {
+    public void resetArena() {
         if (!getType().isBuild()) return;
         if (!isCopy()) return;
 
         setInUse(true);
 
-        if(hardReset) {
+        ChunkAPI api = ChunkAPI.getInstance();
 
-            for(StoredChunk chunk : getStoredChunks()) {
-                Chunk c = chunk.getBukkitChunk();
-                if(!c.isLoaded()) {
-                    c.load(false);
-                }
-            }
-
-            int i = 0;
-            for(Location location : getParent().getAllBlocks()) {
-                Block block = location.getBlock();
-                BlockState oldState = block.getState();
-
-                Location newLocation = location.clone().add(getXDifference(), 0, getZDifference());
-
-                Block newBlock = newLocation.getBlock();
-
-                if(block.getType().equals(newBlock.getType())) continue;
-
-                if(oldState != null && oldState.getData() != newBlock.getState().getData()) {
-                    newBlock.setType(oldState.getType());
-
-                    BlockState bs = newBlock.getState();
-                    bs.setType(oldState.getType());
-                    bs.setData(oldState.getData());
-                    bs.update(true, true);
-                } else {
-                    newBlock.setType(block.getType());
-                }
-                i++;
-            }
-
-            Practice.getInstance().sendDebugMessage("Hard reset " + i + " blocks for arena " + getName() + ".");
-        } else {
-            ChunkAPI api = ChunkAPI.getInstance();
-
-            for (Map.Entry<StoredChunk, ChunkSnapshot> entry : getSnapshots().entrySet()) {
-                StoredChunk sc = entry.getKey();
-                api.restoreSnapshot(sc.getBukkitChunk(), entry.getValue());
-            }
-
-            refreshChunkSnapshots();
+        for (Map.Entry<StoredChunk, ChunkSnapshot> entry : getSnapshots().entrySet()) {
+            StoredChunk sc = entry.getKey();
+            api.restoreSnapshot(sc.getBukkitChunk(), entry.getValue());
         }
+
+        refreshChunkSnapshots();
+
+        setInUse(false);
+    }
+
+    public void copyBlocks() {
+        if (!getType().isBuild()) return;
+        if (!isCopy()) return;
+
+        setInUse(true);
+
+        Logger logger = Practice.getInstance().getLogger();
+
+        logger.info("[Arena#copyBlocks] Starting arena copy process for arena " + getName() + ".");
+
+        int minX, minY, minZ, maxX, maxY, maxZ;
+        Location c1 = getPositions().get("corner1").getLocation(), c2 = getPositions().get("corner2").getLocation();
+        minX = Math.min(c1.getBlockX(), c2.getBlockX());
+        minY = Math.min(c1.getBlockY(), c2.getBlockY());
+        minZ = Math.min(c1.getBlockZ(), c2.getBlockZ());
+        maxX = Math.max(c1.getBlockX(), c2.getBlockX());
+        maxY = Math.max(c1.getBlockY(), c2.getBlockY());
+        maxZ = Math.max(c1.getBlockZ(), c2.getBlockZ());
+
+        List<Location> solidBlocks = new ArrayList<>(), airBlocks = new ArrayList<>();
+        List<StoredChunk> newStoredChunks = new ArrayList<>();
+
+        for (int x = minX; x < maxX; x++) {
+            for (int y = minY; y < maxY; y++) {
+                for (int z = minZ; z < maxZ; z++) {
+                    Location location = new Location(c1.getWorld(), x, y, z);
+                    Block block = location.getBlock();
+
+                    if (block.isEmpty()) {
+                        airBlocks.add(location);
+                    } else {
+                        solidBlocks.add(location);
+                    }
+
+                    Chunk chunk = block.getChunk();
+                    StoredChunk storedChunk = new StoredChunk(chunk.getX(), chunk.getZ(), location.getWorld());
+                    if(!newStoredChunks.contains(storedChunk)) {
+                        newStoredChunks.add(storedChunk);
+                    }
+                }
+            }
+        }
+
+        logger.info("[Arena#copyBlocks] Captured " + (solidBlocks.size() + airBlocks.size()) + " blocks and " + newStoredChunks.size() + " chunks for " + getName() + ", starting iteration.");
+
+        List<Location> newSolidBlocks = new ArrayList<>();
+        int changedBlocks = 0;
+
+        for(Location location : solidBlocks) {
+            Block block = location.getBlock();
+            Location parentLocation = location.clone().subtract(xDifference, 0, zDifference);
+            Block parentBlock = parentLocation.getBlock();
+
+            if(parentBlock.isEmpty()) {
+                block.setType(Material.AIR);
+
+                changedBlocks++;
+            } else {
+                newSolidBlocks.add(location);
+                if(!parentBlock.getType().equals(block.getType())) {
+                    block.setType(parentBlock.getType());
+
+                    BlockState parentState = parentBlock.getState();
+                    BlockState newState = block.getState();
+                    newState.setType(parentState.getType());
+                    newState.setData(parentState.getData());
+                    newState.update();
+
+                    changedBlocks++;
+                }
+            }
+        }
+
+        for(Location location : airBlocks) {
+            Block block = location.getBlock();
+            Location parentLocation = location.clone().subtract(xDifference, 0, zDifference);
+            Block parentBlock = parentLocation.getBlock();
+
+            if(!parentBlock.isEmpty()) {
+                newSolidBlocks.add(location);
+                block.setType(parentBlock.getType());
+
+                BlockState parentState = parentBlock.getState();
+                BlockState newState = block.getState();
+                newState.setType(parentState.getType());
+                newState.setData(parentState.getData());
+                newState.update();
+
+                changedBlocks++;
+            }
+        }
+
+        logger.info("[Arena#copyBlocks] Finished copying " + changedBlocks + " blocks for " + getName() + ".");
+
+        setSolidBlocks(newSolidBlocks);
+        setStoredChunks(newStoredChunks);
+
+        refreshChunkSnapshots();
 
         setInUse(false);
     }
 
     public boolean isOriginalBlock(Location location) {
 
-        if (!type.isBedRespawn()) return blocks.contains(location);
+        if (!type.isBedRespawn()) return solidBlocks.contains(location);
 
         for (ArenaPosition position : positions.values()) {
             if(!position.getPosition().contains("bed")) continue;
@@ -288,8 +339,8 @@ public class Arena implements Comparable<Arena>{
                 for (int y = l.getBlockY(); y < l.getBlockY() + 3; y++) {
                     for (int z = l.getBlockZ() - 4; z < l.getBlockZ() + 4; z++) {
                         Location blockLocation = new Location(l.getWorld(), x, y, z);
-                        Block block = blockLocation.getBlock();
-                        if (block.equals(location.getBlock())) {
+                        Block b = blockLocation.getBlock();
+                        if (b.equals(location.getBlock())) {
                             return false;
                         }
                     }
@@ -297,7 +348,7 @@ public class Arena implements Comparable<Arena>{
             }
         }
 
-        return blocks.contains(location);
+        return solidBlocks.contains(location);
     }
 
     @Override
