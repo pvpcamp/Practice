@@ -46,7 +46,10 @@ public class PlayerMoveListener implements Listener {
                     if (!game.getKit().isMoveOnStart()) {
                         if (!Arrays.asList(Game.State.ACTIVE, Game.State.ENDED).contains(game.getState()) && game.getCurrentPlayersPlaying().contains(player)) {
                             if (from.getX() != to.getX() || from.getZ() != to.getZ()) {
-                                player.teleport(from);
+                                Location location = player.getLocation();
+                                location.setX(from.getX());
+                                location.setZ(from.getZ());
+                                player.teleport(location);
                             }
                         }
                     }

@@ -1,6 +1,6 @@
 main: camp.pvp.practice.Practice
 name: ${project.name}
-version: ${project.version} ${git.branch}-${git.commit.id.abbrev}
+version: ${git.branch}-${git.commit.id.abbrev}
 author: leuo
 depend:
   - Citizens
@@ -12,6 +12,9 @@ depend:
 commands:
   accept:
     description: Accepts a duel from a player or team.
+  announce:
+    permission: practice.commands.announce
+    description: Announce to the server that you are looking to play a game.
   arena:
     permission: practice.commands.arena
     description: Arena configuration utility.
@@ -72,7 +75,7 @@ commands:
     description: View the statistics of yourself or another player.
   surrender:
     description: Surrender a game.
-    aliases: [forfeit, suicide, giveup, imdone]
+    aliases: [forfeit, suicide, giveup, igiveup, imdone, quit]
   tournament:
     description: Join, leave, or host a tournament.
   whereami:
@@ -96,11 +99,3 @@ permissions:
     description: Allows a player to select a map for duel requests.
   practice.lobby.fly:
     description: Allows a player to fly in the lobby.
-
-  # Commands
-  practice.commands.arena:
-    description: Allows the player to use the arena command.
-  practice.commands.arenaposition:
-    description: Allows the player to use the arenaposition command.
-  practice.commands.explode:
-    description: Allows the player to use the explode command.

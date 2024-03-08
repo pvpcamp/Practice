@@ -53,38 +53,11 @@ public class OneInTheChamberMinigame extends Minigame {
 
         this.setState(State.STARTING);
 
-        List<Player> players = new ArrayList<>(this.getAlivePlayers());
-        players.sort(Comparator.comparing(HumanEntity::getName));
-
-        StringBuilder sb = new StringBuilder();
-
-        int s = 0;
-        while(s != this.getAlive().size()) {
-            Player p = players.get(0);
-            sb.append(ChatColor.WHITE + p.getName());
-
-            players.remove(p);
-            s++;
-            if(s == this.getAlivePlayers().size()) {
-                sb.append(ChatColor.GRAY + ".");
-            } else {
-                sb.append(ChatColor.GRAY + ", ");
-            }
-        }
-
-        String startingMessage = """
-                
-                &6&lMinigame starting in 5 seconds.
-                 &7● &6Minigame: &fOne In The Chamber
-                 &7● &6Arena: &f%s
-                 &7● &6Participants: &f%s
-                 \n
-                 """.formatted(arena.getDisplayName(), sb);
+        sendStartingMessage();
 
         for(GameParticipant participant : getParticipants().values()) {
             Player p = Bukkit.getPlayer(participant.getUuid());
             p.teleport(getRespawnLocation(participant));
-            p.sendMessage(Colors.get(startingMessage));
             participant.getProfile().givePlayerItems();
         }
 
@@ -134,52 +107,6 @@ public class OneInTheChamberMinigame extends Minigame {
                 end();
             }
         }
-    }
-
-    @Override
-    public void end() {
-
-        if(getState() == State.ENDED) return;
-
-        GameParticipant winner = determineWinner();
-
-        GameProfileManager gpm = getPlugin().getGameProfileManager();
-        setEnded(new Date());
-        setState(State.ENDED);
-
-        if(getStarted() == null) {
-            setStarted(new Date());
-            getStartingTimer().cancel();
-        }
-
-        StringBuilder topPlayers = new StringBuilder();
-        List<GameParticipant> sortedParticipants = new ArrayList<>(this.getParticipants().values());
-        sortedParticipants.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
-
-        for(GameParticipant p : sortedParticipants) {
-            if(p.getRespawnTask() != null) p.getRespawnTask().cancel();
-            p.setLivingState(GameParticipant.LivingState.ALIVE);
-        }
-
-        for(int i = 0; i < Math.min(sortedParticipants.size(), 3); i++) {
-            GameParticipant p = sortedParticipants.get(i);
-            topPlayers.append("\n &7● &6" + (i + 1) + ": &f" + p.getName() + " &7- &f" + p.getKills() + " Kill" + (p.getKills() == 1 ? "" : "s"));
-        }
-
-        String endMessage = """
-                
-                &6&lMinigame finished.
-                 &7● &6Winner: &f%s
-                 \n
-                &6&lTop Players: %s
-                 \n
-                """.formatted(winner.getName(), topPlayers.toString());
-
-        for(Player player : this.getAllPlayers()) {
-            player.sendMessage(Colors.get(endMessage));
-        }
-
-        cleanup(3);
     }
 
     @Override

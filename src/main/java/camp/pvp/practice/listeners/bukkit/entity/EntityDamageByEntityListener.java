@@ -52,21 +52,24 @@ public class EntityDamageByEntityListener implements Listener {
             }
         }
 
-        if(event.getDamager() instanceof Arrow arrow && arrow.getShooter() instanceof Player) {
-            attacker = (Player) arrow.getShooter();
-        }
+        if(event.getDamager() instanceof Arrow arrow && arrow.getShooter() instanceof Player) attacker = (Player) arrow.getShooter();
 
         if(event.getDamager() instanceof Fireball || event.getDamager() instanceof TNTPrimed) {
 
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId());
             Game game = profile.getGame();
-            if(game != null && game.getKit().equals(GameKit.FIREBALL_FIGHT)) {
+
+            if(game != null && game.getKit().equals(GameKit.FIREBALL_FIGHT) && game.getAlive().containsKey(player.getUniqueId())) {
+
+                double damage = 5;
 
                 if (event.getDamager().getTicksLived() < 20) {
-                    player.damage(0);
+                    damage = 0;
                 } else {
-                    player.damage(event.getFinalDamage());
+                    damage = event.getFinalDamage() / 4;
                 }
+
+                player.damage(damage);
 
                 Vector dirToExplosion = event.getDamager().getLocation().toVector().subtract(player.getLocation().toVector());
 
@@ -78,7 +81,7 @@ public class EntityDamageByEntityListener implements Listener {
                 // Multiply the vector to get desired explosion strength.
                 dirToExplosion.multiply(1.25);
                 // Set Y to make the player fly up.
-                dirToExplosion.setY(1.25);
+                dirToExplosion.setY(1.20);
 
                 player.setVelocity(dirToExplosion);
 

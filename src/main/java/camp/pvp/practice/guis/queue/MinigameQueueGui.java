@@ -20,7 +20,7 @@ public class MinigameQueueGui extends ArrangedGui {
         this.setDefaultBorder();
 
         GuiButton back = new GuiButton(Material.ARROW, "&c&lBack");
-        back.setAction((p, b, g, click) -> new ChooseQueueGui(profile).open(p));
+        back.setAction((p, b, g, click) -> new PlayGui(profile).open(p));
         back.setLore("&7Click to return to", "&7the play menu.");
         back.setSlot(0);
         back.setOverrideGuiArrangement(true);

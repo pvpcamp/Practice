@@ -46,8 +46,8 @@ public class TeamDuel extends TeamGame {
             String red = "&cR &fRed: ";
 
             if (getKit().equals(GameKit.BED_FIGHT) || getKit().equals(GameKit.FIREBALL_FIGHT)) {
-                blue = blue + "&9&l" + (getBlue().isRespawn() ? "✓" : getBlue().getCurrentParticipants().size());
-                red = red + "&c&l" + (getRed().isRespawn() ? "✓" : getRed().getCurrentParticipants().size());
+                blue = blue + "&9&l" + (getBlue().isRespawn() ? "✔" : getBlue().getCurrentParticipants().size());
+                red = red + "&c&l" + (getRed().isRespawn() ? "✔" : getRed().getCurrentParticipants().size());
             } else {
                 blue = blue + "&9" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size();
                 red = red + "&c" + getRed().getAliveParticipants().size() + "/" + getRed().getParticipants().size();

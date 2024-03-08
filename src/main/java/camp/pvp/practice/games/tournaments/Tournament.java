@@ -134,7 +134,7 @@ public class Tournament {
                     return;
                 }
 
-                if (this.getActiveGames().isEmpty()) {
+                if (this.getActiveGames().isEmpty() && this.getState().equals(State.IN_GAME)) {
                     this.nextRound();
                 }
             }, 1);
@@ -181,7 +181,8 @@ public class Tournament {
                     setState(State.ENDED);
                 }
 
-                Tournament.this.getTournamentParticipants().clear();
+                getTournamentParticipants().clear();
+                plugin.getGameManager().setTournament(null);
                 return;
             }
         }
@@ -192,7 +193,7 @@ public class Tournament {
         Collections.shuffle(shuffledParticipants);
 
         Queue<TournamentParticipant> queuedParticipants = new LinkedList<>(shuffledParticipants);
-        while(queuedParticipants.size() > 0) {
+        while(!queuedParticipants.isEmpty()) {
             TournamentParticipant participantOne = null, participantTwo = null;
             participantOne = queuedParticipants.poll();
             participantTwo = queuedParticipants.poll();
@@ -230,7 +231,7 @@ public class Tournament {
                     roundStartingTimer.cancel();
                 } else {
                     if(times.contains(timer)) {
-                        announce("&eRound " + currentRound + " starting in " + timer + " second(s).");
+                        announce("&eRound " + currentRound + " starting in " + timer + " second" + (timer == 1 ? "" : "s") + ".");
                     }
                     timer--;
                 }

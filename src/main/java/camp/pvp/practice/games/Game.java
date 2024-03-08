@@ -24,21 +24,16 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.*;
-import org.bukkit.block.Chest;
-import org.bukkit.block.Dispenser;
-import org.bukkit.block.Furnace;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.*;
-import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import java.util.*;
 
@@ -183,7 +178,7 @@ public abstract class Game {
 
             plugin.getGameProfileManager().updateGlobalPlayerVisibility();
 
-            if(getArena() != null) getArena().resetArena();
+            if(getArena() != null) getArena().resetArena(false);
 
             setState(State.INACTIVE);
 
@@ -224,7 +219,7 @@ public abstract class Game {
         setEnded(new Date());
         setState(State.ENDED);
 
-        arena.resetArena();
+        arena.resetArena(true);
     }
 
     private void killRespawn(Player player, GameParticipant participant) {
@@ -254,12 +249,6 @@ public abstract class Game {
             return;
         }
 
-        Location location = player.getLocation();
-
-        boolean velocity = participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK);
-
-        profile.getDeathAnimation().playAnimation(this, player, location, velocity);
-
         participant.kill();
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
@@ -277,16 +266,31 @@ public abstract class Game {
             }
         }
 
+        Location location = player.getLocation();
+        boolean velocity = participant.getLastDamageCause() != null && participant.getLastDamageCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK);
+
         if(participant.isRespawn() && !leftGame) {
+
+            playSound(location, Sound.HURT_FLESH, 1F, 1F);
+
+            if(velocity) {
+                player.setVelocity(new Vector(0, 0.5, 0));
+            }
+
             killRespawn(player, participant);
             return;
         }
 
         if(leftGame) {
+            participant.setRespawn(false);
             participant.setLivingState(GameParticipant.LivingState.DEAD);
         } else {
             spectateStart(player);
             announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
+        }
+
+        if(participant.getLivingState().equals(GameParticipant.LivingState.DEAD)) {
+            profile.getDeathAnimation().playAnimation(this, player, location, velocity);
         }
     }
 
@@ -305,6 +309,11 @@ public abstract class Game {
             int currentTick = plugin.getTickNumberCounter().getCurrentTick();
 
             if(participant.getLastInvalidHitTick() == currentTick && participant.getLastValidHitTick() != currentTick && event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
+                event.setCancelled(true);
+                return false;
+            }
+
+            if(event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)) {
                 event.setCancelled(true);
                 return false;
             }
@@ -560,9 +569,18 @@ public abstract class Game {
 
         if(!getState().equals(State.ACTIVE)) return;
 
+        GameParticipant participant = getCurrentPlaying().get(player.getUniqueId());
+
         if(item.getType().equals(Material.FIREBALL) && getArena().getType().isBuild()) {
-            Fireball fireball = player.launchProjectile(Fireball.class);
-            fireball.setVelocity(fireball.getVelocity().multiply(3));
+
+            PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.FIREBALL);
+            if(cooldown != null && !cooldown.isExpired()) {
+                player.sendMessage(cooldown.getBlockedMessage());
+                return;
+            }
+
+            Fireball fireball = player.launchProjectile(Fireball.class, player.getLocation().getDirection().multiply(1.1));
+
             fireball.setIsIncendiary(false);
             addEntity(fireball);
 
@@ -571,6 +589,9 @@ public abstract class Game {
             } else {
                 player.getInventory().remove(item);
             }
+
+            cooldown = new PlayerCooldown(PlayerCooldown.Type.FIREBALL, participant, player);
+            participant.getCooldowns().put(PlayerCooldown.Type.FIREBALL, cooldown);
 
             event.setCancelled(true);
         }
@@ -717,7 +738,7 @@ public abstract class Game {
             player.getInventory().addItem(new ItemStack(Material.SNOW_BALL));
         } else {
             for (ItemStack item : block.getDrops()) {
-                Item i = block.getLocation().getWorld().dropItemNaturally(block.getLocation(), item);
+                Item i = block.getLocation().getWorld().dropItem(block.getLocation(), item);
                 addEntity(i);
             }
         }
@@ -730,52 +751,91 @@ public abstract class Game {
 
         if(!block.getType().equals(Material.BED_BLOCK)) block.setType(Material.AIR);
 
-        if(!(arena.getType().equals(Arena.Type.DUEL_BED_FIGHT) || arena.getType().equals(Arena.Type.DUEL_FIREBALL_FIGHT))) return;
+        if(getArena().getType().isBedRespawn()) {
 
-        if(!material.equals(Material.BED_BLOCK)) return;
+            if (!material.equals(Material.BED_BLOCK)) return;
 
-        GameParticipant participant = null;
-        GameTeam.Color color = null;
-        ArenaPosition bedPosition = null;
+            GameParticipant participant = null;
+            GameTeam.Color color = null;
+            ArenaPosition bedPosition = null;
 
-        for(int x = block.getX() - 2; x < block.getX() + 2; x++) {
-            for(int z = block.getZ() - 2; z < block.getZ() + 2; z++) {
-                for(ArenaPosition arenaPosition : arena.getPositions().values()) {
-                    if(arenaPosition.getPosition().contains("bed") &&
-                            arenaPosition.getLocation().equals(new Location(block.getWorld(), x, block.getY(), z))) bedPosition = arenaPosition;
+            for (int x = block.getX() - 2; x < block.getX() + 2; x++) {
+                for (int z = block.getZ() - 2; z < block.getZ() + 2; z++) {
+                    for (ArenaPosition arenaPosition : arena.getPositions().values()) {
+                        if (arenaPosition.getPosition().contains("bed") &&
+                                arenaPosition.getLocation().equals(new Location(block.getWorld(), x, block.getY(), z)))
+                            bedPosition = arenaPosition;
+                    }
                 }
             }
+
+            if (bedPosition == null) return;
+
+            for (GameParticipant p : getParticipants().values()) {
+                if (bedPosition.getPosition().contains(p.getTeamColor().toString().toLowerCase())) {
+                    color = p.getTeamColor();
+                    participant = p;
+                    break;
+                }
+            }
+
+            if (participant == null) return;
+
+            if (breaker.getTeamColor().equals(color)) {
+                player.sendMessage(ChatColor.RED + "You cannot destroy your own bed.");
+                event.setCancelled(true);
+                return;
+            }
+
+            block.setType(Material.AIR);
+
+            participant.setRespawn(false);
+            announceAll(
+                    " ",
+                    color.getChatColor() + "&l" + color.name() + " BED DESTROYED!",
+                    color.getChatColor() + "Bed has been destroyed by &f" + player.getName() + color.getChatColor() + "!",
+                    " ");
+
+            playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 1F);
+
+            if (participant.getTeam() != null) participant.getTeam().setRespawn(false);
         }
+    }
 
-        if(bedPosition == null) return;
+    public void sendStartingMessage() {
+        List<GameParticipant> sortedParticipants = new ArrayList<>(this.getAlive().values());
+        sortedParticipants.sort(Comparator.comparing(GameParticipant::getName));
 
-        for(GameParticipant p : getParticipants().values()) {
-            if(bedPosition.getPosition().contains(p.getTeamColor().getName().toLowerCase())) {
-                color = p.getTeamColor();
-                participant = p;
+        StringBuilder sb = new StringBuilder();
+
+        int s = 0;
+        while(s != this.getAlive().size()) {
+            GameParticipant participant = sortedParticipants.get(0);
+            sb.append(ChatColor.WHITE + participant.getName());
+
+            sortedParticipants.remove(participant);
+            s++;
+            if(s == this.getAlive().size()) {
+                sb.append(ChatColor.GRAY + ".");
+            } else {
+                sb.append(ChatColor.GRAY + ", ");
             }
         }
 
-        if(participant == null) return;
+        String startingMessage = """
+                
+                &6&l%s starting in 5 seconds.
+                 &7● &6Kit: &f%s
+                 &7● &6Arena: &f%s
+                 &7● &6Participants: &f%s
+                 \n
+                 """.formatted(getClass().getSimpleName(), getKit().getDisplayName(), getArena().getDisplayName(), sb);
 
-        if(breaker.getTeamColor().equals(color)) {
-            player.sendMessage(ChatColor.RED + "You cannot destroy your own bed.");
-            event.setCancelled(true);
-            return;
-        }
+        this.announce(startingMessage);
+    }
 
-        block.setType(Material.AIR);
+    public void sendEndingMessage() {
 
-        participant.setRespawn(false);
-        announceAll(
-                " ",
-                color.getChatColor() + "&l" + color.name() + " BED DESTROYED!",
-                color.getChatColor() + "Bed has been destroyed by &f" + player.getName() + color.getChatColor() + "!",
-                " ");
-
-        playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 1F);
-
-        if(participant.getTeam() != null) participant.getTeam().setRespawn(false);
     }
 
     public boolean isBuild() {

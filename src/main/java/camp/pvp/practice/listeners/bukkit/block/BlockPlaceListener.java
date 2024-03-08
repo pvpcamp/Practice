@@ -5,6 +5,7 @@ import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
@@ -40,8 +41,10 @@ public class BlockPlaceListener implements Listener {
                 }
 
                 if(block.getType().equals(Material.TNT)) {
-                    TNTPrimed tntPrimed = (TNTPrimed) block.getWorld().spawnEntity(block.getLocation(), EntityType.PRIMED_TNT);
-                    tntPrimed.setFuseTicks(40);
+                    Location location = block.getLocation();
+                    location.add(0.5, 0.5, 0.5);
+                    TNTPrimed tntPrimed = (TNTPrimed) block.getWorld().spawnEntity(location, EntityType.PRIMED_TNT);
+                    tntPrimed.setFuseTicks(60);
 
                     block.setType(Material.AIR);
                     game.addEntity(tntPrimed);

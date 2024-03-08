@@ -401,6 +401,8 @@ public enum GameKit {
                 inv[5].addEnchantment(Enchantment.DIG_SPEED, 1);
 
                 inv[6] = new ItemStack(Material.SHEARS);
+                inv[7] = new ItemStack(Material.TNT, 2);
+                inv[8] = new ItemStack(Material.LADDER, 8);
                 break;
             case DEBUFF:
                 Potion poison = new Potion(PotionType.POISON, 1);
@@ -817,6 +819,25 @@ public enum GameKit {
 
                         item.setDurability((short) 14);
                     }
+                    break;
+                case YELLOW:
+                    helmetMeta.setColor(Color.YELLOW);
+                    chestplateMeta.setColor(Color.YELLOW);
+                    leggingsMeta.setColor(Color.YELLOW);
+                    bootsMeta.setColor(Color.YELLOW);
+
+                    for(ItemStack item : pi.getContents()) {
+                        if(item == null) continue;
+                        if(!item.getType().equals(Material.WOOL)) continue;
+
+                        item.setDurability((short) 4);
+                    }
+                    break;
+                case WHITE:
+                    helmetMeta.setColor(Color.WHITE);
+                    chestplateMeta.setColor(Color.WHITE);
+                    leggingsMeta.setColor(Color.WHITE);
+                    bootsMeta.setColor(Color.WHITE);
                     break;
             }
 

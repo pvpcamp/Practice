@@ -2,7 +2,7 @@ package camp.pvp.practice.guis.games.events;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.sumo.SumoEvent;
-import camp.pvp.practice.guis.queue.ChooseQueueGui;
+import camp.pvp.practice.guis.queue.PlayGui;
 import camp.pvp.practice.guis.tournament.TournamentHostGui;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
@@ -26,7 +26,7 @@ public class HostEventGui extends StandardGui {
         Practice plugin = Practice.instance;
 
         GuiButton back = new GuiButton(Material.ARROW, "&c&lBack");
-        back.setAction((p, b, g, click) -> new ChooseQueueGui(plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId())).open(p));
+        back.setAction((p, b, g, click) -> new PlayGui(plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId())).open(p));
         back.setLore("&7Click to return to", "&7the play menu.");
         back.setSlot(0);
         back.setOverrideGuiArrangement(true);
@@ -55,13 +55,13 @@ public class HostEventGui extends StandardGui {
 
             sumoLines.add("&eClick to host this event.");
         } else {
-            sumoLines.add("&cYou must have &5&lPlus Rank");
+            sumoLines.add("&cYou must have &e&lExplorer Rank");
             sumoLines.add("&cor higher to host this event.");
         }
 
         sumoEvent.setLore(sumoLines);
         sumoEvent.setSlot(11);
-        this.addButton(sumoEvent, false);
+        addButton(sumoEvent);
 
         GuiButton tournament = new GuiButton(Material.DIAMOND_SWORD, "&6&lTournament");
 
@@ -84,12 +84,12 @@ public class HostEventGui extends StandardGui {
 
             tournamentLines.add("&eClick to host this event.");
         } else {
-            tournamentLines.add("&cYou must have &6&lPremium Rank");
-            tournamentLines.add("&cto host this event.");
+            tournamentLines.add("&cYou must have &b&lAdventurer Rank");
+            tournamentLines.add("&cor higher to host this event.");
         }
 
         tournament.setLore(tournamentLines);
         tournament.setSlot(15);
-        this.addButton(tournament, false);
+        addButton(tournament);
     }
 }

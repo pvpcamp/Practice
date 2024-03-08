@@ -177,7 +177,8 @@ public class SumoEvent {
             }
             default -> {
                 if(getCurrentDuel() != null && getCurrentDuel().getCurrentPlaying().containsKey(player.getUniqueId())) {
-                    nextRound();
+                    setState(State.NEXT_ROUND_STARTING);
+                    Bukkit.getScheduler().runTaskLater(plugin, this::nextRound, 40);
                 }
             }
         }
@@ -203,7 +204,7 @@ public class SumoEvent {
                 lines.add("&7● &6Players: &f" + getAliveCount());
                 lines.add("&7● &6Starting In: &f" + (timer + 1) + "s");
             }
-            case IN_GAME -> {
+            case IN_GAME, NEXT_ROUND_STARTING -> {
                 lines.add("&7● &6Players: &f" + getAliveCount() + "/" + getTotalParticipants());
                 lines.add("&7● &6Round: &f" + round);
 
@@ -335,7 +336,7 @@ public class SumoEvent {
 
                 player.sendMessage(strings);
 
-                TextComponent msg = new TextComponent(Colors.get("&6[Click to join!]"));
+                TextComponent msg = new TextComponent(Colors.get("&6[Click to join]"));
 
                 msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/event join"));
 
@@ -346,7 +347,7 @@ public class SumoEvent {
     }
 
     public enum State {
-        INACTIVE, STARTING, IN_GAME, ENDING, ENDED;
+        INACTIVE, STARTING, NEXT_ROUND_STARTING, IN_GAME, ENDING, ENDED;
 
         @Override
         public String toString() {
