@@ -109,7 +109,10 @@ public class Arena implements Comparable<Arena>{
 
         scanArena();
 
-        if(reset) resetArena(true);
+        if(reset) {
+            scanArena();
+            resetArena(true);
+        }
     }
 
     /**
@@ -204,7 +207,7 @@ public class Arena implements Comparable<Arena>{
         ChunkAPI api = ChunkAPI.getInstance();
 
         for(StoredChunk sc : storedChunks) {
-            getSnapshots().put(sc, api.takeSnapshot(sc.world().getChunkAt(sc.x(), sc.z())));
+            getSnapshots().put(sc, api.takeSnapshot(sc.getWorld().getChunkAt(sc.getX(), sc.getZ())));
         }
     }
 
@@ -225,6 +228,14 @@ public class Arena implements Comparable<Arena>{
         setInUse(true);
 
         if(hardReset) {
+
+            for(StoredChunk chunk : getStoredChunks()) {
+                Chunk c = chunk.getBukkitChunk();
+                if(!c.isLoaded()) {
+                    c.load(false);
+                }
+            }
+
             int i = 0;
             for(Location location : getParent().getAllBlocks()) {
                 Block block = location.getBlock();
@@ -236,15 +247,7 @@ public class Arena implements Comparable<Arena>{
 
                 if(block.getType().equals(newBlock.getType())) continue;
 
-                Chunk chunk = newBlock.getChunk();
-                if(!chunk.isLoaded()) {
-                    chunk.load();
-                }
-
                 if(oldState != null && oldState.getData() != newBlock.getState().getData()) {
-
-                    newBlock.setType(Material.AIR);
-
                     newBlock.setType(oldState.getType());
 
                     BlockState bs = newBlock.getState();
@@ -263,7 +266,7 @@ public class Arena implements Comparable<Arena>{
 
             for (Map.Entry<StoredChunk, ChunkSnapshot> entry : getSnapshots().entrySet()) {
                 StoredChunk sc = entry.getKey();
-                api.restoreSnapshot(sc.world().getChunkAt(sc.x(), sc.z()), entry.getValue());
+                api.restoreSnapshot(sc.getBukkitChunk(), entry.getValue());
             }
 
             refreshChunkSnapshots();
