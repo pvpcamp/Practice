@@ -400,7 +400,7 @@ public class GameProfileManager {
         for (Player player : Bukkit.getOnlinePlayers()) {
             GameProfile profile = loadedProfiles.get(player.getUniqueId());
             profile.getProfileStatistics().export().forEach((key, value) -> getStatisticsCollection().updateOne(Filters.eq("_id", player.getUniqueId()), Updates.set(key, value)));
-            exportToDatabase(player.getUniqueId(), false);
+            profile.export().forEach((key, value) -> getProfilesCollection().updateOne(Filters.eq("_id", player.getUniqueId()), Updates.set(key, value)));
         }
 
         plugin.getLogger().info("All player profiles have been exported to the database.");

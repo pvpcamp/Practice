@@ -80,7 +80,9 @@ public class Practice extends JavaPlugin {
         getLogger().info("Resetting all blocks for arena copies.");
 
         for(Arena arena : arenaManager.getArenas()) {
-            arena.resetArena(true);
+            if(arena.isCopy()) {
+                arena.copyBlocks();
+            }
         }
 
         getLogger().info("Finished resetting all blocks for arena copies, continuing startup.");

@@ -146,8 +146,10 @@ public class ArenaManager {
 
         int arenas = 0;
         for(Arena arena : getArenas()) {
-            if(arena.hasValidPositions()) {
+            if(!arena.isCopy() && arena.hasValidPositions()) {
                 arena.scanArena();
+
+                logger.info("Scanned arena " + arena.getName() + ".");
 
                 arenas++;
             }

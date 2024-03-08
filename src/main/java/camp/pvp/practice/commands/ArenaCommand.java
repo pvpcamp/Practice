@@ -208,7 +208,6 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        arena.setName(args[2].toLowerCase());
         int copies = 0;
         for(Arena a : plugin.getArenaManager().getArenaCopies(arena)) {
             String cn = a.getName().replace(arena.getName() + "_copy_", "");
@@ -222,6 +221,8 @@ public class ArenaCommand implements CommandExecutor, TabCompleter {
         } else {
             player.sendMessage(ChatColor.GREEN + "Arena " + ChatColor.WHITE + arena.getName() + ChatColor.GREEN + " and its " + copies + " copies have been renamed to " + ChatColor.WHITE + name.toLowerCase() + ChatColor.GREEN + ".");
         }
+
+        arena.setName(args[2].toLowerCase());
     }
 
     private void buildlimit(Player player, String[] args) {
