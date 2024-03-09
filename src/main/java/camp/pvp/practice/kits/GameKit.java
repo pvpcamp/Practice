@@ -27,14 +27,12 @@ import java.util.Collections;
 import java.util.List;
 
 public enum GameKit {
-    FIREBALL_FIGHT, NO_DEBUFF, BOXING, BED_FIGHT, SUMO, DEBUFF, ARCHER, BUILD_UHC, CLASSIC, SOUP, HCF, INVADED, SKYWARS, SPLEEF, STRATEGY, ONE_IN_THE_CHAMBER;
+    FIREBALL_FIGHT, NO_DEBUFF, BOXING, BED_FIGHT, SUMO, DEBUFF, ARCHER, BUILD_UHC, CLASSIC, SOUP, INVADED, SKYWARS, SPLEEF, STRATEGY, ONE_IN_THE_CHAMBER;
 
     public String getDisplayName() {
         switch(this) {
             case BUILD_UHC:
                 return "Build UHC";
-            case HCF:
-                return "HCF";
             default:
                 String name = this.name();
                 name = name.replace("_", " ");
@@ -44,8 +42,6 @@ public enum GameKit {
 
     public List<Arena.Type> getArenaTypes() {
         switch(this) {
-            case HCF:
-                return Arrays.asList(Arena.Type.DUEL_HCF);
             case SUMO:
                 return Collections.singletonList(Arena.Type.DUEL_SUMO);
             case BOXING:
@@ -107,7 +103,7 @@ public enum GameKit {
     }
 
     public boolean isRanked() {
-        return !this.equals(HCF);
+        return true;
     }
 
     public boolean isTournament() {
@@ -115,7 +111,6 @@ public enum GameKit {
         if(!isDuelKit()) return false;
 
         switch(this) {
-            case HCF:
             case SUMO:
                 return false;
             default:
@@ -219,7 +214,6 @@ public enum GameKit {
         switch(this) {
             default:
                 return true;
-            case HCF:
             case BOXING:
             case SKYWARS:
             case BED_FIGHT:
@@ -300,6 +294,16 @@ public enum GameKit {
         }
     }
 
+    public boolean isCappedBlockHits() {
+        switch(this) {
+            case NO_DEBUFF:
+            case DEBUFF:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public boolean isShowArrowDamage() {
         return !this.equals(ONE_IN_THE_CHAMBER);
     }
@@ -317,9 +321,6 @@ public enum GameKit {
                 break;
             case BUILD_UHC:
                 item = new ItemStack(Material.LAVA_BUCKET);
-                break;
-            case HCF:
-                item = new ItemStack(Material.FENCE);
                 break;
             case DEBUFF:
                 potion = new Potion(PotionType.POISON);
@@ -527,56 +528,6 @@ public enum GameKit {
 
                 inv[9] = new ItemStack(Material.ARROW);
                 break;
-            case HCF:
-                armor[3] = new ItemStack(Material.DIAMOND_HELMET);
-                armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[3].addEnchantment(Enchantment.DURABILITY, 3);
-
-                armor[2] = new ItemStack(Material.DIAMOND_CHESTPLATE);
-                armor[2].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[2].addEnchantment(Enchantment.DURABILITY, 3);
-
-                armor[1] = new ItemStack(Material.DIAMOND_LEGGINGS);
-                armor[1].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[1].addEnchantment(Enchantment.DURABILITY, 3);
-
-                armor[0] = new ItemStack(Material.DIAMOND_BOOTS);
-                armor[0].addEnchantment(Enchantment.PROTECTION_FALL, 4);
-                armor[0].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
-                armor[0].addEnchantment(Enchantment.DURABILITY, 3);
-
-                inv[0] = new ItemStack(Material.DIAMOND_SWORD);
-                inv[0].addEnchantment(Enchantment.DAMAGE_ALL, 3);
-                inv[0].addEnchantment(Enchantment.FIRE_ASPECT, 2);
-                inv[0].addEnchantment(Enchantment.DURABILITY, 3);
-
-                inv[1] = new ItemStack(Material.ENDER_PEARL, 16);
-                inv[2] = new ItemStack(Material.GOLDEN_APPLE, 16);
-                inv[3] = new ItemStack(Material.FISHING_ROD, 1);
-
-                speed = new Potion(PotionType.SPEED, 2);
-
-                fireResistance = new Potion(PotionType.FIRE_RESISTANCE, 1);
-                fireResistance.setHasExtendedDuration(true);
-
-                health = new Potion(PotionType.INSTANT_HEAL, 2);
-                health.setSplash(true);
-
-                inv[8] = speed.toItemStack(1);
-                inv[17] = speed.toItemStack(1);
-                inv[26] = speed.toItemStack(1);
-                inv[35] = speed.toItemStack(1);
-
-                inv[7] = fireResistance.toItemStack(1);
-
-                for(int x = 0; x < 36; x++) {
-                    ItemStack i = inv[x];
-                    if(i == null) {
-                        inv[x] = health.toItemStack(1);
-                    }
-                }
-
-                break;
             case CLASSIC:
                 armor[3] = new ItemStack(Material.DIAMOND_HELMET);
                 armor[2] = new ItemStack(Material.DIAMOND_CHESTPLATE);
@@ -668,49 +619,44 @@ public enum GameKit {
                 break;
             case STRATEGY:
                 armor[3] = new ItemStack(Material.DIAMOND_HELMET);
-                armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
+                armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
                 armor[3].addEnchantment(Enchantment.DURABILITY, 3);
 
                 armor[2] = new ItemStack(Material.DIAMOND_CHESTPLATE);
-                armor[2].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
+                armor[2].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
                 armor[2].addEnchantment(Enchantment.DURABILITY, 3);
 
                 armor[1] = new ItemStack(Material.DIAMOND_LEGGINGS);
-                armor[1].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
+                armor[1].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
                 armor[1].addEnchantment(Enchantment.DURABILITY, 3);
 
                 armor[0] = new ItemStack(Material.DIAMOND_BOOTS);
-                armor[0].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
+                armor[0].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
                 armor[0].addEnchantment(Enchantment.DURABILITY, 3);
 
                 inv[0] = new ItemStack(Material.DIAMOND_AXE);
-                inv[0].addEnchantment(Enchantment.DAMAGE_ALL, 3);
+                inv[0].addEnchantment(Enchantment.DAMAGE_ALL, 5);
                 inv[0].addEnchantment(Enchantment.DURABILITY, 3);
 
-                inv[1] = new ItemStack(Material.FISHING_ROD);
-                inv[1].addEnchantment(Enchantment.DURABILITY, 3);
-
-                inv[2] = new ItemStack(Material.BOW);
-                inv[2].addEnchantment(Enchantment.ARROW_DAMAGE, 2);
-                inv[2].addEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
-
+                inv[1] = new ItemStack(Material.WEB, 16);
+                inv[2] = new ItemStack(Material.GOLDEN_APPLE, 16);
                 inv[3] = new ItemStack(Material.WOOD, 64);
-                inv[4] = new ItemStack(Material.ENDER_PEARL, 2);
+                inv[4] = new ItemStack(Material.LAVA_BUCKET);
+                inv[5] = new ItemStack(Material.WATER_BUCKET);
 
-                slowness = new Potion(PotionType.SLOWNESS, 1);
-                slowness.setSplash(true);
+                inv[6] = new ItemStack(Material.BOW);
+                inv[6].addEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
+                inv[6].addEnchantment(Enchantment.ARROW_INFINITE, 1);
+                inv[6].addEnchantment(Enchantment.DURABILITY, 3);
 
-                inv[5] = slowness.toItemStack(1);
+                inv[9] = new ItemStack(Material.ARROW, 1);
+                inv[10] = new ItemStack(Material.ENDER_PEARL, 3);
+                inv[11] = new ItemStack(Material.SNOW_BALL, 16);
+                inv[12] = new ItemStack(Material.EGG, 16);
 
-                inv[6] = new ItemStack(Material.WEB, 64);
-                inv[7] = new ItemStack(Material.GOLDEN_APPLE, 8);
-
-                inv[9] = new ItemStack(Material.SNOW_BALL, 16);
-                inv[10] = new ItemStack(Material.LAVA_BUCKET);
-                inv[11] = new ItemStack(Material.LAVA_BUCKET);
-                inv[12] = new ItemStack(Material.WATER_BUCKET);
-                inv[13] = new ItemStack(Material.WATER_BUCKET);
-                inv[14] = new ItemStack(Material.ARROW, 16);
+                ItemStack milk = new ItemStack(Material.MILK_BUCKET);
+                inv[13] = milk;
+                inv[14] = milk.clone();
 
                 speed = new Potion(PotionType.SPEED, 2);
 
@@ -718,6 +664,27 @@ public enum GameKit {
                 inv[17] = speed.toItemStack(1);
                 inv[26] = speed.toItemStack(1);
                 inv[35] = speed.toItemStack(1);
+
+                Potion strength = new Potion(PotionType.STRENGTH, 1);
+                strength.setHasExtendedDuration(true);
+                inv[7] = strength.toItemStack(1);
+                inv[16] = strength.toItemStack(1);
+
+                poison = new Potion(PotionType.POISON, 1);
+                poison.setSplash(true);
+
+                inv[27] = poison.toItemStack(1);
+                inv[28] = poison.toItemStack(1);
+
+                Potion damage = new Potion(PotionType.INSTANT_DAMAGE, 2);
+                damage.setSplash(true);
+                inv[29] = damage.toItemStack(1);
+                inv[30] = damage.toItemStack(1);
+
+                health = new Potion(PotionType.INSTANT_HEAL, 2);
+                health.setSplash(true);
+                inv[31] = health.toItemStack(1);
+                inv[32] = health.toItemStack(1);
 
                 break;
             case BED_FIGHT:

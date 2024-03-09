@@ -93,6 +93,8 @@ public class SumoEventDuel extends Duel {
             participant.getProfile().givePlayerItems(false);
             participant.getProfile().setGame(null);
         }
+
+        getParticipants().clear();
     }
 
     @Override

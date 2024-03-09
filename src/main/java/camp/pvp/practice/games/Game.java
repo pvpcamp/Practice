@@ -898,6 +898,27 @@ public abstract class Game {
         return players;
     }
 
+    public Map<UUID, GameParticipant> getLimbo() {
+        Map<UUID, GameParticipant> limbo = new HashMap<>();
+        for(Map.Entry<UUID, GameParticipant> entry : participants.entrySet()) {
+            if(entry.getValue().getLivingState().equals(GameParticipant.LivingState.AWAITING_RESPAWN)) {
+                limbo.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return limbo;
+    }
+
+    public List<Player> getLimboPlayers() {
+        List<Player> players = new ArrayList<>();
+        for(UUID uuid : getLimbo().keySet()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if(player != null) {
+                players.add(player);
+            }
+        }
+        return players;
+    }
+
     public List<Player> getSpectatorsPlayers() {
         List<Player> players = new ArrayList<>();
         for(UUID uuid : spectators.keySet()) {
@@ -1058,6 +1079,9 @@ public abstract class Game {
     }
 
     public void updateEntities() {
+
+        if(getArena().getType().isBuild()) return;
+
         List<Player> players = getAllPlayers();
         for(Entity entity : getEntities()) {
             for(Player player : Bukkit.getOnlinePlayers()) {

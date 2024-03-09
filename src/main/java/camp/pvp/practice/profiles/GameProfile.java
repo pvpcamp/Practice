@@ -342,23 +342,27 @@ public class GameProfile {
                 return;
             }
 
-            if(game.getAlive().containsKey(player.getUniqueId())) {
+            if(game.getCurrentPlaying().containsKey(player.getUniqueId())) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     GameSpectator spectator = game.getSpectators().get(p.getUniqueId());
-                    if (spectator != null && !spectator.isVisibleToPlayers()) {
-                        getHiddenPlayers().add(p.getUniqueId());
-                    }
+                    if(!game.getAllPlayers().contains(p)) { getHiddenPlayers().add(p.getUniqueId()); continue; }
+
+                    if (spectator != null && !spectator.isVisibleToPlayers()) { getHiddenPlayers().add(p.getUniqueId()); continue; }
+
+                    if(game.getLimbo().containsKey(p.getUniqueId())) { getHiddenPlayers().add(p.getUniqueId()); }
                 }
             } else {
                 boolean seeSpectators = this.isSpectatorVisibility();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     GameProfile pProfile = gpm.getLoadedProfiles().get(p.getUniqueId());
 
-                    if(!game.getAllPlayers().contains(player)) { getHiddenPlayers().add(p.getUniqueId()); continue; }
+                    if(!game.getAllPlayers().contains(p)) { getHiddenPlayers().add(p.getUniqueId()); continue; }
 
-                    if (pProfile.isStaffMode() && !player.hasPermission("practice.staff")) { getHiddenPlayers().add(p.getUniqueId()); return; }
+                    if(game.getLimbo().containsKey(p.getUniqueId())) { getHiddenPlayers().add(p.getUniqueId()); continue; }
 
-                    if(!seeSpectators) getHiddenPlayers().add(p.getUniqueId());
+                    if(pProfile.isStaffMode() && !player.hasPermission("practice.staff") && game.getSpectators().containsKey(p.getUniqueId())) { getHiddenPlayers().add(p.getUniqueId()); continue; }
+
+                    if(!seeSpectators && game.getSpectators().containsKey(p.getUniqueId())) getHiddenPlayers().add(p.getUniqueId());
                 }
             }
 
@@ -492,19 +496,22 @@ public class GameProfile {
         Map<String, Map<String, Map<String, Object>>> ck = (Map<String, Map<String, Map<String, Object>>>) serializedKits;
 
         for(Map.Entry<String, Map<String, Map<String, Object>>> kitEntry : ck.entrySet()) {
+            try {
+                GameKit kit = GameKit.valueOf(kitEntry.getKey());
 
-            GameKit kit = GameKit.valueOf(kitEntry.getKey());
+                for (Map.Entry<String, Map<String, Object>> customKitEntry : kitEntry.getValue().entrySet()) {
 
-            for(Map.Entry<String, Map<String, Object>> customKitEntry : kitEntry.getValue().entrySet()) {
+                    int i = Integer.parseInt(customKitEntry.getKey());
 
-                int i = Integer.parseInt(customKitEntry.getKey());
+                    Map<String, Object> map = customKitEntry.getValue();
 
-                Map<String, Object> map = customKitEntry.getValue();
+                    CustomGameKit customGameKit = new CustomGameKit(kit, i, true);
+                    getCustomDuelKits().get(kit).put(i, customGameKit);
 
-                CustomGameKit customGameKit = new CustomGameKit(kit, i, true);
-                getCustomDuelKits().get(kit).put(i, customGameKit);
-
-                customGameKit.importFromMap(map);
+                    customGameKit.importFromMap(map);
+                }
+            } catch (IllegalArgumentException ignored) {
+                Practice.getInstance().getLogger().warning("Failed to import custom kit " + kitEntry.getKey() + " for " + this.getName() + " (" + this.getUuid() + ")");
             }
         }
     }

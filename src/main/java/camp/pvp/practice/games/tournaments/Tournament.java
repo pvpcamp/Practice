@@ -124,9 +124,7 @@ public class Tournament {
 
             profile.setTournament(null);
 
-            if(!profile.getState().equals(GameProfile.State.IN_GAME)) {
-                profile.playerUpdate(false);
-            }
+            if(profile.getState().isLobby()) profile.playerUpdate(false);
 
             Bukkit.getScheduler().runTaskLater(plugin, ()-> {
                 if (this.getAlive().size() < 2) {

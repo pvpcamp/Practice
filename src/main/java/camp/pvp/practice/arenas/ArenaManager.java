@@ -156,6 +156,28 @@ public class ArenaManager {
         }
 
         logger.info("Arena scanner has finished scanning " + arenas + " arenas.");
+
+        copyArenaBlockLocations();
+
+        logger.info("Arena block locations have been copied. If the arenas do not have the correct blocks, please update the parent arena accordingly.");
+    }
+
+    public void copyArenaBlockLocations() {
+        for(Arena arena : getArenas()) {
+            if(arena.isCopy()) {
+                Arena parent = getArenaFromName(arena.getParentName());
+                if(parent != null) {
+                    List<Location> solidBlocks = parent.getSolidBlocks();
+                    List<Location> newSolidBlocks = new ArrayList<>();
+
+                    for(Location location : solidBlocks) {
+                        newSolidBlocks.add(location.clone().add(arena.getXDifference(), 0, arena.getZDifference()));
+                    }
+
+                    arena.setSolidBlocks(newSolidBlocks);
+                }
+            }
+        }
     }
 
     public Location getNextAvailableArenaLocation(World world) {

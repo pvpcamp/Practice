@@ -77,16 +77,6 @@ public class Practice extends JavaPlugin {
         this.gameProfileManager = new GameProfileManager(this);
         this.arenaManager = new ArenaManager(this);
 
-        getLogger().info("Resetting all blocks for arena copies.");
-
-        for(Arena arena : arenaManager.getArenas()) {
-            if(arena.isCopy()) {
-                arena.copyBlocks();
-            }
-        }
-
-        getLogger().info("Finished resetting all blocks for arena copies, continuing startup.");
-
         this.gameManager = new GameManager(this);
         this.gameQueueManager = new GameQueueManager(this);
         this.partyManager = new PartyManager(this);

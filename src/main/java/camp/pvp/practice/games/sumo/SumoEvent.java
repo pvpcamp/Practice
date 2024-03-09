@@ -94,7 +94,6 @@ public class SumoEvent {
         currentDuel = duel;
 
         duel.initialize();
-
     }
 
     public void forceEnd() {
@@ -111,6 +110,8 @@ public class SumoEvent {
     }
 
     public void end() {
+
+        if(state.equals(State.ENDED)) return;
 
         setState(State.ENDED);
 
@@ -176,7 +177,7 @@ public class SumoEvent {
 
             }
             default -> {
-                if(getCurrentDuel() != null && getCurrentDuel().getCurrentPlaying().containsKey(player.getUniqueId())) {
+                if(getCurrentDuel() != null && getCurrentDuel().getParticipants().containsKey(player.getUniqueId()) && getAliveCount() > 2) {
                     setState(State.NEXT_ROUND_STARTING);
                     Bukkit.getScheduler().runTaskLater(plugin, this::nextRound, 40);
                 }
@@ -192,6 +193,9 @@ public class SumoEvent {
 
         Practice.getInstance().getGameProfileManager().updateGlobalPlayerVisibility();
 
+        if(getAliveCount() < 2) {
+            end();
+        }
     }
 
     public List<String> getScoreboard(GameProfile profile) {

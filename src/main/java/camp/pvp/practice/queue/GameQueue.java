@@ -182,7 +182,7 @@ public class GameQueue {
                         return;
                     }
 
-                    List<GameQueueMember> members = new ArrayList<>(queueMembers);
+                    List<GameQueueMember> members = new ArrayList<>();
 
                     for(int i = 0; i < minigameType.getQueueSizeBeforeStart(); i++) {
                         members.add(queueMembers.poll());

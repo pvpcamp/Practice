@@ -399,8 +399,8 @@ public class Duel extends Game {
                 GameParticipant blue = pList.get(0);
                 GameParticipant red = pList.get(1);
 
-                lines.add("&9B &fBlue: &9&l" + (blue.isRespawn() ? "✓" : "1"));
-                lines.add("&cR &fRed: &c&l" + (red.isRespawn() ? "✓" : "1"));
+                lines.add("&9B &fBlue: &9&l" + (blue.isRespawn() ? "✔" : "1"));
+                lines.add("&cR &fRed: &c&l" + (red.isRespawn() ? "✔" : "1"));
                 lines.add(" ");
             }
 
@@ -412,7 +412,7 @@ public class Duel extends Game {
                     if (getKit().equals(GameKit.BOXING)) {
                         lines.add("&7> &f" + participant.getName() + " &7(" + participant.getHits() + ")");
                     } else {
-                        if (!queueType.equals(GameQueue.Type.RANKED)) {
+                        if (!queueType.equals(GameQueue.Type.RANKED) || getKit().showHealthBar()) {
                             lines.add("&7> &f" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
                         } else {
                             lines.add("&7> &f" + participant.getName() + "&c ❤");

@@ -59,9 +59,9 @@ public class EntityDamageByEntityListener implements Listener {
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId());
             Game game = profile.getGame();
 
-            if(game != null && game.getKit().equals(GameKit.FIREBALL_FIGHT) && game.getAlive().containsKey(player.getUniqueId())) {
+            if(game != null && game.getState().equals(Game.State.ACTIVE) && game.getKit().equals(GameKit.FIREBALL_FIGHT) && game.getAlive().containsKey(player.getUniqueId())) {
 
-                double damage = 5;
+                double damage;
 
                 if (event.getDamager().getTicksLived() < 20) {
                     damage = 0;

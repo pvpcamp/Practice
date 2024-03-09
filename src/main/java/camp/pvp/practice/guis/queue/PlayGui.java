@@ -143,50 +143,54 @@ public class PlayGui extends StandardGui {
         minigames.setSlot(14);
         addButton(minigames);
 
-        GuiButton events = new GuiButton(Material.NETHER_STAR, "events");
-        events.setAction((player, guiButton, gui, clickType) -> {
+//        GuiButton events = new GuiButton(Material.NETHER_STAR, "events");
+//        events.setAction((player, guiButton, gui, clickType) -> {
+//
+//            if(plugin.getGameManager().isEventRunning()) {
+//                if(plugin.getGameManager().getTournament() != null) {
+//                    plugin.getGameManager().getTournament().join(player);
+//                    player.closeInventory();
+//                    return;
+//                }
+//
+//                if(plugin.getGameManager().getActiveEvent() != null) {
+//                    plugin.getGameManager().getActiveEvent().join(player);
+//                    player.closeInventory();
+//                }
+//            } else {
+//                new HostEventGui(player).open(player);
+//            }
+//        });
+//
+//        events.setButtonUpdater((guiButton, gui) -> {
+//            if(plugin.getGameManager().isEventRunning()) {
+//                Tournament tournament = plugin.getGameManager().getTournament();
+//                if(tournament != null) {
+//                    guiButton.updateName("&6&lJoin Tournament");
+//                    guiButton.setType(Material.DIAMOND_HELMET);
+//                    guiButton.setLore(
+//                            "&7Click to join the active tournament.");
+//                    return;
+//                }
+//
+//                if(plugin.getGameManager().getActiveEvent() != null) {
+//                    guiButton.updateName("&6&lJoin Sumo Event");
+//                    guiButton.setType(Material.SLIME_BALL);
+//                    guiButton.setLore(
+//                            "&7Click to join the active Sumo event.");
+//                    return;
+//                }
+//            }
+//
+//            guiButton.updateName("&6&lHost an Event");
+//            guiButton.setType(Material.NETHER_STAR);
+//            guiButton.setLore("&7Click to host an event.");
+//        });
+//
+//        events.setSlot(15);
+//        addButton(events);
 
-            if(plugin.getGameManager().isEventRunning()) {
-                if(plugin.getGameManager().getTournament() != null) {
-                    plugin.getGameManager().getTournament().join(player);
-                    player.closeInventory();
-                    return;
-                }
-
-                if(plugin.getGameManager().getActiveEvent() != null) {
-                    plugin.getGameManager().getActiveEvent().join(player);
-                    player.closeInventory();
-                }
-            } else {
-                new HostEventGui(player).open(player);
-            }
-        });
-
-        events.setButtonUpdater((guiButton, gui) -> {
-            if(plugin.getGameManager().isEventRunning()) {
-                Tournament tournament = plugin.getGameManager().getTournament();
-                if(tournament != null) {
-                    guiButton.updateName("&6&lJoin Tournament");
-                    guiButton.setType(Material.DIAMOND_HELMET);
-                    guiButton.setLore(
-                            "&7Click to join the active tournament.");
-                    return;
-                }
-
-                if(plugin.getGameManager().getActiveEvent() != null) {
-                    guiButton.updateName("&6&lJoin Sumo Event");
-                    guiButton.setType(Material.SLIME_BALL);
-                    guiButton.setLore(
-                            "&7Click to join the active Sumo event.");
-                    return;
-                }
-            }
-
-            guiButton.updateName("&6&lHost an Event");
-            guiButton.setType(Material.NETHER_STAR);
-            guiButton.setLore("&7Click to host an event.");
-        });
-
+        GuiButton events = new GuiButton(Material.NETHER_STAR, "&6&lEvents &c(Disabled)");
         events.setSlot(15);
         addButton(events);
 
