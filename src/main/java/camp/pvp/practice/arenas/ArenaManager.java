@@ -176,6 +176,8 @@ public class ArenaManager {
 
                     arena.setSolidBlocks(newSolidBlocks);
                 }
+
+                arena.refreshChunkSnapshots();
             }
         }
     }
