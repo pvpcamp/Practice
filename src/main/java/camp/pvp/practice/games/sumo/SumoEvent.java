@@ -10,6 +10,7 @@ import camp.pvp.practice.utils.TimeUtil;
 import lombok.Data;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -134,11 +135,12 @@ public class SumoEvent {
         EventParticipant participant = participants.get(player.getUniqueId());
 
         if(participant == null) {
-            participant = new EventParticipant(player);
-            participant.setPlaying(state.equals(State.STARTING));
-        };
+            participant = new EventParticipant(player, this);
 
-        participant.setAlive(state.equals(State.STARTING));
+            if(state.equals(State.IN_GAME) || state.equals(State.NEXT_ROUND_STARTING)) {
+                participant.setPlayingState(EventParticipant.PlayingState.SPECTATOR);
+            }
+        }
 
         participants.put(player.getUniqueId(), participant);
 
@@ -169,13 +171,10 @@ public class SumoEvent {
 
         if(!state.equals(State.ENDED) && participant.isAlive()) announce("&f" + player.getName() + message);
 
-        participant.setAlive(false);
+        participant.setPlayingState(EventParticipant.PlayingState.SPECTATOR);
 
         switch(state) {
             case STARTING, ENDED -> participants.remove(player.getUniqueId());
-            case ENDING -> {
-
-            }
             default -> {
                 if(getCurrentDuel() != null && getCurrentDuel().getParticipants().containsKey(player.getUniqueId()) && getAliveCount() > 2) {
                     setState(State.NEXT_ROUND_STARTING);
@@ -186,7 +185,7 @@ public class SumoEvent {
 
         if(leftGame) {
             profile.setSumoEvent(null);
-            participant.setActive(false);
+            participant.setPlayingState(EventParticipant.PlayingState.DEAD);
         }
 
         profile.playerUpdate(true);
@@ -227,12 +226,7 @@ public class SumoEvent {
                     for(Player player : getCurrentDuel().getCurrentPlayersPlaying()) {
                         lines.add("&7> &f" + player.getName());
                     }
-                } else {
-
                 }
-            }
-            case ENDING -> {
-
             }
         }
 
@@ -247,8 +241,9 @@ public class SumoEvent {
         list.sort(Comparator.comparingInt(EventParticipant::getMatches).reversed());
 
         List<EventParticipant> nextRound = new ArrayList<>();
-        nextRound.add(list.get(0));
-        nextRound.add(list.get(1));
+        for(int i = 0; i < 2; i++) {
+            nextRound.add(list.get(i));
+        }
 
         return nextRound;
     }
@@ -276,7 +271,7 @@ public class SumoEvent {
     public Map<UUID, EventParticipant> getActiveParticipants() {
         Map<UUID, EventParticipant> map = new HashMap<>();
         for(EventParticipant participant : participants.values()) {
-            if(participant.isActive()) {
+            if(participant.isAlive()) {
                 map.put(participant.getUuid(), participant);
             }
         }
@@ -306,7 +301,7 @@ public class SumoEvent {
         int i = 0;
 
         for(EventParticipant participant : participants.values()) {
-            if(participant.isPlaying()) {
+            if(participant.isPlayer()) {
                 i++;
             }
         }
@@ -351,20 +346,13 @@ public class SumoEvent {
     }
 
     public enum State {
-        INACTIVE, STARTING, NEXT_ROUND_STARTING, IN_GAME, ENDING, ENDED;
+        INACTIVE, STARTING, NEXT_ROUND_STARTING, IN_GAME, ENDED;
 
         @Override
         public String toString() {
-            switch(this) {
-                case INACTIVE:
-                    return "Inactive";
-                case STARTING:
-                    return "Starting";
-                case IN_GAME:
-                    return "In Game";
-                default:
-                    return "Ended";
-            }
+            String name = this.name();
+            name = name.replace("_", " ");
+            return WordUtils.capitalizeFully(name);
         }
     }
 }
