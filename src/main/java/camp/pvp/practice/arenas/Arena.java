@@ -216,15 +216,41 @@ public class Arena implements Comparable<Arena>{
         maxX = Math.max(c1.getBlockX(), c2.getBlockX());
         maxZ = Math.max(c1.getBlockZ(), c2.getBlockZ());
 
+        int chunkMinX = Integer.MAX_VALUE, chunkMinZ = Integer.MAX_VALUE, chunkMaxX = Integer.MIN_VALUE, chunkMaxZ = Integer.MIN_VALUE;
+
         for (int x = minX; x < maxX; x++) {
             for (int z = minZ; z < maxZ; z++) {
                 Location location = new Location(c1.getWorld(), x, 0, z);
                 Chunk chunk = location.getChunk();
 
-                StoredChunk storedChunk = new StoredChunk(chunk.getX(), chunk.getZ(), worldId);
-                if(!storedChunks.contains(storedChunk)) {
-                    storedChunks.add(storedChunk);
+                int chunkX = chunk.getX(), chunkZ = chunk.getZ();
+
+                if(chunkX < chunkMinX) {
+                    chunkMinX = chunkX;
                 }
+
+                if(chunkX > chunkMaxX) {
+                    chunkMaxX = chunkX;
+                }
+
+                if(chunkZ < chunkMinZ) {
+                    chunkMinZ = chunkZ;
+                }
+
+                if(chunkZ > chunkMaxZ) {
+                    chunkMaxZ = chunkZ;
+                }
+            }
+        }
+
+        chunkMinX -= 1;
+        chunkMinZ -= 1;
+        chunkMaxX += 1;
+        chunkMaxZ += 1;
+
+        for(int x = chunkMinX; x <= chunkMaxX; x++) {
+            for(int z = chunkMinZ; z <= chunkMaxZ; z++) {
+                storedChunks.add(new StoredChunk(x, z, worldId));
             }
         }
     }
