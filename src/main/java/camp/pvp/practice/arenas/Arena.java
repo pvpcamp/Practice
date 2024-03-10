@@ -22,6 +22,7 @@ public class Arena implements Comparable<Arena>{
 
     private String name, displayName;
     private Arena.Type type;
+    private UUID worldId;
     private Map<String, ArenaPosition> positions;
     private List<Location> randomSpawnLocations;
     private List<LootChest> lootChests;
@@ -152,7 +153,6 @@ public class Arena implements Comparable<Arena>{
 
             getSnapshots().clear();
             getSolidBlocks().clear();
-            getStoredChunks().clear();
 
             int minX, minY, minZ, maxX, maxY, maxZ;
             Location c1 = corner1.getLocation(), c2 = corner2.getLocation();
@@ -168,20 +168,19 @@ public class Arena implements Comparable<Arena>{
                     for (int z = minZ; z < maxZ; z++) {
                         Location location = new Location(c1.getWorld(), x, y, z);
                         Block block = location.getBlock();
-                        Chunk chunk = block.getChunk();
 
                         if(!block.isEmpty()) {
                             solidBlocks.add(location);
                         }
 
-                        StoredChunk storedChunk = new StoredChunk(chunk.getX(), chunk.getZ(), location.getWorld());
-                        if(!storedChunks.contains(storedChunk)) {
-                            storedChunks.add(storedChunk);
+                        if(worldId == null) {
+                            worldId = location.getWorld().getUID();
                         }
                     }
                 }
             }
 
+            generateStoredChunks();
             refreshChunkSnapshots();
         }
     }
@@ -190,6 +189,8 @@ public class Arena implements Comparable<Arena>{
         getSnapshots().clear();
 
         ChunkAPI api = ChunkAPI.getInstance();
+
+        Practice.getInstance().getLogger().info("[Arena#refreshChunkSnapshots] Refreshing " + storedChunks.size() + " chunk snapshots for " + getName() + ".");
 
         for(StoredChunk sc : storedChunks) {
             getSnapshots().put(sc, api.takeSnapshot(sc.getWorld().getChunkAt(sc.getX(), sc.getZ())));
@@ -200,6 +201,31 @@ public class Arena implements Comparable<Arena>{
         scanArena();
         for(Location location : getSolidBlocks()) {
             location.getBlock().setType(Material.AIR);
+        }
+    }
+
+    public void generateStoredChunks() {
+        if(!hasValidPositions()) return;
+
+        storedChunks.clear();
+
+        int minX, minZ, maxX, maxZ;
+        Location c1 = positions.get("corner1").getLocation(), c2 = positions.get("corner2").getLocation();
+        minX = Math.min(c1.getBlockX(), c2.getBlockX());
+        minZ = Math.min(c1.getBlockZ(), c2.getBlockZ());
+        maxX = Math.max(c1.getBlockX(), c2.getBlockX());
+        maxZ = Math.max(c1.getBlockZ(), c2.getBlockZ());
+
+        for (int x = minX; x < maxX; x++) {
+            for (int z = minZ; z < maxZ; z++) {
+                Location location = new Location(c1.getWorld(), x, 0, z);
+                Chunk chunk = location.getChunk();
+
+                StoredChunk storedChunk = new StoredChunk(chunk.getX(), chunk.getZ(), worldId);
+                if(!storedChunks.contains(storedChunk)) {
+                    storedChunks.add(storedChunk);
+                }
+            }
         }
     }
 
@@ -259,7 +285,7 @@ public class Arena implements Comparable<Arena>{
                     }
 
                     Chunk chunk = block.getChunk();
-                    StoredChunk storedChunk = new StoredChunk(chunk.getX(), chunk.getZ(), location.getWorld());
+                    StoredChunk storedChunk = new StoredChunk(chunk.getX(), chunk.getZ(), worldId);
                     if(!newStoredChunks.contains(storedChunk)) {
                         newStoredChunks.add(storedChunk);
                     }

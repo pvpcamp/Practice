@@ -123,6 +123,12 @@ public class PartyCommand implements CommandExecutor {
                             party = targetProfile.getParty();
                             switch (args[0].toLowerCase()) {
                                 case "join":
+
+                                    if(!profile.getState().equals(GameProfile.State.LOBBY)) {
+                                        player.sendMessage(ChatColor.RED + "You cannot join a party right now.");
+                                        return true;
+                                    }
+
                                     if (profile.getParty() == null) {
                                         if (party != null && party.isOpen()) {
                                             party.join(player);

@@ -658,6 +658,8 @@ public enum GameKit {
                 inv[13] = milk;
                 inv[14] = milk.clone();
 
+                inv[15] = new ItemStack(Material.COOKED_BEEF, 64);
+
                 speed = new Potion(PotionType.SPEED, 2);
 
                 inv[8] = speed.toItemStack(1);

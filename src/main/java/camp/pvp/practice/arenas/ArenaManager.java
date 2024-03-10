@@ -3,12 +3,9 @@ package camp.pvp.practice.arenas;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.GameKit;
 import lombok.Getter;
-import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -157,26 +154,31 @@ public class ArenaManager {
 
         logger.info("Arena scanner has finished scanning " + arenas + " arenas.");
 
-        copyArenaBlockLocations();
+        copyArenaBlockChunkLocations();
 
         logger.info("Arena block locations have been copied. If the arenas do not have the correct blocks, please update the parent arena accordingly.");
     }
 
-    public void copyArenaBlockLocations() {
+    public void copyArenaBlockChunkLocations() {
         for(Arena arena : getArenas()) {
             if(arena.isCopy()) {
                 Arena parent = getArenaFromName(arena.getParentName());
                 if(parent != null) {
-                    List<Location> solidBlocks = parent.getSolidBlocks();
                     List<Location> newSolidBlocks = new ArrayList<>();
 
-                    for(Location location : solidBlocks) {
-                        newSolidBlocks.add(location.clone().add(arena.getXDifference(), 0, arena.getZDifference()));
+                    for(Location location : parent.getSolidBlocks()) {
+                        Location newLocation = location.clone().add(arena.getXDifference(), 0, arena.getZDifference());
+                        newSolidBlocks.add(newLocation);
+
+                        if(arena.getWorldId() == null) {
+                            arena.setWorldId(newLocation.getWorld().getUID());
+                        }
                     }
 
                     arena.setSolidBlocks(newSolidBlocks);
                 }
 
+                arena.generateStoredChunks();
                 arena.refreshChunkSnapshots();
             }
         }
