@@ -819,7 +819,7 @@ public abstract class Game {
                     color.getChatColor() + "Bed has been destroyed by &f" + player.getName() + color.getChatColor() + "!",
                     " ");
 
-            playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 0F);
+            playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 1F);
 
             if (participant.getTeam() != null) participant.getTeam().setRespawn(false);
         }

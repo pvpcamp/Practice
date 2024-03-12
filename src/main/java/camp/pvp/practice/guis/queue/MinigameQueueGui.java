@@ -34,8 +34,14 @@ public class MinigameQueueGui extends ArrangedGui {
                 int playing = queue.getPlaying();
                 List<String> lore = new ArrayList<>(minigame.getDescription());
                 lore.add(" ");
-                lore.add("&6Players Required: &f" + minigame.getQueueSizeBeforeStart());
-                lore.add("&6In Queue: &f" + queue.getQueueMembers().size() + "&7/&f" + minigame.getQueueSizeBeforeStart());
+                lore.add("&6In Queue: &f" + queue.getQueueMembers().size() + "&7/&f" + minigame.getMaxPlayers());
+
+                if(queue.isCountdown()) {
+                    final int time = queue.getTimeBeforeStart();
+                    lore.add("&6Starting In: &f" + time + "second" + (time == 1 ? "" : "s"));
+                    lore.add(" ");
+                }
+
                 lore.add("&6Playing: &f" + playing);
                 lore.add(" ");
                 lore.add("&7Click to join the queue.");

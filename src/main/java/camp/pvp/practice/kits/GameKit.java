@@ -135,8 +135,6 @@ public enum GameKit {
 
                 items[7] = new ItemStack(Material.GOLDEN_CARROT, 64);
                 return items;
-            default:
-                break;
         }
 
         return null;
