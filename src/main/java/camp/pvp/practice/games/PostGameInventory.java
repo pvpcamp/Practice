@@ -102,6 +102,7 @@ public class PostGameInventory extends GameInventory {
             combatStatsLore.add(" &6Hits: &f" + gameParticipant.getHits());
             combatStatsLore.add(" &6Longest Combo: &f" + gameParticipant.getLongestCombo());
             combatStatsLore.add(" &6Blocked Hits: &f" + gameParticipant.getBlockedHits());
+            combatStatsLore.add(" &6Critical Hits: &f" + gameParticipant.getCriticalHits());
         }
 
         if(gameParticipant.getArrowShots() > 0) {

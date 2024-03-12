@@ -324,6 +324,16 @@ public enum GameKit {
         }
     }
 
+    public boolean isCappedCriticalHits() {
+        switch(this) {
+            case NO_DEBUFF:
+            case DEBUFF:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public boolean isShowArrowDamage() {
         return !this.equals(ONE_IN_THE_CHAMBER);
     }

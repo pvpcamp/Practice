@@ -429,12 +429,32 @@ public abstract class Game {
         victimParticipant.setHunger(victim.getFoodLevel());
         victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
 
-        if(event.getDamager() instanceof Player) {
+        if(event.getDamager() instanceof Player damager) {
             participant.hits++;
             participant.currentCombo++;
 
             if(victim.isBlocking()) {
-                victimParticipant.blockedHits++;
+
+                if(victimParticipant.blockedHits >= 20 && getKit().isCappedBlockHits()) {
+                    event.setDamage(EntityDamageEvent.DamageModifier.BLOCKING, 0);
+                } else {
+                    victimParticipant.blockedHits++;
+                }
+            }
+
+            Location location = damager.getLocation();
+            Block block = location.getBlock();
+
+            if(!damager.isOnGround()
+                    && !damager.isSprinting()
+                    && damager.getVehicle() == null
+                    && !block.isLiquid()) {
+                if(participant.getCriticalHits() >= 50 && getKit().isCappedCriticalHits()) {
+                    event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage() / 1.5);
+                } else {
+                    participant.criticalHits++;
+                }
+
             }
 
             if (participant.isComboMessages()) {
@@ -444,11 +464,11 @@ public abstract class Game {
                         attacker.sendMessage(Colors.get("&a ** 5 Hit Combo! **"));
                         break;
                     case 10:
-                        attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
+                        attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_WINGS, 1F, 1F);
                         attacker.sendMessage(Colors.get("&6&o ** 10 HIT COMBO! **"));
                         break;
                     case 20:
-                        attacker.playSound(attacker.getLocation(), Sound.ENDERDRAGON_GROWL, 1F, 1F);
+                        attacker.playSound(attacker.getLocation(), Sound.EXPLODE, 1F, 1F);
                         attacker.sendMessage(Colors.get("&4&l&o ** 20 HIT COMBO!!! **"));
                         break;
                 }
