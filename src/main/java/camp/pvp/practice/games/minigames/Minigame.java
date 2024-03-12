@@ -162,13 +162,13 @@ public abstract class Minigame extends Game {
             switch(this) {
                 case FIREBALL_BLITZ -> {
                     return List.of(
-                            "&74 Player Fireball Fight.",
+                            "&7Fireball Fight, but crazier.",
                             "&7Be the last player standing",
                             "&7to win.");
                 }
                 case SKYWARS -> {
                     return List.of(
-                            "&74 Player FFA Skywars.",
+                            "&7FFA Skywars.",
                             "&7No respawns, last player",
                             "&7alive wins.");
                 }
@@ -190,19 +190,9 @@ public abstract class Minigame extends Game {
 
         public int getMaxPlayers() {
             switch(this) {
-                case FIREBALL_BLITZ, SKYWARS -> {
-                    return 4;
-                }
-                case ONE_IN_THE_CHAMBER -> {
-                    return 8;
-                }
+                case ONE_IN_THE_CHAMBER -> { return 8; }
+                default -> { return 4; }
             }
-
-            return 0;
-        }
-
-        public int getQueueSizeBeforeStart() {
-            return 4;
         }
 
         public Minigame createGame(Practice plugin, UUID uuid) {

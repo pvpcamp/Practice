@@ -10,6 +10,7 @@ import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
@@ -18,7 +19,7 @@ import java.util.*;
 public class GameQueue {
 
     public enum GameType {
-        DUEL, MINIGAME;
+        DUEL, MINIGAME
     }
 
     public enum Type {
@@ -26,31 +27,21 @@ public class GameQueue {
 
         @Override
         public String toString() {
-            switch(this) {
-                case UNRANKED:
-                    return "Unranked";
-                case RANKED:
-                    return "Ranked";
-                case PRIVATE:
-                    return "Private Game";
-                case TOURNAMENT:
-                    return "Tournament";
-                default:
-                    return null;
-            }
+            return switch (this) {
+                case UNRANKED -> "Unranked";
+                case RANKED -> "Ranked";
+                case PRIVATE -> "Private Game";
+                case TOURNAMENT -> "Tournament";
+            };
         }
 
         public ChatColor getColor() {
-            switch (this) {
-                case RANKED:
-                    return ChatColor.GOLD;
-                case PRIVATE:
-                    return ChatColor.AQUA;
-                case TOURNAMENT:
-                    return ChatColor.LIGHT_PURPLE;
-                default:
-                    return ChatColor.YELLOW;
-            }
+            return switch (this) {
+                case RANKED -> ChatColor.GOLD;
+                case PRIVATE -> ChatColor.AQUA;
+                case TOURNAMENT -> ChatColor.LIGHT_PURPLE;
+                default -> ChatColor.YELLOW;
+            };
         }
     }
 
@@ -60,7 +51,8 @@ public class GameQueue {
     private GameKit gameKit;
     private Minigame.Type minigameType;
     private Queue<GameQueueMember> queueMembers;
-    private BukkitTask queueTask;
+    private BukkitTask queueTask, minigameQueueTask;
+    private int timeBeforeStart;
     private boolean available;
 
     public GameQueue(Practice plugin, GameKit gameKit, Type type) {
@@ -178,27 +170,70 @@ public class GameQueue {
             case MINIGAME -> {
                 queueTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
 
-                    if(queueMembers.size() < minigameType.getQueueSizeBeforeStart()) {
+                    if(queueMembers.size() < minigameType.getMinPlayers() && timeBeforeStart < 30) {
+                        announce("&cThere are not enough players to start the minigame, waiting for players.");
+                        timeBeforeStart = Integer.MAX_VALUE;
                         return;
                     }
 
-                    List<GameQueueMember> members = new ArrayList<>();
+                    if(queueMembers.size() >= minigameType.getMaxPlayers()) {
 
-                    for(int i = 0; i < minigameType.getQueueSizeBeforeStart(); i++) {
-                        members.add(queueMembers.poll());
+                        announce("&aQueue has reached capacity, starting minigame.");
+
+                        List<GameQueueMember> members = new ArrayList<>();
+                        for(int i = 0; i < minigameType.getMaxPlayers(); i++) {
+                            members.add(queueMembers.poll());
+                        }
+
+                        startMinigame(members);
+                        return;
                     }
 
-                    Minigame minigame = minigameType.createGame(plugin, UUID.randomUUID());
-                    assert minigame != null;
+                    if(timeBeforeStart == 0) {
+                        List<GameQueueMember> members = new ArrayList<>();
+                        final int size = queueMembers.size();
+                        for(int i = 0; i < size; i++) {
+                            members.add(queueMembers.poll());
+                        }
 
-                    for(GameQueueMember member : members) {
-                        minigame.join(member.getPlayer());
+                        startMinigame(members);
+                        return;
                     }
 
-                    minigame.initialize();
-                }, 5, 5);
+                    if(queueMembers.size() > 4 && timeBeforeStart > 10) {
+                        timeBeforeStart = 10;
+                    }
+
+                    if(timeBeforeStart > 30) {
+                        timeBeforeStart = 30;
+                        announce("&aStarting minigame in &f30 &aseconds.");
+                    }
+
+                    if(timeBeforeStart <= 5) {
+                        announce("&aStarting minigame in &f" + timeBeforeStart + " &asecond" + (timeBeforeStart == 1 ? "" : "s") + ".");
+                    }
+
+                    timeBeforeStart--;
+                }, 0, 20);
             }
         }
+    }
+
+    private void startMinigame(List<GameQueueMember> members) {
+        Minigame minigame = minigameType.createGame(plugin, UUID.randomUUID());
+        assert minigame != null;
+
+        for(GameQueueMember member : members) {
+            minigame.join(member.getPlayer());
+        }
+
+        minigame.initialize();
+    }
+
+    public boolean isCountdown() {
+        if(!gameType.equals(GameType.MINIGAME)) return false;
+
+        return timeBeforeStart <= 30;
     }
 
     public void stopQueue() {
@@ -210,5 +245,18 @@ public class GameQueue {
         }
 
         plugin.getGameQueueManager().removeQueue(this);
+    }
+
+    public void announce(String... message) {
+        for(GameQueueMember member : queueMembers) {
+            member.getPlayer().sendMessage(Colors.get(message));
+        }
+    }
+
+    public void playSound(String sound, float volume, float pitch) {
+        for(GameQueueMember member : queueMembers) {
+            Player player = member.getPlayer();
+            player.playSound(player.getLocation(), sound, volume, pitch);
+        }
     }
 }
