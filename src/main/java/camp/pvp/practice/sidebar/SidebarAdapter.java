@@ -124,9 +124,9 @@ public class SidebarAdapter implements AssembleAdapter {
                             lines.add(" &7● &6In Queue: &f" + queue.getQueueMembers().size());
 
                             if(queue.isCountdown()) {
-                                lines.add(" &7● &6Starting In: &f" + queue.getTimeBeforeStart() + "s");
+                                lines.add(" &7● &6Starting In: &f" + (queue.getTimeBeforeStart() + 1) + "s");
                             } else {
-                                lines.add("&7&oWaiting for players.");
+                                lines.add(" &7● &6&oWaiting for players.");
                             }
                         }
                     }
@@ -191,8 +191,6 @@ public class SidebarAdapter implements AssembleAdapter {
 
                     lines.add("&6Anvil: &fSave");
                     break;
-                default:
-                    lines.add("&f&oIn Development.");
             }
 
             lines.add(" ");

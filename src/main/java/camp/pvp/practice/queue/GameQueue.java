@@ -10,6 +10,7 @@ import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -170,33 +171,23 @@ public class GameQueue {
             case MINIGAME -> {
                 queueTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
 
-                    if(queueMembers.size() < minigameType.getMinPlayers() && timeBeforeStart < 30) {
-                        announce("&cThere are not enough players to start the minigame, waiting for players.");
+                    if(queueMembers.size() < minigameType.getMinPlayers()) {
+                        if(timeBeforeStart <= 30) {
+                            announce("&cThere are not enough players to start the minigame, waiting for players.");
+                            timeBeforeStart = Integer.MAX_VALUE;
+                        }
+                        return;
+                    }
+
+                    if(queueMembers.size() >= minigameType.getMaxPlayers() || timeBeforeStart == 0) {
+                        List<GameQueueMember> members = new ArrayList<>();
+                        final int players = Math.min(minigameType.getMaxPlayers(), queueMembers.size());
+                        for(int i = 0; i < players; i++) {
+                            members.add(queueMembers.poll());
+                        }
+
+                        startMinigame(members);
                         timeBeforeStart = Integer.MAX_VALUE;
-                        return;
-                    }
-
-                    if(queueMembers.size() >= minigameType.getMaxPlayers()) {
-
-                        announce("&aQueue has reached capacity, starting minigame.");
-
-                        List<GameQueueMember> members = new ArrayList<>();
-                        for(int i = 0; i < minigameType.getMaxPlayers(); i++) {
-                            members.add(queueMembers.poll());
-                        }
-
-                        startMinigame(members);
-                        return;
-                    }
-
-                    if(timeBeforeStart == 0) {
-                        List<GameQueueMember> members = new ArrayList<>();
-                        final int size = queueMembers.size();
-                        for(int i = 0; i < size; i++) {
-                            members.add(queueMembers.poll());
-                        }
-
-                        startMinigame(members);
                         return;
                     }
 
@@ -207,10 +198,12 @@ public class GameQueue {
                     if(timeBeforeStart > 30) {
                         timeBeforeStart = 30;
                         announce("&aStarting minigame in &f30 &aseconds.");
+                        playSound(Sound.ORB_PICKUP, 1, 1);
                     }
 
-                    if(timeBeforeStart <= 5) {
+                    if(timeBeforeStart <= 5 || timeBeforeStart == 10) {
                         announce("&aStarting minigame in &f" + timeBeforeStart + " &asecond" + (timeBeforeStart == 1 ? "" : "s") + ".");
+                        playSound(Sound.CLICK, 1, 1);
                     }
 
                     timeBeforeStart--;
@@ -253,7 +246,7 @@ public class GameQueue {
         }
     }
 
-    public void playSound(String sound, float volume, float pitch) {
+    public void playSound(Sound sound, float volume, float pitch) {
         for(GameQueueMember member : queueMembers) {
             Player player = member.getPlayer();
             player.playSound(player.getLocation(), sound, volume, pitch);
