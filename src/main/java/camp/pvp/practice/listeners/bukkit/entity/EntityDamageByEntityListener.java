@@ -61,28 +61,35 @@ public class EntityDamageByEntityListener implements Listener {
 
             if(game != null && game.getState().equals(Game.State.ACTIVE) && game.getKit().equals(GameKit.FIREBALL_FIGHT) && game.getAlive().containsKey(player.getUniqueId())) {
 
-                double damage;
+                double damage = 0;
 
-                if (event.getDamager().getTicksLived() < 20) {
-                    damage = 0;
-                } else {
+                if (event.getDamager().getTicksLived() > 20) {
                     damage = event.getFinalDamage() / 4;
                 }
 
                 player.damage(damage);
 
-                Location location = event.getDamager().getLocation().subtract(0, -1, 0);
+                Location location = event.getDamager().getLocation();
                 Vector dirToExplosion = location.toVector().subtract(player.getLocation().toVector());
+                double distanceFromExplosion = location.distance(player.getLocation());
 
                 // Invert direction.
                 dirToExplosion.multiply(-1);
                 // Normalize the vector.
                 dirToExplosion.setY(0).normalize();
 
+                double explosionStrength = 1.25;
+                double explosionY = 1.1;
+
+                if(distanceFromExplosion > 1.5) {
+                    explosionStrength = 0.7;
+                    explosionY = 0.8;
+                }
+
                 // Multiply the vector to get desired explosion strength.
-                dirToExplosion.multiply(1.25);
+                dirToExplosion.multiply(explosionStrength);
                 // Set Y to make the player fly up.
-                dirToExplosion.setY(1.20);
+                dirToExplosion.setY(explosionY);
 
                 player.setVelocity(dirToExplosion);
 

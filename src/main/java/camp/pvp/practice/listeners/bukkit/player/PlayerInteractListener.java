@@ -115,7 +115,7 @@ public class PlayerInteractListener implements Listener {
                 switch (block.getType()) {
                     case CHEST:
                         if(editingKit.getMoreItems() != null) {
-                            Inventory inventory = Bukkit.createInventory(player, 36, "More Items");
+                            Inventory inventory = Bukkit.createInventory(player, 36, "&6More Items");
                             for(ItemStack i : editingKit.getMoreItems()) {
                                 if(i != null && !i.getType().equals(Material.AIR)) {
                                     inventory.addItem(i);
@@ -126,7 +126,7 @@ public class PlayerInteractListener implements Listener {
                         }
                         break;
                     case ANVIL:
-                        StandardGui gui = new StandardGui("Editing " + editingKit.getDisplayName(), 36);
+                        StandardGui gui = new StandardGui("&6Editing " + editingKit.getDisplayName(), 36);
                         Map<Integer, CustomGameKit> customKits = profile.getCustomDuelKits().get(editingKit);
                         int x = 1;
                         while (x < 6) {

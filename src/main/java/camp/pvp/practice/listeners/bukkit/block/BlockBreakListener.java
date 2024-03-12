@@ -36,7 +36,7 @@ public class BlockBreakListener implements Listener {
             return;
         }
 
-        if(game != null && game.isBuild() && game.getState().equals(Game.State.ACTIVE)) {
+        if(game != null && game.isBuild()) {
             if(game.getAlivePlayers().contains(player)) {
                 if(game.isInBorder(location)) {
                     game.handleBlockBreak(player, block, event);

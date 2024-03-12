@@ -32,7 +32,11 @@ public class EntityExplodeListener implements Listener {
             }
         }
 
-        if (game == null) return;
+        if (game == null) {
+            event.blockList().clear();
+            event.setCancelled(true);
+            return;
+        }
 
         if(event.getEntity() instanceof Fireball fireball) {
             fireball.setIsIncendiary(false);

@@ -531,11 +531,6 @@ public abstract class Game {
 
         if(block != null) {
 
-            if(!getState().equals(State.ACTIVE)) {
-                event.setCancelled(true);
-                return;
-            }
-
             if(arena.getType().canModifyArena()) return;
 
             Material material = block.getType();
@@ -586,7 +581,7 @@ public abstract class Game {
                 return;
             }
 
-            Fireball fireball = player.launchProjectile(Fireball.class, player.getLocation().getDirection().multiply(1.1));
+            Fireball fireball = player.launchProjectile(Fireball.class, player.getLocation().add(0, .25, 0).getDirection().multiply(0.75));
 
             fireball.setIsIncendiary(false);
             addEntity(fireball);
@@ -744,8 +739,9 @@ public abstract class Game {
         if(block.getType().equals(Material.SNOW_BLOCK)) {
             player.getInventory().addItem(new ItemStack(Material.SNOW_BALL));
         } else {
+            Location dropLocation = block.getLocation().clone().add(0.5, 0.5, 0.5);
             for (ItemStack item : block.getDrops()) {
-                Item i = block.getLocation().getWorld().dropItem(block.getLocation(), item);
+                Item i = block.getLocation().getWorld().dropItemNaturally(dropLocation, item);
                 addEntity(i);
             }
         }
@@ -803,7 +799,7 @@ public abstract class Game {
                     color.getChatColor() + "Bed has been destroyed by &f" + player.getName() + color.getChatColor() + "!",
                     " ");
 
-            playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 1F);
+            playSound(null, Sound.ENDERDRAGON_GROWL, 1F, 0F);
 
             if (participant.getTeam() != null) participant.getTeam().setRespawn(false);
         }

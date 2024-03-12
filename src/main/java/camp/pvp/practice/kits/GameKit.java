@@ -187,6 +187,26 @@ public enum GameKit {
         }
     }
 
+    public boolean canPlaceTntBeforeStart() {
+        switch(this) {
+            case FIREBALL_FIGHT:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public boolean canPlaceBlocksBeforeStart() {
+        switch(this) {
+            case BUILD_UHC:
+            case SKYWARS:
+            case STRATEGY:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public boolean isMoveOnStart() {
         switch(this) {
             case BED_FIGHT:
