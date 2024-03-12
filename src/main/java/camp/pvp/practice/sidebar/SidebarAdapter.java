@@ -7,6 +7,8 @@ import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.games.sumo.SumoEventDuel;
 import camp.pvp.practice.games.tournaments.Tournament;
+import camp.pvp.practice.kits.CustomGameKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.parties.PartyMember;
@@ -95,7 +97,6 @@ public class SidebarAdapter implements AssembleAdapter {
 
                     if(staff) lines.add("&6Staff Mode: &f" + (profile.isStaffMode() ? "Enabled" : "Disabled"));
 
-
                     break;
                 case LOBBY_QUEUE:
                     GameQueue queue = gameQueueManager.getQueue(player);
@@ -121,6 +122,12 @@ public class SidebarAdapter implements AssembleAdapter {
                             lines.add("&6In Minigame Queue:");
                             lines.add(" &7● " + queue.getType().getColor() + queue.getMinigameType().toString() + (ranked ? " &f&l(R)" : " &f(U)"));
                             lines.add(" &7● &6In Queue: &f" + queue.getQueueMembers().size());
+
+                            if(queue.isCountdown()) {
+                                lines.add(" &7● &6Starting In: &f" + (queue.getTimeBeforeStart() + 1) + "s");
+                            } else {
+                                lines.add(" &7● &6&oWaiting for players.");
+                            }
                         }
                     }
 
@@ -132,6 +139,7 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());
                     lines.add("&6In Game: &f" + gameManager.getTotalInGame());
                     lines.add(" ");
+
                     Party party = profile.getParty();
                     PartyMember member = party.getMembers().get(player.getUniqueId());
                     HCFKit kit = member.getHcfKit();
@@ -170,15 +178,19 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.addAll(game.getSpectatorScoreboard(profile));
                     break;
                 case KIT_EDITOR:
+                    GameKit editingKit = profile.getEditingKit();
+
                     lines.add("&6Editing Kit:");
-                    lines.add(" &f" + profile.getEditingKit().getDisplayName());
+                    lines.add(" &f" + editingKit.getDisplayName());
                     lines.add(" ");
                     lines.add("&6Sign: &fLeave");
-                    lines.add("&6Chest: &fMore Items");
+
+                    if(editingKit.getMoreItems() != null) {
+                        lines.add("&6Chest: &fMore Items");
+                    }
+
                     lines.add("&6Anvil: &fSave");
                     break;
-                default:
-                    lines.add("&f&oIn Development.");
             }
 
             lines.add(" ");

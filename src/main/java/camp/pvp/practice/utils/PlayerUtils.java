@@ -1,12 +1,7 @@
 package camp.pvp.practice.utils;
 
-import camp.pvp.practice.interactables.InteractableItems;
-import camp.pvp.practice.Practice;
-import camp.pvp.practice.interactables.InteractableItem;
-import camp.pvp.practice.profiles.GameProfile;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
 import java.lang.reflect.InvocationTargetException;

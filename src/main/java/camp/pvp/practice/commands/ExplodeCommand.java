@@ -1,6 +1,7 @@
 package camp.pvp.practice.commands;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.profiles.GameProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -31,8 +32,12 @@ public class ExplodeCommand implements CommandExecutor {
             return true;
         }
 
+        GameProfile targetProfile = plugin.getGameProfileManager().getLoadedProfile(target.getUniqueId());
+
         target.sendMessage(ChatColor.DARK_RED + "You go boom.");
-        target.damage(5D);
+
+        if(targetProfile.getState().equals(GameProfile.State.IN_GAME) && targetProfile.getGame().getAlive().containsKey(target.getUniqueId())) target.damage(5D);
+        
         target.setVelocity(new Vector(0, .75, 0));
 
         for(Player player : Bukkit.getOnlinePlayers()) {

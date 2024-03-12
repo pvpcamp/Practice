@@ -35,7 +35,7 @@ public class AnnounceCommand implements CommandExecutor {
             return true;
         }
 
-        if(System.currentTimeMillis() - lastUse < 30 * 1000) {
+        if(System.currentTimeMillis() - lastUse < 30 * 1000 && !player.hasPermission("practice.minigame.announce.bypass")) {
             player.sendMessage(ChatColor.RED + lastUserName + " has already used this command in the last 30 seconds, please wait before using it again.");
             return true;
         }
@@ -49,7 +49,7 @@ public class AnnounceCommand implements CommandExecutor {
                         profile.getName(),
                         queue.getMinigameType().toString(),
                         queue.getQueueMembers().size(),
-                        queue.getMinigameType().getQueueSizeBeforeStart()
+                        queue.getMinigameType().getMaxPlayers()
                 );
 
         for(Player p : Bukkit.getOnlinePlayers()) {
