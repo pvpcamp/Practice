@@ -3,11 +3,13 @@ package camp.pvp.practice.guis.party;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.impl.teams.TeamDuel;
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.parties.PartyMember;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.GameProfileManager;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
 import camp.pvp.utils.guis.Gui;
@@ -23,13 +25,12 @@ public class SplitKitGui extends ArrangedGui {
     public SplitKitGui(GameProfile profile, Party party) {
         super("&6Choose a Kit");
 
-        this.setDefaultBorder();
-
         for(GameKit kit : GameKit.values()) {
-            if(!kit.isDuelKit()) continue;
-            if(!kit.isTeams()) continue;
+            BaseKit baseKit = kit.getBaseKit();
+            if(!baseKit.getGameTypes().contains(GameQueue.GameType.DUEL)) continue;
+            if(!baseKit.isTeams()) continue;
 
-            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
+            GuiButton button = new GuiButton(baseKit.getIcon(), "&6&l" + kit.getDisplayName());
             button.setCloseOnClick(true);
             button.setLore(
                     "&7Click to start &f" + kit.getDisplayName() + " &7Split Teams event!");
@@ -59,7 +60,7 @@ public class SplitKitGui extends ArrangedGui {
                         List<PartyMember> shuffledMembers = new ArrayList<>(members);
                         Collections.shuffle(shuffledMembers);
 
-                        teamDuel.setKit(kit);
+                        teamDuel.setKit(baseKit);
                         teamDuel.getParties().add(party);
 
                         int x = 0;

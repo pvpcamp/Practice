@@ -40,13 +40,13 @@ public class BlockPlaceListener implements Listener {
                 return;
             }
 
-            if(material.equals(Material.TNT) && !game.getKit().canPlaceTntBeforeStart() && !game.getState().equals(Game.State.ACTIVE)) {
+            if(material.equals(Material.TNT) && !game.getKit().isPlaceTntBeforeStart()&& !game.getState().equals(Game.State.ACTIVE)) {
                 player.sendMessage(ChatColor.RED + "You cannot place TNT before the game starts.");
                 event.setCancelled(true);
                 return;
             }
 
-            if(!game.getKit().canPlaceBlocksBeforeStart() && !game.getState().equals(Game.State.ACTIVE) && !material.equals(Material.TNT)) {
+            if(!game.getKit().isPlaceBlocksBeforeStart() && !game.getState().equals(Game.State.ACTIVE) && !material.equals(Material.TNT)) {
                 player.sendMessage(ChatColor.RED + "You cannot place blocks before the game starts.");
                 event.setCancelled(true);
                 return;

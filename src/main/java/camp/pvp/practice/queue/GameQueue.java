@@ -2,10 +2,10 @@ package camp.pvp.practice.queue;
 
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.minigames.Minigame;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
@@ -118,7 +118,7 @@ public class GameQueue {
                             Duel duel = new Duel(plugin, UUID.randomUUID());
 
                             duel.setQueueType(type);
-                            duel.setKit(gameKit);
+                            duel.setKit(gameKit.getBaseKit());
 
                             duel.join(member1.getPlayer());
                             duel.join(member2.getPlayer());
@@ -150,7 +150,7 @@ public class GameQueue {
                                             Duel duel = new Duel(plugin, UUID.randomUUID());
 
                                             duel.setQueueType(type);
-                                            duel.setKit(gameKit);
+                                            duel.setKit(gameKit.getBaseKit());
 
                                             duel.join(member1.getPlayer());
                                             duel.join(member2.getPlayer());

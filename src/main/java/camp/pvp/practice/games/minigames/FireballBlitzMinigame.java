@@ -8,13 +8,11 @@ import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -28,7 +26,7 @@ public class FireballBlitzMinigame extends Minigame{
         super(plugin, uuid);
 
         setType(Type.FIREBALL_BLITZ);
-        setKit(GameKit.FIREBALL_FIGHT);
+        setKit(GameKit.FIREBALL_FIGHT.getBaseKit());
     }
 
     @Override

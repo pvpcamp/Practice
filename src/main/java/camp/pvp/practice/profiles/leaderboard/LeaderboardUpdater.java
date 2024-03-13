@@ -1,8 +1,10 @@
 package camp.pvp.practice.profiles.leaderboard;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfileManager;
+import camp.pvp.practice.queue.GameQueue;
 import lombok.Getter;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -28,7 +30,8 @@ public class LeaderboardUpdater implements Runnable{
         long start = System.currentTimeMillis();
 
         for(GameKit kit : GameKit.values()) {
-            if(kit.isDuelKit() && kit.isRanked()) {
+            BaseKit baseKit = kit.getBaseKit();
+            if(baseKit.getGameTypes().contains(GameQueue.GameType.DUEL) && baseKit.isRanked()) {
                 List<LeaderboardEntry> entries = new ArrayList<>();
 
                 leaderboard.put(kit, entries);

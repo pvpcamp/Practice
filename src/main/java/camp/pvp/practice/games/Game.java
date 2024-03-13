@@ -5,6 +5,7 @@ import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.tournaments.Tournament;
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.CustomGameKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
@@ -56,7 +57,7 @@ public abstract class Game {
 
     private State state;
     private Arena arena;
-    private GameKit kit;
+    private BaseKit kit;
 
     public int round, timer;
     private Date created, started, ended;
@@ -136,13 +137,13 @@ public abstract class Game {
                     if(this instanceof Duel duel) {
                         GameQueue.Type queueType = duel.getQueueType();
                         if(queueType.equals(GameQueue.Type.UNRANKED) || queueType.equals(GameQueue.Type.RANKED) || queueType.equals(GameQueue.Type.PRIVATE)) {
-                            PreviousQueue previousQueue = new PreviousQueue(duel.getKit(), queueType.equals(GameQueue.Type.PRIVATE) ? GameQueue.Type.UNRANKED : queueType);
+                            PreviousQueue previousQueue = new PreviousQueue(duel.getKit().getGameKit(), queueType.equals(GameQueue.Type.PRIVATE) ? GameQueue.Type.UNRANKED : queueType);
                             profile.setPreviousQueue(previousQueue);
 
                             Rematch rematch;
                             for(GameParticipant p : getParticipants().values()) {
                                 if(p.getUuid() != participant.getUuid() && p.getPlayer() != null && p.getPlayer().isOnline()) {
-                                    rematch = new Rematch(profile, p.getUuid(), p.getName(), duel.getKit());
+                                    rematch = new Rematch(profile, p.getUuid(), p.getName(), duel.getKit().getGameKit());
                                     profile.setRematch(rematch);
                                 }
                             }
@@ -496,13 +497,13 @@ public abstract class Game {
                     handleRightClickedItem(player, item, event);
             }
         } else {
-            GameKit kit = getKit();
+            BaseKit kit = getKit();
             switch(player.getItemInHand().getType()) {
                 case ENCHANTED_BOOK:
                     int slot = player.getInventory().getHeldItemSlot() + 1;
-                    CustomGameKit cdk = participant.getProfile().getCustomDuelKits().get(kit).get(slot);
+                    CustomGameKit cdk = participant.getProfile().getCustomDuelKits().get(kit.getGameKit()).get(slot);
                     if(cdk != null) {
-                        cdk.apply(participant);
+                        kit.apply(participant, cdk);
                         participant.setAppliedCustomKit(cdk);
                         player.updateInventory();
                     }
@@ -614,7 +615,7 @@ public abstract class Game {
         GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
         participant.setGame(this);
         participant.setComboMessages(profile.isComboMessages());
-        participant.setGameKit(kit);
+        participant.setBaseKit(kit);
 
         if(kit.isRespawn()) {
             participant.setRespawn(true);
@@ -832,7 +833,7 @@ public abstract class Game {
                  &7● &6Arena: &f%s
                  &7● &6Participants: &f%s
                  \n
-                 """.formatted(getClass().getSimpleName(), getKit().getDisplayName(), getArena().getDisplayName(), sb);
+                 """.formatted(getClass().getSimpleName(), getKit().getGameKit().getDisplayName(), getArena().getDisplayName(), sb);
 
         this.announce(startingMessage);
     }

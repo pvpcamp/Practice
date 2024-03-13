@@ -21,12 +21,10 @@ public class FFAKitGui extends ArrangedGui {
     public FFAKitGui(GameProfile profile, Party party) {
         super("&6Choose a Kit");
 
-        this.setDefaultBorder();
-
         for(GameKit kit : GameKit.values()) {
-            if(!kit.isDuelKit() || !kit.isFfa()) continue;
+            if(!kit.getBaseKit().isFfa()) continue;
 
-            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
+            GuiButton button = new GuiButton(kit.getBaseKit().getIcon(), "&6&l" + kit.getDisplayName());
             button.setCloseOnClick(true);
             button.setLore(
                     "&7Click to start &f" + kit.getDisplayName() + " &7FFA event!");
@@ -54,7 +52,7 @@ public class FFAKitGui extends ArrangedGui {
                         }
 
                         ffa.getParties().add(party);
-                        ffa.setKit(kit);
+                        ffa.setKit(kit.getBaseKit());
 
                         for (PartyMember member : members) {
                             ffa.join(member.getPlayer());

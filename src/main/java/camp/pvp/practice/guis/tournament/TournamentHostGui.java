@@ -15,9 +15,9 @@ public class TournamentHostGui extends ArrangedGui {
 
         for(GameKit kit : GameKit.values()) {
 
-            if(!kit.isTournament()) continue;
+            if(!kit.getBaseKit().isTournament()) continue;
 
-            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
+            GuiButton button = new GuiButton(kit.getBaseKit().getIcon(), "&6" + kit.getDisplayName());
 
             button.setLore(
                     "&7Next, select a team size for ",

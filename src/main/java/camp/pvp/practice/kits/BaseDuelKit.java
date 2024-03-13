@@ -1,13 +1,12 @@
 package camp.pvp.practice.kits;
 
-import camp.pvp.practice.arenas.Arena;
+import camp.pvp.practice.queue.GameQueue;
 
 public abstract class BaseDuelKit extends BaseKit {
-    public BaseDuelKit(NewGameKit gameKit) {
+    public BaseDuelKit(GameKit gameKit) {
         super(gameKit);
 
-        getArenaTypes().add(Arena.Type.DUEL);
-        getArenaTypes().add(Arena.Type.DUEL_FLAT);
+        getGameTypes().add(GameQueue.GameType.DUEL);
 
         setTournament(true);
         setTeams(true);

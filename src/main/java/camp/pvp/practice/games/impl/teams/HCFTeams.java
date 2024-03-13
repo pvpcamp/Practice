@@ -58,7 +58,7 @@ public class HCFTeams extends TeamDuel {
 
         arena.prepare();
 
-        this.setKit(GameKit.NO_DEBUFF);
+        this.setKit(GameKit.NO_DEBUFF.getBaseKit());
 
         for(Party party : this.getParties()) {
             party.setGame(this);
@@ -386,7 +386,6 @@ public class HCFTeams extends TeamDuel {
 
         switch(getState()) {
             case STARTING:
-                lines.add("&6Kit: &f" + getKit().getDisplayName());
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
                 lines.add(" ");
                 lines.add("&9Blue Team: &f" + getBlue().getAliveParticipants().size() + "/" + getBlue().getParticipants().size());

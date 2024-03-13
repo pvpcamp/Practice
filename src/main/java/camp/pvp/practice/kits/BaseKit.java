@@ -24,20 +24,19 @@ public abstract class BaseKit {
 
     private final ItemStack[] items, armor, moreItems;
     private final List<PotionEffect> potionEffects;
-    private final NewGameKit gameKit;
+    private GameKit gameKit;
     private ItemStack icon;
     private List<Arena.Type> arenaTypes;
     private List<GameQueue.GameType> gameTypes;
     private boolean build, respawn, regen, ranked, tournament, editable, hunger, showHealthBar, takeDamage,
             placeTntBeforeStart, placeBlocksBeforeStart, moveOnStart, dieInWater, ffa, teams, issueCooldowns,
             dropItemsOnDeath, itemDurability, arrowOneShot, arrowPickup, fallDamage, cappedBlockHits, showArrowDamage,
-            applyLeatherTeamColor;
+            applyLeatherTeamColor, bedwars, boxing, biggerExplosions;
 
-    public BaseKit(NewGameKit gameKit) {
+    public BaseKit(GameKit gameKit) {
         this.items = new ItemStack[36];
         this.moreItems = new ItemStack[36];
         this.armor = new ItemStack[4];
-        this.arenaTypes = new ArrayList<>();
         this.gameTypes = new ArrayList<>();
         this.potionEffects = new ArrayList<>();
         this.gameKit = gameKit;
@@ -60,16 +59,20 @@ public abstract class BaseKit {
     }
 
     public void apply(Player player) {
+        apply(player, null);
+    }
+
+    public void apply(Player player, CustomGameKit customKit) {
         PlayerInventory pi = player.getInventory();
+        ItemStack[] items = getItems();
+
+        if(customKit != null) {
+            items = customKit.getItems();
+        }
 
         PlayerUtils.reset(player, false);
 
-        for(PotionEffect effect : getPotionEffects()) {
-            player.addPotionEffect(effect);
-        }
-
-        pi.setArmorContents(getArmor().clone());
-        pi.setContents(getItems().clone());
+        pi.setContents(items.clone());
         player.updateInventory();
     }
 

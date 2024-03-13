@@ -1,11 +1,8 @@
 package camp.pvp.practice.listeners.bukkit.entity;
 
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import camp.pvp.practice.utils.Colors;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
@@ -59,7 +56,7 @@ public class EntityDamageByEntityListener implements Listener {
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId());
             Game game = profile.getGame();
 
-            if(game != null && game.getState().equals(Game.State.ACTIVE) && game.getKit().equals(GameKit.FIREBALL_FIGHT) && game.getAlive().containsKey(player.getUniqueId())) {
+            if(game != null && game.getState().equals(Game.State.ACTIVE) && game.getKit().isBiggerExplosions() && game.getAlive().containsKey(player.getUniqueId())) {
 
                 double damage = 0;
 
@@ -80,8 +77,13 @@ public class EntityDamageByEntityListener implements Listener {
 
                 double explosionStrength = 1.25;
                 double explosionY = 1.1;
+                double explosionDistance = 1.5;
 
-                if(distanceFromExplosion > 1.5) {
+                if(event.getDamager().getType().equals(EntityType.PRIMED_TNT)) {
+                    explosionDistance = 2.5;
+                }
+
+                if(distanceFromExplosion > explosionDistance) {
                     explosionStrength = 0.7;
                     explosionY = 0.8;
                 }

@@ -1,11 +1,11 @@
 package camp.pvp.practice.commands;
 
 import camp.pvp.practice.guis.games.duel.DuelRequestKitSelectionGui;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.DuelRequest;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
@@ -55,7 +55,7 @@ public class DuelCommand implements CommandExecutor {
                                 StandardGui acceptGui = new StandardGui("Accept Duel from " + target.getName() + "?", 27);
 
                                 GameKit kit = duelRequest.getKit();
-                                GuiButton acceptButton = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName() + " Duel Request");
+                                GuiButton acceptButton = new GuiButton(kit.getBaseKit().getIcon(), "&6" + kit.getDisplayName() + " Duel Request");
                                 acceptButton.setLore(
                                         "&7Would you like to accept this duel?",
                                         "&6Arena: &f" + (duelRequest.getArena() == null ? "Random" : Colors.get(duelRequest.getArena().getDisplayName())));

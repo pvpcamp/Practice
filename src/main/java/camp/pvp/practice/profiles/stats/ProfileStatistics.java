@@ -26,7 +26,7 @@ public class ProfileStatistics {
         for (GameKit kit : GameKit.values()) {
             unranked.put(kit, new ProfileIndividualStatistics());
 
-            if(kit.isRanked()) {
+            if(kit.getBaseKit().isRanked()) {
                 ranked.put(kit, new ProfileIndividualStatistics());
             }
         }
@@ -111,7 +111,7 @@ public class ProfileStatistics {
         for (GameKit kit : GameKit.values()) {
             map.put("unranked_" + kit.name(), unranked.get(kit).export());
 
-            if(kit.isRanked()) {
+            if(kit.getBaseKit().isRanked()) {
                 map.put("ranked_" + kit.name(), ranked.get(kit).export());
             }
         }

@@ -20,7 +20,7 @@ public class GamesGui extends PaginatedGui {
         super("&6Active Games", 36);
 
         for(Game game : Practice.getInstance().getGameManager().getActiveGames()) {
-            GuiButton button = new GuiButton(game.getKit().getIcon(), "&6&l" + game.getKit().getDisplayName() + " " + game.getClass().getSimpleName());
+            GuiButton button = new GuiButton(game.getKit().getIcon(), "&6&l" + game.getKit().getGameKit().getDisplayName() + " " + game.getClass().getSimpleName());
 
             List<String> lines = new ArrayList<>();
             lines.add("&6Spectating: &f" + game.getSpectators().size());

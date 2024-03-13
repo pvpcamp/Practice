@@ -1,10 +1,7 @@
 package camp.pvp.practice.kits.impl;
 
-import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.kits.BaseDuelKit;
-import camp.pvp.practice.kits.BaseKit;
-import camp.pvp.practice.kits.NewGameKit;
-import camp.pvp.practice.queue.GameQueue;
+import camp.pvp.practice.kits.GameKit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +11,7 @@ import org.bukkit.potion.PotionType;
 public class NoDebuffKit extends BaseDuelKit {
 
     public NoDebuffKit() {
-        super(NewGameKit.NO_DEBUFF);
+        super(GameKit.NO_DEBUFF);
 
         Potion potion = new Potion(PotionType.INSTANT_HEAL, 2);
         potion.setSplash(true);
@@ -23,12 +20,6 @@ public class NoDebuffKit extends BaseDuelKit {
         setFfa(true);
 
         ItemStack[] armor = getArmor(), inv = getItems(), more = getMoreItems();
-
-        for (int i = 0; i < 36; i++) {
-            more[i] = getItems()[i].clone();
-        }
-
-        more[7] = new ItemStack(Material.GOLDEN_CARROT, 64);
 
         armor[3] = new ItemStack(Material.DIAMOND_HELMET);
         armor[3].addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
@@ -76,5 +67,11 @@ public class NoDebuffKit extends BaseDuelKit {
                 inv[x] = health.toItemStack(1);
             }
         }
+
+        for (int i = 0; i < 36; i++) {
+            more[i] = getItems()[i].clone();
+        }
+
+        more[7] = new ItemStack(Material.GOLDEN_CARROT, 64);
     }
 }

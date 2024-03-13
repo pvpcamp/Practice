@@ -1,9 +1,9 @@
 package camp.pvp.practice.arenas;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.GameKit;
 import lombok.Getter;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -40,7 +40,7 @@ public class ArenaManager {
         return null;
     }
 
-    public Arena selectRandomArena(GameKit kit) {
+    public Arena selectRandomArena(BaseKit kit) {
         List<Arena> arenas = new ArrayList<>();
         if(kit.isBuild()) {
             for(Arena a : getOriginalArenas()) {

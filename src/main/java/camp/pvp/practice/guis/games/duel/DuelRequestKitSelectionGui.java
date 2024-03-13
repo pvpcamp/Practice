@@ -1,8 +1,10 @@
 package camp.pvp.practice.guis.games.duel;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.DuelRequest;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
 import org.bukkit.inventory.ItemStack;
@@ -12,9 +14,10 @@ public class DuelRequestKitSelectionGui extends ArrangedGui {
         super("&6Duel " + duelRequest.getOpponent().getName());
 
         for(GameKit gameKit : GameKit.values()) {
-            if(!gameKit.isDuelKit()) continue;
+            BaseKit baseKit = gameKit.getBaseKit();
+            if(!baseKit.getGameTypes().contains(GameQueue.GameType.DUEL)) continue;
 
-            ItemStack item = gameKit.getIcon();
+            ItemStack item = baseKit.getIcon();
             GuiButton button = new GuiButton(item, "&6&l" + gameKit.getDisplayName());
 
             boolean hasPermission = duelRequest.getSender().getPlayer().hasPermission("practice.duel_requests.map_selection");
