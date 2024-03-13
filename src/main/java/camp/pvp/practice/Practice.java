@@ -6,6 +6,7 @@ import camp.pvp.practice.commands.*;
 import camp.pvp.practice.cooldowns.CooldownRunnable;
 import camp.pvp.practice.games.GameManager;
 import camp.pvp.practice.kits.EnergyRunnable;
+import camp.pvp.practice.kits.KitManager;
 import camp.pvp.practice.listeners.bukkit.block.BlockBreakListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockBurnListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockFromToListener;
@@ -60,6 +61,7 @@ public class Practice extends JavaPlugin {
     private GameManager gameManager;
     private GameQueueManager gameQueueManager;
     private GameProfileManager gameProfileManager;
+    private KitManager kitManager;
     private PartyManager partyManager;
 
     private BukkitTask cooldownTask, energyTask, nameColorTask, tickNumberTask;
@@ -79,6 +81,7 @@ public class Practice extends JavaPlugin {
 
         this.gameManager = new GameManager(this);
         this.gameQueueManager = new GameQueueManager(this);
+        this.kitManager = new KitManager(this);
         this.partyManager = new PartyManager(this);
 
         this.assemble = new Assemble(this, new SidebarAdapter(this));
