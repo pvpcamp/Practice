@@ -1,6 +1,5 @@
 package camp.pvp.practice;
 
-import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaManager;
 import camp.pvp.practice.commands.*;
 import camp.pvp.practice.cooldowns.CooldownRunnable;

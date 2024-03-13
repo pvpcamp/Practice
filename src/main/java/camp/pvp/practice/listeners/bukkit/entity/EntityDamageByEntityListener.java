@@ -1,11 +1,8 @@
 package camp.pvp.practice.listeners.bukkit.entity;
 
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import camp.pvp.practice.utils.Colors;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
@@ -59,30 +56,42 @@ public class EntityDamageByEntityListener implements Listener {
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId());
             Game game = profile.getGame();
 
-            if(game != null && game.getState().equals(Game.State.ACTIVE) && game.getKit().equals(GameKit.FIREBALL_FIGHT) && game.getAlive().containsKey(player.getUniqueId())) {
+            if(game != null && game.getState().equals(Game.State.ACTIVE) && game.getKit().isBiggerExplosions() && game.getAlive().containsKey(player.getUniqueId())) {
 
-                double damage;
+                double damage = 0;
 
-                if (event.getDamager().getTicksLived() < 20) {
-                    damage = 0;
-                } else {
+                if (event.getDamager().getTicksLived() > 20) {
                     damage = event.getFinalDamage() / 4;
                 }
 
                 player.damage(damage);
 
-                Location location = event.getDamager().getLocation().subtract(0, -1, 0);
+                Location location = event.getDamager().getLocation();
                 Vector dirToExplosion = location.toVector().subtract(player.getLocation().toVector());
+                double distanceFromExplosion = location.distance(player.getLocation());
 
                 // Invert direction.
                 dirToExplosion.multiply(-1);
                 // Normalize the vector.
                 dirToExplosion.setY(0).normalize();
 
+                double explosionStrength = 1.25;
+                double explosionY = 1.1;
+                double explosionDistance = 1.5;
+
+                if(event.getDamager().getType().equals(EntityType.PRIMED_TNT)) {
+                    explosionDistance = 2.5;
+                }
+
+                if(distanceFromExplosion > explosionDistance) {
+                    explosionStrength = 0.7;
+                    explosionY = 0.8;
+                }
+
                 // Multiply the vector to get desired explosion strength.
-                dirToExplosion.multiply(1.25);
+                dirToExplosion.multiply(explosionStrength);
                 // Set Y to make the player fly up.
-                dirToExplosion.setY(1.20);
+                dirToExplosion.setY(explosionY);
 
                 player.setVelocity(dirToExplosion);
 
@@ -99,8 +108,7 @@ public class EntityDamageByEntityListener implements Listener {
 
                 if(event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
                     if(attackerProfile.getCps() > 20) {
-                        event.setCancelled(true);
-                        return;
+                        event.setDamage(0);
                     }
                 }
 

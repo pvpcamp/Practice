@@ -5,10 +5,10 @@ import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.PostGameInventory;
 import camp.pvp.practice.games.tasks.TeleportFix;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.ArenaPosition;
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
@@ -26,7 +26,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.*;
 
@@ -88,7 +87,7 @@ public class Duel extends Game {
                 p.sendMessage(" ");
                 p.sendMessage(Colors.get("&6&lDuel starting in 3 seconds."));
                 p.sendMessage(Colors.get(" &7● &6Mode: &f" + this.queueType.toString()));
-                p.sendMessage(Colors.get(" &7● &6Kit: &f" + getKit().getDisplayName()));
+                p.sendMessage(Colors.get(" &7● &6Kit: &f" + getKit().getGameKit().getDisplayName()));
                 p.sendMessage(Colors.get(" &7● &6Map: &f" + Colors.get(arena.getDisplayName())));
                 p.sendMessage(Colors.get(" &7● &6Participants: &f" + stringBuilder));
                 p.sendMessage(" ");
@@ -120,7 +119,7 @@ public class Duel extends Game {
 
             Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
 
-            startingTimer(3);
+            startingTimer(5);
         } else {
             for(Player p : getAlivePlayers()) {
                 GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
@@ -203,12 +202,12 @@ public class Duel extends Game {
 
         int winnerElo = 0, loserElo = 0, difference = 0;
 
+        GameKit kit = getKit().getGameKit();
+
         if(queueType.equals(GameQueue.Type.RANKED)) {
             ProfileELO winnerEloProfile, loserEloProfile;
             winnerEloProfile = winnerProfile.getProfileElo();
             loserEloProfile = loserProfile.getProfileElo();
-
-            GameKit kit = getKit();
 
             winnerElo = winnerEloProfile.getRatings().get(kit);
             loserElo = loserEloProfile.getRatings().get(kit);
@@ -217,8 +216,8 @@ public class Duel extends Game {
             stringBuilder.append(Colors.get("\n &7● &aWinner: &f" + winnerParticipant.getName() + " &7- &a" + (winnerElo + difference) + " +" + difference));
             stringBuilder.append(Colors.get("\n &7● &cLoser: &f" + loserParticipant.getName()+ " &7- &c" + (loserElo - difference) + " -" + difference));
 
-            winnerEloProfile.addElo(getKit(), difference);
-            loserEloProfile.subtractElo(getKit(), difference);
+            winnerEloProfile.addElo(kit, difference);
+            loserEloProfile.subtractElo(kit, difference);
 
             gpm.exportElo(winnerEloProfile);
             gpm.exportElo(loserEloProfile);
@@ -226,8 +225,8 @@ public class Duel extends Game {
             stringBuilder.append(Colors.get("\n &7● &6Winner: &f" + winnerParticipant.getName()));
         }
 
-        winnerProfile.getProfileStatistics().incrementWins(getKit(), queueType);
-        loserProfile.getProfileStatistics().resetWinStreak(getKit(), queueType);
+        winnerProfile.getProfileStatistics().incrementWins(kit, queueType);
+        loserProfile.getProfileStatistics().resetWinStreak(kit, queueType);
 
         // Export match record.
         MatchRecord record = new MatchRecord(this, winnerParticipant, loserParticipant, difference, winnerElo, loserElo);
@@ -250,11 +249,11 @@ public class Duel extends Game {
 
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfile(player.getUniqueId());
-        profile.getProfileStatistics().incrementDeaths(getKit(), queueType);
+        profile.getProfileStatistics().incrementDeaths(getKit().getGameKit(), queueType);
 
         GameProfile attackerProfile = getPlugin().getGameProfileManager().getLoadedProfile(participant.getAttacker());
         if (attackerProfile != null) {
-            attackerProfile.getProfileStatistics().incrementKills(getKit(), queueType);
+            attackerProfile.getProfileStatistics().incrementKills(getKit().getGameKit(), queueType);
         }
 
         if (getTournament() != null) {
@@ -298,7 +297,7 @@ public class Duel extends Game {
 
         switch(getState()) {
             case STARTING:
-                lines.add("&6Kit: &f" + getKit().getDisplayName());
+                lines.add("&6Kit: &f" + getKit().getGameKit().getDisplayName());
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
                 lines.add("&6Opponent: &f" + opponent.getName());
                 break;
@@ -309,7 +308,7 @@ public class Duel extends Game {
 
                     boolean show = false;
 
-                    if(getKit().equals(GameKit.BED_FIGHT) || getKit().equals(GameKit.FIREBALL_FIGHT)) {
+                    if(getKit().isBedwars()) {
                         List<GameParticipant> pList = new ArrayList<>(getCurrentPlaying().values());
                         GameParticipant blue = pList.get(0);
                         GameParticipant red = pList.get(1);
@@ -319,7 +318,7 @@ public class Duel extends Game {
                         lines.add(" ");
                     }
 
-                    if (getKit().equals(GameKit.BOXING)) {
+                    if (getKit().isBoxing()) {
                         show = true;
                         StringBuilder lineBuilder = new StringBuilder();
                         lineBuilder.append("&6Hits: &f" + self.getHits());
@@ -394,7 +393,7 @@ public class Duel extends Game {
 
         if(!getState().equals(State.ENDED)) {
 
-            if(getKit().equals(GameKit.BED_FIGHT) || getKit().equals(GameKit.FIREBALL_FIGHT)) {
+            if(getKit().isBedwars()) {
                 List<GameParticipant> pList = new ArrayList<>(getCurrentPlaying().values());
                 GameParticipant blue = pList.get(0);
                 GameParticipant red = pList.get(1);
@@ -409,10 +408,10 @@ public class Duel extends Game {
             for (GameParticipant participant : getParticipants().values()) {
                 if (participant.isAlive()) {
                     Player player = participant.getPlayer();
-                    if (getKit().equals(GameKit.BOXING)) {
+                    if (getKit().isBoxing()) {
                         lines.add("&7> &f" + participant.getName() + " &7(" + participant.getHits() + ")");
                     } else {
-                        if (!queueType.equals(GameQueue.Type.RANKED) || getKit().showHealthBar()) {
+                        if (!queueType.equals(GameQueue.Type.RANKED) || getKit().isShowHealthBar()) {
                             lines.add("&7> &f" + participant.getName() + " &c" + Math.round(player.getHealth()) + " ❤");
                         } else {
                             lines.add("&7> &f" + participant.getName() + "&c ❤");
@@ -427,7 +426,7 @@ public class Duel extends Game {
         switch(getState()) {
             case STARTING:
                 lines.add(" ");
-                lines.add("&6Kit: &f" + getKit().getDisplayName());
+                lines.add("&6Kit: &f" + getKit().getGameKit().getDisplayName());
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
                 break;
             case ACTIVE:

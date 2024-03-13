@@ -2,7 +2,6 @@ package camp.pvp.practice.games.impl.teams;
 
 import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.TeleportFix;
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
@@ -45,7 +44,7 @@ public class TeamDuel extends TeamGame {
             String blue = "&9B &fBlue: ";
             String red = "&cR &fRed: ";
 
-            if (getKit().equals(GameKit.BED_FIGHT) || getKit().equals(GameKit.FIREBALL_FIGHT)) {
+            if (getKit().isBedwars()) {
                 blue = blue + "&9&l" + (getBlue().isRespawn() ? "✔" : getBlue().getCurrentParticipants().size());
                 red = red + "&c&l" + (getRed().isRespawn() ? "✔" : getRed().getCurrentParticipants().size());
             } else {
@@ -63,7 +62,7 @@ public class TeamDuel extends TeamGame {
         switch(getState()) {
             case STARTING:
                 lines.add(" ");
-                lines.add("&6Kit: &f" + getKit().getDisplayName());
+                lines.add("&6Kit: &f" + getKit().getGameKit().getDisplayName());
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
                 break;
             case ACTIVE:
@@ -143,7 +142,7 @@ public class TeamDuel extends TeamGame {
         String blue = "&9B &fBlue: ";
         String red = "&cR &fRed: ";
 
-        if (getKit().equals(GameKit.BED_FIGHT) || getKit().equals(GameKit.FIREBALL_FIGHT)) {
+        if (getKit().isBedwars()) {
             lines.add(blue + "&9&l" + (getBlue().isRespawn() ? "✓" : getBlue().getCurrentParticipants().size()));
             lines.add(red + "&c&l" + (getRed().isRespawn() ? "✓" : getRed().getCurrentParticipants().size()));
         } else {
@@ -154,7 +153,7 @@ public class TeamDuel extends TeamGame {
         switch(getState()) {
             case STARTING:
                 lines.add(" ");
-                lines.add("&6Kit: &f" + getKit().getDisplayName());
+                lines.add("&6Kit: &f" + getKit().getGameKit().getDisplayName());
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
                 break;
             case ACTIVE:
@@ -207,7 +206,7 @@ public class TeamDuel extends TeamGame {
         StringBuilder sb = new StringBuilder();
         sb.append(" ");
         sb.append("\n&6&lTeam Duel starting in 5 seconds.");
-        sb.append("\n &7● &6Kit: &f" + getKit().getDisplayName());
+        sb.append("\n &7● &6Kit: &f" + getKit().getGameKit().getDisplayName());
         sb.append("\n &7● &6Map: &f" + arena.getDisplayName());
 
         ArenaPosition blueSpawn = arena.getPositions().get("spawn1");

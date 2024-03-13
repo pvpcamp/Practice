@@ -2,9 +2,11 @@ package camp.pvp.practice.guis.statistics;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.guis.profile.MyProfileGui;
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.profiles.stats.ProfileStatistics;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
 import org.bukkit.Material;
@@ -48,7 +50,8 @@ public class StatisticsGui extends ArrangedGui {
         addButton(globalStats);
 
         for(GameKit kit : GameKit.values()) {
-            if(!kit.isDuelKit()) continue;
+            BaseKit baseKit = kit.getBaseKit();
+            if(!baseKit.getGameTypes().contains(GameQueue.GameType.DUEL)) continue;
 
             List<String> lines = new ArrayList<>();
             lines.add("&e&lUnranked:");
@@ -58,7 +61,7 @@ public class StatisticsGui extends ArrangedGui {
             lines.add(" &7● &eCurrent Win Streak: &f" + statistics.getUnranked().get(kit).getWinStreak());
             lines.add(" &7● &eBest Win Streak: &f" + statistics.getUnranked().get(kit).getBestWinStreak());
 
-            if(kit.isRanked()) {
+            if(baseKit.isRanked()) {
                 lines.add(" ");
                 lines.add("&6&lRanked:");
                 lines.add(" &7● &6ELO: &f" + profileELO.getRatings().get(kit));
@@ -69,7 +72,7 @@ public class StatisticsGui extends ArrangedGui {
                 lines.add(" &7● &6Best Win Streak: &f" + statistics.getRanked().get(kit).getBestWinStreak());
             }
 
-            GuiButton button = new GuiButton(kit.getIcon(), "&6&l" + kit.getDisplayName());
+            GuiButton button = new GuiButton(baseKit.getIcon(), "&6&l" + kit.getDisplayName());
             button.setLore(lines);
             addButton(button);
         }

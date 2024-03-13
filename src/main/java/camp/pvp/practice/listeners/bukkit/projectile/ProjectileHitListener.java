@@ -1,6 +1,5 @@
 package camp.pvp.practice.listeners.bukkit.projectile;
 
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
@@ -39,17 +38,6 @@ public class ProjectileHitListener implements Listener {
 
         if(game != null) {
             game.addEntity(entity);
-
-            if(game.getKit().equals(GameKit.SPLEEF)) {
-                Location location = event.getEntity().getLocation();
-                location.subtract(0, 1, 0);
-
-                Block block = location.getBlock();
-
-                if(block != null && block.getType().equals(Material.SNOW_BLOCK)) {
-                    block.setType(Material.AIR);
-                }
-            }
 
             if(entity instanceof Arrow arrow && !game.getKit().isArrowPickup()) {
                 arrow.remove();

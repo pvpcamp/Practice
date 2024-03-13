@@ -34,7 +34,7 @@ public class DuelRequestArenaSelectionGui extends PaginatedGui {
         addNavigationButton(kitSelection);
 
         for(Arena arena : arenas) {
-            if(duelRequest.getKit().getArenaTypes().contains(arena.getType()) && arena.isEnabled()) {
+            if(duelRequest.getKit().getBaseKit().getArenaTypes().contains(arena.getType()) && arena.isEnabled()) {
                 GuiButton button = new GuiButton(Material.EMPTY_MAP, Colors.get("&6" + arena.getDisplayName()));
 
                 button.setCloseOnClick(true);

@@ -1,7 +1,7 @@
 package camp.pvp.practice.games;
 
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.CustomGameKit;
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
@@ -43,7 +44,7 @@ public class GameParticipant {
     private long lastInvalidHitTick, lastValidHitTick;
 
     public long health, maxHealth, hunger,
-            hits, currentCombo, longestCombo, blockedHits,
+            hits, currentCombo, longestCombo, blockedHits, criticalHits,
             arrowShots, arrowHits,
             fireballShots,
             thrownPotions, missedPotions;
@@ -52,7 +53,7 @@ public class GameParticipant {
     private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
     private Location spawnLocation;
-    private GameKit gameKit;
+    private BaseKit baseKit;
     private CustomGameKit appliedCustomKit;
 
     private BukkitTask respawnTask;
@@ -142,10 +143,14 @@ public class GameParticipant {
                     if(getAppliedCustomKit() != null) {
                         getAppliedCustomKit().apply(GameParticipant.this);
                     } else {
-                        getGameKit().apply(GameParticipant.this);
+                        getBaseKit().apply(GameParticipant.this);
                     }
 
-                    getPlayer().teleport(GameParticipant.this.game.getRespawnLocation(GameParticipant.this));
+                    Location location = GameParticipant.this.game.getRespawnLocation(GameParticipant.this);
+                    location.getBlock().setType(Material.AIR);
+                    location.clone().add(0, 1, 0).getBlock().setType(Material.AIR);
+
+                    getPlayer().teleport(location);
                     setLivingState(LivingState.ALIVE);
 
                     setLastDamageCause(null);
@@ -156,6 +161,8 @@ public class GameParticipant {
                     Bukkit.getScheduler().runTaskLater(Practice.getInstance(), () -> {
                         setInvincible(false);
                     }, 20L);
+
+                    getPlayer().sendMessage(ChatColor.GREEN + "You have respawned.");
 
                     getRespawnTask().cancel();
                 } else {

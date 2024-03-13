@@ -41,7 +41,7 @@ public class MatchRecord {
         this.befloreLoserElo = befloreLoserElo;
         this.rolledBack = false;
         this.queueType = duel.getQueueType();
-        this.kit = duel.getKit();
+        this.kit = duel.getKit().getGameKit();
     }
 
     public void importFromDocument(Document doc) {

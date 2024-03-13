@@ -201,7 +201,7 @@ public class Tournament {
                 switch(teamSize) {
                     case 1:
                         Duel duel = new Duel(plugin, UUID.randomUUID());
-                        duel.setKit(gameKit);
+                        duel.setKit(gameKit.getBaseKit());
                         duel.setTournament(this);
                         duel.setQueueType(GameQueue.Type.TOURNAMENT);
 

@@ -1,16 +1,14 @@
 package camp.pvp.practice.listeners.bukkit.player;
 
-import camp.pvp.practice.arenas.Arena;
-import camp.pvp.practice.cooldowns.PlayerCooldown;
-import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.interactables.InteractableItem;
 import camp.pvp.practice.interactables.InteractableItems;
+import camp.pvp.practice.kits.BaseKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.kits.CustomGameKit;
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.Gui;
 import camp.pvp.utils.guis.GuiAction;
@@ -20,9 +18,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
-import org.bukkit.block.Furnace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -33,7 +28,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.*;
 
 import java.util.Map;
 
@@ -112,11 +106,12 @@ public class PlayerInteractListener implements Listener {
                 }
 
                 GameKit editingKit = profile.getEditingKit();
+                BaseKit baseKit = editingKit.getBaseKit();
                 switch (block.getType()) {
                     case CHEST:
-                        if(editingKit.getMoreItems() != null) {
-                            Inventory inventory = Bukkit.createInventory(player, 36, "More Items");
-                            for(ItemStack i : editingKit.getMoreItems()) {
+                        if(baseKit.getMoreItems() != null) {
+                            Inventory inventory = Bukkit.createInventory(player, 36, "&6More Items");
+                            for(ItemStack i : baseKit.getMoreItems()) {
                                 if(i != null && !i.getType().equals(Material.AIR)) {
                                     inventory.addItem(i);
                                 }
@@ -126,7 +121,7 @@ public class PlayerInteractListener implements Listener {
                         }
                         break;
                     case ANVIL:
-                        StandardGui gui = new StandardGui("Editing " + editingKit.getDisplayName(), 36);
+                        StandardGui gui = new StandardGui("&6Editing " + editingKit.getDisplayName(), 36);
                         Map<Integer, CustomGameKit> customKits = profile.getCustomDuelKits().get(editingKit);
                         int x = 1;
                         while (x < 6) {

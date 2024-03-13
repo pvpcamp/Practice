@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.util.Vector;
 
 public class BlockPlaceListener implements Listener {
 
@@ -29,26 +30,39 @@ public class BlockPlaceListener implements Listener {
         Player player = event.getPlayer();
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         Block block = event.getBlock();
+        Material material = block.getType();
         Game game = profile.getGame();
 
-        if(game != null && game.isBuild() && game.getState().equals(Game.State.ACTIVE)) {
-            if(game.getAlivePlayers().contains(player)) {
+        if(game != null && game.isBuild() && game.getAlivePlayers().contains(player)) {
+            if(game.getArena().getBuildLimit() < block.getLocation().getBlockY()) {
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "You have reached the build limit.");
+                return;
+            }
 
-                if(game.getArena().getBuildLimit() < block.getLocation().getBlockY()) {
-                    event.setCancelled(true);
-                    player.sendMessage(ChatColor.RED + "You have reached the build limit.");
-                    return;
-                }
+            if(material.equals(Material.TNT) && !game.getKit().isPlaceTntBeforeStart()&& !game.getState().equals(Game.State.ACTIVE)) {
+                player.sendMessage(ChatColor.RED + "You cannot place TNT before the game starts.");
+                event.setCancelled(true);
+                return;
+            }
 
-                if(block.getType().equals(Material.TNT)) {
-                    Location location = block.getLocation();
-                    location.add(0.5, 0.5, 0.5);
-                    TNTPrimed tntPrimed = (TNTPrimed) block.getWorld().spawnEntity(location, EntityType.PRIMED_TNT);
-                    tntPrimed.setFuseTicks(60);
+            if(!game.getKit().isPlaceBlocksBeforeStart() && !game.getState().equals(Game.State.ACTIVE) && !material.equals(Material.TNT)) {
+                player.sendMessage(ChatColor.RED + "You cannot place blocks before the game starts.");
+                event.setCancelled(true);
+                return;
+            }
 
-                    block.setType(Material.AIR);
-                    game.addEntity(tntPrimed);
-                }
+            if(block.getType().equals(Material.TNT)) {
+                Location location = block.getLocation();
+                location.add(0.5, 0.5, 0.5);
+                TNTPrimed tntPrimed = (TNTPrimed) block.getWorld().spawnEntity(location, EntityType.PRIMED_TNT);
+                tntPrimed.setFuseTicks(60);
+
+                Vector velocity = new Vector(0, 0.25, 0);
+                tntPrimed.setVelocity(velocity);
+
+                block.setType(Material.AIR);
+                game.addEntity(tntPrimed);
             }
         } else {
             if(profile.isBuildMode()) {

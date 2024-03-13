@@ -3,6 +3,7 @@ package camp.pvp.practice.commands;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.profiles.GameProfile;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -24,7 +25,7 @@ public class SurrenderCommand implements CommandExecutor {
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfile(player.getUniqueId());
 
         if(!profile.getState().equals(GameProfile.State.IN_GAME)) {
-            player.sendMessage("You are not in a game.");
+            player.sendMessage(ChatColor.RED + "You are not in a game.");
             return true;
         }
 

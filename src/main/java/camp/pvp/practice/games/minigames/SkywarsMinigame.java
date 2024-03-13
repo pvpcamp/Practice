@@ -4,16 +4,13 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -24,7 +21,7 @@ public class SkywarsMinigame extends Minigame {
         super(plugin, uuid);
 
         setType(Type.SKYWARS);
-        setKit(GameKit.SKYWARS);
+        setKit(GameKit.SKYWARS.getBaseKit());
     }
 
     @Override

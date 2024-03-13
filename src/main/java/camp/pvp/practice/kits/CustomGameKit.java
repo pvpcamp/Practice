@@ -38,7 +38,7 @@ public class CustomGameKit {
         if (existing) {
             items = new ItemStack[36];
         } else {
-            this.items = gameKit.getGameInventory().getInventory();
+            this.items = gameKit.getBaseKit().getItems();
         }
     }
 
@@ -89,108 +89,13 @@ public class CustomGameKit {
         this.items = items;
     }
 
+    @Deprecated
     public void apply(Player player) {
-        PlayerInventory pi = player.getInventory();
-        GameInventory gi = gameKit.getGameInventory();
-
-        PlayerUtils.reset(player, false);
-
-        for(PotionEffect effect : gi.getPotionEffects()) {
-            player.addPotionEffect(effect);
-        }
-
-        pi.setArmorContents(gi.getArmor());
-        pi.setContents(this.items);
-        player.updateInventory();
+        gameKit.getBaseKit().apply(player, this);
     }
 
+    @Deprecated
     public void apply(GameParticipant participant) {
-        Player player = participant.getPlayer();
-        PlayerInventory pi = player.getInventory();
-        GameInventory gi = gameKit.getGameInventory();
-
-        PlayerUtils.reset(player, false);
-
-        for(PotionEffect effect : gi.getPotionEffects()) {
-            player.addPotionEffect(effect);
-        }
-
-        pi.setArmorContents(gi.getArmor());
-        pi.setContents(this.items);
-
-        participant.setKitApplied(true);
-
-        if(gameKit.equals(GameKit.BED_FIGHT) || gameKit.equals(GameKit.FIREBALL_FIGHT)) {
-            ItemStack[] armor = pi.getArmorContents();
-            GameTeam.Color color = participant.getTeamColor();
-
-            LeatherArmorMeta helmetMeta = (LeatherArmorMeta) armor[3].getItemMeta();
-            LeatherArmorMeta chestplateMeta = (LeatherArmorMeta) armor[2].getItemMeta();
-            LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) armor[1].getItemMeta();
-            LeatherArmorMeta bootsMeta = (LeatherArmorMeta) armor[0].getItemMeta();
-
-            switch(color) {
-                case BLUE:
-                    helmetMeta.setColor(Color.BLUE);
-                    chestplateMeta.setColor(Color.BLUE);
-                    leggingsMeta.setColor(Color.BLUE);
-                    bootsMeta.setColor(Color.BLUE);
-
-                    for(ItemStack item : pi.getContents()) {
-                        if(item == null) continue;
-                        if(!item.getType().equals(Material.WOOL)) continue;
-
-                        item.setDurability((short) 11);
-                    }
-                    break;
-                case RED:
-                    helmetMeta.setColor(Color.RED);
-                    chestplateMeta.setColor(Color.RED);
-                    leggingsMeta.setColor(Color.RED);
-                    bootsMeta.setColor(Color.RED);
-
-                    for(ItemStack item : pi.getContents()) {
-                        if(item == null) continue;
-                        if(!item.getType().equals(Material.WOOL)) continue;
-
-                        item.setDurability((short) 14);
-                    }
-                    break;
-            }
-
-            armor[3].setItemMeta(helmetMeta);
-            armor[2].setItemMeta(chestplateMeta);
-            armor[1].setItemMeta(leggingsMeta);
-            armor[0].setItemMeta(bootsMeta);
-        }
-
-        if(!gameKit.isItemDurability()) {
-
-            for (ItemStack item : pi.getContents()) {
-
-                if(item == null || item.getType().isBlock()) continue;
-
-                ItemMeta meta = item.getItemMeta();
-
-                if(meta == null) continue;
-
-                meta.spigot().setUnbreakable(true);
-                item.setItemMeta(meta);
-            }
-
-            for (ItemStack item : pi.getArmorContents()) {
-
-                if(item == null) continue;
-
-                ItemMeta meta = item.getItemMeta();
-
-                if(meta == null) continue;
-
-                meta.spigot().setUnbreakable(true);
-                item.setItemMeta(meta);
-            }
-        }
-
-        player.updateInventory();
+        gameKit.getBaseKit().apply(participant, this);
     }
 }

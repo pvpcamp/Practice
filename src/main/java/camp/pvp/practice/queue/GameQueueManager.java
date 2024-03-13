@@ -1,9 +1,10 @@
 package camp.pvp.practice.queue;
 
 import camp.pvp.practice.games.minigames.Minigame;
+import camp.pvp.practice.kits.BaseKit;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.kits.GameKit;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -176,7 +177,8 @@ public class GameQueueManager {
         int queues = 0;
 
         for(GameKit gameKit : GameKit.values()) {
-            if(gameKit.isDuelKit()) {
+            BaseKit baseKit = gameKit.getBaseKit();
+            if(baseKit.getGameTypes().contains(GameQueue.GameType.DUEL)) {
                 GameQueue queue = new GameQueue(plugin, gameKit, GameQueue.Type.UNRANKED);
                 addQueue(queue);
 
@@ -184,7 +186,7 @@ public class GameQueueManager {
 
                 queues++;
 
-                if(gameKit.isRanked()) {
+                if(baseKit.isRanked()) {
                     GameQueue rankedQueue = new GameQueue(plugin, gameKit, GameQueue.Type.RANKED);
                     addQueue(rankedQueue);
 

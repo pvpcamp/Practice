@@ -22,7 +22,7 @@ public class SumoEventDuel extends Duel {
         super(plugin, UUID.randomUUID());
         this.sumoEvent = event;
         this.setArena(event.getArena());
-        this.setKit(GameKit.SUMO);
+        this.setKit(GameKit.FIREBALL_FIGHT.getBaseKit());
     }
 
     @Override
