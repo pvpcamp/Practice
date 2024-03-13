@@ -1,8 +1,10 @@
 package camp.pvp.practice.guis.statistics;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.leaderboard.LeaderboardEntry;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
 
@@ -15,8 +17,9 @@ public class LeaderboardsGui extends ArrangedGui {
         Map<GameKit, List<LeaderboardEntry>> leaderboard = Practice.getInstance().getGameProfileManager().getLeaderboardUpdater().getLeaderboard();
 
         for(GameKit kit : GameKit.values()) {
-            if(!kit.isDuelKit()) continue;
-            if(!kit.isRanked()) continue;
+            BaseKit baseKit = kit.getBaseKit();
+            if(!baseKit.getGameTypes().contains(GameQueue.GameType.DUEL)) continue;
+            if(!baseKit.isRanked()) continue;
 
             List<LeaderboardEntry> entries = leaderboard.get(kit);
 
@@ -44,7 +47,7 @@ public class LeaderboardsGui extends ArrangedGui {
                 lines.add(sb.toString());
             }
 
-            GuiButton button = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
+            GuiButton button = new GuiButton(baseKit.getIcon(), "&6" + kit.getDisplayName());
             button.setLore(lines);
             addButton(button);
         }

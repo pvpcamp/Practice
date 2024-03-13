@@ -6,13 +6,13 @@ import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
+import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.interactables.InteractableItem;
 import camp.pvp.practice.interactables.InteractableItems;
 import camp.pvp.practice.kits.CustomGameKit;
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.PartyInvite;
 import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
@@ -143,7 +143,7 @@ public class GameProfile {
         this.sidebarShowPing = true;
 
         for(GameKit kit : GameKit.values()) {
-            if(kit.isEditable()) {
+            if(kit.getBaseKit().isEditable()) {
                 customDuelKits.put(kit, new HashMap<>());
             }
         }
@@ -193,11 +193,7 @@ public class GameProfile {
 
         if(player != null) {
 
-            boolean flying = false;
-
-            if (player.hasPermission("practice.lobby.fly") && getState().isLobby()) {
-                flying = true;
-            }
+            boolean flying = player.hasPermission("practice.lobby.fly") && getState().isLobby();
 
             // Update is only used for when the player is in the lobby and their items need to be updated.
             // This is why the player is not fully reset or their slot updated.
@@ -242,12 +238,12 @@ public class GameProfile {
             }
 
             if(game != null && game.getAlive().get(this.getUuid()) != null) {
-                GameKit kit = game.getKit();
+                GameKit kit = game.getKit().getGameKit();
 
                 Map<Integer, CustomGameKit> customKits = getCustomDuelKits().get(kit);
                 if(customKits == null || customKits.isEmpty()) {
                     GameParticipant participant = game.getParticipants().get(uuid);
-                    kit.apply(participant);
+                    kit.getBaseKit().apply(participant);
                     return;
                 }
 

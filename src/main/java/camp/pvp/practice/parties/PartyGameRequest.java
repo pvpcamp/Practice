@@ -85,7 +85,7 @@ public class PartyGameRequest {
         if(toParty.getGame() == null && fromParty.getGame() == null) {
             if(type.equals(Type.TEAMS)) {
                 TeamDuel teamDuel = new TeamDuel(Practice.instance, UUID.randomUUID());
-                teamDuel.setKit(kit);
+                teamDuel.setKit(kit.getBaseKit());
 
                 for (PartyMember member : toParty.getMembers().values()) {
                     GameParticipant p = teamDuel.join(member.getPlayer());

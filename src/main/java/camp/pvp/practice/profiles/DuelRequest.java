@@ -99,7 +99,7 @@ public class DuelRequest {
             Duel duel = new Duel(Practice.getInstance(), UUID.randomUUID());
 
             duel.setQueueType(GameQueue.Type.PRIVATE);
-            duel.setKit(kit);
+            duel.setKit(kit.getBaseKit());
             duel.setArena(arena);
 
             duel.join(senderPlayer);

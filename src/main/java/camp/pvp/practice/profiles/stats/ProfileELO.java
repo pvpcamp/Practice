@@ -54,7 +54,7 @@ public class ProfileELO {
 
     public void resetRatings() {
         for(GameKit kit : GameKit.values()) {
-            if(kit.isRanked()) {
+            if(kit.getBaseKit().isRanked()) {
                 ratings.put(kit, 1000);
             }
         }

@@ -1,6 +1,7 @@
 package camp.pvp.practice.guis.queue;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.leaderboard.LeaderboardEntry;
@@ -105,11 +106,11 @@ public class DuelQueueGui extends ArrangedGui {
         addButton(rankedQueue);
 
         for(GameKit kit : GameKit.values()) {
-
-            if(!kit.isDuelKit()) continue;
+            BaseKit baseKit = kit.getBaseKit();
+            if(!baseKit.getGameTypes().contains(GameQueue.GameType.DUEL)) continue;
 
             GameQueue queue = gqm.getQueue(kit, queueType);
-            GuiButton button = new GuiButton(kit.getIcon(), color + "&l" + kit.getDisplayName());
+            GuiButton button = new GuiButton(baseKit.getIcon(), color + "&l" + kit.getDisplayName());
 
             if(queue == null) continue;
 

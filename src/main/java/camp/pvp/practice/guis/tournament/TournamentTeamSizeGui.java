@@ -17,7 +17,7 @@ public class TournamentTeamSizeGui extends StandardGui {
     public TournamentTeamSizeGui(Practice plugin, GameKit gameKit) {
         super("Choose a Team Size", 27);
 
-        GuiButton selectedKit = new GuiButton(gameKit.getIcon(), "&aSelected Kit: &f" + gameKit.getDisplayName());
+        GuiButton selectedKit = new GuiButton(gameKit.getBaseKit().getIcon(), "&aSelected Kit: &f" + gameKit.getDisplayName());
         selectedKit.setSlot(13);
         this.addButton(selectedKit, false);
 

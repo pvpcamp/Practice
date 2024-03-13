@@ -1,7 +1,7 @@
 package camp.pvp.practice.games;
 
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.CustomGameKit;
-import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
@@ -53,7 +53,7 @@ public class GameParticipant {
     private List<PotionEffect> potionEffects;
     private PostGameInventory postGameInventory;
     private Location spawnLocation;
-    private GameKit gameKit;
+    private BaseKit baseKit;
     private CustomGameKit appliedCustomKit;
 
     private BukkitTask respawnTask;
@@ -143,7 +143,7 @@ public class GameParticipant {
                     if(getAppliedCustomKit() != null) {
                         getAppliedCustomKit().apply(GameParticipant.this);
                     } else {
-                        getGameKit().apply(GameParticipant.this);
+                        getBaseKit().apply(GameParticipant.this);
                     }
 
                     Location location = GameParticipant.this.game.getRespawnLocation(GameParticipant.this);

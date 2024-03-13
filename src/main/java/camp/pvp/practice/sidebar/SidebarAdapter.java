@@ -3,11 +3,8 @@ package camp.pvp.practice.sidebar;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameManager;
-import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.games.sumo.SumoEvent;
-import camp.pvp.practice.games.sumo.SumoEventDuel;
 import camp.pvp.practice.games.tournaments.Tournament;
-import camp.pvp.practice.kits.CustomGameKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.parties.Party;
@@ -185,7 +182,7 @@ public class SidebarAdapter implements AssembleAdapter {
                     lines.add(" ");
                     lines.add("&6Sign: &fLeave");
 
-                    if(editingKit.getMoreItems() != null) {
+                    if(editingKit.getBaseKit().getMoreItems() != null) {
                         lines.add("&6Chest: &fMore Items");
                     }
 

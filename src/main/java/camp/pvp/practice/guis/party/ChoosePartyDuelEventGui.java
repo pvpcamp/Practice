@@ -1,9 +1,11 @@
 package camp.pvp.practice.guis.party;
 
+import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.parties.PartyGameRequest;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.utils.buttons.GuiButton;
 import camp.pvp.utils.guis.ArrangedGui;
 import camp.pvp.utils.guis.Gui;
@@ -34,8 +36,9 @@ public class ChoosePartyDuelEventGui extends StandardGui {
                 kitGui.setDefaultBorder();
 
                 for(GameKit kit : GameKit.values()) {
-                    if(kit.isDuelKit() && kit.isTeams()) {
-                        GuiButton kitButton = new GuiButton(kit.getIcon(), "&6" + kit.getDisplayName());
+                    BaseKit baseKit = kit.getBaseKit();
+                    if(baseKit.getGameTypes().contains(GameQueue.GameType.DUEL) && baseKit.isTeams()) {
+                        GuiButton kitButton = new GuiButton(baseKit.getIcon(), "&6" + kit.getDisplayName());
                         kitButton.setCloseOnClick(true);
 
                         kitButton.setLore("&7Click to invite &6" + party.getLeader().getName() + "'s Party", "&7to a &f" + kit.getDisplayName() + " &7team fight.");

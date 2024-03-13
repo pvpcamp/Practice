@@ -6,15 +6,12 @@ import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.profiles.GameProfileManager;
-import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -27,7 +24,7 @@ public class OneInTheChamberMinigame extends Minigame {
     public OneInTheChamberMinigame(Practice plugin, UUID uuid) {
         super(plugin, uuid);
 
-        setKit(GameKit.ONE_IN_THE_CHAMBER);
+        setKit(GameKit.ONE_IN_THE_CHAMBER.getBaseKit());
         setType(Type.ONE_IN_THE_CHAMBER);
     }
 

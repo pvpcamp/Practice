@@ -46,7 +46,7 @@ public class FreeForAll extends Game {
 
         switch(getState()) {
             case STARTING:
-                lines.add("&6Kit: &f" + getKit().getDisplayName());
+                lines.add("&6Kit: &f" + getKit().getGameKit().getDisplayName());
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
                 lines.add("&6Players: &f" + this.getAlive().size());
                 break;
@@ -86,7 +86,7 @@ public class FreeForAll extends Game {
 
         switch(getState()) {
             case STARTING:
-                lines.add("&6Kit: &f" + getKit().getDisplayName());
+                lines.add("&6Kit: &f" + getKit().getGameKit().getDisplayName());
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
                 break;
             case ACTIVE:
@@ -161,7 +161,7 @@ public class FreeForAll extends Game {
                 p.sendMessage(" ");
                 p.sendMessage(Colors.get("&6&lMatch starting in 5 seconds."));
                 p.sendMessage(Colors.get(" &7● &6Mode: &fFree for All"));
-                p.sendMessage(Colors.get(" &7● &6Kit: &f" + getKit().getDisplayName()));
+                p.sendMessage(Colors.get(" &7● &6Kit: &f" + getKit().getGameKit().getDisplayName()));
                 p.sendMessage(Colors.get(" &7● &6Map: &f" + Colors.get(getArena().getDisplayName())));
                 p.sendMessage(Colors.get(" &7● &6Participants: &f" + stringBuilder));
                 p.sendMessage(" ");
@@ -170,7 +170,6 @@ public class FreeForAll extends Game {
             for (Map.Entry<UUID, GameParticipant> entry : this.getParticipants().entrySet()) {
                 GameParticipant participant = entry.getValue();
                 Player p = Bukkit.getPlayer(entry.getKey());
-                Location location = null;
 
                 if (p != null) {
                     p.teleport(spawn.getLocation());

@@ -77,7 +77,7 @@ public class MatchesCommand implements CommandExecutor {
 
             for(MatchRecord record : profile.getMatchRecords()) {
                 GameKit kit = record.getKit();
-                GuiButton button = new GuiButton(record.getKit().getIcon(), "&6&l" + kit.getDisplayName() + " Duel");
+                GuiButton button = new GuiButton(record.getKit().getBaseKit().getIcon(), "&6&l" + kit.getDisplayName() + " Duel");
 
                 boolean admin = player.hasPermission("practice.admin");
 
