@@ -108,8 +108,7 @@ public class EntityDamageByEntityListener implements Listener {
 
                 if(event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)) {
                     if(attackerProfile.getCps() > 20) {
-                        event.setCancelled(true);
-                        return;
+                        event.setDamage(0);
                     }
                 }
 

@@ -436,7 +436,7 @@ public abstract class Game {
 
             if(victim.isBlocking()) {
 
-                if(victimParticipant.blockedHits >= 20 && getKit().isCappedBlockHits()) {
+                if(victimParticipant.blockedHits >= 20 && getKit().isCappedBlockHits() && this instanceof Duel) {
                     event.setDamage(EntityDamageEvent.DamageModifier.BLOCKING, 0);
                 } else {
                     victimParticipant.blockedHits++;
@@ -450,12 +450,7 @@ public abstract class Game {
                     && !damager.isSprinting()
                     && damager.getVehicle() == null
                     && !block.isLiquid()) {
-                if(participant.getCriticalHits() >= 50 && getKit().isCappedCriticalHits()) {
-                    event.setDamage(EntityDamageEvent.DamageModifier.BASE, event.getDamage() / 1.5);
-                } else {
-                    participant.criticalHits++;
-                }
-
+                participant.criticalHits++;
             }
 
             if (participant.isComboMessages()) {
@@ -1117,7 +1112,7 @@ public abstract class Game {
         }
     }
 
-    public void announce(String s) {
+    public void announce(String... s) {
         for(Player p : getAllPlayers()) {
             p.sendMessage(Colors.get(s));
         }

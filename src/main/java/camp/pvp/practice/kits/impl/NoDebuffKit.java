@@ -18,6 +18,7 @@ public class NoDebuffKit extends BaseDuelKit {
 
         setIcon(potion.toItemStack(1));
         setFfa(true);
+        setCappedBlockHits(true);
 
         ItemStack[] armor = getArmor(), inv = getItems(), more = getMoreItems();
 
