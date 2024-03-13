@@ -1,5 +1,6 @@
 package camp.pvp.practice.kits.impl;
 
+import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.kits.BaseDuelKit;
 import camp.pvp.practice.kits.GameKit;
 import org.bukkit.ChatColor;
@@ -7,6 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Collections;
 
 public class FireballFightKit extends BaseDuelKit {
 
@@ -19,8 +22,12 @@ public class FireballFightKit extends BaseDuelKit {
         setHunger(false);
         setMoveOnStart(false);
         setItemDurability(false);
+        setRespawn(true);
         setPlaceTntBeforeStart(true);
         setBiggerExplosions(true);
+        setFallDamage(false);
+
+        setArenaTypes(Collections.singletonList(Arena.Type.DUEL_FIREBALL_FIGHT));
 
         setIcon(new ItemStack(Material.FIREBALL));
 

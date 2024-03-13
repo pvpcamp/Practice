@@ -1,5 +1,6 @@
 package camp.pvp.practice.kits.impl;
 
+import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.kits.BaseDuelKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.utils.Colors;
@@ -7,6 +8,8 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Collections;
 
 public class BuildUHCKit extends BaseDuelKit {
     public BuildUHCKit() {
@@ -16,6 +19,8 @@ public class BuildUHCKit extends BaseDuelKit {
         setFfa(true);
         setShowHealthBar(true);
         setDropItemsOnDeath(true);
+
+        setArenaTypes(Collections.singletonList(Arena.Type.DUEL_BUILD));
 
         setIcon(new ItemStack(Material.LAVA_BUCKET));
 

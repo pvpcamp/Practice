@@ -33,7 +33,7 @@ public abstract class BaseKit {
             dropItemsOnDeath, itemDurability, arrowOneShot, arrowPickup, fallDamage, cappedBlockHits, showArrowDamage,
             applyLeatherTeamColor, bedwars, boxing, biggerExplosions;
 
-    public BaseKit(GameKit gameKit) {
+    protected BaseKit(GameKit gameKit) {
         this.items = new ItemStack[36];
         this.moreItems = new ItemStack[36];
         this.armor = new ItemStack[4];

@@ -17,6 +17,7 @@ public class SpleefKit extends BaseDuelKit {
         setIcon(new ItemStack(Material.SNOW_BALL));
 
         setArenaTypes(Collections.singletonList(Arena.Type.SPLEEF));
+
         setBuild(true);
         setHunger(false);
         setTakeDamage(false);

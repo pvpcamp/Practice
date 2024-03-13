@@ -5,25 +5,56 @@ import lombok.Getter;
 import org.apache.commons.lang.WordUtils;
 
 public enum GameKit {
-    FIREBALL_FIGHT(new FireballFightKit()),
-    NO_DEBUFF(new NoDebuffKit()),
-    BOXING(new BoxingKit()),
-    BED_FIGHT(new BedFightKit()),
-    SUMO(new SumoKit()),
-    DEBUFF(new DebuffKit()),
-    ARCHER(new ArcherKit()),
-    BUILD_UHC(new BuildUHCKit()),
-    CLASSIC(new ClassicKit()),
-    SOUP(new SoupKit()),
-    INVADED(new InvadedKit()),
-    SKYWARS(new SkywarsKit()),
-    SPLEEF(new SpleefKit()),
-    STRATEGY(new StrategyKit()),
-    ONE_IN_THE_CHAMBER(new OneInTheChamberKit());
+    FIREBALL_FIGHT,
+    NO_DEBUFF,
+    BOXING,
+    BED_FIGHT,
+    SUMO,
+    DEBUFF,
+    ARCHER,
+    BUILD_UHC,
+    CLASSIC,
+    SOUP,
+    INVADED,
+    SKYWARS,
+    SPLEEF,
+    STRATEGY,
+    ONE_IN_THE_CHAMBER;
 
-    @Getter private BaseKit baseKit;
-    GameKit(BaseKit baseKit) {
-        this.baseKit = baseKit;
+    public BaseKit getBaseKit() {
+        switch(this) {
+            case FIREBALL_FIGHT:
+                return new FireballFightKit();
+            case NO_DEBUFF:
+                return new NoDebuffKit();
+            case BOXING:
+                return new BoxingKit();
+            case BED_FIGHT:
+                return new BedFightKit();
+            case SUMO:
+                return new SumoKit();
+            case DEBUFF:
+                return new DebuffKit();
+            case ARCHER:
+                return new ArcherKit();
+            case BUILD_UHC:
+                return new BuildUHCKit();
+            case CLASSIC:
+                return new ClassicKit();
+            case SOUP:
+                return new SoupKit();
+            case INVADED:
+                return new InvadedKit();
+            case SKYWARS:
+                return new SkywarsKit();
+            case SPLEEF:
+                return new SpleefKit();
+            case STRATEGY:
+                return new StrategyKit();
+            case ONE_IN_THE_CHAMBER:
+                return new OneInTheChamberKit();
+        }
+        return null;
     }
 
     public String getDisplayName() {

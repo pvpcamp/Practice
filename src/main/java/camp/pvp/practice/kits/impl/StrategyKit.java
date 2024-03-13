@@ -1,5 +1,6 @@
 package camp.pvp.practice.kits.impl;
 
+import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.kits.BaseDuelKit;
 import camp.pvp.practice.kits.GameKit;
 import org.bukkit.Material;
@@ -7,6 +8,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
+
+import java.util.Collections;
 
 public class StrategyKit extends BaseDuelKit {
     public StrategyKit() {
@@ -16,6 +19,8 @@ public class StrategyKit extends BaseDuelKit {
         setShowHealthBar(true);
 
         setIcon(new ItemStack(Material.WEB));
+
+        setArenaTypes(Collections.singletonList(Arena.Type.DUEL_BUILD));
 
         ItemStack[] armor = getArmor(), inv = getItems();
 

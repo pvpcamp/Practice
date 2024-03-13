@@ -1,10 +1,13 @@
 package camp.pvp.practice.kits.impl;
 
+import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.kits.BaseDuelKit;
 import camp.pvp.practice.kits.GameKit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Collections;
 
 public class BedFightKit extends BaseDuelKit {
     public BedFightKit() {
@@ -12,12 +15,16 @@ public class BedFightKit extends BaseDuelKit {
 
         setBuild(true);
         setBedwars(true);
+        setRespawn(true);
         setApplyLeatherTeamColor(true);
         setHunger(false);
         setMoveOnStart(false);
         setItemDurability(false);
+        setFallDamage(false);
 
         setIcon(new ItemStack(Material.BED));
+
+        setArenaTypes(Collections.singletonList(Arena.Type.DUEL_BED_FIGHT));
 
         ItemStack[] armor = getArmor(), inv = getItems();
 

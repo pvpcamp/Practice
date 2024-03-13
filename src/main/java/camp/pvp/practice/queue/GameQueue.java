@@ -118,7 +118,7 @@ public class GameQueue {
                             Duel duel = new Duel(plugin, UUID.randomUUID());
 
                             duel.setQueueType(type);
-                            duel.setKit(gameKit.getBaseKit());
+                            duel.setKit(gameKit.getBaseKit().getGameKit().getBaseKit());
 
                             duel.join(member1.getPlayer());
                             duel.join(member2.getPlayer());
