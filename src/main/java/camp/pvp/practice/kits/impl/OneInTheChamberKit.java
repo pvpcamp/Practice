@@ -20,6 +20,12 @@ public class OneInTheChamberKit extends BaseKit {
         setShowHealthBar(true);
         setHunger(false);
         setMoveOnStart(false);
+        setArrowOneShot(true);
+        setShowArrowDamage(false);
+        setArrowPickup(false);
+        setRespawn(true);
+        setDropItemsOnDeath(false);
+        setFallDamage(false);
 
         setIcon(new ItemStack(Material.ARROW));
 
