@@ -50,6 +50,11 @@ public class SidebarAdapter implements AssembleAdapter {
 
         GameProfile profile = gameProfileManager.getLoadedProfile(player.getUniqueId());
 
+        if(profile.getSumoEvent() != null) {
+            sb.append(" &7❘ &fEvent");
+            return sb.toString();
+        }
+
         switch(profile.getState()) {
             case IN_GAME, SPECTATING -> {
                 sb.append(" &7❘ &f");
@@ -67,8 +72,7 @@ public class SidebarAdapter implements AssembleAdapter {
         GameProfile profile = gameProfileManager.getLoadedProfiles().get(player.getUniqueId());
         if(profile != null && profile.isShowSidebar()) {
             GameProfile.State state = profile.getState();
-            boolean showDuration = profile.isSidebarShowDuration(),
-                    showLines = profile.isSidebarShowLines(),
+            boolean showLines = profile.isSidebarShowLines(),
                     staff = player.hasPermission("practice.staff");
 
             if(showLines) {
@@ -118,19 +122,19 @@ public class SidebarAdapter implements AssembleAdapter {
                         case MINIGAME -> {
                             lines.add("&6In Minigame Queue:");
                             lines.add(" &7● " + queue.getType().getColor() + queue.getMinigameType().toString() + (ranked ? " &f&l(R)" : " &f(U)"));
-                            lines.add(" &7● &6In Queue: &f" + queue.getQueueMembers().size());
+                            lines.add(" &7● &6In Queue: &f" + queue.getQueueMembers().size() + "&7/&f" + queue.getMinigameType().getMaxPlayers());
 
                             if(queue.isCountdown()) {
                                 lines.add(" &7● &6Starting In: &f" + (queue.getTimeBeforeStart() + 1) + "s");
                             } else {
-                                lines.add(" &7● &6&oWaiting for players.");
+                                int playersNeeded = queue.getMinigameType().getMinPlayers() - queue.getQueueMembers().size();
+                                lines.add(" ");
+                                lines.add("&7Waiting for &f" + playersNeeded + "&7 more");
+                                lines.add("&7player" + (playersNeeded == 1 ? "" : "s") + " to start.");
                             }
                         }
                     }
 
-                    if(showDuration) {
-                        lines.add(" &7● &f" + TimeUtil.get(new Date(), queueMember.getJoined()));
-                    }
                     break;
                 case LOBBY_PARTY:
                     lines.add("&6Online: &f" + Bukkit.getOnlinePlayers().size());

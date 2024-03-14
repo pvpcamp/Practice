@@ -94,11 +94,11 @@ public enum InteractableItems {
                         new ItemBuilder(Material.DIAMOND, "&6Tournament Status").create(), 0, new TournamentStatusInteract());
             case TOURNAMENT_LEAVE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.NETHER_STAR, "&6Leave Tournament").create(), 4, new TournamentLeaveInteract());
+                        new ItemBuilder(Material.NETHER_STAR, "&cLeave Tournament").create(), 4, new TournamentLeaveInteract());
             // LOBBY_EVENT
             case EVENT_LEAVE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.REDSTONE, "&cLeave Event").create(), 4, new EventLeaveInteract());
+                        new ItemBuilder(Material.NETHER_STAR, "&cLeave Event").create(), 4, new EventLeaveInteract());
             // SPECTATING
             case SHOW_SPECTATORS:
                 return new InteractableItem(

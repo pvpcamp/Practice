@@ -27,7 +27,7 @@ public class TournamentTeamSizeGui extends StandardGui {
             @Override
             public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                 if(plugin.getGameManager().getTournament() == null || plugin.getGameManager().getTournament().getState().equals(Tournament.State.ENDED)) {
-                    Tournament tournament = new Tournament(plugin, gameKit, 1, 64);
+                    Tournament tournament = new Tournament(plugin, gameKit, 1, 8,128);
                     plugin.getGameManager().setTournament(tournament);
 
                     player.sendMessage(ChatColor.GREEN + "You have started a new tournament.");

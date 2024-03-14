@@ -14,6 +14,7 @@ public class InvadedKit extends BaseDuelKit {
 
         setFfa(true);
         setShowHealthBar(true);
+        setArrowPickup(false);
 
         setIcon(new ItemStack(Material.BLAZE_POWDER));
 

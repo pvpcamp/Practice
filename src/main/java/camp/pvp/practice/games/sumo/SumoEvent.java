@@ -5,10 +5,13 @@ import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.GameProfileManager;
+import camp.pvp.practice.utils.ClickableMessageBuilder;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.TimeUtil;
 import lombok.Data;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
@@ -61,12 +64,12 @@ public class SumoEvent {
                 return;
             }
 
-            if(timer % 15 == 0) {
+            if(timer % 15 == 0 || timer == 5) {
                 joinMessage();
             }
 
-            if(timer % 10 == 0 || timer < 5) {
-                announce("&aEvent starting in &f" + timer + " &asecond(s).");
+            if(timer % 10 == 0 || timer <= 5) {
+                announce("&aEvent starting in &f" + timer + " &asecond" + (timer == 1 ? "" : "s") + ".");
             }
 
             timer--;
@@ -91,8 +94,11 @@ public class SumoEvent {
         announce("&aRound &f" + round + " &ahas started.");
 
         SumoEventDuel duel = new SumoEventDuel(plugin, this);
-        duel.join(nextRoundParticipants.get(0).getPlayer());
-        duel.join(nextRoundParticipants.get(1).getPlayer());
+
+        for(EventParticipant participant : nextRoundParticipants) {
+            participant.incrementMatches();
+            duel.join(participant.getPlayer());
+        }
 
         currentDuel = duel;
 
@@ -138,10 +144,10 @@ public class SumoEvent {
 
         if(participant == null) {
             participant = new EventParticipant(player, this);
+        }
 
-            if(state.equals(State.IN_GAME) || state.equals(State.NEXT_ROUND_STARTING)) {
-                participant.setPlayingState(EventParticipant.PlayingState.SPECTATOR);
-            }
+        if(state.equals(State.IN_GAME) || state.equals(State.NEXT_ROUND_STARTING)) {
+            participant.setPlayingState(EventParticipant.PlayingState.SPECTATOR);
         }
 
         participants.put(player.getUniqueId(), participant);
@@ -151,8 +157,8 @@ public class SumoEvent {
         profile.playerUpdate(true);
 
         if(state.equals(State.STARTING)) {
-            announce("&f" + player.getName() + " &ahas joined the event.");
             participant.setPlayerInEvent(true);
+            announce("&f" + player.getName() + " &ahas joined the event. &7(" + getTotalParticipants() + " player" + (getTotalParticipants() == 1 ? "" : "s") + ")");
         }
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
@@ -243,6 +249,8 @@ public class SumoEvent {
 
         if(list.size() < 2) return null;
 
+        Collections.shuffle(list);
+
         list.sort(Comparator.comparingInt(EventParticipant::getMatches).reversed());
 
         List<EventParticipant> nextRound = new ArrayList<>();
@@ -276,7 +284,7 @@ public class SumoEvent {
     public Map<UUID, EventParticipant> getActiveParticipants() {
         Map<UUID, EventParticipant> map = new HashMap<>();
         for(EventParticipant participant : participants.values()) {
-            if(participant.isAlive()) {
+            if(participant.isActive()) {
                 map.put(participant.getUuid(), participant);
             }
         }
@@ -327,26 +335,20 @@ public class SumoEvent {
     }
 
     public void joinMessage() {
-        GameProfileManager gpm = plugin.getGameProfileManager();
-        for(Player player : Bukkit.getOnlinePlayers()) {
-            GameProfile profile = gpm.getLoadedProfiles().get(player.getUniqueId());
-            if(profile != null && profile.isTournamentNotifications()) {
-                String[] strings = new String[]{
+        ClickableMessageBuilder cmb = new ClickableMessageBuilder()
+                .setLines(
                         " ",
-                        Colors.get("&6&lSumo Event"),
-                        Colors.get(" &7● &6Starting In: &f" + timer + "s"),
-                        Colors.get(" &7● &6Players: &f" + getTotalParticipants())
-                };
+                        "&6&lSumo Event",
+                        " &7● &6Starting In: &f" + timer + "s",
+                        " &7● &6Players: &f" + getTotalParticipants(),
+                        "&aClick to join!",
+                        " "
+                )
+                .setHoverMessage("&aClick to join the event!")
+                .setCommand("/event join");
 
-                player.sendMessage(strings);
-
-                TextComponent msg = new TextComponent(Colors.get("&6[Click to join]"));
-
-                msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/event join"));
-
-                player.spigot().sendMessage(msg);
-                player.sendMessage(" ");
-            }
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            cmb.sendToPlayer(player);
         }
     }
 

@@ -77,10 +77,10 @@ public class EntityDamageByEntityListener implements Listener {
 
                 double explosionStrength = 1.25;
                 double explosionY = 1.1;
-                double explosionDistance = 1.5;
+                double explosionDistance = 2.0;
 
                 if(event.getDamager().getType().equals(EntityType.PRIMED_TNT)) {
-                    explosionDistance = 2.5;
+                    explosionDistance = 3.0;
                 }
 
                 if(distanceFromExplosion > explosionDistance) {

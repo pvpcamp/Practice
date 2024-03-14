@@ -119,7 +119,7 @@ public class Duel extends Game {
 
             Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
 
-            startingTimer(5);
+            startingTimer(3);
         } else {
             for(Player p : getAlivePlayers()) {
                 GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfiles().get(p.getUniqueId());
@@ -263,18 +263,6 @@ public class Duel extends Game {
         if (getCurrentPlaying().size() < 2) {
             end();
         }
-    }
-
-    @Override
-    public void handleHit(Player victim, Player attacker, EntityDamageByEntityEvent event) {
-
-        // TODO: Add blocked hit capping.
-//        victim.sendMessage(event.getDamage() + " damage");
-//        if(victim.isBlocking()) {
-//            victim.sendMessage(event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) + " block reduction");
-//        }
-
-        super.handleHit(victim, attacker, event);
     }
 
     @Override

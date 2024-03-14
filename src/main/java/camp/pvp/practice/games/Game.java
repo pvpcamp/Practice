@@ -288,7 +288,7 @@ public abstract class Game {
             participant.setLivingState(GameParticipant.LivingState.DEAD);
         } else {
             spectateStart(player);
-            announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + Bukkit.getOfflinePlayer(participant.getAttacker()).getName() + "&a."));
+            announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + getParticipants().get(participant.getAttacker()).getName() + "&a."));
         }
 
         if(participant.getLivingState().equals(GameParticipant.LivingState.DEAD)) {
@@ -479,7 +479,7 @@ public abstract class Game {
             if (!kit.isTakeDamage()) {
                 event.setDamage(0);
                 victim.setHealth(victim.getMaxHealth());
-                if (kit.equals(GameKit.BOXING) && participant.getHits() > 99) {
+                if (kit.isBoxing() && participant.getHits() > 99) {
                     this.eliminate(victim, false);
                 }
             }
@@ -547,7 +547,7 @@ public abstract class Game {
 
         if(block != null) {
 
-            if(arena.getType().canModifyArena()) return;
+            if(arena.getType().isBuild() && arena.getType().canModifyArena() && state.equals(State.ACTIVE)) return;
 
             Material material = block.getType();
 
@@ -600,6 +600,7 @@ public abstract class Game {
             Fireball fireball = player.launchProjectile(Fireball.class, player.getLocation().add(0, .25, 0).getDirection().multiply(0.75));
 
             fireball.setIsIncendiary(false);
+            fireball.setFireTicks(0);
             addEntity(fireball);
 
             if(item.getAmount() > 1) {

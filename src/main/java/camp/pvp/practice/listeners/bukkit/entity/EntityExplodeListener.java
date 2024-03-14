@@ -40,6 +40,7 @@ public class EntityExplodeListener implements Listener {
 
         if(event.getEntity() instanceof Fireball fireball) {
             fireball.setIsIncendiary(false);
+            fireball.setFireTicks(0);
         }
 
         Arena arena = game.getArena();

@@ -26,6 +26,8 @@ public class FireballFightKit extends BaseDuelKit {
         setPlaceTntBeforeStart(true);
         setBiggerExplosions(true);
         setFallDamage(false);
+        setDropItemsOnDeath(false);
+        setShowHealthBar(true);
 
         setArenaTypes(Collections.singletonList(Arena.Type.DUEL_FIREBALL_FIGHT));
 

@@ -7,6 +7,7 @@ import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.queue.GameQueue;
+import camp.pvp.practice.utils.ClickableMessageBuilder;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,14 +47,14 @@ public class Tournament {
 
     private Practice plugin;
     private final GameKit gameKit;
-    private final int teamSize, maxPlayers;
+    private final int teamSize, minPlayers, maxPlayers;
     private int currentRound, timer;
     private State state;
     private List<Game> games;
     private List<TournamentMatch> queuedGames;
     private Map<UUID, TournamentParticipant> tournamentParticipants;
     private BukkitTask startingTimer, roundStartingTimer;
-    public Tournament(Practice plugin, GameKit gameKit, int teamSize, int maxPlayers) {
+    public Tournament(Practice plugin, GameKit gameKit, int teamSize, int minPlayers, int maxPlayers) {
         this.plugin = plugin;
         plugin.getGameManager().setTournament(this);
 
@@ -61,6 +62,7 @@ public class Tournament {
         this.timer = 0;
         this.gameKit = gameKit;
         this.teamSize = teamSize;
+        this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
         this.games = new ArrayList<>();
         this.queuedGames = new ArrayList<>();
@@ -149,13 +151,12 @@ public class Tournament {
         startingTimer = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
             @Override
             public void run() {
-                List<Integer> times = Arrays.asList(120, 105, 90, 75, 60, 30, 15, 5);
                 if(timer == 0) {
                     nextRound();
 
                     startingTimer.cancel();
                 } else {
-                    if (times.contains(timer)) {
+                    if(timer % 15 == 0 || timer == 5) {
                         joinMessage();
                     }
                     timer--;
@@ -168,21 +169,19 @@ public class Tournament {
 
         setState(State.NEXT_ROUND_STARTING);
 
-        if(this.getCurrentRound() == 0) {
-            if(this.getTournamentParticipants().size() < 2) {
-                announce("&cNot enough players joined the tournament, cancelling.");
-                for(TournamentParticipant p : Tournament.this.getTournamentParticipants().values()) {
-                    GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(p.getUuid());
-                    profile.setTournament(null);
-                    profile.playerUpdate(true);
+        if(this.getCurrentRound() == 0 && this.getTournamentParticipants().size() < this.getMinPlayers()) {
+            announce("&cNot enough players joined to start the tournament, cancelling.");
+            for(TournamentParticipant p : Tournament.this.getTournamentParticipants().values()) {
+                GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(p.getUuid());
+                profile.setTournament(null);
+                profile.playerUpdate(true);
 
-                    setState(State.ENDED);
-                }
-
-                getTournamentParticipants().clear();
-                plugin.getGameManager().setTournament(null);
-                return;
+                setState(State.ENDED);
             }
+
+            getTournamentParticipants().clear();
+            plugin.getGameManager().setTournament(null);
+            return;
         }
 
         this.currentRound++;
@@ -194,30 +193,31 @@ public class Tournament {
 
         Queue<TournamentParticipant> queuedParticipants = new LinkedList<>(shuffledParticipants);
         while(!queuedParticipants.isEmpty()) {
-            TournamentParticipant participantOne = null, participantTwo = null;
+            TournamentParticipant participantOne, participantTwo;
             participantOne = queuedParticipants.poll();
             participantTwo = queuedParticipants.poll();
 
-            if(participantTwo != null) {
-                TournamentMatch match = null;
-                switch(teamSize) {
-                    case 1:
-                        Duel duel = new Duel(plugin, UUID.randomUUID());
-                        duel.setKit(gameKit.getBaseKit());
-                        duel.setTournament(this);
-                        duel.setQueueType(GameQueue.Type.TOURNAMENT);
-
-                        match = new TournamentMatch(duel, participantOne, participantTwo);
-                        this.getQueuedGames().add(match);
-                        this.getGames().add(duel);
-
-                        String matchMessage = "&6[Tournament Match] Your next match: &f" + participantOne.getName() + " &cvs. &f" + participantTwo.getName();
-                        participantOne.getPlayer().sendMessage(Colors.get(matchMessage));
-                        participantTwo.getPlayer().sendMessage(Colors.get(matchMessage));
-                }
-            } else {
+            if(participantTwo == null) {
                 Player player = participantOne.getPlayer();
                 player.sendMessage(ChatColor.GREEN + "You will not have an opponent this round.");
+                continue;
+            }
+
+            TournamentMatch match;
+            switch(teamSize) {
+                case 1:
+                    Duel duel = new Duel(plugin, UUID.randomUUID());
+                    duel.setKit(gameKit.getBaseKit());
+                    duel.setTournament(this);
+                    duel.setQueueType(GameQueue.Type.TOURNAMENT);
+
+                    match = new TournamentMatch(duel, participantOne, participantTwo);
+                    this.getQueuedGames().add(match);
+                    this.getGames().add(duel);
+
+                    String matchMessage = "&6[Tournament Match] Your next match: &f" + participantOne.getName() + " &cvs. &f" + participantTwo.getName();
+                    participantOne.getPlayer().sendMessage(Colors.get(matchMessage));
+                    participantTwo.getPlayer().sendMessage(Colors.get(matchMessage));
             }
         }
 
@@ -225,12 +225,11 @@ public class Tournament {
         roundStartingTimer = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
             @Override
             public void run() {
-                List<Integer> times = Arrays.asList(30, 15, 10, 5,4,3,2,1);
                 if(timer == 0) {
                     startGames();
                     roundStartingTimer.cancel();
                 } else {
-                    if(times.contains(timer)) {
+                    if(timer % 15 == 0 || timer <= 5) {
                         announce("&eRound " + currentRound + " starting in " + timer + " second" + (timer == 1 ? "" : "s") + ".");
                     }
                     timer--;
@@ -313,9 +312,10 @@ public class Tournament {
     public List<String> getScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
         lines.add("&6Tournament");
+
         switch(this.getState()) {
             case STARTING:
-                lines.add(" &7● &6Starting In: &f" + this.getTimer() + "s");
+                lines.add(" &7● &6Starting In: &f" + (this.getTimer() + 1) + "s");
                 lines.add(" &7● &6Players: &f" + this.getTournamentParticipants().size() + "/" + this.getMaxPlayers());
                 if(teamSize == 2) {
                     // TODO: 2v2 Tournaments.
@@ -323,21 +323,21 @@ public class Tournament {
                 break;
             case NEXT_ROUND_STARTING:
                 lines.add(" &7● &6Round: &f" + this.getCurrentRound());
-                lines.add(" &7● &6Starting In: &f" + this.getTimer() + "s");
+                lines.add(" &7● &6Starting In: &f" + (this.getTimer() + 1) + "s");
                 lines.add(" &7● &6Players Left: &f" + this.getAlive().size() + "/" + this.getTournamentParticipants().size());
                 switch(teamSize) {
                     case 1:
                         TournamentParticipant opponent = null;
                         for(TournamentMatch match : getQueuedGames()) {
-                            if(match.getParticipants().get(profile.getUuid()) != null) {
-                                for(TournamentParticipant p : match.getParticipants().values()) {
-                                    if(!p.getUuid().equals(profile.getUuid())) {
-                                        opponent = p;
-                                        break;
-                                    }
+                            if(match.getParticipants().get(profile.getUuid()) == null) continue;
+
+                            for(TournamentParticipant p : match.getParticipants().values()) {
+                                if(!p.getUuid().equals(profile.getUuid())) {
+                                    opponent = p;
+                                    break;
                                 }
-                                break;
                             }
+                            break;
                         }
 
                         lines.add(" ");
@@ -397,46 +397,36 @@ public class Tournament {
 
     public void announce(String s) {
         for(Player player : getAllPlayers()) {
-            player.sendMessage(Colors.get("&6[Tournament] &f" + s));
+            player.sendMessage(Colors.get(s));
         }
     }
 
     public void joinMessage() {
-        GameProfileManager gpm = plugin.getGameProfileManager();
-        for(Player player : Bukkit.getOnlinePlayers()) {
-            GameProfile profile = gpm.getLoadedProfiles().get(player.getUniqueId());
-            if(profile != null && profile.isTournamentNotifications()) {
-                String[] strings = new String[]{
+        ClickableMessageBuilder cmb = new ClickableMessageBuilder()
+                .setLines(
                         " ",
-                        Colors.get("&6&lTournament"),
-                        Colors.get(" &7● &6Starting In: &f" + timer + "s"),
-                        Colors.get(" &7● &6Kit: &f" + getGameKit().getDisplayName()),
-                        Colors.get(" &7● &6Players: &f" + getTournamentParticipants().size())
-                };
+                        "&6&lTournament",
+                        " &7● &6Starting In: &f" + timer + "s",
+                        " &7● &6Kit: &f" + getGameKit().getDisplayName(),
+                        " &7● &6Players: &f" + getTournamentParticipants().size(),
+                        "&aClick to join!",
+                        " "
+                )
+                .setHoverMessage("&aClick to join the tournament!")
+                .setCommand("/tournament join");
 
-                player.sendMessage(strings);
-
-                TextComponent msg = new TextComponent(Colors.get("&6[Click to join]"));
-
-                msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tournament join"));
-                msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Colors.get("&aClick to join the tournament!")).create()));
-
-                player.spigot().sendMessage(msg);
-                player.sendMessage(" ");
-            }
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            cmb.sendToPlayer(player);
         }
     }
 
     public void announceAll(String... strings) {
         GameProfileManager gpm = plugin.getGameProfileManager();
         for(Player p : Bukkit.getOnlinePlayers()) {
-            GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
-            if(profile != null) {
-                if(getAllPlayers().contains(p) || profile.isTournamentNotifications()) {
-                    for (String s : strings) {
-                        p.sendMessage(Colors.get(s));
-                    }
-                }
+            GameProfile profile = gpm.getLoadedProfile(p.getUniqueId());
+            if(profile == null) continue;
+            if(getAllPlayers().contains(p) || profile.isTournamentNotifications()) {
+                p.sendMessage(Colors.get(strings));
             }
         }
     }

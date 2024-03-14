@@ -47,7 +47,7 @@ public class LeaderboardsGui extends ArrangedGui {
                 lines.add(sb.toString());
             }
 
-            GuiButton button = new GuiButton(baseKit.getIcon(), "&6" + kit.getDisplayName());
+            GuiButton button = new GuiButton(baseKit.getIcon(), "&6&l" + kit.getDisplayName());
             button.setLore(lines);
             addButton(button);
         }

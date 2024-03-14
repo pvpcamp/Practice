@@ -38,7 +38,7 @@ public class MinigameQueueGui extends ArrangedGui {
 
                 if(queue.isCountdown()) {
                     final int time = queue.getTimeBeforeStart();
-                    lore.add("&6Starting In: &f" + time + "second" + (time == 1 ? "" : "s"));
+                    lore.add("&6Starting In: &f" + time + " second" + (time == 1 ? "" : "s"));
                     lore.add(" ");
                 }
 

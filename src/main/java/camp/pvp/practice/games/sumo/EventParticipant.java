@@ -52,4 +52,8 @@ public class EventParticipant {
     public boolean isCurrentlyPlaying() {
         return event.getCurrentDuel() != null && event.getCurrentDuel().getParticipants().containsKey(this.getUuid());
     }
+
+    public void incrementMatches() {
+        this.matches++;
+    }
 }

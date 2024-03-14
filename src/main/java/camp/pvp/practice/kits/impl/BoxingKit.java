@@ -14,6 +14,7 @@ public class BoxingKit extends BaseDuelKit {
         setTeams(false);
         setTakeDamage(false);
         setBoxing(true);
+        setHunger(false);
         setItemDurability(false);
         setDropItemsOnDeath(false);
 
