@@ -155,6 +155,12 @@ public class GameProfile {
 
     public State getState() {
 
+        if(sumoEvent != null) {
+            if(game != null) return State.IN_GAME;
+
+            return State.LOBBY_EVENT;
+        }
+
         if (game != null) {
             if (game.getCurrentPlaying().get(this.uuid) != null) {
                 return State.IN_GAME;
@@ -163,8 +169,6 @@ public class GameProfile {
             }
         } else if (tournament != null) {
             return State.LOBBY_TOURNAMENT;
-        } else if (sumoEvent != null) {
-            return State.LOBBY_EVENT;
         } else if (Practice.instance.getGameQueueManager().getQueue(uuid) != null) {
             return State.LOBBY_QUEUE;
         } else if (editingKit != null) {

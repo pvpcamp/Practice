@@ -76,7 +76,9 @@ public class SumoEvent {
     public void nextRound() {
         round++;
 
-        currentDuel = null;
+        if(state.equals(State.ENDED)) {
+            return;
+        }
 
         setState(State.IN_GAME);
 
@@ -150,6 +152,7 @@ public class SumoEvent {
 
         if(state.equals(State.STARTING)) {
             announce("&f" + player.getName() + " &ahas joined the event.");
+            participant.setPlayerInEvent(true);
         }
 
         plugin.getGameProfileManager().updateGlobalPlayerVisibility();
@@ -176,8 +179,9 @@ public class SumoEvent {
         switch(state) {
             case STARTING, ENDED -> participants.remove(player.getUniqueId());
             default -> {
-                if(getCurrentDuel() != null && getCurrentDuel().getParticipants().containsKey(player.getUniqueId()) && getAliveCount() > 2) {
+                if(getCurrentDuel() != null && getCurrentDuel().getParticipants().containsKey(player.getUniqueId()) && getAliveCount() > 1) {
                     setState(State.NEXT_ROUND_STARTING);
+                    setCurrentDuel(null);
                     Bukkit.getScheduler().runTaskLater(plugin, this::nextRound, 40);
                 }
             }
@@ -185,6 +189,7 @@ public class SumoEvent {
 
         if(leftGame) {
             profile.setSumoEvent(null);
+            profile.setGame(null);
             participant.setPlayingState(EventParticipant.PlayingState.DEAD);
         }
 
@@ -192,7 +197,7 @@ public class SumoEvent {
 
         Practice.getInstance().getGameProfileManager().updateGlobalPlayerVisibility();
 
-        if(getAliveCount() < 2) {
+        if(getAliveCount() < 2 && (getState().equals(State.IN_GAME) || getState().equals(State.NEXT_ROUND_STARTING))) {
             end();
         }
     }
@@ -211,7 +216,7 @@ public class SumoEvent {
                 lines.add("&7● &6Players: &f" + getAliveCount() + "/" + getTotalParticipants());
                 lines.add("&7● &6Round: &f" + round);
 
-                if(getCurrentDuel() != null) {
+                if(getCurrentDuel() != null && !getCurrentDuel().getState().equals(Game.State.ENDED)) {
 
                     if(profile.isSidebarShowDuration() && getCurrentDuel().getState().equals(Game.State.ACTIVE)) {
                         lines.add("&7● &6Duration: &f" + TimeUtil.get(new Date(), getCurrentDuel().getStarted()));
@@ -301,7 +306,7 @@ public class SumoEvent {
         int i = 0;
 
         for(EventParticipant participant : participants.values()) {
-            if(participant.isPlayer()) {
+            if(participant.isPlayerInEvent()) {
                 i++;
             }
         }

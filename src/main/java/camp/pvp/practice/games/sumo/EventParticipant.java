@@ -19,6 +19,7 @@ public class EventParticipant {
     private final String name;
     private final SumoEvent event;
     private PlayingState playingState;
+    private boolean playerInEvent;
     private int matches;
 
     public EventParticipant(Player player, SumoEvent event) {
@@ -46,10 +47,6 @@ public class EventParticipant {
 
     public boolean isActive () {
         return this.playingState.equals(PlayingState.ALIVE) || this.playingState.equals(PlayingState.SPECTATOR);
-    }
-
-    public boolean isPlayer() {
-        return this.playingState.equals(PlayingState.ALIVE) || this.playingState.equals(PlayingState.DEAD);
     }
 
     public boolean isCurrentlyPlaying() {
