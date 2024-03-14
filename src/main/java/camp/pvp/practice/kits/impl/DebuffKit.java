@@ -10,7 +10,7 @@ public class DebuffKit extends NoDebuffKit {
         super();
         setGameKit(GameKit.DEBUFF);
 
-        ItemStack[] inv = getItems();
+        ItemStack[] inv = getItems(), moreItems = getMoreItems();
 
         Potion poison = new Potion(PotionType.POISON, 1);
         poison.setSplash(true);
@@ -26,5 +26,12 @@ public class DebuffKit extends NoDebuffKit {
         inv[19] = slowness.toItemStack(1);
         inv[27] = poison.toItemStack(1);
         inv[28] = slowness.toItemStack(1);
+
+        moreItems[9] = poison.toItemStack(1);
+        moreItems[10] = slowness.toItemStack(1);
+        moreItems[18] = poison.toItemStack(1);
+        moreItems[19] = slowness.toItemStack(1);
+        moreItems[27] = poison.toItemStack(1);
+        moreItems[28] = slowness.toItemStack(1);
     }
 }

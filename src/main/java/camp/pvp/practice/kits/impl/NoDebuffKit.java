@@ -20,6 +20,8 @@ public class NoDebuffKit extends BaseDuelKit {
         setFfa(true);
         setCappedBlockHits(true);
 
+        setMoreItems(new ItemStack[36]);
+
         ItemStack[] armor = getArmor(), inv = getItems(), more = getMoreItems();
 
         armor[3] = new ItemStack(Material.DIAMOND_HELMET);

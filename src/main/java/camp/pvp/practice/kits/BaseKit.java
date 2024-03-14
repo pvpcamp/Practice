@@ -22,8 +22,9 @@ import java.util.List;
 @Data
 public abstract class BaseKit {
 
-    private final ItemStack[] items, armor, moreItems;
+    private final ItemStack[] items, armor;
     private final List<PotionEffect> potionEffects;
+    private ItemStack[] moreItems;
     private GameKit gameKit;
     private ItemStack icon;
     private List<Arena.Type> arenaTypes;
@@ -35,7 +36,6 @@ public abstract class BaseKit {
 
     protected BaseKit(GameKit gameKit) {
         this.items = new ItemStack[36];
-        this.moreItems = new ItemStack[36];
         this.armor = new ItemStack[4];
         this.gameTypes = new ArrayList<>();
         this.potionEffects = new ArrayList<>();

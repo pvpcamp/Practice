@@ -110,7 +110,7 @@ public class PlayerInteractListener implements Listener {
                 switch (block.getType()) {
                     case CHEST:
                         if(baseKit.getMoreItems() != null) {
-                            Inventory inventory = Bukkit.createInventory(player, 36, "&6More Items");
+                            Inventory inventory = Bukkit.createInventory(player, 36, Colors.get("&6More Items"));
                             for(ItemStack i : baseKit.getMoreItems()) {
                                 if(i != null && !i.getType().equals(Material.AIR)) {
                                     inventory.addItem(i);
