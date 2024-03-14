@@ -11,17 +11,22 @@ import java.util.UUID;
 @Data
 public class EventParticipant {
 
+    public enum PlayingState {
+        ALIVE, SPECTATOR, DEAD
+    }
+
     private final UUID uuid;
     private final String name;
+    private final SumoEvent event;
+    private PlayingState playingState;
+    private boolean playerInEvent;
     private int matches;
-    private boolean alive, playing, active;
 
-    public EventParticipant(Player player) {
+    public EventParticipant(Player player, SumoEvent event) {
         this.uuid = player.getUniqueId();
         this.name = player.getName();
-        this.alive = true;
-        this.playing = true;
-        this.active = true;
+        this.event = event;
+        this.playingState = PlayingState.ALIVE;
     }
 
     public Player getPlayer() {
@@ -32,7 +37,19 @@ public class EventParticipant {
         return Practice.getInstance().getGameProfileManager().getLoadedProfiles().get(uuid);
     }
 
+    public boolean isAlive() {
+        return this.playingState.equals(PlayingState.ALIVE);
+    }
+
     public void eliminate() {
-        this.alive = false;
+        this.playingState = PlayingState.SPECTATOR;
+    }
+
+    public boolean isActive () {
+        return this.playingState.equals(PlayingState.ALIVE) || this.playingState.equals(PlayingState.SPECTATOR);
+    }
+
+    public boolean isCurrentlyPlaying() {
+        return event.getCurrentDuel() != null && event.getCurrentDuel().getParticipants().containsKey(this.getUuid());
     }
 }

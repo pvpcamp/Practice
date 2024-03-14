@@ -22,7 +22,7 @@ public class SumoEventDuel extends Duel {
         super(plugin, UUID.randomUUID());
         this.sumoEvent = event;
         this.setArena(event.getArena());
-        this.setKit(GameKit.FIREBALL_FIGHT.getBaseKit());
+        this.setKit(GameKit.SUMO.getBaseKit());
     }
 
     @Override
@@ -57,7 +57,7 @@ public class SumoEventDuel extends Duel {
 
         Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
 
-        startingTimer(3);
+        startingTimer(5);
     }
 
     @Override
@@ -90,11 +90,11 @@ public class SumoEventDuel extends Duel {
         clearEntities();
         for(GameParticipant participant : getCurrentPlaying().values()) {
             participant.getPlayer().teleport(getArena().getPositions().get("lobby").getLocation());
-            participant.getProfile().givePlayerItems(false);
             participant.getProfile().setGame(null);
+            participant.getProfile().playerUpdate(true);
         }
 
-        getParticipants().clear();
+        getPlugin().getGameManager().getGames().remove(this.getUuid());
     }
 
     @Override
@@ -119,6 +119,8 @@ public class SumoEventDuel extends Duel {
         profile.getDeathAnimation().playAnimation(this, player, location, velocity);
 
         getPlugin().getGameProfileManager().updateGlobalPlayerVisibility();
+
+        profile.setGame(null);
 
         end();
 

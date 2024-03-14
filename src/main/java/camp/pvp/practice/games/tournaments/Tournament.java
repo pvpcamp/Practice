@@ -187,6 +187,8 @@ public class Tournament {
 
         this.currentRound++;
 
+        getGames().clear();
+
         List<TournamentParticipant> shuffledParticipants = new ArrayList<>(getAlive());
         Collections.shuffle(shuffledParticipants);
 
@@ -363,7 +365,7 @@ public class Tournament {
     public List<Game> getActiveGames() {
         List<Game> activeGames = new ArrayList<>();
         for(Game game : this.getGames()) {
-            if(!game.getState().equals(Game.State.ENDED)) {
+            if(!(game.getState().equals(Game.State.ENDED) || game.getState().equals(Game.State.INACTIVE))) {
                 activeGames.add(game);
             }
         }
