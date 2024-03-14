@@ -20,9 +20,15 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.utils.PlayerUtils;
 import com.lunarclient.apollo.Apollo;
 import com.lunarclient.apollo.module.cooldown.CooldownModule;
+import com.lunarclient.apollo.module.title.Title;
+import com.lunarclient.apollo.module.title.TitleModule;
+import com.lunarclient.apollo.module.title.TitleType;
 import com.lunarclient.apollo.player.ApolloPlayer;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.*;
 import org.bukkit.block.*;
 import org.bukkit.entity.*;
@@ -36,10 +42,39 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
+import java.time.Duration;
 import java.util.*;
 
 @Getter @Setter
 public abstract class Game {
+
+    private static final Title deadTitle = Title.builder()
+            .type(TitleType.TITLE)
+            .message(Component.text()
+                    .content("YOU DIED!")
+                    .color(NamedTextColor.RED)
+                    .decorate(TextDecoration.BOLD)
+                    .build())
+            .scale(1.0f)
+            .displayTime(Duration.ofMillis(3000))
+            .fadeInTime(Duration.ofMillis(200))
+            .fadeOutTime(Duration.ofMillis(500))
+            .build();
+
+    private static final Title winTitle = Title.builder()
+            .type(TitleType.TITLE)
+            .message(Component.text()
+                    .content("YOU WIN!")
+                    .color(NamedTextColor.GOLD)
+                    .decorate(TextDecoration.BOLD)
+                    .build())
+            .scale(1.0f)
+            .displayTime(Duration.ofMillis(3000))
+            .fadeInTime(Duration.ofMillis(200))
+            .fadeOutTime(Duration.ofMillis(500))
+            .build();
+
+    private static final TitleModule titleModule = Apollo.getModuleManager().getModule(TitleModule.class);
 
     public enum State {
         INACTIVE, STARTING, NEXT_ROUND_STARTING, ACTIVE, ROUND_ENDED, ENDED;
@@ -293,6 +328,7 @@ public abstract class Game {
 
         if(participant.getLivingState().equals(GameParticipant.LivingState.DEAD)) {
             profile.getDeathAnimation().playAnimation(this, player, location, velocity);
+            sendLunarDeathTitle(player);
         }
     }
 
@@ -856,6 +892,18 @@ public abstract class Game {
 
     public void sendEndingMessage() {
 
+    }
+
+    public void sendLunarWinTitle(Player player) {
+        Optional<ApolloPlayer> apolloPlayerOpt = Apollo.getPlayerManager().getPlayer(player.getUniqueId());
+
+        apolloPlayerOpt.ifPresent(apolloPlayer -> titleModule.displayTitle(apolloPlayer, winTitle));
+    }
+
+    public void sendLunarDeathTitle(Player player) {
+        Optional<ApolloPlayer> apolloPlayerOpt = Apollo.getPlayerManager().getPlayer(player.getUniqueId());
+
+        apolloPlayerOpt.ifPresent(apolloPlayer -> titleModule.displayTitle(apolloPlayer, deadTitle));
     }
 
     public boolean isBuild() {

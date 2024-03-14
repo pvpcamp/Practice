@@ -39,6 +39,10 @@ public abstract class Minigame extends Game {
 
         determineWinner();
 
+        if(getWinner() != null) {
+            sendLunarWinTitle(getWinner().getPlayer());
+        }
+
         setEnded(new Date());
         setState(State.ENDED);
 

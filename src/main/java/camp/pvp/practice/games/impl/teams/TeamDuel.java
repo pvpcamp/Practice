@@ -287,6 +287,13 @@ public class TeamDuel extends TeamGame {
             winningTeam = getBlue();
         }
 
+        for(GameParticipant p : winningTeam.getParticipants().values()) {
+            Player player = p.getPlayer();
+            if(player != null) {
+                sendLunarWinTitle(player);
+            }
+        }
+
         for(GameParticipant participant : getAlive().values()) {
             Player player = participant.getPlayer();
             PostGameInventory pgi = new PostGameInventory(UUID.randomUUID(), participant, player.getInventory().getContents(), player.getInventory().getArmorContents());

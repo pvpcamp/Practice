@@ -168,6 +168,8 @@ public class Duel extends Game {
                 loserInventory = participant.getPostGameInventory();
             }
         }
+
+        sendLunarWinTitle(winnerParticipant.getPlayer());
         
         winnerInventory.setOpponentInventory(loserParticipant, loserInventory);
         loserInventory.setOpponentInventory(winnerParticipant, winnerInventory);
