@@ -176,6 +176,7 @@ public class Practice extends JavaPlugin {
 
         new FoodLevelChangeListener(this);
         new PlayerBucketEmptyListener(this);
+        new PlayerBucketFillListener(this);
         new PlayerChatListener(this);
         new PlayerCommandPreprocessListener(this);
         new PlayerDeathListener(this);

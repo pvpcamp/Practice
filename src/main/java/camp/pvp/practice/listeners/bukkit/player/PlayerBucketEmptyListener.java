@@ -4,6 +4,7 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.profiles.GameProfile;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -24,13 +25,10 @@ public class PlayerBucketEmptyListener implements Listener {
         Player player = event.getPlayer();
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
         Game game = profile.getGame();
-        Block block = event.getBlockClicked();
 
         if(profile.isBuildMode()) {
             return;
         }
-
-        player.updateInventory();
 
         if(game != null && game.isBuild()) {
             if(game.getCurrentPlayersPlaying().contains(player)) {
@@ -38,6 +36,7 @@ public class PlayerBucketEmptyListener implements Listener {
                 return;
             }
         }
+
         event.setCancelled(true);
     }
 }
