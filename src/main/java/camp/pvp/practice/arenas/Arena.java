@@ -410,14 +410,14 @@ public class Arena implements Comparable<Arena>{
 
     public enum Type {
         DUEL, DUEL_FLAT, DUEL_BUILD, DUEL_SUMO, DUEL_HCF, DUEL_SKYWARS, DUEL_BED_FIGHT, DUEL_FIREBALL_FIGHT, DUEL_BRIDGE, SPLEEF, HCF_TEAMFIGHT, FFA, EVENT_SUMO,
-        MINIGAME_FIREBALL_BLITZ, MINIGAME_SKYWARS, MINIGAME_OITC;
+        MINIGAME_FIREBALL_BLITZ, MINIGAME_SKYWARS, MINIGAME_OITC, MINIGAME_TNT_TAG;
 
         public List<String> getValidPositions() {
             return switch (this) {
                 case DUEL_BED_FIGHT, DUEL_FIREBALL_FIGHT -> Arrays.asList("spawn1", "spawn2", "corner1", "corner2", "bluebed", "redbed");
                 case DUEL_BUILD, DUEL_SKYWARS, SPLEEF -> Arrays.asList("spawn1", "spawn2", "center", "corner1", "corner2");
                 case EVENT_SUMO -> Arrays.asList("spawn1", "spawn2", "lobby");
-                case FFA -> Arrays.asList("spawn");
+                case FFA, MINIGAME_TNT_TAG -> Arrays.asList("spawn");
                 case MINIGAME_FIREBALL_BLITZ -> Arrays.asList("bluespawn", "redspawn", "yellowspawn", "whitespawn", "bluebed", "redbed", "yellowbed", "whitebed", "corner1", "corner2");
                 case MINIGAME_OITC -> Arrays.asList("center");
                 case MINIGAME_SKYWARS -> Arrays.asList("spawn1", "spawn2", "spawn3", "spawn4", "center", "corner1", "corner2");

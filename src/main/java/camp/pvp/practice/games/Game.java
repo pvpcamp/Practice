@@ -664,7 +664,7 @@ public abstract class Game {
         profile.getDuelRequests().clear();
         plugin.getGameQueueManager().removeFromQueue(player);
 
-        GameParticipant participant = new GameParticipant(player.getUniqueId(), player.getName());
+        GameParticipant participant = createParticipant(player);
         participant.setGame(this);
         participant.setComboMessages(profile.isComboMessages());
         participant.setBaseKit(kit);
@@ -679,6 +679,14 @@ public abstract class Game {
 
         return participant;
     }
+
+    /***
+     * Creates a new participant for the game. Some games might implement
+     * custom GameParticipant classes, so you can implement them here.
+     * @param player
+     * @return
+     */
+    public abstract GameParticipant createParticipant(Player player);
 
     public void spectateStart(Player player) {
         spectateStart(player, null);

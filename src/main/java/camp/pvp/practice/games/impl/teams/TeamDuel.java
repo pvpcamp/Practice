@@ -346,6 +346,11 @@ public class TeamDuel extends TeamGame {
     }
 
     @Override
+    public GameParticipant createParticipant(Player player) {
+        return new GameParticipant(player.getUniqueId(), player.getName());
+    }
+
+    @Override
     public String getScoreboardTitle() {
         return "Teams";
     }

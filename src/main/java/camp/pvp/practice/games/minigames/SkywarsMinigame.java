@@ -138,4 +138,9 @@ public class SkywarsMinigame extends Minigame {
             end();
         }
     }
+
+    @Override
+    public GameParticipant createParticipant(Player player) {
+        return new GameParticipant(player.getUniqueId(), player.getName());
+    }
 }

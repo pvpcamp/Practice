@@ -199,6 +199,11 @@ public class OneInTheChamberMinigame extends Minigame {
     }
 
     @Override
+    public GameParticipant createParticipant(Player player) {
+        return new GameParticipant(player.getUniqueId(), player.getName());
+    }
+
+    @Override
     public GameParticipant determineWinner() {
 
         List<GameParticipant> sp = new ArrayList<>(this.getCurrentPlaying().values());
