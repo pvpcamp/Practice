@@ -275,10 +275,10 @@ public abstract class Game {
     }
 
     public void eliminate(Player player, boolean leftGame) {
-        eliminate(player, leftGame, true);
+        eliminate(player, leftGame, true, true);
     }
 
-    public void eliminate(Player player, boolean leftGame, boolean showDeathAnimation) {
+    public void eliminate(Player player, boolean leftGame, boolean showDeathAnimation, boolean showDeathMessage) {
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
@@ -326,12 +326,15 @@ public abstract class Game {
             return;
         }
 
-        if(leftGame) {
+        if (leftGame) {
             participant.setRespawn(false);
             participant.setLivingState(GameParticipant.LivingState.DEAD);
         } else {
             spectateStart(player);
-            announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + getParticipants().get(participant.getAttacker()).getName() + "&a."));
+
+            if(showDeathMessage) {
+                announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + getParticipants().get(participant.getAttacker()).getName() + "&a."));
+            }
         }
 
         if(participant.getLivingState().equals(GameParticipant.LivingState.DEAD) && showDeathAnimation) {

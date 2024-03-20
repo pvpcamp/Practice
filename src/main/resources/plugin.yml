@@ -75,8 +75,9 @@ commands:
     description: View the statistics of yourself or another player.
   surrender:
     description: Surrender a game.
-    aliases: [forfeit, suicide, giveup, igiveup, imdone, quit]
+    aliases: [forfeit, leave, suicide, giveup, igiveup, imdone, quit]
   tournament:
+    aliases: [tourney]
     description: Join, leave, or host a tournament.
   whereami:
     description: Shows debug information about your player.

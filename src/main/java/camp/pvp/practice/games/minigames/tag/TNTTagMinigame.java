@@ -50,16 +50,20 @@ public class TNTTagMinigame extends Minigame {
             case STARTING:
                 lines.add("&6Minigame: &fTNT Tag");
                 lines.add("&6Arena: &f" + getArena().getDisplayName());
-                lines.add("&6Players: &f" + this.getCurrentPlaying().size());
+                lines.add("&6Players: &f" + getCurrentPlaying().size());
                 break;
             case ACTIVE:
-                lines.add("&6Round: &f" + round);
+                lines.add("&7Round " + round);
 
                 if(timer > -1) {
-                    lines.add("&6Time Left: &f" + timer + "s");
+                    lines.add(" ");
+                    lines.add("&cExplosion in &f" + (timer + 1) + "s");
+                    lines.add("&aGoal: &f" + (self.isTagged() ? "Tag someone!" : "Run away!"));
                 }
 
-                lines.add("&6Alive: &f" + this.getCurrentPlaying().size() + "/" + this.getParticipants().size());
+                lines.add(" ");
+
+                lines.add("&6Alive: &f" + getCurrentPlaying().size() + "/" + getParticipants().size());
                 lines.add("&6Tagged: &f" + getTagged().size());
 
                 if(profile.isSidebarShowDuration() || profile.isSidebarShowPing()) {
@@ -72,11 +76,6 @@ public class TNTTagMinigame extends Minigame {
 
                 if(profile.isSidebarShowDuration()) {
                     lines.add("&6Duration: &f" + TimeUtil.get(getStarted()));
-                }
-
-                if(self.isTagged()) {
-                    lines.add(" ");
-                    lines.add("&c&lYOU ARE TAGGED!");
                 }
 
 
@@ -100,13 +99,16 @@ public class TNTTagMinigame extends Minigame {
                 lines.add("&6Players: &f" + this.getCurrentPlaying().size());
                 break;
             case ACTIVE:
-                lines.add("&6Round: &f" + round);
+                lines.add("&7Round " + round);
 
                 if(timer > -1) {
-                    lines.add("&6Time Left: &f" + timer + "s");
+                    lines.add(" ");
+                    lines.add("&cExplosion in &f" + (timer + 1) + "s");
                 }
 
-                lines.add("&6Alive: &f" + this.getCurrentPlaying().size() + "/" + this.getParticipants().size());
+                lines.add(" ");
+
+                lines.add("&6Alive: &f" + getCurrentPlaying().size() + "/" + getParticipants().size());
                 lines.add("&6Tagged: &f" + getTagged().size());
 
                 if(profile.isSidebarShowDuration()) {
@@ -278,23 +280,56 @@ public class TNTTagMinigame extends Minigame {
             if(timer < 1) {
                 roundTimerTask.cancel();
 
-                timer = Integer.MIN_VALUE;
-
-                for(TNTTagParticipant participant : getTagged()) {
-                    eliminate(participant.getPlayer(), false);
-                }
-
-                Bukkit.getScheduler().runTaskLater(getPlugin(), this::nextRound, 60L);
+                endRound();
                 return;
+            }
+
+            if(timer == 3) {
+                announce("&c&oThe fuse has been lit...");
+                playSound(null, Sound.FUSE, 1.0F, 1.0F);
             }
 
             timer--;
         }, 20, 20);
     }
 
+    public void endRound() {
+        timer = Integer.MIN_VALUE;
+
+        final List<TNTTagParticipant> tagged = new ArrayList<>(getTagged());
+
+        StringBuilder sb = new StringBuilder();
+
+        for(TNTTagParticipant participant : tagged) {
+            eliminate(participant.getPlayer(), false, false, false);
+
+            sb.append("&f").append(participant.getName());
+
+            if(tagged.indexOf(participant) != tagged.size() - 1) {
+                sb.append("&7, ");
+            }
+        }
+
+        if(tagged.size() > 1) {
+            sb.append("&c have blown up!");
+        } else {
+            sb.append("&c has blown up!");
+        }
+
+        announce("""
+                
+                &4&lBOOM!
+                %s
+                 \n
+                """.formatted(sb.toString())
+        );
+
+        roundTimerTask = Bukkit.getScheduler().runTaskLater(getPlugin(), this::nextRound, 60L);
+    }
+
     @Override
-    public void eliminate(Player player, boolean leftGame) {
-        super.eliminate(player, leftGame, false);
+    public void eliminate(Player player, boolean leftGame, boolean showDeathAnimation, boolean showDeathMessage) {
+        super.eliminate(player, leftGame, false, showDeathMessage);
 
         TNTTagParticipant participant = (TNTTagParticipant) getParticipants().get(player.getUniqueId());
         participant.setTagged(false);

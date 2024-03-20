@@ -25,6 +25,7 @@ public class OneInTheChamberKit extends BaseKit {
         setArrowPickup(false);
         setRespawn(true);
         setDropItemsOnDeath(false);
+        setItemDurability(false);
         setFallDamage(false);
 
         setIcon(new ItemStack(Material.ARROW));
