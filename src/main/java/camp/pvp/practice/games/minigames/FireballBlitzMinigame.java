@@ -190,6 +190,11 @@ public class FireballBlitzMinigame extends Minigame{
     }
 
     @Override
+    public GameParticipant createParticipant(Player player) {
+        return new GameParticipant(player.getUniqueId(), player.getName());
+    }
+
+    @Override
     public GameParticipant determineWinner() {
         GameParticipant winner = getCurrentPlaying().values().stream().findFirst().orElse(null);
         setWinner(winner);

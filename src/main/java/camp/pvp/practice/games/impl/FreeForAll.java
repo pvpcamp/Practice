@@ -267,6 +267,11 @@ public class FreeForAll extends Game {
     }
 
     @Override
+    public GameParticipant createParticipant(Player player) {
+        return new GameParticipant(player.getUniqueId(), player.getName());
+    }
+
+    @Override
     public String getScoreboardTitle() {
         return "FFA";
     }

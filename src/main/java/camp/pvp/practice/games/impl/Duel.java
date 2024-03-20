@@ -268,6 +268,11 @@ public class Duel extends Game {
     }
 
     @Override
+    public GameParticipant createParticipant(Player player) {
+        return new GameParticipant(player.getUniqueId(), player.getName());
+    }
+
+    @Override
     public List<String> getScoreboard(GameProfile profile) {
         List<String> lines = new ArrayList<>();
         GameParticipant self = getParticipants().get(profile.getUuid());
