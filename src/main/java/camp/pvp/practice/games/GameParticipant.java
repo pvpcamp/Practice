@@ -28,6 +28,7 @@ public class GameParticipant {
     private Game game;
     private GameTeam team;
     private LivingState livingState;
+    private Date aliveTime, deathTime;
     private boolean respawn, invincible, kitApplied, comboMessages;
 
     // HCFTEAMS ONLY
@@ -117,7 +118,10 @@ public class GameParticipant {
             }
         }
 
-        if(!isRespawn() && respawnTask != null) respawnTask.cancel();
+        if(!isRespawn()) {
+            deathTime = new Date();
+            if (respawnTask != null) respawnTask.cancel();
+        }
     }
 
     public boolean isRespawn() {

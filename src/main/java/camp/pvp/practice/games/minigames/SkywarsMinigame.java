@@ -36,7 +36,7 @@ public class SkywarsMinigame extends Minigame {
                 lines.add("&6Players: &f" + this.getCurrentPlaying().size());
                 break;
             case ACTIVE:
-                lines.add("&6Players Alive: &f" + this.getCurrentPlaying().size() + "/" + this.getParticipants().size());
+                lines.add("&6Alive: &f" + this.getCurrentPlaying().size() + "/" + this.getParticipants().size());
                 lines.add("&6Kills: &f" + self.getKills());
 
                 if(profile.isSidebarShowPing()) {
@@ -66,7 +66,7 @@ public class SkywarsMinigame extends Minigame {
                 lines.add("&6Players: &f" + this.getCurrentPlaying().size());
                 break;
             case ACTIVE:
-                lines.add("&6Players Alive: &f" + this.getCurrentPlaying().size() + "/" + this.getParticipants().size());
+                lines.add("&6Alive: &f" + this.getCurrentPlaying().size() + "/" + this.getParticipants().size());
 
                 if(profile.isSidebarShowDuration()) {
                     lines.add(" ");

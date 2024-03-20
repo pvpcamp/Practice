@@ -141,6 +141,10 @@ public abstract class Game {
     }
 
     public void start() {
+
+        final Date date = new Date();
+        getParticipants().values().forEach(p -> p.setAliveTime(date));
+
         for(Player p : getAllPlayers()) {
             if(p != null) {
                 p.removePotionEffect(PotionEffectType.JUMP);
@@ -149,7 +153,7 @@ public abstract class Game {
             }
         }
 
-        setStarted(new Date());
+        setStarted(date);
         setState(Game.State.ACTIVE);
     }
 
@@ -271,6 +275,10 @@ public abstract class Game {
     }
 
     public void eliminate(Player player, boolean leftGame) {
+        eliminate(player, leftGame, true);
+    }
+
+    public void eliminate(Player player, boolean leftGame, boolean showDeathAnimation) {
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
@@ -326,7 +334,7 @@ public abstract class Game {
             announce("&f" + player.getName() + "&a has been eliminated" + (participant.getAttacker() == null ? "." : " by &f" + getParticipants().get(participant.getAttacker()).getName() + "&a."));
         }
 
-        if(participant.getLivingState().equals(GameParticipant.LivingState.DEAD)) {
+        if(participant.getLivingState().equals(GameParticipant.LivingState.DEAD) && showDeathAnimation) {
             profile.getDeathAnimation().playAnimation(this, player, location, velocity);
             sendLunarDeathTitle(player);
         }
@@ -854,7 +862,7 @@ public abstract class Game {
             block.setType(Material.AIR);
 
             participant.setRespawn(false);
-            announceAll(
+            announce(
                     " ",
                     color.getChatColor() + "&l" + color.name() + " BED DESTROYED!",
                     color.getChatColor() + "Bed has been destroyed by &f" + player.getName() + color.getChatColor() + "!",
@@ -1178,14 +1186,6 @@ public abstract class Game {
     public void staffAnnounce(String s) {
         for (Player p : getAllPlayers()) {
             if (p.hasPermission("practice.staff")) {
-                p.sendMessage(Colors.get(s));
-            }
-        }
-    }
-
-    public void announceAll(String... strings) {
-        for(Player p : getAllPlayers()) {
-            for(String s : strings) {
                 p.sendMessage(Colors.get(s));
             }
         }

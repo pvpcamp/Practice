@@ -5,13 +5,15 @@ import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.queue.GameQueue;
 
+import java.util.List;
+
 public class TNTTagKit extends BaseKit {
 
-    public TNTTagKit(GameKit gameKit) {
-        super(gameKit);
+    public TNTTagKit() {
+        super(GameKit.TNT_TAG);
 
         getGameTypes().add(GameQueue.GameType.MINIGAME);
-        getArenaTypes().add(Arena.Type.MINIGAME_TNT_TAG);
+        setArenaTypes(List.of(Arena.Type.MINIGAME_TNT_TAG));
 
         setTakeDamage(false);
         setFallDamage(false);

@@ -19,7 +19,8 @@ public enum GameKit {
     SKYWARS,
     SPLEEF,
     STRATEGY,
-    ONE_IN_THE_CHAMBER;
+    ONE_IN_THE_CHAMBER,
+    TNT_TAG;
 
     public BaseKit getBaseKit() {
         switch(this) {
@@ -53,6 +54,8 @@ public enum GameKit {
                 return new StrategyKit();
             case ONE_IN_THE_CHAMBER:
                 return new OneInTheChamberKit();
+            case TNT_TAG:
+                return new TNTTagKit();
         }
         return null;
     }
@@ -61,6 +64,8 @@ public enum GameKit {
         switch(this) {
             case BUILD_UHC:
                 return "Build UHC";
+            case TNT_TAG:
+                return "TNT Tag";
             default:
                 String name = this.name();
                 name = name.replace("_", " ");

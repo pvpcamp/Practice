@@ -3,6 +3,7 @@ package camp.pvp.practice.games.minigames;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
+import camp.pvp.practice.games.minigames.tag.TNTTagMinigame;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
 import lombok.Getter;
@@ -117,13 +118,16 @@ public abstract class Minigame extends Game {
     }
 
     public enum Type {
-        FIREBALL_BLITZ, SKYWARS, ONE_IN_THE_CHAMBER;
+        FIREBALL_BLITZ, SKYWARS, ONE_IN_THE_CHAMBER, TNT_TAG;
 
         @Override
         public String toString() {
             switch(this) {
                 case ONE_IN_THE_CHAMBER -> {
                     return "OITC";
+                }
+                case TNT_TAG -> {
+                    return "TNT Tag";
                 }
                 default -> {
                     String name = this.name();
@@ -139,6 +143,8 @@ public abstract class Minigame extends Game {
                     return "Blitz";
                 case ONE_IN_THE_CHAMBER:
                     return "OITC";
+                case TNT_TAG:
+                    return "TNT Tag";
                 default:
                     String name = this.name();
                     name = name.replace("_", " ");
@@ -157,6 +163,9 @@ public abstract class Minigame extends Game {
                 case ONE_IN_THE_CHAMBER -> {
                     return Material.BOW;
                 }
+                case TNT_TAG -> {
+                    return Material.TNT;
+                }
             }
 
             return null;
@@ -173,8 +182,7 @@ public abstract class Minigame extends Game {
                 case SKYWARS -> {
                     return List.of(
                             "&7FFA Skywars.",
-                            "&7No respawns, last player",
-                            "&7alive wins.");
+                            "&7Later player alive wins.");
                 }
                 case ONE_IN_THE_CHAMBER -> {
                     return List.of(
@@ -182,6 +190,12 @@ public abstract class Minigame extends Game {
                             "&7One shot, one kill.",
                             "&7First player that gets",
                             "&7to 15 kills wins.");
+                }
+                case TNT_TAG -> {
+                    return List.of(
+                            "&7If you are tagged when the",
+                            "&7timer runs out, you explode.",
+                            "&7Later player alive wins.");
                 }
             }
 
@@ -194,6 +208,7 @@ public abstract class Minigame extends Game {
 
         public int getMaxPlayers() {
             switch(this) {
+                case TNT_TAG -> { return 20; }
                 case ONE_IN_THE_CHAMBER -> { return 8; }
                 default -> { return 4; }
             }
@@ -209,6 +224,9 @@ public abstract class Minigame extends Game {
                 }
                 case ONE_IN_THE_CHAMBER -> {
                     return new OneInTheChamberMinigame(plugin, uuid);
+                }
+                case TNT_TAG -> {
+                    return new TNTTagMinigame(plugin, uuid);
                 }
             }
 
