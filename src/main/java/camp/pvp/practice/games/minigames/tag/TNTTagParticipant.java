@@ -1,4 +1,4 @@
-package camp.pvp.practice.games.minigames;
+package camp.pvp.practice.games.minigames.tag;
 
 import camp.pvp.practice.games.GameParticipant;
 import lombok.Getter;
