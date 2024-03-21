@@ -19,6 +19,7 @@ public class TNTTagKit extends BaseKit {
         setFallDamage(false);
         setEditable(false);
         setDropItemsOnDeath(false);
+        setDropItems(false);
         setHunger(false);
     }
 }

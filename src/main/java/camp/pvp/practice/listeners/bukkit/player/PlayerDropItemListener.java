@@ -4,6 +4,7 @@ import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -47,6 +48,12 @@ public class PlayerDropItemListener implements Listener {
                 return;
             }
 
+            if(!game.getKit().isDropItems()) {
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.RED + "You cannot drop items in this game.");
+                return;
+            }
+
             if(player.getInventory().getHeldItemSlot() == profile.getNoDropHotbarSlot() && !item.getItemStack().equals(profile.getLastClickedItem())) {
                 event.setCancelled(true);
                 player.sendMessage(ChatColor.RED + "You cannot drop the item in this slot.");
@@ -54,11 +61,7 @@ public class PlayerDropItemListener implements Listener {
 
             profile.setLastClickedItem(null);
 
-            new BukkitRunnable() {
-                public void run() {
-                    item.remove();
-                }
-            }.runTaskLater(plugin, 400L);
+            Bukkit.getScheduler().runTaskLater(plugin, item::remove, 400L);
         } else if (profile.getState().equals(GameProfile.State.KIT_EDITOR)) {
             Item item = event.getItemDrop();
             item.remove();

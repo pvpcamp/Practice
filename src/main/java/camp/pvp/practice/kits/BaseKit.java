@@ -32,7 +32,7 @@ public abstract class BaseKit {
     private boolean build, respawn, regen, ranked, tournament, editable, hunger, showHealthBar, takeDamage,
             placeTntBeforeStart, placeBlocksBeforeStart, moveOnStart, dieInWater, ffa, teams, issueCooldowns,
             dropItemsOnDeath, itemDurability, arrowOneShot, arrowPickup, fallDamage, cappedBlockHits, showArrowDamage,
-            applyLeatherTeamColor, bedwars, boxing, biggerExplosions;
+            applyLeatherTeamColor, bedwars, boxing, biggerExplosions, dropItems;
 
     protected BaseKit(GameKit gameKit) {
         this.items = new ItemStack[36];

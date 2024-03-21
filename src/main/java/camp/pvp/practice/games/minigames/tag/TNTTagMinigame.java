@@ -9,6 +9,7 @@ import camp.pvp.practice.games.minigames.Minigame;
 import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
+import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.PlayerUtils;
 import camp.pvp.practice.utils.TimeUtil;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -27,7 +29,7 @@ import java.util.*;
 public class TNTTagMinigame extends Minigame {
 
     @Getter @Setter private int round, timer;
-    private BukkitTask roundTimerTask;
+    private BukkitTask roundTimerTask, compassUpdaterTask;
 
     public TNTTagMinigame(Practice plugin, UUID uuid) {
         super(plugin, uuid);
@@ -57,7 +59,7 @@ public class TNTTagMinigame extends Minigame {
 
                 if(timer > -1) {
                     lines.add(" ");
-                    lines.add("&cExplosion in &f" + (timer + 1) + "s");
+                    lines.add("&cExplosion in " + (timer < 3 ? "&4&l" : "&f") + (timer + 1) + "s");
                     lines.add("&aGoal: &f" + (self.isTagged() ? "Tag someone!" : "Run away!"));
                 }
 
@@ -103,7 +105,7 @@ public class TNTTagMinigame extends Minigame {
 
                 if(timer > -1) {
                     lines.add(" ");
-                    lines.add("&cExplosion in &f" + (timer + 1) + "s");
+                    lines.add("&cExplosion in " + (timer < 3 ? "&4&l" : "&f") + (timer + 1) + "s");
                 }
 
                 lines.add(" ");
@@ -132,7 +134,7 @@ public class TNTTagMinigame extends Minigame {
 
         if(!getAlive().containsKey(victim.getUniqueId()) || !getAlive().containsKey(attacker.getUniqueId())) return;
 
-        if(timer == 0) return;
+        if(timer < 0) return;
 
         TNTTagParticipant victimParticipant = (TNTTagParticipant) getParticipants().get(victim.getUniqueId()),
                 attackerParticipant = (TNTTagParticipant) getParticipants().get(attacker.getUniqueId());
@@ -165,9 +167,14 @@ public class TNTTagMinigame extends Minigame {
         PotionEffect speedThree = new PotionEffect(PotionEffectType.SPEED, 999999, 2, true, false);
         victimPlayer.addPotionEffect(speedThree);
 
-        for(int i = 0; i < 9; i++) {
-            victimInventory.setItem(i, tnt);
-        }
+        victimInventory.setItem(0, new ItemStack(Material.TNT));
+
+        ItemStack compass = new ItemStack(Material.COMPASS);
+        ItemMeta compassMeta = compass.getItemMeta();
+        compassMeta.setDisplayName(Colors.get("&6Player Tracker"));
+        compass.setItemMeta(compassMeta);
+
+        victimInventory.setItem(1, compass);
 
         if(attacker != null) {
             attacker.setTagged(false);
@@ -226,6 +233,24 @@ public class TNTTagMinigame extends Minigame {
         Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
 
         startingTimer(5);
+
+        compassUpdaterTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
+            for(TNTTagParticipant participant : getTagged()) {
+                Player player = participant.getPlayer();
+                Location location = player.getLocation(), nearest = null;
+                for(GameParticipant p : getAlive().values()) {
+                    TNTTagParticipant target = (TNTTagParticipant) p;
+                    if(p.getUuid().equals(participant.getUuid()) || target.isTagged()) continue;
+
+                    Location l = p.getPlayer().getLocation();
+                    if(nearest == null || location.distance(l) < location.distance(nearest)) {
+                        nearest = l;
+                    }
+                }
+
+                if(nearest != null) player.setCompassTarget(nearest);
+            }
+        }, 0, 10);
     }
 
     @Override
@@ -310,6 +335,8 @@ public class TNTTagMinigame extends Minigame {
             }
         }
 
+        if(!getState().equals(State.ACTIVE)) return;
+
         if(tagged.size() > 1) {
             sb.append("&c have blown up!");
         } else {
@@ -325,6 +352,12 @@ public class TNTTagMinigame extends Minigame {
         );
 
         roundTimerTask = Bukkit.getScheduler().runTaskLater(getPlugin(), this::nextRound, 60L);
+    }
+
+    @Override
+    public void end() {
+        super.end();
+        compassUpdaterTask.cancel();
     }
 
     @Override
@@ -347,15 +380,22 @@ public class TNTTagMinigame extends Minigame {
         StringBuilder topPlayers = new StringBuilder();
         List<GameParticipant> sortedParticipants = new ArrayList<>(this.getParticipants().values());
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.SECOND, 1);
+        final Date now = calendar.getTime();
+
         sortedParticipants.forEach(p -> {
-            if(p.getAliveTime() == null) p.setAliveTime(new Date());
+            if(p.getAliveTime() == null) p.setAliveTime(now);
+            if(p.getDeathTime() == null) p.setDeathTime(now);
+
         });
 
-        sortedParticipants.sort((p1, p2) -> Integer.compare(p2.getKills(), p1.getKills()));
+        sortedParticipants.sort((p1, p2) -> p2.getDeathTime().compareTo(p1.getDeathTime()));
 
         for(int i = 0; i < Math.min(sortedParticipants.size(), 3); i++) {
             GameParticipant p = sortedParticipants.get(i);
-            String aliveTime = p.getDeathTime() == null ? "&6&lALIVE" : TimeUtil.get(p.getDeathTime(), p.getAliveTime());
+            String aliveTime = p.getDeathTime() == now ? "&6&lALIVE" : TimeUtil.get(p.getDeathTime(), p.getAliveTime());
             topPlayers.append("\n &7● &6" + (i + 1) + ": &f" + p.getName() + " &7" + aliveTime);
         }
 
