@@ -55,6 +55,7 @@ public abstract class BaseKit {
         this.itemDurability = true;
         this.arrowPickup = true;
         this.fallDamage = true;
+        this.dropItems = true;
         this.showArrowDamage = true;
     }
 

@@ -25,17 +25,14 @@ import java.util.List;
 
 public class SidebarAdapter implements AssembleAdapter {
 
-    private static String TITLE;
-    private static String LINE;
+    private final static String TITLE = Practice.getInstance().getConfig().getString("scoreboard.title");
+    private final static String LINE = "&7&m------------------";
 
     private Practice plugin;
     private GameManager gameManager;
     private GameProfileManager gameProfileManager;
     private GameQueueManager gameQueueManager;
     public SidebarAdapter(Practice plugin) {
-        TITLE = plugin.getConfig().getString("scoreboard.title");
-        LINE = "&7&m------------------";
-
         this.plugin = plugin;
         this.gameManager = plugin.getGameManager();
         this.gameProfileManager = plugin.getGameProfileManager();

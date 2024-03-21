@@ -1,6 +1,7 @@
 package camp.pvp.practice.profiles;
 
 import camp.pvp.core.Core;
+import camp.pvp.core.api.CoreAPI;
 import camp.pvp.practice.cosmetics.DeathAnimation;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.GameSpectator;
@@ -18,6 +19,7 @@ import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import camp.pvp.practice.queue.GameQueue;
+import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
@@ -278,8 +280,8 @@ public class GameProfile {
                 Location location;
                 State state = getState();
                 location = switch (state) {
-                    case LOBBY_QUEUE, LOBBY_PARTY, LOBBY_TOURNAMENT, LOBBY -> Practice.instance.getLobbyLocation();
-                    case KIT_EDITOR -> Practice.instance.getKitEditorLocation();
+                    case LOBBY_QUEUE, LOBBY_PARTY, LOBBY_TOURNAMENT, LOBBY -> Practice.getInstance().getLobbyLocation();
+                    case KIT_EDITOR -> Practice.getInstance().getKitEditorLocation();
                     case LOBBY_EVENT -> sumoEvent.getArena().getPositions().get("lobby").getLocation();
                     default -> null;
                 };

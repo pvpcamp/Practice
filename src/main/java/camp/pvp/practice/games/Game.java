@@ -638,6 +638,8 @@ public abstract class Game {
 
         if(item.getType().equals(Material.FIREBALL) && getArena().getType().isBuild()) {
 
+            event.setCancelled(true);
+
             PlayerCooldown cooldown = participant.getCooldowns().get(PlayerCooldown.Type.FIREBALL);
             if(cooldown != null && !cooldown.isExpired()) {
                 player.sendMessage(cooldown.getBlockedMessage());
@@ -658,8 +660,6 @@ public abstract class Game {
 
             cooldown = new PlayerCooldown(PlayerCooldown.Type.FIREBALL, participant, player);
             participant.getCooldowns().put(PlayerCooldown.Type.FIREBALL, cooldown);
-
-            event.setCancelled(true);
         }
     }
 

@@ -182,7 +182,7 @@ public abstract class Minigame extends Game {
                 case SKYWARS -> {
                     return List.of(
                             "&7FFA Skywars.",
-                            "&7Later player alive wins.");
+                            "&7Last player alive wins.");
                 }
                 case ONE_IN_THE_CHAMBER -> {
                     return List.of(
@@ -195,7 +195,7 @@ public abstract class Minigame extends Game {
                     return List.of(
                             "&7If you are tagged when the",
                             "&7timer runs out, you explode.",
-                            "&7Later player alive wins.");
+                            "&7Last player alive wins.");
                 }
             }
 
