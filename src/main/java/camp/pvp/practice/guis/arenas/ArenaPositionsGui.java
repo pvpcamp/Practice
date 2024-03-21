@@ -63,6 +63,10 @@ public class ArenaPositionsGui extends ArrangedGui {
                     location = player.getLocation();
                 }
 
+                if(arena.getWorldId() == null) {
+                    arena.setWorldId(location.getWorld().getUID());
+                }
+
                 arena.getPositions().put(position, new ArenaPosition(position, location));
                 player.sendMessage(Colors.get("&aPosition &f" + position + "&a for arena &f" + arena.getName() + "&a set to &f" + location.getX() + " " + location.getY() + " " + location.getZ() + "&a."));
 

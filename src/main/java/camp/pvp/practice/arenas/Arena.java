@@ -108,6 +108,7 @@ public class Arena implements Comparable<Arena>{
         setDisplayName(parent.getDisplayName());
         setBuildLimit(parent.getBuildLimit());
         setVoidLevel(parent.getVoidLevel());
+        setWorldId(parent.getWorldId());
 
         if(reset) {
             copyBlocks();
