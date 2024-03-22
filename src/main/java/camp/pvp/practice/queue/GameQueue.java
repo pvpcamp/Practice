@@ -171,7 +171,7 @@ public class GameQueue {
             case MINIGAME -> {
                 queueTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
 
-                    if(queueMembers.size() < minigameType.getMinPlayers()) {
+                    if(queueMembers.size() < minigameType.getMinQueuePlayers()) {
                         if(timeBeforeStart <= 30) {
                             announce("&cThere are not enough players to start the minigame, waiting for players.");
                             timeBeforeStart = Integer.MAX_VALUE;

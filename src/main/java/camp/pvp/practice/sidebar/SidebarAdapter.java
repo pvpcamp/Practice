@@ -124,7 +124,7 @@ public class SidebarAdapter implements AssembleAdapter {
                             if(queue.isCountdown()) {
                                 lines.add(" &7● &6Starting In: &f" + (queue.getTimeBeforeStart() + 1) + "s");
                             } else {
-                                int playersNeeded = queue.getMinigameType().getMinPlayers() - queue.getQueueMembers().size();
+                                int playersNeeded = queue.getMinigameType().getMinQueuePlayers() - queue.getQueueMembers().size();
                                 lines.add(" ");
                                 lines.add("&7Waiting for &f" + playersNeeded + "&7 more");
                                 lines.add("&7player" + (playersNeeded == 1 ? "" : "s") + " to start.");

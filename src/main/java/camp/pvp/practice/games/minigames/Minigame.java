@@ -202,6 +202,13 @@ public abstract class Minigame extends Game {
             return null;
         }
 
+        public int getMinQueuePlayers() {
+            switch(this) {
+                case TNT_TAG -> { return 4; }
+                default -> { return 2; }
+            }
+        }
+
         public int getMinPlayers() {
             return 2;
         }
