@@ -1,6 +1,5 @@
 package camp.pvp.practice.utils;
 
-import com.comphenix.protocol.ProtocolLibrary;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;

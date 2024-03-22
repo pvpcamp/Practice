@@ -5,6 +5,7 @@ import camp.pvp.practice.arenas.Arena;
 import camp.pvp.practice.games.impl.Duel;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.queue.GameQueue;
+import camp.pvp.practice.utils.ClickableMessageBuilder;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,21 +56,19 @@ public class DuelRequest {
 
                 senderPlayer.sendMessage(ChatColor.GREEN + "You sent a duel request to " + opponentPlayer.getName() + ".");
 
-                StringBuilder sb = new StringBuilder();
-                sb.append("\n&6&lNew Duel Request\n");
-                sb.append("\n &7● &6From: &f" + senderPlayer.getName());
-                sb.append("\n &7● &6Kit: &f" + kit.getDisplayName());
-                sb.append("\n &7● &6Arena: &f" + (arena == null ? "Random" : arena.getDisplayName()));
-                sb.append("\n");
-                opponentPlayer.sendMessage(Colors.get(sb.toString()));
-
-                TextComponent msg = new TextComponent(Colors.get("&6[Click to accept this duel]"));
-
-                msg.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/accept " + senderPlayer.getName()));
-                msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(Colors.get("&a/accept " + senderPlayer.getName())).create()));
-
-                opponentPlayer.spigot().sendMessage(msg);
-                opponentPlayer.sendMessage(" ");
+                ClickableMessageBuilder builder = new ClickableMessageBuilder();
+                builder.setLines(
+                        " ",
+                        "&6&lNew Duel Request",
+                        " &7● &6From: &f" + senderPlayer.getName(),
+                        " &7● &6Kit: &f" + kit.getDisplayName(),
+                        " &7● &6Arena: &f" + (arena == null ? "Random" : arena.getDisplayName()),
+                        "&6Click to accept.",
+                        " "
+                );
+                builder.setCommand("/accept " + senderPlayer.getName());
+                builder.setHoverMessage("&a/accept " + senderPlayer.getName());
+                builder.sendToPlayer(opponentPlayer);
 
                 opponentPlayer.playSound(opponentPlayer.getLocation(), Sound.LAVA_POP, 1, 1);
             } else {
@@ -85,14 +84,7 @@ public class DuelRequest {
         if(senderPlayer != null && opponentPlayer != null) {
             if(arena != null) {
                 if (arena.getType().isBuild()) {
-                    for (Arena a : Practice.getInstance().getArenaManager().getArenaCopies(arena)) {
-                        if (!a.isInUse() && a.isEnabled()) {
-                            arena = a;
-                            break;
-                        }
-                    }
-
-                    if(!arena.isCopy()) arena = null;
+                    arena = Practice.getInstance().getArenaManager().getAvailableCopy(arena);
                 }
             }
 

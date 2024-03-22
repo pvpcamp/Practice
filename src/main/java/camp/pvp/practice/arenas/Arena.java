@@ -1,6 +1,18 @@
 package camp.pvp.practice.arenas;
 
 import camp.pvp.practice.Practice;
+import camp.pvp.practice.utils.BukkitReflection;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.LocalWorld;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitUtil;
+import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
+import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.internal.LocalWorldAdapter;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.world.World;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.WordUtils;
@@ -8,12 +20,10 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
+import org.bukkit.scheduler.BukkitTask;
 import xyz.refinedev.spigot.api.chunk.ChunkAPI;
 import xyz.refinedev.spigot.api.chunk.ChunkSnapshot;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -217,40 +227,18 @@ public class Arena implements Comparable<Arena>{
         maxX = Math.max(c1.getBlockX(), c2.getBlockX());
         maxZ = Math.max(c1.getBlockZ(), c2.getBlockZ());
 
-        int chunkMinX = Integer.MAX_VALUE, chunkMinZ = Integer.MAX_VALUE, chunkMaxX = Integer.MIN_VALUE, chunkMaxZ = Integer.MIN_VALUE;
+        int lowChunkX = minX >> 4;
+        int lowChunkZ = minZ >> 4;
+        int highChunkX = maxX >> 4;
+        int highChunkZ = maxZ >> 4;
 
-        for (int x = minX; x < maxX; x++) {
-            for (int z = minZ; z < maxZ; z++) {
-                Location location = new Location(c1.getWorld(), x, 0, z);
-                Chunk chunk = location.getChunk();
+        lowChunkX--;
+        lowChunkZ--;
+        highChunkX++;
+        highChunkZ++;
 
-                int chunkX = chunk.getX(), chunkZ = chunk.getZ();
-
-                if(chunkX < chunkMinX) {
-                    chunkMinX = chunkX;
-                }
-
-                if(chunkX > chunkMaxX) {
-                    chunkMaxX = chunkX;
-                }
-
-                if(chunkZ < chunkMinZ) {
-                    chunkMinZ = chunkZ;
-                }
-
-                if(chunkZ > chunkMaxZ) {
-                    chunkMaxZ = chunkZ;
-                }
-            }
-        }
-
-        chunkMinX -= 1;
-        chunkMinZ -= 1;
-        chunkMaxX += 1;
-        chunkMaxZ += 1;
-
-        for(int x = chunkMinX; x <= chunkMaxX; x++) {
-            for(int z = chunkMinZ; z <= chunkMaxZ; z++) {
+        for (int x = lowChunkX; x < highChunkX; x++) {
+            for (int z = lowChunkZ; z < highChunkZ; z++) {
                 storedChunks.add(new StoredChunk(x, z, worldId));
             }
         }
@@ -285,8 +273,6 @@ public class Arena implements Comparable<Arena>{
 
         Logger logger = Practice.getInstance().getLogger();
 
-        logger.info("[Arena#copyBlocks] Starting arena copy process for arena " + getName() + ".");
-
         int minX, minY, minZ, maxX, maxY, maxZ;
         Location c1 = getPositions().get("corner1").getLocation(), c2 = getPositions().get("corner2").getLocation();
         minX = Math.min(c1.getBlockX(), c2.getBlockX());
@@ -296,84 +282,38 @@ public class Arena implements Comparable<Arena>{
         maxY = Math.max(c1.getBlockY(), c2.getBlockY());
         maxZ = Math.max(c1.getBlockZ(), c2.getBlockZ());
 
-        List<Location> solidBlocks = new ArrayList<>(), airBlocks = new ArrayList<>();
-        List<StoredChunk> newStoredChunks = new ArrayList<>();
+        logger.info("[Arena#copyBlocks] Copying blocks with WorldEdit for " + getName() + ".");
 
-        for (int x = minX; x < maxX; x++) {
-            for (int y = minY; y < maxY; y++) {
-                for (int z = minZ; z < maxZ; z++) {
-                    Location location = new Location(c1.getWorld(), x, y, z);
-                    Block block = location.getBlock();
+        com.sk89q.worldedit.Vector min = new com.sk89q.worldedit.Vector(minX - xDifference, minY, minZ - zDifference);
+        com.sk89q.worldedit.Vector max = new com.sk89q.worldedit.Vector(maxX - xDifference, maxY, maxZ - xDifference);
+        com.sk89q.worldedit.Vector origin = new com.sk89q.worldedit.Vector(minX, minY, minZ);
 
-                    if (block.isEmpty()) {
-                        airBlocks.add(location);
-                    } else {
-                        solidBlocks.add(location);
-                    }
+        CuboidRegion region = new CuboidRegion(min, max);
+        LocalWorld world = BukkitUtil.getLocalWorld(c1.getWorld());
+        region.setWorld(world);
 
-                    Chunk chunk = block.getChunk();
-                    StoredChunk storedChunk = new StoredChunk(chunk.getX(), chunk.getZ(), worldId);
-                    if(!newStoredChunks.contains(storedChunk)) {
-                        newStoredChunks.add(storedChunk);
-                    }
-                }
-            }
+        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
+        ForwardExtentCopy forwardExtentCopy = new ForwardExtentCopy(world, region, min, editSession, origin);
+        try {
+            Operations.complete(forwardExtentCopy);
+        } catch (WorldEditException e) {
+            throw new RuntimeException(e);
         }
 
-        logger.info("[Arena#copyBlocks] Captured " + (solidBlocks.size() + airBlocks.size()) + " blocks and " + newStoredChunks.size() + " chunks for " + getName() + ", starting iteration.");
+        logger.info("[Arena#copyBlocks] Copying solid block locations for " + getName() + ".");
 
         List<Location> newSolidBlocks = new ArrayList<>();
-        int changedBlocks = 0;
 
-        for(Location location : solidBlocks) {
-            Block block = location.getBlock();
-            Location parentLocation = location.clone().subtract(xDifference, 0, zDifference);
-            Block parentBlock = parentLocation.getBlock();
-
-            if(parentBlock.isEmpty()) {
-                block.setType(Material.AIR);
-
-                changedBlocks++;
-            } else {
-                newSolidBlocks.add(location);
-                if(!parentBlock.getType().equals(block.getType())) {
-                    block.setType(parentBlock.getType());
-
-                    BlockState parentState = parentBlock.getState();
-                    BlockState newState = block.getState();
-                    newState.setType(parentState.getType());
-                    newState.setData(parentState.getData());
-                    newState.update();
-
-                    changedBlocks++;
-                }
-            }
+        for(Location location : getParent().getSolidBlocks()) {
+            Location newLocation = location.clone().add(xDifference, 0, zDifference);
+            newSolidBlocks.add(newLocation);
         }
-
-        for(Location location : airBlocks) {
-            Block block = location.getBlock();
-            Location parentLocation = location.clone().subtract(xDifference, 0, zDifference);
-            Block parentBlock = parentLocation.getBlock();
-
-            if(!parentBlock.isEmpty()) {
-                newSolidBlocks.add(location);
-                block.setType(parentBlock.getType());
-
-                BlockState parentState = parentBlock.getState();
-                BlockState newState = block.getState();
-                newState.setType(parentState.getType());
-                newState.setData(parentState.getData());
-                newState.update();
-
-                changedBlocks++;
-            }
-        }
-
-        logger.info("[Arena#copyBlocks] Finished copying " + changedBlocks + " blocks for " + getName() + ".");
 
         setSolidBlocks(newSolidBlocks);
-        setStoredChunks(newStoredChunks);
 
+        logger.info("[Arena#copyBlocks] Refreshing chunk information and snapshots for " + getName() + ".");
+
+        generateStoredChunks();
         refreshChunkSnapshots();
 
         setInUse(false);

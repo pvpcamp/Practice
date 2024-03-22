@@ -86,7 +86,9 @@ public class ArenaInfoGui extends ArrangedGui {
                         " ",
                         "&aLeft Click to view copies.",
                         "&eMiddle Click to run arena scanner.",
-                        "&cRight Click to update copies.");
+                        "&cRight Click to update copies.",
+                        "",
+                        "&4Updating copies will lag the server!");
                 button.setType(Material.BOOKSHELF);
             }
         });

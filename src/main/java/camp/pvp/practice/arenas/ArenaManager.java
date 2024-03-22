@@ -273,6 +273,16 @@ public class ArenaManager {
         return arenas;
     }
 
+    public Arena getAvailableCopy(Arena arena) {
+        for(Arena a : getArenaCopies(arena)) {
+            if(!a.isInUse() && a.isEnabled()) {
+                return a;
+            }
+        }
+
+        return null;
+    }
+
     public void updateArenaCopies(Arena arena, boolean reset) {
         for(Arena a : getArenaCopies(arena)) {
             a.updateCopy(arena, reset);

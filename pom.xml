@@ -109,6 +109,20 @@
             <version>1.1</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>enginehub</groupId>
+            <artifactId>WorldEdit</artifactId>
+            <version>6.1.7.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/worldedit-bukkit-6.1.7.2.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>fawe</groupId>
+            <artifactId>FastAsyncWorldEdit</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/FastAsyncWorldEdit.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>

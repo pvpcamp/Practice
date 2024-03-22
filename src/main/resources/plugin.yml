@@ -8,6 +8,8 @@ depend:
   - ProtocolLib
   - Apollo-Bukkit
   - Core
+  - WorldEdit
+  - FastAsyncWorldEdit
 
 commands:
   accept:
