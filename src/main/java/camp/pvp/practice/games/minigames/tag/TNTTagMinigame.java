@@ -250,7 +250,7 @@ public class TNTTagMinigame extends Minigame {
 
                 if(nearest != null) player.setCompassTarget(nearest);
             }
-        }, 0, 10);
+        }, 0, 5);
     }
 
     @Override
@@ -287,17 +287,25 @@ public class TNTTagMinigame extends Minigame {
             player.addPotionEffect(speedTwo);
         }
 
-        for(TNTTagParticipant participant : selectRandomAlive()) {
+        StringBuilder sb = new StringBuilder();
+        List<TNTTagParticipant> random = selectRandomAlive();
+        for(TNTTagParticipant participant : random) {
             tag(participant);
+
+            sb.append("&f").append(participant.getName());
+
+            if(random.indexOf(participant) != random.size() - 1) {
+                sb.append("&7, ");
+            }
         }
 
         announce("""
                 
                 &6&lRound %s
                  &7● &6Time: &f%ss
-                 &7● &6Tagged: &f%s
+                 &7● &6Tagged: %s
                  \n
-                """.formatted(round, timer, getTagged().size()));
+                """.formatted(round, timer, sb));
 
         playSound(null, Sound.FIREWORK_LAUNCH, 1.0F, 1.0F);
 
@@ -357,6 +365,7 @@ public class TNTTagMinigame extends Minigame {
     @Override
     public void end() {
         super.end();
+        if(roundTimerTask != null) roundTimerTask.cancel();
         compassUpdaterTask.cancel();
     }
 

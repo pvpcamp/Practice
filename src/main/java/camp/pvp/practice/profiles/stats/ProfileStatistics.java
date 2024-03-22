@@ -5,20 +5,20 @@ import camp.pvp.practice.queue.GameQueue;
 import lombok.Data;
 import org.bson.Document;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 public class ProfileStatistics {
 
     private final UUID uuid;
+    private String name;
     private Map<GameKit, ProfileIndividualStatistics> unranked;
     private Map<GameKit, ProfileIndividualStatistics> ranked;
     private ProfileIndividualStatistics global;
 
-    public ProfileStatistics(UUID uuid) {
+    public ProfileStatistics(UUID uuid, String name) {
         this.uuid = uuid;
+        this.name = name;
         this.unranked = new HashMap<>();
         this.ranked = new HashMap<>();
         this.global = new ProfileIndividualStatistics();
@@ -84,6 +84,44 @@ public class ProfileStatistics {
         global.resetWinStreak();
     }
 
+    public int getElo(GameKit kit) {
+        return ranked.get(kit).getElo();
+    }
+
+    public int addElo(GameKit kit, int difference) {
+        int elo = ranked.get(kit).getElo();
+        int newElo = elo + difference;
+        ranked.get(kit).setElo(newElo);
+        return newElo;
+    }
+
+    public int subtractElo(GameKit kit, int difference) {
+        int elo = ranked.get(kit).getElo();
+        int newElo = elo - difference;
+        ranked.get(kit).setElo(newElo);
+        return newElo;
+    }
+
+    public void resetRankedElo() {
+        for(ProfileIndividualStatistics stats : ranked.values()) {
+            stats.setElo(1000);
+        }
+    }
+
+    public int getGlobalElo() {
+        List<Integer> elos = new ArrayList<>();
+        for(ProfileIndividualStatistics stats : ranked.values()) {
+            elos.add(stats.getElo());
+        }
+
+        double total = 0;
+        for(int elo : elos) {
+            total += elo;
+        }
+
+        return (int) Math.round(total / elos.size());
+    }
+
     public void importFromDocument(Document doc) {
         for (GameKit kit : GameKit.values()) {
             if (doc.containsKey("unranked_" + kit.name())) {
@@ -104,6 +142,7 @@ public class ProfileStatistics {
         ProfileIndividualStatistics global = new ProfileIndividualStatistics();
         global.importFromMap((Map<String, Object>) doc.get("global"));
         this.global = global;
+        this.name = doc.get("name", "Unknown");
     }
 
     public Map<String, Object> export() {
@@ -117,6 +156,7 @@ public class ProfileStatistics {
         }
 
         map.put("global", global.export());
+        map.put("name", name);
         return map;
     }
 }

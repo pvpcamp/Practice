@@ -3,7 +3,6 @@ package camp.pvp.practice.profiles;
 import camp.pvp.practice.Practice;
 import camp.pvp.mongo.MongoManager;
 import camp.pvp.practice.profiles.stats.MatchRecord;
-import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.profiles.leaderboard.LeaderboardUpdater;
 import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import com.mongodb.client.MongoCollection;
@@ -30,7 +29,7 @@ public class GameProfileManager {
     private @Getter Map<UUID, MatchRecord> matchRecords;
 
     private @Getter MongoManager mongoManager;
-    private @Getter String profilesCollectionName, eloCollectionName, statisticsCollectionName, matchRecordsCollectionName;
+    private @Getter String profilesCollectionName, statisticsCollectionName, matchRecordsCollectionName;
 
     private BukkitTask leaderboardUpdaterTask, playerVisibilityUpdaterTask;
     private @Getter LeaderboardUpdater leaderboardUpdater;
@@ -46,7 +45,6 @@ public class GameProfileManager {
 
         this.mongoManager = new MongoManager(plugin, config.getString("networking.mongo.uri"), config.getString("networking.mongo.database"));
         this.profilesCollectionName = config.getString("networking.mongo.profiles_collection");
-        this.eloCollectionName = config.getString("networking.mongo.elo_collection");
         this.statisticsCollectionName = config.getString("networking.mongo.statistics_collection");
         this.matchRecordsCollectionName = config.getString("networking.mongo.match_records_collection");
 
@@ -73,36 +71,16 @@ public class GameProfileManager {
                 GameProfile p = new GameProfile(doc.get("_id", UUID.class));
                 p.importFromDocument(doc);
 
-                MongoCollection<Document> eloCollection = getEloCollection();
-                eloCollection.find(Filters.eq("_id", p.getUuid())).forEach(document -> {
-                    ProfileELO profileELO = new ProfileELO(document.get("_id", UUID.class));
-                    profileELO.importFromDocument(document);
-                    p.setProfileElo(profileELO);
-                });
-
-                if(p.getProfileElo() == null) {
-                    ProfileELO profileELO = new ProfileELO(p.getUuid());
-                    profileELO.setName(p.getName());
-                    p.setProfileElo(profileELO);
-
-                    Document document = eloCollection.find(new Document("_id", profileELO.getUuid())).first();
-                    if(document == null) {
-                        eloCollection.insertOne(new Document("_id", profileELO.getUuid()));
-                    }
-
-                    profileELO.export().forEach((key, value) -> eloCollection.updateOne(Filters.eq("_id", profileELO.getUuid()), Updates.set(key, value)));
-                }
-
                 MongoCollection<Document> statisticsCollection = getStatisticsCollection();
 
                 statisticsCollection.find(Filters.eq("_id", p.getUuid())).forEach(document -> {
-                    ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class));
+                    ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class), document.get("name", p.getName()));
                     profileStatistics.importFromDocument(document);
                     p.setProfileStatistics(profileStatistics);
                 });
 
                 if(p.getProfileStatistics() == null) {
-                    ProfileStatistics profileStatistics = new ProfileStatistics(p.getUuid());
+                    ProfileStatistics profileStatistics = new ProfileStatistics(p.getUuid(), p.getName());
                     p.setProfileStatistics(profileStatistics);
 
                     Document document = statisticsCollection.find(new Document("_id", profileStatistics.getUuid())).first();
@@ -112,14 +90,6 @@ public class GameProfileManager {
 
                     profileStatistics.export().forEach((key, value) -> statisticsCollection.updateOne(Filters.eq("_id", profileStatistics.getUuid()), Updates.set(key, value)));
                 }
-
-                MongoCollection<Document> matchRecordsCollection = getMatchRecordsCollection();
-
-                matchRecordsCollection.find(Filters.or(Filters.eq("winner", p.getUuid()), Filters.eq("loser", p.getUuid()))).forEach(document -> {
-                    MatchRecord record = new MatchRecord(document.get("_id", UUID.class));
-                    record.importFromDocument(document);
-                    matchRecords.put(record.getUuid(), record);
-                });
 
                 p.setLastLoadFromDatabase(System.currentTimeMillis());
 
@@ -148,35 +118,15 @@ public class GameProfileManager {
                 GameProfile p = new GameProfile(uuid);
                 p.importFromDocument(doc);
 
-                MongoCollection<Document> eloCollection = getEloCollection();
-                eloCollection.find(Filters.eq("_id", p.getUuid())).forEach(document -> {
-                    ProfileELO profileELO = new ProfileELO(document.get("_id", UUID.class));
-                    profileELO.importFromDocument(document);
-                    p.setProfileElo(profileELO);
-                });
-
-                if(p.getProfileElo() == null) {
-                    ProfileELO profileELO = new ProfileELO(p.getUuid());
-                    profileELO.setName(p.getName());
-                    p.setProfileElo(profileELO);
-
-                    Document document = eloCollection.find(new Document("_id", profileELO.getUuid())).first();
-                    if(document == null) {
-                        eloCollection.insertOne(new Document("_id", profileELO.getUuid()));
-                    }
-
-                    profileELO.export().forEach((key, value) -> eloCollection.updateOne(Filters.eq("_id", profileELO.getUuid()), Updates.set(key, value)));
-                }
-
                 MongoCollection<Document> statisticsCollection = getStatisticsCollection();
                 statisticsCollection.find(Filters.eq("_id", p.getUuid())).forEach(document -> {
-                    ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class));
+                    ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class), document.get("name", p.getName()));
                     profileStatistics.importFromDocument(document);
                     p.setProfileStatistics(profileStatistics);
                 });
 
                 if(p.getProfileStatistics() == null) {
-                    ProfileStatistics profileStatistics = new ProfileStatistics(p.getUuid());
+                    ProfileStatistics profileStatistics = new ProfileStatistics(p.getUuid(), p.getName());
                     p.setProfileStatistics(profileStatistics);
 
                     Document document = statisticsCollection.find(new Document("_id", profileStatistics.getUuid())).first();
@@ -271,31 +221,16 @@ public class GameProfileManager {
 
         final GameProfile fProfile = profile;
 
-        MongoCollection<Document> eloCollection = getEloCollection();
-        eloCollection.find(Filters.eq("_id", uuid)).forEach(document -> {
-            ProfileELO profileELO = new ProfileELO(document.get("_id", UUID.class));
-            profileELO.importFromDocument(document);
-            fProfile.setProfileElo(profileELO);
-        });
-
         fProfile.setLastLoadFromDatabase(System.currentTimeMillis());
 
-        if(fProfile.getProfileElo() == null) {
-            ProfileELO profileELO = new ProfileELO(uuid);
-            profileELO.setName(name);
-            fProfile.setProfileElo(profileELO);
-
-            exportElo(profileELO);
-        }
-
         getStatisticsCollection().find(Filters.eq("_id", uuid)).forEach(document -> {
-            ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class));
+            ProfileStatistics profileStatistics = new ProfileStatistics(document.get("_id", UUID.class), name);
             profileStatistics.importFromDocument(document);
             fProfile.setProfileStatistics(profileStatistics);
         });
 
         if(fProfile.getProfileStatistics() == null) {
-            ProfileStatistics profileStatistics = new ProfileStatistics(uuid);
+            ProfileStatistics profileStatistics = new ProfileStatistics(uuid, name);
             fProfile.setProfileStatistics(profileStatistics);
 
             exportStatistics(profileStatistics, true);
@@ -329,18 +264,6 @@ public class GameProfileManager {
         } else {
             profile.export().forEach((key, value) -> getProfilesCollection().updateOne(Filters.eq("_id", uuid), Updates.set(key, value)));
         }
-    }
-
-    public void exportElo(ProfileELO elo) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            MongoCollection<Document> eloCollection = getEloCollection();
-            Document doc = eloCollection.find().filter(Filters.eq("_id", elo.getUuid())).first();
-            if(doc == null) {
-                eloCollection.insertOne(new Document("_id", elo.getUuid()));
-            }
-
-            elo.export().forEach((key, value) -> eloCollection.updateOne(Filters.eq("_id", elo.getUuid()), Updates.set(key, value)));
-        });
     }
 
     public void exportStatistics(ProfileStatistics statistics, boolean async) {
@@ -382,10 +305,6 @@ public class GameProfileManager {
 
     public MongoCollection<Document> getProfilesCollection() {
         return mongoManager.getDatabase().getCollection(profilesCollectionName);
-    }
-
-    public MongoCollection<Document> getEloCollection() {
-        return mongoManager.getDatabase().getCollection(eloCollectionName);
     }
 
     public MongoCollection<Document> getStatisticsCollection() {

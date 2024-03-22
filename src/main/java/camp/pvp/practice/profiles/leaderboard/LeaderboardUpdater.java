@@ -5,6 +5,7 @@ import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.queue.GameQueue;
+import com.mongodb.client.MongoCollection;
 import lombok.Getter;
 import org.bson.Document;
 import org.bukkit.Bukkit;
@@ -29,6 +30,8 @@ public class LeaderboardUpdater implements Runnable{
 
         long start = System.currentTimeMillis();
 
+        MongoCollection<Document> collection = Practice.getInstance().getGameProfileManager().getStatisticsCollection();
+
         for(GameKit kit : GameKit.values()) {
             BaseKit baseKit = kit.getBaseKit();
             if(baseKit.getGameTypes().contains(GameQueue.GameType.DUEL) && baseKit.isRanked()) {
@@ -36,17 +39,16 @@ public class LeaderboardUpdater implements Runnable{
 
                 leaderboard.put(kit, entries);
 
-                gpm.getEloCollection().find().sort(new Document("kit_" + kit.name(), -1)).limit(10).forEach(
+                collection.find().sort(new Document("ranked_" + kit.name() + ".elo", -1)).limit(10).forEach(
                         document ->  {
-                            if(document.containsKey("kit_" + kit.name())) {
-                                String name = document.getString("name");
-                                int elo = document.getInteger("kit_" + kit.name());
-                                entries.add(new LeaderboardEntry(name, elo));
-                            }
+                            String name = document.getString("name");
+                            Document desc = (Document) document.get("ranked_" + kit.name());
+                            int elo = desc.getInteger("elo");
+                            entries.add(new LeaderboardEntry(name, elo));
                         }
                 );
 
-                Collections.sort(entries);
+//                Collections.sort(entries);
             }
         }
 

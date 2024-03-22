@@ -3,7 +3,7 @@ package camp.pvp.practice.commands;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.profiles.stats.ProfileELO;
+import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import camp.pvp.practice.utils.Colors;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -66,9 +66,9 @@ public class EloManagerCommand implements CommandExecutor {
                 return;
             }
 
-            ProfileELO profileELO = profile.getProfileElo();
-            profileELO.resetRatings();
-            plugin.getGameProfileManager().exportElo(profileELO);
+            ProfileStatistics statistics = profile.getProfileStatistics();
+            statistics.resetRankedElo();
+            plugin.getGameProfileManager().exportStatistics(statistics, true);
             sender.sendMessage(ChatColor.GREEN + "ELO for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + " has been reset.");
         });
     }
@@ -93,10 +93,9 @@ public class EloManagerCommand implements CommandExecutor {
                 return;
             }
 
-            ProfileELO profileELO = profile.getProfileElo();
-
-            profileELO.setElo(gameKit, elo);
-            plugin.getGameProfileManager().exportElo(profileELO);
+            ProfileStatistics statistics = profile.getProfileStatistics();
+            statistics.getRanked().get(gameKit).setElo(elo);
+            plugin.getGameProfileManager().exportStatistics(statistics, true);
             sender.sendMessage(ChatColor.GREEN + "ELO for player " + ChatColor.WHITE + profile.getName() + ChatColor.GREEN + " for kit " + ChatColor.WHITE + gameKit.getDisplayName() + ChatColor.GREEN + " has been set to " + elo + ".");
         });
     }

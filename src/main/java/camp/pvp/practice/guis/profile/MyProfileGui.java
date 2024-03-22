@@ -27,7 +27,7 @@ public class MyProfileGui extends StandardGui {
         statistics.setCloseOnClick(true);
         statistics.setLore("&7Click to view your statistics.");
         statistics.setAction((player, button, gui, click) -> {
-            new StatisticsGui(player, profile.getProfileElo(), profile.getProfileStatistics()).open(player);
+            new StatisticsGui(player, profile.getProfileStatistics()).open(player);
         });
         addButton(statistics);
 

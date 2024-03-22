@@ -14,6 +14,7 @@ public class ProfileIndividualStatistics {
     private int wins;
     private int winStreak;
     private int bestWinStreak;
+    private int elo = 1000;
 
     public void incrementKills() {
         kills++;
@@ -36,11 +37,12 @@ public class ProfileIndividualStatistics {
     }
 
     public void importFromMap(Map<String, Object> map) {
-        kills = (int) map.get("kills");
-        deaths = (int) map.get("deaths");
-        wins = (int) map.get("wins");
-        winStreak = (int) map.get("win_streak");
-        bestWinStreak = (int) map.get("best_win_streak");
+        kills = (int) map.getOrDefault("kills", 0);
+        deaths = (int) map.getOrDefault("deaths", 0);
+        wins = (int) map.getOrDefault("wins", 0);
+        winStreak = (int) map.getOrDefault("win_streak", 0);
+        bestWinStreak = (int) map.getOrDefault("best_win_streak", 0);
+        elo = (int) map.getOrDefault("elo", 1000);
     }
 
     public Map<String, Object> export() {
@@ -50,6 +52,7 @@ public class ProfileIndividualStatistics {
         map.put("wins", wins);
         map.put("win_streak", winStreak);
         map.put("best_win_streak", bestWinStreak);
+        map.put("elo", elo);
         return map;
     }
 }

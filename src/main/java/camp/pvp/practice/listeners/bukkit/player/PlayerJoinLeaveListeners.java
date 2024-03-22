@@ -56,7 +56,7 @@ public class PlayerJoinLeaveListeners implements Listener {
         }
 
         profile.setName(player.getName());
-        profile.getProfileElo().setName(player.getName());
+        profile.getProfileStatistics().setName(player.getName());
 
         profile.playerUpdate(true);
 

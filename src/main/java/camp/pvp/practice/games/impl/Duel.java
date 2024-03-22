@@ -11,7 +11,7 @@ import camp.pvp.practice.Practice;
 import camp.pvp.practice.arenas.ArenaPosition;
 import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.profiles.stats.MatchRecord;
-import camp.pvp.practice.profiles.stats.ProfileELO;
+import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.EloCalculator;
@@ -25,7 +25,6 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 import java.util.*;
 
@@ -206,29 +205,29 @@ public class Duel extends Game {
 
         GameKit kit = getKit().getGameKit();
 
-        if(queueType.equals(GameQueue.Type.RANKED)) {
-            ProfileELO winnerEloProfile, loserEloProfile;
-            winnerEloProfile = winnerProfile.getProfileElo();
-            loserEloProfile = loserProfile.getProfileElo();
+        ProfileStatistics winnerStatistics = winnerProfile.getProfileStatistics();
+        ProfileStatistics loserStatistics = loserProfile.getProfileStatistics();
 
-            winnerElo = winnerEloProfile.getRatings().get(kit);
-            loserElo = loserEloProfile.getRatings().get(kit);
+        if(queueType.equals(GameQueue.Type.RANKED)) {
+
+            winnerElo = winnerStatistics.getElo(kit);
+            loserElo = loserStatistics.getElo(kit);
             difference = EloCalculator.getEloDifference(winnerElo, loserElo);
 
             stringBuilder.append(Colors.get("\n &7● &aWinner: &f" + winnerParticipant.getName() + " &7- &a" + (winnerElo + difference) + " +" + difference));
             stringBuilder.append(Colors.get("\n &7● &cLoser: &f" + loserParticipant.getName()+ " &7- &c" + (loserElo - difference) + " -" + difference));
 
-            winnerEloProfile.addElo(kit, difference);
-            loserEloProfile.subtractElo(kit, difference);
-
-            gpm.exportElo(winnerEloProfile);
-            gpm.exportElo(loserEloProfile);
+            winnerStatistics.addElo(kit, difference);
+            loserStatistics.subtractElo(kit, difference);
         } else {
             stringBuilder.append(Colors.get("\n &7● &6Winner: &f" + winnerParticipant.getName()));
         }
 
-        winnerProfile.getProfileStatistics().incrementWins(kit, queueType);
-        loserProfile.getProfileStatistics().resetWinStreak(kit, queueType);
+        winnerStatistics.incrementWins(kit, queueType);
+        loserStatistics.resetWinStreak(kit, queueType);
+
+        getPlugin().getGameProfileManager().exportStatistics(winnerStatistics, true);
+        getPlugin().getGameProfileManager().exportStatistics(loserStatistics, true);
 
         // Export match record.
         MatchRecord record = new MatchRecord(this, winnerParticipant, loserParticipant, difference, winnerElo, loserElo);
@@ -251,7 +250,8 @@ public class Duel extends Game {
 
         GameParticipant participant = getParticipants().get(player.getUniqueId());
         GameProfile profile = getPlugin().getGameProfileManager().getLoadedProfile(player.getUniqueId());
-        profile.getProfileStatistics().incrementDeaths(getKit().getGameKit(), queueType);
+        ProfileStatistics statistics = profile.getProfileStatistics();
+        statistics.incrementDeaths(getKit().getGameKit(), queueType);
 
         GameProfile attackerProfile = getPlugin().getGameProfileManager().getLoadedProfile(participant.getAttacker());
         if (attackerProfile != null) {

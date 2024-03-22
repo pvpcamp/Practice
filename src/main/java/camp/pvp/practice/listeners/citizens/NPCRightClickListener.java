@@ -47,7 +47,7 @@ public class NPCRightClickListener implements Listener {
                         new LeaderboardsGui().open(player);
                         break;
                     case STATISTICS:
-                        new StatisticsGui(player, profile.getProfileElo(), profile.getProfileStatistics()).open(player);
+                        new StatisticsGui(player, profile.getProfileStatistics()).open(player);
                         break;
                     default:
                         player.sendMessage(ChatColor.GREEN + "Coming soon!");

@@ -126,7 +126,7 @@ public class DuelQueueGui extends ArrangedGui {
                     lines.add(" ");
 
                     if (queueType.equals(GameQueue.Type.RANKED)) {
-                        lines.add("&6Your ELO: &f" + profile.getProfileElo().getRatings().get(kit));
+                        lines.add("&6Your ELO: &f" + profile.getProfileStatistics().getElo(kit));
                         lines.add(" ");
                         List<LeaderboardEntry> leaderboardEntries = Practice.getInstance().getGameProfileManager().getLeaderboardUpdater().getLeaderboard().get(kit);
                         for(int i = 0; i < 3; i++) {

@@ -57,7 +57,7 @@ public class SumoEventDuel extends Duel {
 
         Bukkit.getScheduler().runTaskLater(getPlugin(), new TeleportFix(this), 1);
 
-        startingTimer(5);
+        startingTimer(3);
     }
 
     @Override

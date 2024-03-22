@@ -6,6 +6,8 @@ import camp.pvp.core.profiles.CoreProfile;
 import camp.pvp.core.ranks.Rank;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.impl.teams.TeamGame;
+import camp.pvp.practice.games.minigames.tag.TNTTagMinigame;
+import camp.pvp.practice.games.minigames.tag.TNTTagParticipant;
 import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.utils.Colors;
@@ -39,6 +41,7 @@ public class NameColorRunnable implements Runnable{
             Team taggedBlueTeam = scoreboard.getTeam("blue_tagged");
             Team taggedRedTeam = scoreboard.getTeam("red_tagged");
             Team spectatorTeam = scoreboard.getTeam("spectators");
+            Team itTeam = scoreboard.getTeam("it");
 
             boolean showHealth = false;
             if(profile.getGame() != null) {
@@ -92,8 +95,13 @@ public class NameColorRunnable implements Runnable{
                 spectatorTeam.setCanSeeFriendlyInvisibles(true);
             }
 
+            if (itTeam == null) {
+                itTeam = scoreboard.registerNewTeam("it");
+                itTeam.setPrefix(Colors.get("&c&l[IT] "));
+            }
+
             Map<Rank, Team> rankTeams = new HashMap<>();
-            List<Team> allTeams = new ArrayList<>(Arrays.asList(blueTeam, redTeam, taggedBlueTeam, taggedRedTeam, spectatorTeam));
+            List<Team> allTeams = new ArrayList<>(Arrays.asList(blueTeam, redTeam, taggedBlueTeam, taggedRedTeam, spectatorTeam, itTeam));
             Map<Team, List<String>> newEntries = new HashMap<>();
 
             for (Rank rank : Core.getInstance().getRankManager().getRanks().values()) {
@@ -116,7 +124,8 @@ public class NameColorRunnable implements Runnable{
             switch(profile.getState()) {
                 case SPECTATING:
                 case IN_GAME:
-                    if (profile.getGame() instanceof TeamGame) {
+                    final Game game = profile.getGame();
+                    if (game instanceof TeamGame) {
                         TeamGame teamGame = (TeamGame) profile.getGame();
                         for (GameParticipant p : teamGame.getBlue().getAliveParticipants().values()) {
                             if(p.isArcherTagged()) {
@@ -132,6 +141,12 @@ public class NameColorRunnable implements Runnable{
                             } else {
                                 newEntries.get(redTeam).add(p.getName());
                             }
+                        }
+                    }
+
+                    if(game instanceof TNTTagMinigame minigame) {
+                        for (TNTTagParticipant p : minigame.getTagged()) {
+                            newEntries.get(itTeam).add(p.getName());
                         }
                     }
 

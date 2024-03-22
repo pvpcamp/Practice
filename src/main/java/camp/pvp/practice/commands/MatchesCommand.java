@@ -5,7 +5,7 @@ import camp.pvp.practice.guis.profile.MyProfileGui;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.stats.MatchRecord;
-import camp.pvp.practice.profiles.stats.ProfileELO;
+import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.utils.Colors;
 import camp.pvp.utils.buttons.AbstractButtonUpdater;
@@ -121,16 +121,16 @@ public class MatchesCommand implements CommandExecutor {
                             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                                 CompletableFuture<GameProfile> winnerProfile = plugin.getGameProfileManager().findAsync(record.getWinner());
                                 winnerProfile.thenAccept(profile -> {
-                                    ProfileELO elo = profile.getProfileElo();
-                                    elo.subtractElo(record.getKit(), record.getEloChange());
-                                    plugin.getGameProfileManager().exportElo(elo);
+                                    ProfileStatistics profileStatistics = profile.getProfileStatistics();
+                                    profileStatistics.subtractElo(record.getKit(), record.getEloChange());
+                                    plugin.getGameProfileManager().exportStatistics(profileStatistics, false);
                                 });
 
                                 CompletableFuture<GameProfile> loserProfile = plugin.getGameProfileManager().findAsync(record.getLoser());
                                 loserProfile.thenAccept(profile -> {
-                                    ProfileELO elo = profile.getProfileElo();
-                                    elo.addElo(record.getKit(), record.getEloChange());
-                                    plugin.getGameProfileManager().exportElo(elo);
+                                    ProfileStatistics profileStatistics = profile.getProfileStatistics();
+                                    profileStatistics.addElo(record.getKit(), record.getEloChange());
+                                    plugin.getGameProfileManager().exportStatistics(profileStatistics, false);
                                 });
 
                                 record.setRolledBack(true);

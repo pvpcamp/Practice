@@ -1,7 +1,6 @@
 package camp.pvp.practice.profiles;
 
 import camp.pvp.core.Core;
-import camp.pvp.core.api.CoreAPI;
 import camp.pvp.practice.cosmetics.DeathAnimation;
 import camp.pvp.practice.games.GameParticipant;
 import camp.pvp.practice.games.GameSpectator;
@@ -16,10 +15,8 @@ import camp.pvp.practice.interactables.InteractableItems;
 import camp.pvp.practice.kits.CustomGameKit;
 import camp.pvp.practice.parties.PartyInvite;
 import camp.pvp.practice.profiles.stats.MatchRecord;
-import camp.pvp.practice.profiles.stats.ProfileELO;
 import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import camp.pvp.practice.queue.GameQueue;
-import camp.pvp.practice.utils.Colors;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
@@ -110,7 +107,6 @@ public class GameProfile {
     private GameKit editingKit;
     private CustomGameKit editingCustomKit;
 
-    private ProfileELO profileElo;
     private ProfileStatistics profileStatistics;
 
     private Set<UUID> hiddenPlayers;
@@ -382,61 +378,6 @@ public class GameProfile {
                 }
             }
         }
-
-
-//      OLD VISIBILITY CODE
-//        if(player != null) {
-//            if(game != null) {
-//                if(game.seeEveryone()) {
-//                    for (Player p : Bukkit.getOnlinePlayers()) {
-//                        if(!game.getAllPlayers().contains(p)) {
-//                            getHiddenPlayers().add(p.getUniqueId());
-//                        }
-//                    }
-//                } else {
-//                    if(game.getAlive().containsKey(player.getUniqueId())) {
-//                        for (Player p : Bukkit.getOnlinePlayers()) {
-//                            if(!game.getAlivePlayers().contains(p)) {
-//                                if (game.getSpectators().get(p.getUniqueId()) == null || !game.getSpectators().get(p.getUniqueId()).isVisibleToPlayers()) {
-//                                    getHiddenPlayers().add(p.getUniqueId());
-//                                }
-//                            }
-//                        }
-//                    } else {
-//                        boolean seeSpectators = this.isSpectatorVisibility();
-//                        for (Player p : Bukkit.getOnlinePlayers()) {
-//                            GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
-//                            boolean spectating = game.getSpectators().containsKey(p.getUniqueId());
-//                            boolean playing = game.getCurrentPlayersPlaying().contains(p);
-//                            if(!playing) {
-//                                if (spectating) {
-//                                    if (seeSpectators) {
-//                                        if (profile.isStaffMode() && !player.hasPermission("practice.staff")) {
-//                                            getHiddenPlayers().add(p.getUniqueId());
-//                                        }
-//                                    } else {
-//                                        getHiddenPlayers().add(p.getUniqueId());
-//                                    }
-//                                } else {
-//                                    getHiddenPlayers().add(p.getUniqueId());
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            } else {
-//                for(Player p : Bukkit.getOnlinePlayers()) {
-//                    GameProfile profile = gpm.getLoadedProfiles().get(p.getUniqueId());
-//                    if((profile.getGame() != null && profile.getGame().getSpectators().get(p.getUniqueId()) != null) || !this.isLobbyVisibility() || this.getState().equals(State.KIT_EDITOR)) {
-//                        getHiddenPlayers().add(p.getUniqueId());
-//                    } else {
-//                        if(profile.isStaffMode() && !player.hasPermission("practice.staff")) {
-//                            getHiddenPlayers().add(p.getUniqueId());
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 
     public boolean isValid() {

@@ -36,7 +36,7 @@ public class GameQueueManager {
             GameProfile profile = plugin.getGameProfileManager().getLoadedProfiles().get(player.getUniqueId());
 
             if(gameQueue.getType().equals(GameQueue.Type.RANKED)) {
-                gqm = new GameQueueMember(player.getUniqueId(), player.getName(), profile.getProfileElo().getRatings().get(gameQueue.getGameKit()));
+                gqm = new GameQueueMember(player.getUniqueId(), player.getName(), profile.getProfileStatistics().getElo(gameQueue.getGameKit()));
             } else {
                 gqm = new GameQueueMember(player.getUniqueId(), player.getName());
             }

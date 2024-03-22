@@ -87,7 +87,7 @@ public class Practice extends JavaPlugin {
 
         cooldownTask = this.getServer().getScheduler().runTaskTimer(this, new CooldownRunnable(this), 2, 2);
         energyTask = this.getServer().getScheduler().runTaskTimer(this, new EnergyRunnable(this), 0, 20);
-        nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 0, 20);
+        nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 0, 5);
 
         tickNumberCounter = new TickNumberCounter();
         tickNumberTask = Bukkit.getScheduler().runTaskTimer(this, tickNumberCounter, 0, 1);
