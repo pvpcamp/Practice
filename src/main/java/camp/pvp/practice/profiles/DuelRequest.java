@@ -63,7 +63,7 @@ public class DuelRequest {
                         " &7● &6From: &f" + senderPlayer.getName(),
                         " &7● &6Kit: &f" + kit.getDisplayName(),
                         " &7● &6Arena: &f" + (arena == null ? "Random" : arena.getDisplayName()),
-                        "&6Click to accept.",
+                        "&aClick to accept.",
                         " "
                 );
                 builder.setCommand("/accept " + senderPlayer.getName());

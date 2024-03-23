@@ -305,6 +305,10 @@ public class GameProfile {
             tournament.leave(getPlayer());
         }
 
+        if (sumoEvent != null) {
+            sumoEvent.leave(getPlayer());
+        }
+
         Practice.getInstance().getGameQueueManager().removeFromQueue(getPlayer());
 
         List<GameProfile> profiles = new ArrayList<>(Practice.getInstance().getGameProfileManager().getLoadedProfiles().values());

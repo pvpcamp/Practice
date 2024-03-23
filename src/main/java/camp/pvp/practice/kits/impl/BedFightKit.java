@@ -21,6 +21,7 @@ public class BedFightKit extends BaseDuelKit {
         setMoveOnStart(false);
         setItemDurability(false);
         setShowHealthBar(true);
+        setDropItemsOnDeath(false);
         setFallDamage(false);
 
         setIcon(new ItemStack(Material.BED));

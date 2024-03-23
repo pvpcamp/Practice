@@ -7,6 +7,7 @@ import camp.pvp.practice.games.tasks.TeleportFix;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.profiles.GameProfileManager;
+import camp.pvp.practice.queue.GameQueue;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -23,6 +24,7 @@ public class SumoEventDuel extends Duel {
         this.sumoEvent = event;
         this.setArena(event.getArena());
         this.setKit(GameKit.SUMO.getBaseKit());
+        this.setQueueType(GameQueue.Type.PRIVATE);
     }
 
     @Override

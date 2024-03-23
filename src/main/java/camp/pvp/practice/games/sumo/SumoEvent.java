@@ -131,7 +131,7 @@ public class SumoEvent {
                 ""
         );
 
-        for(EventParticipant participant : new ArrayList<>(participants.values())) {
+        for(EventParticipant participant : new ArrayList<>(getActiveParticipants().values())) {
             leave(participant.getPlayer());
         }
 
@@ -193,7 +193,7 @@ public class SumoEvent {
             }
         }
 
-        if(leftGame) {
+        if(leftGame || state.equals(State.ENDED)) {
             profile.setSumoEvent(null);
             profile.setGame(null);
             participant.setPlayingState(EventParticipant.PlayingState.DEAD);
@@ -251,7 +251,7 @@ public class SumoEvent {
 
         Collections.shuffle(list);
 
-        list.sort(Comparator.comparingInt(EventParticipant::getMatches).reversed());
+        list.sort(Comparator.comparingInt(EventParticipant::getMatches));
 
         List<EventParticipant> nextRound = new ArrayList<>();
         for(int i = 0; i < 2; i++) {
@@ -324,7 +324,10 @@ public class SumoEvent {
 
     public void announce(String... messages) {
         for(EventParticipant participant : getActiveParticipants().values()) {
-            participant.getPlayer().sendMessage(Colors.get(messages));
+            Player player = participant.getPlayer();
+            if(player == null) continue;
+
+            player.sendMessage(Colors.get(messages));
         }
     }
 

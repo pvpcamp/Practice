@@ -209,13 +209,20 @@ public abstract class Minigame extends Game {
             }
         }
 
+        public int getExpeditedQueuePlayers() {
+            switch(this) {
+                case TNT_TAG -> { return 12; }
+                default -> { return 4; }
+            }
+        }
+
         public int getMinPlayers() {
             return 2;
         }
 
         public int getMaxPlayers() {
             switch(this) {
-                case TNT_TAG -> { return 20; }
+                case TNT_TAG -> { return 24; }
                 case ONE_IN_THE_CHAMBER -> { return 8; }
                 default -> { return 4; }
             }

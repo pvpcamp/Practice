@@ -139,7 +139,7 @@ public class TNTTagMinigame extends Minigame {
         TNTTagParticipant victimParticipant = (TNTTagParticipant) getParticipants().get(victim.getUniqueId()),
                 attackerParticipant = (TNTTagParticipant) getParticipants().get(attacker.getUniqueId());
 
-        if(attackerParticipant.isTagged()) {
+        if(attackerParticipant.isTagged() && !victimParticipant.isTagged()) {
             tag(victimParticipant, attackerParticipant);
         }
     }
@@ -160,11 +160,13 @@ public class TNTTagMinigame extends Minigame {
 
         victimPlayer.sendMessage(ChatColor.RED + "You have been tagged!");
 
+        playSound(victimPlayer.getLocation(), Sound.FIREWORK_LAUNCH, 1.0F, 1.0F);
+
         for(PotionEffect effect : victimPlayer.getActivePotionEffects()){
             victimPlayer.removePotionEffect(effect.getType());
         }
 
-        PotionEffect speedThree = new PotionEffect(PotionEffectType.SPEED, 999999, 2, true, false);
+        PotionEffect speedThree = new PotionEffect(PotionEffectType.SPEED, 999999, 3, true, false);
         victimPlayer.addPotionEffect(speedThree);
 
         victimInventory.setItem(0, new ItemStack(Material.TNT));
@@ -273,9 +275,15 @@ public class TNTTagMinigame extends Minigame {
         round++;
 
         final int size = getAlive().size();
-        timer = 20;
-        if(size > 10) timer = 45;
-        else if(size > 5) timer = 30;
+        if(size > 12) timer = 45;
+        else if(size > 5) {
+            timer = 30;
+        } else {
+            timer = 20;
+            for(GameParticipant participant : getAlive().values()) {
+                participant.getPlayer().teleport(participant.getSpawnLocation());
+            }
+        }
 
         for(GameParticipant participant : getAlive().values()) {
             TNTTagParticipant tntTagParticipant = (TNTTagParticipant) participant;
@@ -306,8 +314,6 @@ public class TNTTagMinigame extends Minigame {
                  &7● &6Tagged: %s
                  \n
                 """.formatted(round, timer, sb));
-
-        playSound(null, Sound.FIREWORK_LAUNCH, 1.0F, 1.0F);
 
         roundTimerTask = Bukkit.getScheduler().runTaskTimer(getPlugin(), () -> {
             if(timer < 1) {
@@ -365,6 +371,7 @@ public class TNTTagMinigame extends Minigame {
     @Override
     public void end() {
         super.end();
+        timer = Integer.MIN_VALUE;
         if(roundTimerTask != null) roundTimerTask.cancel();
         compassUpdaterTask.cancel();
     }
@@ -373,11 +380,19 @@ public class TNTTagMinigame extends Minigame {
     public void eliminate(Player player, boolean leftGame, boolean showDeathAnimation, boolean showDeathMessage) {
         super.eliminate(player, leftGame, false, showDeathMessage);
 
-        TNTTagParticipant participant = (TNTTagParticipant) getParticipants().get(player.getUniqueId());
-        participant.setTagged(false);
-
         playEffect(player.getLocation(), Effect.EXPLOSION_HUGE, null);
         playSound(player.getLocation(), Sound.EXPLODE, 1.0F, 1.0F);
+
+        TNTTagParticipant participant = (TNTTagParticipant) getParticipants().get(player.getUniqueId());
+
+        if(participant.isTagged()) {
+            if(getTagged().size() == 1 && timer > 0) {
+                if(roundTimerTask != null) roundTimerTask.cancel();
+                nextRound();
+            }
+
+            participant.setTagged(false);
+        }
 
         if(getAlive().size() < 2) {
             end();
@@ -433,8 +448,8 @@ public class TNTTagMinigame extends Minigame {
         final int size = participants.size();
         int amount = 1;
 
-        if(size > 10) amount = 2;
-        else if(size > 5) amount = 3;
+        if(size > 12) amount = 3;
+        else if(size > 5) amount = 2;
 
         for(int i = 0; i < amount; i++) {
             selected.add(participants.get(i));

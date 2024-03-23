@@ -84,7 +84,7 @@ public class GameQueue {
         switch(gameType) {
             case DUEL -> {
                 for(Game game : getPlugin().getGameManager().getActiveGames()) {
-                    if(game instanceof Duel && game.getKit().equals(gameKit) && ((Duel) game).getQueueType().equals(getType())) {
+                    if(game instanceof Duel && game.getKit().getGameKit().equals(gameKit) && ((Duel) game).getQueueType().equals(getType())) {
                         i += game.getCurrentPlaying().size();
                     }
                 }
@@ -191,7 +191,7 @@ public class GameQueue {
                         return;
                     }
 
-                    if(queueMembers.size() > 4 && timeBeforeStart > 10) {
+                    if(queueMembers.size() > minigameType.getExpeditedQueuePlayers() && timeBeforeStart > 10) {
                         timeBeforeStart = 10;
                     }
 

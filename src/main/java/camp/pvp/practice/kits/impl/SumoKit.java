@@ -14,6 +14,7 @@ public class SumoKit extends BaseDuelKit {
     public SumoKit() {
         super(GameKit.SUMO);
 
+        setFfa(true);
         setDieInWater(true);
         setTakeDamage(false);
         setHunger(false);
@@ -27,7 +28,7 @@ public class SumoKit extends BaseDuelKit {
 
         setIcon(new ItemStack(Material.LEASH));
 
-        PotionEffect jump = new PotionEffect(PotionEffectType.JUMP, 99999, 245, true, false);
+        PotionEffect jump = new PotionEffect(PotionEffectType.JUMP, 10, 245, true, false);
         getPotionEffects().add(jump);
     }
 }
