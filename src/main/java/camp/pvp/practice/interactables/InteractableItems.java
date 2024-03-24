@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum InteractableItems {
-    QUEUE, PARTY_CREATE, PROFILE, KIT_EDITOR, SETTINGS,
+    QUEUE, PARTY_CREATE, SERVERS, PROFILE, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
     PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS, PARTY_INFO,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
@@ -47,6 +47,11 @@ public enum InteractableItems {
             case PARTY_CREATE:
                 return new InteractableItem(
                         new ItemBuilder(Material.NAME_TAG, "&6Create a Party").create(), 1, new PartyCreateInteract());
+            case SERVERS:
+                return new InteractableItem(
+                        new ItemBuilder(Material.WATCH, "&6&lNetwork Navigator").create(), 4, (player, gameProfile) -> {
+                            player.performCommand("servers");
+                        });
             case PROFILE:
                 return new InteractableItem(
                         new ItemBuilder(Material.SKULL_ITEM, "&6My Profile").create(), 6, new MyProfileInteract(), (item, profile) -> {
@@ -137,6 +142,7 @@ public enum InteractableItems {
             case LOBBY:
                 items.add(QUEUE);
                 items.add(PARTY_CREATE);
+                items.add(SERVERS);
                 items.add(PROFILE);
                 items.add(KIT_EDITOR);
                 items.add(SETTINGS);

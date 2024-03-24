@@ -102,19 +102,7 @@ public class FreeForAll extends Game {
 
     @Override
     public void initialize() {
-        if(getArena() == null) {
-            List<Arena> list = new ArrayList<>();
-            for(Arena a : getPlugin().getArenaManager().getArenas()) {
-                if(a.isEnabled() && getKit().getArenaTypes().contains(a.getType())) {
-                    list.add(a);
-                }
-            }
-
-            if(!list.isEmpty()) {
-                Collections.shuffle(list);
-                this.setArena(list.get(0));
-            }
-        }
+        setArena(getPlugin().getArenaManager().selectRandomArena(getKit()));
 
         if(getArena() == null) {
             for(Player p : getAlivePlayers()) {
