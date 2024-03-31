@@ -2,6 +2,8 @@
 
 A complex Practice plugin that includes a variety of duel gamemodes as well as minigames.
 
+This plugin stores all arenas in a flatfile (yml), and stores all player data in a MongoDB database.
+
 ### Dependencies
 - Citizens
 - Gooey2
