@@ -483,11 +483,14 @@ public abstract class Game {
 
             if(victim.isBlocking()) {
 
-                if(victimParticipant.blockedHits >= 20 && getKit().isCappedBlockHits() && this instanceof Duel) {
-                    event.setDamage(EntityDamageEvent.DamageModifier.BLOCKING, 0);
-                } else {
-                    victimParticipant.blockedHits++;
-                }
+                victimParticipant.blockedHits++;
+
+                // Block hit capping not done correctly.
+//                if(victimParticipant.blockedHits >= 20 && getKit().isCappedBlockHits() && this instanceof Duel) {
+//                    event.setDamage(EntityDamageEvent.DamageModifier.BLOCKING, 0);
+//                } else {
+//                    victimParticipant.blockedHits++;
+//                }
             }
 
             Location location = damager.getLocation();
