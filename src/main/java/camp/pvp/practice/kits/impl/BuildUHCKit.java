@@ -19,6 +19,7 @@ public class BuildUHCKit extends BaseDuelKit {
         setFfa(true);
         setShowHealthBar(true);
         setDropItemsOnDeath(true);
+        setRegen(false);
 
         setArenaTypes(Collections.singletonList(Arena.Type.DUEL_BUILD));
 
