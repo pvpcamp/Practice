@@ -1,6 +1,7 @@
 package camp.pvp.practice;
 
 import camp.pvp.practice.arenas.ArenaManager;
+import camp.pvp.practice.bstats.Metrics;
 import camp.pvp.practice.commands.*;
 import camp.pvp.practice.cooldowns.CooldownRunnable;
 import camp.pvp.practice.games.GameManager;
@@ -48,6 +49,7 @@ public class Practice extends JavaPlugin {
 
     private ProtocolManager protocolManager;
     private EntityHider entityHider;
+    private Metrics metrics;
 
     private Assemble assemble;
 
@@ -73,6 +75,11 @@ public class Practice extends JavaPlugin {
 
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.entityHider = new EntityHider(this, EntityHider.Policy.BLACKLIST);
+
+        // Even if you are using this on your own server, I would appreciate it if you kept this in.
+        // It helps me keep track of how many servers are using my plugin.
+        // Here is the link to the stats: https://bstats.org/plugin/bukkit/CampPractice/22356
+        this.metrics = new Metrics(this, 22356);
 
         this.messageManager = new MessageManager(this);
 
@@ -216,6 +223,8 @@ public class Practice extends JavaPlugin {
         arenaManager.shutdown();
         gameManager.shutdown();
         gameProfileManager.shutdown();
+
+        metrics.shutdown();
     }
 
     public void sendDebugMessage(String message) {
