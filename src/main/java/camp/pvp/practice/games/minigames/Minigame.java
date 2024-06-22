@@ -118,7 +118,7 @@ public abstract class Minigame extends Game {
     }
 
     public enum Type {
-        FIREBALL_BLITZ, SKYWARS, ONE_IN_THE_CHAMBER, TNT_TAG;
+        ONE_IN_THE_CHAMBER, TNT_TAG;
 
         @Override
         public String toString() {
@@ -139,8 +139,6 @@ public abstract class Minigame extends Game {
 
         public String getScoreboardTitle() {
             switch(this) {
-                case FIREBALL_BLITZ:
-                    return "Blitz";
                 case ONE_IN_THE_CHAMBER:
                     return "OITC";
                 case TNT_TAG:
@@ -154,12 +152,6 @@ public abstract class Minigame extends Game {
 
         public Material getMaterial() {
             switch(this) {
-                case FIREBALL_BLITZ -> {
-                    return Material.FIREBALL;
-                }
-                case SKYWARS -> {
-                    return Material.EYE_OF_ENDER;
-                }
                 case ONE_IN_THE_CHAMBER -> {
                     return Material.BOW;
                 }
@@ -173,17 +165,6 @@ public abstract class Minigame extends Game {
 
         public List<String> getDescription() {
             switch(this) {
-                case FIREBALL_BLITZ -> {
-                    return List.of(
-                            "&7Fireball Fight, but crazier.",
-                            "&7Be the last player standing",
-                            "&7to win.");
-                }
-                case SKYWARS -> {
-                    return List.of(
-                            "&7FFA Skywars.",
-                            "&7Last player alive wins.");
-                }
                 case ONE_IN_THE_CHAMBER -> {
                     return List.of(
                             "&7COD-Style One in the Chamber.",
@@ -230,12 +211,6 @@ public abstract class Minigame extends Game {
 
         public Minigame createGame(Practice plugin, UUID uuid) {
             switch(this) {
-                case FIREBALL_BLITZ -> {
-                    return new FireballBlitzMinigame(plugin, uuid);
-                }
-                case SKYWARS -> {
-                    return new SkywarsMinigame(plugin, uuid);
-                }
                 case ONE_IN_THE_CHAMBER -> {
                     return new OneInTheChamberMinigame(plugin, uuid);
                 }

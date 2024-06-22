@@ -1,39 +1,32 @@
 package camp.pvp.practice.interactables;
 
-import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import camp.pvp.practice.games.GameManager;
 import camp.pvp.practice.games.GameSpectator;
 import camp.pvp.practice.games.sumo.SumoEventDuel;
-import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.interactables.impl.event.EventLeaveInteract;
 import camp.pvp.practice.interactables.impl.game.*;
 import camp.pvp.practice.interactables.impl.lobby.*;
-import camp.pvp.practice.interactables.impl.tournaments.TournamentJoinInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentLeaveInteract;
 import camp.pvp.practice.interactables.impl.tournaments.TournamentStatusInteract;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.profiles.GameProfile;
-import camp.pvp.practice.profiles.PreviousQueue;
-import camp.pvp.practice.profiles.Rematch;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.interactables.impl.party.PartyCreateInteract;
 import camp.pvp.practice.interactables.impl.queue.LeaveQueueInteract;
-import camp.pvp.practice.interactables.impl.queue.QueueInteract;
+import camp.pvp.practice.interactables.impl.queue.PlayInteract;
 import camp.pvp.practice.interactables.impl.party.*;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public enum InteractableItems {
-    QUEUE, PARTY_CREATE, SERVERS, PROFILE, KIT_EDITOR, SETTINGS,
+    QUEUE, PARTY_CREATE, PROFILE, KIT_EDITOR, SETTINGS,
     LEAVE_QUEUE,
-    PARTY_EVENT, PARTY_SPECTATE, PARTY_KIT, PARTY_LEAVE, PARTY_SETTINGS, PARTY_INFO,
+    PARTY_EVENT, PARTY_SPECTATE, PARTY_LEAVE, PARTY_SETTINGS, PARTY_INFO,
     TOURNAMENT_STATUS, TOURNAMENT_LEAVE,
     EVENT_LEAVE,
     SHOW_SPECTATORS, STOP_SPECTATING, TELEPORTER, SPECTATOR_VISIBLE_TO_PLAYERS, SPECTATE_RANDOM;
@@ -43,15 +36,10 @@ public enum InteractableItems {
             // LOBBY
             case QUEUE:
                 return new InteractableItem(
-                        new ItemBuilder(Material.GOLD_SWORD, "&6Play").create(), 0, new QueueInteract());
+                        new ItemBuilder(Material.GOLD_SWORD, "&6Play").create(), 0, new PlayInteract());
             case PARTY_CREATE:
                 return new InteractableItem(
                         new ItemBuilder(Material.NAME_TAG, "&6Create a Party").create(), 1, new PartyCreateInteract());
-            case SERVERS:
-                return new InteractableItem(
-                        new ItemBuilder(Material.WATCH, "&6&lNetwork Navigator").create(), 4, (player, gameProfile) -> {
-                            player.performCommand("servers");
-                        });
             case PROFILE:
                 return new InteractableItem(
                         new ItemBuilder(Material.SKULL_ITEM, "&6My Profile").create(), 6, new MyProfileInteract(), (item, profile) -> {
@@ -90,9 +78,6 @@ public enum InteractableItems {
                         new ItemBuilder(Material.PAPER, "&6Party Info").create(), 7, (player, gameProfile) -> {
                             player.performCommand("party info");
                         });
-            case PARTY_KIT:
-                return new InteractableItem(
-                        new ItemBuilder(Material.CHEST, "&6Customize HCF Kits").create(), 6, new PartyKitInteract());
             // LOBBY_TOURNAMENT
             case TOURNAMENT_STATUS:
                 return new InteractableItem(
@@ -142,7 +127,6 @@ public enum InteractableItems {
             case LOBBY:
                 items.add(QUEUE);
                 items.add(PARTY_CREATE);
-                items.add(SERVERS);
                 items.add(PROFILE);
                 items.add(KIT_EDITOR);
                 items.add(SETTINGS);
@@ -159,7 +143,6 @@ public enum InteractableItems {
                 }
 
                 items.add(PARTY_INFO);
-                items.add(PARTY_KIT);
                 items.add(PARTY_LEAVE);
                 items.add(SETTINGS);
                 break;

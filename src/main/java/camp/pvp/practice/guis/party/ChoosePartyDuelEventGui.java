@@ -46,7 +46,7 @@ public class ChoosePartyDuelEventGui extends StandardGui {
                             @Override
                             public void run(Player player, GuiButton button, Gui gui, ClickType click) {
                                 if(party.getGame() == null && profile.getParty().getGame() == null) {
-                                    PartyGameRequest pgr = new PartyGameRequest(profile.getParty(), party, PartyGameRequest.Type.TEAMS);
+                                    PartyGameRequest pgr = new PartyGameRequest(profile.getParty(), party);
                                     pgr.setKit(kit);
                                     pgr.send();
                                 } else {
@@ -65,29 +65,5 @@ public class ChoosePartyDuelEventGui extends StandardGui {
 
         teamFight.setSlot(11);
         this.addButton(teamFight, false);
-
-        GuiButton hcfFight = new GuiButton(Material.FENCE, "&6&lHCF Team Fight");
-        hcfFight.setCloseOnClick(true);
-        hcfFight.setAction(new GuiAction() {
-            @Override
-            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
-                if(party.getGame() == null && profile.getParty().getGame() == null) {
-                    PartyGameRequest pgr = new PartyGameRequest(profile.getParty(), party, PartyGameRequest.Type.HCF);
-                    pgr.send();
-                } else {
-                    player.sendMessage(ChatColor.RED + "You cannot invite this party to a game right now.");
-                }
-            }
-        });
-
-        hcfFight.setLore(
-                "&7Team vs Team HCF fights",
-                "&7using classic HCF kits to",
-                "&7defeat another party.",
-                " ",
-                "&aClick to invite.");
-        hcfFight.setSlot(15);
-        this.addButton(hcfFight, false);
-
     }
 }

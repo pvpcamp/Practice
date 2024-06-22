@@ -1,7 +1,6 @@
 package camp.pvp.practice.games;
 
 import camp.pvp.practice.games.impl.Duel;
-import camp.pvp.practice.games.impl.teams.tasks.HCFEffectUpdater;
 import camp.pvp.practice.games.minigames.Minigame;
 import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
@@ -52,8 +51,6 @@ public class GameManager {
                 }
             }
         }, 0, 100);
-
-        Bukkit.getScheduler().runTaskTimer(plugin, new HCFEffectUpdater(this), 0, 2);
 
         this.logger.info("Initialized GameManager.");
     }

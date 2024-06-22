@@ -6,7 +6,6 @@ import camp.pvp.practice.games.GameManager;
 import camp.pvp.practice.games.sumo.SumoEvent;
 import camp.pvp.practice.games.tournaments.Tournament;
 import camp.pvp.practice.kits.GameKit;
-import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.parties.PartyMember;
 import camp.pvp.practice.profiles.GameProfile;
@@ -14,13 +13,11 @@ import camp.pvp.practice.profiles.GameProfileManager;
 import camp.pvp.practice.queue.GameQueue;
 import camp.pvp.practice.queue.GameQueueManager;
 import camp.pvp.practice.queue.GameQueueMember;
-import camp.pvp.practice.utils.TimeUtil;
 import io.github.thatkawaiisam.assemble.AssembleAdapter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class SidebarAdapter implements AssembleAdapter {
@@ -140,10 +137,8 @@ public class SidebarAdapter implements AssembleAdapter {
 
                     Party party = profile.getParty();
                     PartyMember member = party.getMembers().get(player.getUniqueId());
-                    HCFKit kit = member.getHcfKit();
                     lines.add("&6Party &7(" + party.getMembers().size() + "/" + party.getMaxMembers() + ")");
                     lines.add("&6Leader: &f" + party.getLeader().getName());
-                    lines.add("&6Your HCF Kit: " + kit.getColor() + kit.toString());
 
                     if(party.getGame() != null) {
                         lines.add("&7&oParty In Game");

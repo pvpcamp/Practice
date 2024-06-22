@@ -1,18 +1,13 @@
 package camp.pvp.practice.listeners.bukkit.inventory;
 
 import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.games.impl.teams.HCFTeams;
-import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.profiles.GameProfile;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 public class InventoryClickListener implements Listener {

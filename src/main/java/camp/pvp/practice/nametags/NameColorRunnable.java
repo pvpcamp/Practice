@@ -38,8 +38,6 @@ public class NameColorRunnable implements Runnable{
 
             Team blueTeam = scoreboard.getTeam("blue");
             Team redTeam = scoreboard.getTeam("red");
-            Team taggedBlueTeam = scoreboard.getTeam("blue_tagged");
-            Team taggedRedTeam = scoreboard.getTeam("red_tagged");
             Team spectatorTeam = scoreboard.getTeam("spectators");
             Team itTeam = scoreboard.getTeam("it");
 
@@ -78,16 +76,6 @@ public class NameColorRunnable implements Runnable{
                 redTeam.setPrefix(Colors.get("&c"));
             }
 
-            if (taggedBlueTeam == null) {
-                taggedBlueTeam = scoreboard.registerNewTeam("blue_tagged");
-                taggedBlueTeam.setPrefix(Colors.get("&a&l** &9"));
-            }
-
-            if (taggedRedTeam == null) {
-                taggedRedTeam = scoreboard.registerNewTeam("red_tagged");
-                taggedRedTeam.setPrefix(Colors.get("&a&l** &c"));
-            }
-
             if (spectatorTeam == null) {
                 spectatorTeam = scoreboard.registerNewTeam("spectators");
                 spectatorTeam.setPrefix(Colors.get("&7&o"));
@@ -101,7 +89,7 @@ public class NameColorRunnable implements Runnable{
             }
 
             Map<Rank, Team> rankTeams = new HashMap<>();
-            List<Team> allTeams = new ArrayList<>(Arrays.asList(blueTeam, redTeam, taggedBlueTeam, taggedRedTeam, spectatorTeam, itTeam));
+            List<Team> allTeams = new ArrayList<>(Arrays.asList(blueTeam, redTeam, spectatorTeam, itTeam));
             Map<Team, List<String>> newEntries = new HashMap<>();
 
             for (Rank rank : Core.getInstance().getRankManager().getRanks().values()) {
@@ -128,19 +116,11 @@ public class NameColorRunnable implements Runnable{
                     if (game instanceof TeamGame) {
                         TeamGame teamGame = (TeamGame) profile.getGame();
                         for (GameParticipant p : teamGame.getBlue().getAliveParticipants().values()) {
-                            if(p.isArcherTagged()) {
-                                newEntries.get(taggedBlueTeam).add(p.getName());
-                            } else {
-                                newEntries.get(blueTeam).add(p.getName());
-                            }
+                            newEntries.get(blueTeam).add(p.getName());
                         }
 
                         for (GameParticipant p : teamGame.getRed().getAliveParticipants().values()) {
-                            if(p.isArcherTagged()) {
-                                newEntries.get(taggedRedTeam).add(p.getName());
-                            } else {
-                                newEntries.get(redTeam).add(p.getName());
-                            }
+                            newEntries.get(redTeam).add(p.getName());
                         }
                     }
 

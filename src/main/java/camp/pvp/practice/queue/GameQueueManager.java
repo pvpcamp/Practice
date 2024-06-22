@@ -46,7 +46,12 @@ public class GameQueueManager {
 
             GameKit kit = gameQueue.getGameKit();
             profile.playerUpdate(false);
-            player.sendMessage(ChatColor.GREEN + "You have joined the queue for " + gameQueue.getType().name().toLowerCase() + " " + ChatColor.WHITE + kit.getDisplayName() + ChatColor.GREEN + ".");
+
+            String message = plugin.getMessageManager().getMessage("queue.join_duel");
+            message = message.replace("%queue_type%", gameQueue.getType().name().toLowerCase());
+            message = message.replace("%kit%", kit.getDisplayName());
+
+            player.sendMessage(message);
 
             return gqm;
         }
@@ -68,7 +73,12 @@ public class GameQueueManager {
         queue.getQueueMembers().add(gqm);
 
         profile.playerUpdate(false);
-        player.sendMessage(ChatColor.GREEN + "You have joined the queue for " + queue.getType().name().toLowerCase() + " " + ChatColor.WHITE + queue.getMinigameType().toString() + ChatColor.GREEN + ".");
+
+        String message = plugin.getMessageManager().getMessage("queue.join_minigame");
+        message = message.replace("%queue_type%", queueType.name().toLowerCase());
+        message = message.replace("%game%", minigameType.toString());
+
+        player.sendMessage(message);
 
         return gqm;
     }

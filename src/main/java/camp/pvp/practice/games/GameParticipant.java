@@ -2,7 +2,6 @@ package camp.pvp.practice.games;
 
 import camp.pvp.practice.kits.BaseKit;
 import camp.pvp.practice.kits.CustomGameKit;
-import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.cooldowns.PlayerCooldown;
 import camp.pvp.practice.profiles.GameProfile;
@@ -29,14 +28,7 @@ public class GameParticipant {
     private GameTeam team;
     private LivingState livingState;
     private Date aliveTime, deathTime;
-    private boolean respawn, invincible, kitApplied, comboMessages;
-
-    // HCFTEAMS ONLY
-    private HCFKit appliedHcfKit;
-    private HCFKit previousHcfKit;
-    private int energy;
-    private List<PotionEffect> previousEffects;
-    private Date lastArcherTag;
+    private boolean respawn, invincible, kitApplied;
 
     private Map<PlayerCooldown.Type, PlayerCooldown> cooldowns;
 
@@ -63,11 +55,7 @@ public class GameParticipant {
         this.uuid = uuid;
         this.name = name;
         this.livingState = LivingState.ALIVE;
-        this.previousEffects = new ArrayList<>();
         this.cooldowns = new HashMap<>();
-
-        this.appliedHcfKit = null;
-        this.energy = 0;
     }
 
     public Player getPlayer() {
@@ -82,17 +70,12 @@ public class GameParticipant {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.add(Calendar.SECOND, 10);
-        lastArcherTag = calendar.getTime();
 
         getPlayer().sendMessage(ChatColor.RED + "You have been archer tagged for 10 seconds!");
     }
 
-    public boolean isArcherTagged() {
-        if(lastArcherTag != null) {
-            return lastArcherTag.after(new Date());
-        }
-
-        return false;
+    public boolean isComboMessages() {
+        return getProfile().isComboMessages();
     }
 
     public void clearCooldowns() {
@@ -175,40 +158,6 @@ public class GameParticipant {
                 }
             }
         }, 0, 20);
-    }
-
-    public void applyTemporaryEffect(PotionEffectType type, int duration, int strength) {
-        for(PotionEffect pe : getPlayer().getActivePotionEffects()) {
-            getPreviousEffects().add(pe);
-            if(type.equals(pe.getType())) {
-                getPlayer().removePotionEffect(pe.getType());
-            }
-        }
-
-        previousHcfKit = appliedHcfKit;
-
-        getPlayer().addPotionEffect(new PotionEffect(type, duration * 20, strength));
-
-        Bukkit.getScheduler().runTaskLater(Practice.instance, () -> applyPreviousEffects(duration * 20), duration * 20L);
-    }
-
-    public void applyPreviousEffects(int duration) {
-
-        if(previousHcfKit == appliedHcfKit) {
-            if (getPlayer() != null && getLivingState().equals(LivingState.ALIVE) && postGameInventory == null) {
-                for (PotionEffect pe : getPlayer().getActivePotionEffects()) {
-                    getPlayer().removePotionEffect(pe.getType());
-                }
-
-                for (PotionEffect pe : getPreviousEffects()) {
-                    if(pe.getDuration() - duration > 0) {
-                        PotionEffect newEffect = new PotionEffect(pe.getType(), pe.getDuration() - duration, pe.getAmplifier());
-                        getPlayer().addPotionEffect(newEffect);
-                    }
-                }
-            }
-            getPreviousEffects().clear();
-        }
     }
 
     public GameTeam.Color getTeamColor() {

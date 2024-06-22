@@ -4,7 +4,6 @@ import camp.pvp.practice.games.GameTeam;
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.Game;
 import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.kits.HCFKit;
 import camp.pvp.practice.utils.Colors;
 import lombok.Getter;
 import org.bukkit.ChatColor;
@@ -51,10 +50,6 @@ public abstract class TeamGame extends Game {
                 }
 
                 victimParticipant.setAttacker(attacker.getUniqueId());
-
-                if(event.getDamager() instanceof Arrow && participant.getAppliedHcfKit() != null && participant.getAppliedHcfKit().equals(HCFKit.ARCHER) && (victimParticipant.getAppliedHcfKit() == null || !victimParticipant.getAppliedHcfKit().equals(HCFKit.ARCHER))) {
-                    victimParticipant.archerTag();
-                }
 
                 if(event.getDamager() instanceof Player) {
                     if (victim.getNoDamageTicks() == 0) {

@@ -2,7 +2,6 @@ package camp.pvp.practice.parties;
 
 import camp.pvp.practice.Practice;
 import camp.pvp.practice.games.GameParticipant;
-import camp.pvp.practice.games.impl.teams.HCFTeams;
 import camp.pvp.practice.games.impl.teams.TeamDuel;
 import camp.pvp.practice.kits.GameKit;
 import camp.pvp.practice.utils.Colors;
@@ -23,19 +22,13 @@ import java.util.UUID;
 @Getter @Setter
 public class PartyGameRequest {
 
-    public enum Type {
-        TEAMS, HCF
-    }
-
     private final Party fromParty, toParty;
-    private final Type type;
     private GameKit kit;
     private Date expires;
 
-    public PartyGameRequest(Party fromParty, Party toParty, Type type) {
+    public PartyGameRequest(Party fromParty, Party toParty) {
         this.fromParty = fromParty;
         this.toParty = toParty;
-        this.type = type;
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -56,13 +49,8 @@ public class PartyGameRequest {
         StringBuilder sb = new StringBuilder();
         sb.append("\n&6&lNew Party Duel Request\n");
         sb.append("\n &7● &6From: &f" + fromParty.getLeader().getName());
-
-        if(type.equals(Type.HCF)) {
-            sb.append("\n &7● &6Game Type: &fHCF Team Fight");
-        } else {
-            sb.append("\n &7● &6Game Type: &fParty vs Party");
-            sb.append("\n &7● &6Kit: &f" + kit.getDisplayName());
-        }
+        sb.append("\n &7● &6Game Type: &fParty vs Party");
+        sb.append("\n &7● &6Kit: &f" + kit.getDisplayName());
         sb.append("\n");
         TextComponent msg = new TextComponent(Colors.get("&6[Click to accept this duel]"));
 
@@ -83,52 +71,27 @@ public class PartyGameRequest {
 
     public boolean startGame() {
         if(toParty.getGame() == null && fromParty.getGame() == null) {
-            if(type.equals(Type.TEAMS)) {
-                TeamDuel teamDuel = new TeamDuel(Practice.instance, UUID.randomUUID());
-                teamDuel.setKit(kit.getBaseKit());
+            TeamDuel teamDuel = new TeamDuel(Practice.instance, UUID.randomUUID());
+            teamDuel.setKit(kit.getBaseKit());
 
-                for (PartyMember member : toParty.getMembers().values()) {
-                    GameParticipant p = teamDuel.join(member.getPlayer());
-                    p.setTeam(teamDuel.getBlue());
-                }
-
-                for (PartyMember member : fromParty.getMembers().values()) {
-                    GameParticipant p = teamDuel.join(member.getPlayer());
-                    p.setTeam(teamDuel.getRed());
-                }
-
-                List<Party> parties = teamDuel.getParties();
-                parties.add(toParty);
-                parties.add(fromParty);
-
-                toParty.getPartyGameRequests().clear();
-                fromParty.getPartyGameRequests().clear();
-
-                teamDuel.initialize();
-            } else {
-                HCFTeams teamDuel = new HCFTeams(Practice.instance, UUID.randomUUID());
-
-                for (PartyMember member : toParty.getMembers().values()) {
-                    GameParticipant p = teamDuel.join(member.getPlayer());
-                    p.setAppliedHcfKit(member.getHcfKit());
-                    p.setTeam(teamDuel.getBlue());
-                }
-
-                for (PartyMember member : fromParty.getMembers().values()) {
-                    GameParticipant p = teamDuel.join(member.getPlayer());
-                    p.setAppliedHcfKit(member.getHcfKit());
-                    p.setTeam(teamDuel.getRed());
-                }
-
-                List<Party> parties = teamDuel.getParties();
-                parties.add(toParty);
-                parties.add(fromParty);
-
-                toParty.getPartyGameRequests().clear();
-                fromParty.getPartyGameRequests().clear();
-
-                teamDuel.initialize();
+            for (PartyMember member : toParty.getMembers().values()) {
+                GameParticipant p = teamDuel.join(member.getPlayer());
+                p.setTeam(teamDuel.getBlue());
             }
+
+            for (PartyMember member : fromParty.getMembers().values()) {
+                GameParticipant p = teamDuel.join(member.getPlayer());
+                p.setTeam(teamDuel.getRed());
+            }
+
+            List<Party> parties = teamDuel.getParties();
+            parties.add(toParty);
+            parties.add(fromParty);
+
+            toParty.getPartyGameRequests().clear();
+            fromParty.getPartyGameRequests().clear();
+
+            teamDuel.initialize();
 
             return true;
         } else {

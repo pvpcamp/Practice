@@ -1,7 +1,8 @@
 main: camp.pvp.practice.Practice
 name: ${project.name}
 version: ${git.branch}-${git.commit.id.abbrev}
-author: leuo
+author: PvP Camp Development Team
+description: github.com/pvpcamp/Practice
 depend:
   - Citizens
   - Gooey2

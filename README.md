@@ -9,7 +9,7 @@ This plugin stores all arenas in a flatfile (yml), and stores all player data in
 - Gooey2
 - ProtocolLib
 - Apollo-Bukkit
-- Core (legacy)
+- Core
 - NetworkHelper
 - CarbonSpigot
 

@@ -4,10 +4,8 @@ import camp.pvp.practice.arenas.ArenaManager;
 import camp.pvp.practice.commands.*;
 import camp.pvp.practice.cooldowns.CooldownRunnable;
 import camp.pvp.practice.games.GameManager;
-import camp.pvp.practice.kits.EnergyRunnable;
 import camp.pvp.practice.listeners.bukkit.block.BlockBreakListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockBurnListener;
-import camp.pvp.practice.listeners.bukkit.block.BlockFromToListener;
 import camp.pvp.practice.listeners.bukkit.block.BlockPlaceListener;
 import camp.pvp.practice.listeners.bukkit.entity.*;
 import camp.pvp.practice.listeners.bukkit.inventory.InventoryClickListener;
@@ -19,6 +17,7 @@ import camp.pvp.practice.listeners.bukkit.projectile.ProjectileLaunchListener;
 import camp.pvp.practice.listeners.bukkit.world.WeatherChangeListener;
 import camp.pvp.practice.listeners.citizens.NPCRightClickListener;
 import camp.pvp.practice.listeners.packets.EnderpearlSound;
+import camp.pvp.practice.messages.MessageManager;
 import camp.pvp.practice.nametags.NameColorRunnable;
 import camp.pvp.practice.parties.PartyManager;
 import camp.pvp.practice.profiles.GameProfile;
@@ -61,7 +60,9 @@ public class Practice extends JavaPlugin {
     private GameProfileManager gameProfileManager;
     private PartyManager partyManager;
 
-    private BukkitTask cooldownTask, energyTask, nameColorTask, tickNumberTask;
+    private MessageManager messageManager;
+
+    private BukkitTask cooldownTask, nameColorTask, tickNumberTask;
     private TickNumberCounter tickNumberCounter;
 
     @Override
@@ -72,6 +73,8 @@ public class Practice extends JavaPlugin {
 
         this.protocolManager = ProtocolLibrary.getProtocolManager();
         this.entityHider = new EntityHider(this, EntityHider.Policy.BLACKLIST);
+
+        this.messageManager = new MessageManager(this);
 
         this.gameProfileManager = new GameProfileManager(this);
         this.arenaManager = new ArenaManager(this);
@@ -86,7 +89,6 @@ public class Practice extends JavaPlugin {
         assemble.setup();
 
         cooldownTask = this.getServer().getScheduler().runTaskTimer(this, new CooldownRunnable(this), 2, 2);
-        energyTask = this.getServer().getScheduler().runTaskTimer(this, new EnergyRunnable(this), 0, 20);
         nameColorTask = this.getServer().getScheduler().runTaskTimer(this, new NameColorRunnable(this), 0, 5);
 
         tickNumberCounter = new TickNumberCounter();
@@ -162,7 +164,6 @@ public class Practice extends JavaPlugin {
         // Bukkit
         new BlockBreakListener(this);
         new BlockBurnListener(this);
-        new BlockFromToListener(this);
         new BlockPlaceListener(this);
 
         new EntityDamageByEntityListener(this);

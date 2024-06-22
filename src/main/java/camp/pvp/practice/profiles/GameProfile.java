@@ -17,6 +17,7 @@ import camp.pvp.practice.parties.PartyInvite;
 import camp.pvp.practice.profiles.stats.MatchRecord;
 import camp.pvp.practice.profiles.stats.ProfileStatistics;
 import camp.pvp.practice.queue.GameQueue;
+import camp.pvp.practice.queue.QueueMenuType;
 import camp.pvp.practice.utils.ItemBuilder;
 import camp.pvp.practice.utils.PlayerUtils;
 import lombok.Getter;
@@ -39,7 +40,6 @@ public class GameProfile {
 
     public enum State {
         LOBBY, LOBBY_QUEUE, LOBBY_PARTY, LOBBY_TOURNAMENT, LOBBY_EVENT, KIT_EDITOR, IN_GAME, SPECTATING;
-
 
         @Override
         public String toString() {
@@ -78,6 +78,25 @@ public class GameProfile {
         }
     }
 
+    public enum DefaultQueueMenu {
+        LAST, DUEL_UNRANKED, DUEL_RANKED, MINIGAME;
+
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case DUEL_UNRANKED:
+                    return "Duel (Unranked)";
+                case DUEL_RANKED:
+                    return "Duel (Ranked)";
+                case MINIGAME:
+                    return "Minigame";
+                default:
+                    return "Last Selected";
+            }
+        }
+    }
+
     // Stored DB values.
     private final UUID uuid;
     private String name;
@@ -87,7 +106,8 @@ public class GameProfile {
                     staffMode, buildMode, debugMode;
     private int noDropHotbarSlot;
     private DeathAnimation deathAnimation;
-    private GameQueue.Type lastSelectedQueueType;
+    private QueueMenuType lastSelectedQueueMenu;
+    private DefaultQueueMenu defaultQueueMenu;
     private Map<GameKit, Map<Integer, CustomGameKit>> customDuelKits;
 
     private Game game;
@@ -117,7 +137,8 @@ public class GameProfile {
         this.uuid = uuid;
 
         this.deathAnimation = DeathAnimation.DEFAULT;
-        this.lastSelectedQueueType = GameQueue.Type.UNRANKED;
+        this.lastSelectedQueueMenu = QueueMenuType.DUEL_UNRANKED;
+        this.defaultQueueMenu = DefaultQueueMenu.LAST;
 
         this.partyInvites = new HashMap<>();
         this.duelRequests = new HashMap<>();
@@ -428,7 +449,8 @@ public class GameProfile {
         this.comboMessages = document.getBoolean("combo_messages", true);
         this.time = Time.valueOf(document.get("player_time", "DAY"));
         this.deathAnimation = DeathAnimation.valueOf(document.get("death_animation", "DEFAULT"));
-        this.lastSelectedQueueType = GameQueue.Type.valueOf(document.get("last_selected_queue_type", "UNRANKED"));
+        this.lastSelectedQueueMenu = QueueMenuType.valueOf(document.get("last_selected_queue_menu", QueueMenuType.values()[0].name()));
+        this.defaultQueueMenu = DefaultQueueMenu.valueOf(document.get("default_queue_menu", DefaultQueueMenu.values()[0].name()));
         this.showSidebar = document.getBoolean("show_sidebar", true);
         this.sidebarInGame = document.getBoolean("sidebar_in_game", true);
         this.sidebarShowCps = document.getBoolean("sidebar_show_cps", false);
@@ -473,7 +495,8 @@ public class GameProfile {
         values.put("lobby_visibility", lobbyVisibility);
         values.put("tournament_notifications", tournamentNotifications);
         values.put("death_animation", deathAnimation.name());
-        values.put("last_selected_queue_type", lastSelectedQueueType.name());
+        values.put("last_selected_queue_menu", lastSelectedQueueMenu.name());
+        values.put("default_queue_menu", defaultQueueMenu.name());
         values.put("combo_messages", comboMessages);
         values.put("show_sidebar", isShowSidebar());
         values.put("sidebar_in_game", isSidebarInGame());

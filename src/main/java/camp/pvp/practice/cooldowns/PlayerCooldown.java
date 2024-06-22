@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class PlayerCooldown {
 
     public enum Type {
-        ENDER_PEARL, FIREBALL, ENERGY_JUMP, ENERGY_REGEN, ENERGY_RESISTANCE, ENERGY_SPEED, ENERGY_STRENGTH;
+        ENDER_PEARL, FIREBALL;
 
         public double getDuration() {
             switch(this) {
@@ -30,14 +30,6 @@ public class PlayerCooldown {
                     return 16;
                 case FIREBALL:
                     return 0.5;
-                case ENERGY_JUMP:
-                    return 30;
-                case ENERGY_STRENGTH:
-                case ENERGY_RESISTANCE:
-                case ENERGY_REGEN:
-                    return 60;
-                case ENERGY_SPEED:
-                    return 45;
                 default:
                     return 0;
             }
@@ -49,16 +41,6 @@ public class PlayerCooldown {
                     return Colors.get("&cYou must wait <time> before pearling again.");
                 case FIREBALL:
                     return Colors.get("&cYou are on fireball cooldown.");
-                case ENERGY_JUMP:
-                    return Colors.get("&cYou must wait <time> before using your Jump Boost ability again.");
-                case ENERGY_REGEN:
-                    return Colors.get("&cYou must wait <time> before using your Regeneration ability again.");
-                case ENERGY_RESISTANCE:
-                    return Colors.get("&cYou must wait <time> before using your Resistance ability again.");
-                case ENERGY_STRENGTH:
-                    return Colors.get("&cYou must wait <time> before using your Strength ability again.");
-                case ENERGY_SPEED:
-                    return Colors.get("&cYou must wait <time> before using your Speed ability again.");
                 default:
                     return null;
             }
@@ -68,16 +50,6 @@ public class PlayerCooldown {
             switch(this) {
                 case ENDER_PEARL:
                     return Colors.get("&aYou can now use ender pearls again.");
-                case ENERGY_JUMP:
-                    return Colors.get("&aYou can now use your Jump Boost ability again.");
-                case ENERGY_REGEN:
-                    return Colors.get("&aYou can now use your Regeneration ability again.");
-                case ENERGY_RESISTANCE:
-                    return Colors.get("&aYou can now use your Resistance ability again.");
-                case ENERGY_STRENGTH:
-                    return Colors.get("&aYou can now use your Strength ability again.");
-                case ENERGY_SPEED:
-                    return Colors.get("&aYou can now use your Speed ability again.");
                 default:
                     return null;
             }
@@ -98,46 +70,6 @@ public class PlayerCooldown {
                             .name("fireball")
                             .icon(ItemStackIcon.builder()
                                     .itemName("FIREBALL")
-                                    .build())
-                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
-                            .build();
-                case ENERGY_JUMP:
-                    return Cooldown.builder()
-                            .name("jump")
-                            .icon(ItemStackIcon.builder()
-                                    .itemName("FEATHER")
-                                    .build())
-                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
-                            .build();
-                case ENERGY_REGEN:
-                    return Cooldown.builder()
-                            .name("regen")
-                            .icon(ItemStackIcon.builder()
-                                    .itemName("GHAST_TEAR")
-                                    .build())
-                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
-                            .build();
-                case ENERGY_RESISTANCE:
-                    return Cooldown.builder()
-                            .name("resistance")
-                            .icon(ItemStackIcon.builder()
-                                    .itemName("IRON_INGOT")
-                                    .build())
-                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
-                            .build();
-                case ENERGY_STRENGTH:
-                    return Cooldown.builder()
-                            .name("strength")
-                            .icon(ItemStackIcon.builder()
-                                    .itemName("BLAZE_POWDER")
-                                    .build())
-                            .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
-                            .build();
-                case ENERGY_SPEED:
-                    return Cooldown.builder()
-                            .name("speed")
-                            .icon(ItemStackIcon.builder()
-                                    .itemName("SUGAR")
                                     .build())
                             .duration(Duration.ofMillis(Math.round(this.getDuration() * 1000)))
                             .build();

@@ -2,9 +2,7 @@ package camp.pvp.practice.guis.party;
 
 import camp.pvp.core.utils.Colors;
 import camp.pvp.practice.Practice;
-import camp.pvp.practice.games.minigames.OneInTheChamberMinigame;
 import camp.pvp.practice.games.minigames.Minigame;
-import camp.pvp.practice.games.minigames.SkywarsMinigame;
 import camp.pvp.practice.parties.Party;
 import camp.pvp.practice.parties.PartyMember;
 import camp.pvp.practice.profiles.GameProfileManager;

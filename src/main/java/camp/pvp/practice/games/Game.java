@@ -390,10 +390,6 @@ public abstract class Game {
                 canDie = false;
             }
 
-            if(participant.isArcherTagged()) {
-                event.setDamage(event.getDamage() * 1.25);
-            }
-
             participant.setHealth(Math.round(victim.getHealth()));
             participant.setMaxHealth(Math.round(victim.getMaxHealth()));
             participant.setHunger(victim.getFoodLevel());
@@ -477,7 +473,10 @@ public abstract class Game {
         victimParticipant.setHunger(victim.getFoodLevel());
         victimParticipant.setPotionEffects(new ArrayList<>(victim.getActivePotionEffects()));
 
-        if(event.getDamager() instanceof Player damager) {
+        if(event.getDamager() instanceof Player) {
+
+            attacker = (Player) event.getDamager();
+
             participant.hits++;
             participant.currentCombo++;
 
@@ -485,7 +484,9 @@ public abstract class Game {
 
                 victimParticipant.blockedHits++;
 
-                // Block hit capping not done correctly.
+                // TODO: Blocked hit cap.
+//                victim.sendMessage("Blocking damage: " + event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING));
+//
 //                if(victimParticipant.blockedHits >= 20 && getKit().isCappedBlockHits() && this instanceof Duel) {
 //                    event.setDamage(EntityDamageEvent.DamageModifier.BLOCKING, 0);
 //                } else {
@@ -493,12 +494,12 @@ public abstract class Game {
 //                }
             }
 
-            Location location = damager.getLocation();
+            Location location = attacker.getLocation();
             Block block = location.getBlock();
 
-            if(!damager.isOnGround()
-                    && !damager.isSprinting()
-                    && damager.getVehicle() == null
+            if(!attacker.isOnGround()
+                    && !attacker.isSprinting()
+                    && attacker.getVehicle() == null
                     && !block.isLiquid()) {
                 participant.criticalHits++;
             }
@@ -680,7 +681,6 @@ public abstract class Game {
 
         GameParticipant participant = createParticipant(player);
         participant.setGame(this);
-        participant.setComboMessages(profile.isComboMessages());
         participant.setBaseKit(kit);
 
         if(kit.isRespawn()) {

@@ -1,0 +1,18 @@
+defaults:
+  colors:
+    # You can use all of these colors in your messages.
+    primary: "&6" # %p%
+    secondary: "&f" # %s%
+    default: "&a" # %d%
+messages:
+  # All messages can be single or multi line messages.
+  # You can use the default colors, or regular color codes. (example: %p% for primary, or &6 for gold)
+  # Some messages have special placeholders. (example: %queue_type% or %kit%)
+  # If you want to find out what placeholders are available, you can look at the source code.
+  general:
+  queue:
+    join_duel: "%d%You have joined the queue for %queue_type% &f%kit%%d%."
+    join_minigame: "%d%You have joined the queue for %queue_type% &f%game%%d%."
+
+
+

@@ -63,7 +63,7 @@ public class EventCommand implements CommandExecutor {
                             return true;
                         }
 
-                        new HostEventGui(player).open(player);
+                        new HostEventGui(player, profile).open(player);
                         return true;
                     case "timer":
                         if(args.length > 1) {

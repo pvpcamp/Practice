@@ -166,6 +166,53 @@ public class SettingsGui extends StandardGui {
         sidebarVisibility.setSlot(15);
         this.addButton(sidebarVisibility, false);
 
+        GuiButton defaultQueueMenu = new GuiButton(Material.GOLD_SWORD, "&6&lDefault Queue Menu");
+        defaultQueueMenu.setAction(new GuiAction() {
+            @Override
+            public void run(Player player, GuiButton button, Gui gui, ClickType click) {
+                if(player.hasPermission("practice.cosmetics.default_queue_menu")) {
+                    int ordinal = gameProfile.getDefaultQueueMenu().ordinal();
+                    if(ordinal + 1 == GameProfile.DefaultQueueMenu.values().length) {
+                        gameProfile.setDefaultQueueMenu(GameProfile.DefaultQueueMenu.values()[0]);
+                    } else {
+                        gameProfile.setDefaultQueueMenu(GameProfile.DefaultQueueMenu.values()[ordinal + 1]);
+                    }
+
+                    gui.updateGui();
+                }
+            }
+        });
+
+        defaultQueueMenu.setButtonUpdater(new AbstractButtonUpdater() {
+            @Override
+            public void update(GuiButton guiButton, Gui gui) {
+                if(player.hasPermission("practice.cosmetics.default_queue_menu")) {
+                    List<String> lore = new ArrayList<>();
+                    lore.add("&7What default queue menu would");
+                    lore.add("&7you like to have set?");
+                    lore.add("&7This will be the menu that opens");
+                    lore.add("&7when you use the &6Play &7item.");
+                    lore.add(" ");
+
+                    for(GameProfile.DefaultQueueMenu menu : GameProfile.DefaultQueueMenu.values()) {
+                        lore.add((menu.equals(gameProfile.getDefaultQueueMenu()) ? "&6&l" : "&8") + " ● " + menu.toString());
+                    }
+
+                    guiButton.setLore(lore);
+                } else {
+                    guiButton.setLore(
+                            "&7This feature is only",
+                            "&7available to donators.",
+                            " ",
+                            "&6Purchase a rank here: ",
+                            "&fstore.pvp.camp");
+                }
+            }
+        });
+
+        defaultQueueMenu.setSlot(16);
+        this.addButton(defaultQueueMenu);
+
         GuiButton hotbarSlot = new GuiButton(Material.GLASS_BOTTLE, "&a&lNo Drop Item Slot");
         hotbarSlot.setAction(new GuiAction() {
             @Override
@@ -187,8 +234,8 @@ public class SettingsGui extends StandardGui {
             }
         });
 
-        hotbarSlot.setSlot(16);
-        this.addButton(hotbarSlot, false);
+        hotbarSlot.setSlot(19);
+        this.addButton(hotbarSlot);
 
         GuiButton sidebarSettings = new GuiButton(Material.BOAT, "&d&lSidebar Settings");
         sidebarSettings.setAction(new GuiAction() {
@@ -215,8 +262,8 @@ public class SettingsGui extends StandardGui {
                 }
             }
         });
-        sidebarSettings.setSlot(19);
-        this.addButton(sidebarSettings, false);
+        sidebarSettings.setSlot(20);
+        this.addButton(sidebarSettings);
 
         if(player.hasPermission("practice.staff.debug_mode")) {
             GuiButton debugMode = new GuiButton(Material.COMMAND, "&4&l&oDebug Mode");
